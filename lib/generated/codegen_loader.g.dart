@@ -32,16 +32,14 @@ class CodegenLoader extends AssetLoader{
   },
   "auth": {
     "login": "تسجيل الدخول",
-    "verify_phone": "التحقق من رقم الهاتف",
-    "phone_number": "رقم الهاتف",
-    "send_verification_code": "إرسال رمز التحقق",
-    "already_have_account": "هل لديك حساب بالفعل؟",
-    "login_here": "سجل الدخول هنا",
-    "verify_otp": "التحقق من رمز OTP",
-    "resend_code": "إعادة إرسال الرمز",
-    "didnt_receive_code": "لم تستلم رمزاً؟",
+    "continue_as_guest": "المتابعة كزائر",
+    "verify_phone": "تحقق من رقم جوالك",
+    "phone_number": "رقم التليفون",
+    "send_verification_code": "سنرسل لك رمز تحقق عبر رسالة نصية",
+    "verify_otp": "تحقق من رقم جوالك",
+    "resend_code": "إعادة إرسال الرمز خلال",
+    "resend_code_button": "إعادة إرسال الرمز",
     "enter_verification_code": "أدخل رمز التحقق المرسل إلى",
-    "seconds": "ثواني",
     "verify": "تحقق"
   }
 };
@@ -62,17 +60,15 @@ static const Map<String,dynamic> _en = {
     "arabic": "Arabic"
   },
   "auth": {
-    "login": "Login",
+    "login": "login",
+    "continue_as_guest": "Continue as Guest",
     "verify_phone": "Verify Phone Number",
     "phone_number": "Phone Number",
-    "send_verification_code": "Send Verification Code",
-    "already_have_account": "Already have an account?",
-    "login_here": "Login here",
-    "verify_otp": "Verify OTP",
-    "resend_code": "Resend Code",
-    "didnt_receive_code": "Didn't receive a code?",
+    "send_verification_code": "We'll send you a verification code via SMS",
+    "verify_otp": "Verify your phone number",
+    "resend_code": "Resend Code within",
+    "resend_code_button": "Resend Code",
     "enter_verification_code": "Enter verification code sent to",
-    "seconds": "seconds",
     "verify": "Verify"
   }
 };

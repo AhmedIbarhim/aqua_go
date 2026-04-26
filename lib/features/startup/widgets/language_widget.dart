@@ -1,5 +1,6 @@
 import 'package:aqua_go/core/controllers/language_controller/language_cubit.dart';
 import 'package:aqua_go/core/themes/app_colors.dart';
+import 'package:aqua_go/core/themes/app_text_styles.dart';
 import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -26,49 +27,54 @@ class LanguageWidget extends StatelessWidget {
           border: Border.all(color: AppColors.blueGrey50),
           color: AppColors.white.withValues(alpha: 0.8),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (context.isEn) ...[
-              CircleAvatar(
-                radius: 8,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: SvgPicture.asset(
-                    targetFlag,
-                    width: 16,
-                    height: 16,
-                    fit: BoxFit.fill,
+        child: Directionality(
+          textDirection: TextDirection.rtl,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (context.isEn) ...[
+                CircleAvatar(
+                  radius: 8,
+                  backgroundColor: AppColors.white,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: SvgPicture.asset(
+                      targetFlag,
+                      width: 16,
+                      height: 16,
+                      fit: BoxFit.fill,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 8),
-            ],
+                const SizedBox(width: 8),
+              ],
 
-            Text(
-              targetLanguageName,
-              style: const TextStyle(
-                color: AppColors.contentSecondary,
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-            if (context.isAr) ...[
-              const SizedBox(width: 8),
-              CircleAvatar(
-                radius: 8,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: SvgPicture.asset(
-                    targetFlag,
-                    width: 16,
-                    height: 16,
-                    fit: BoxFit.fill,
+              if (context.isAr) ...[
+                const SizedBox(width: 8),
+                CircleAvatar(
+                  radius: 8,
+                  backgroundColor: AppColors.white,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: SvgPicture.asset(
+                      targetFlag,
+                      width: 16,
+                      height: 16,
+                      fit: BoxFit.fill,
+                    ),
                   ),
+                ),
+                const SizedBox(width: 8),
+              ],
+
+              Text(
+                targetLanguageName,
+                style: AppTextStyles.regular14.copyWith(
+                  color: AppColors.contentSecondary,
                 ),
               ),
             ],
-          ],
+          ),
         ),
       ),
     );

@@ -1,10 +1,12 @@
 import 'package:aqua_go/core/components/custom_button.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/components/custom_text_form_field.dart';
 import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_colors.dart';
 import '../../../../core/themes/app_text_styles.dart';
+import '../../../../generated/locale_keys.g.dart';
 
 class LoginContent extends StatefulWidget {
   const LoginContent({super.key});
@@ -55,16 +57,19 @@ class _LoginContentState extends State<LoginContent> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('تسجيل الدخول', style: AppTextStyles.semiBold24),
+            Text(LocaleKeys.auth_login.tr(), style: AppTextStyles.semiBold24),
             const SizedBox(height: 8),
             Text(
-              "سنرسل لك رمز تحقق عبر رسالة نصية",
+              LocaleKeys.auth_send_verification_code.tr(),
               style: AppTextStyles.regular16.copyWith(
                 color: AppColors.textSecondary,
               ),
             ),
             const SizedBox(height: 48),
-            Text("رقم التليفون", style: AppTextStyles.regular14),
+            Text(
+              LocaleKeys.auth_phone_number.tr(),
+              style: AppTextStyles.regular14,
+            ),
             const SizedBox(height: 16),
             CustomPhoneTextField(controller: _phoneController),
             const SizedBox(height: 24),
@@ -78,12 +83,12 @@ class _LoginContentState extends State<LoginContent> {
                       );
                     }
                   : null,
-              text: "تسجيل الدخول",
+              text: LocaleKeys.auth_login.tr(),
               enabled: _isPhoneValid,
             ),
             const SizedBox(height: 16),
             CustomButton(
-              text: "المتابعة كزائر",
+              text: LocaleKeys.auth_continue_as_guest.tr(),
               color: AppColors.black,
               textColor: AppColors.primary,
               onPressed: () {},

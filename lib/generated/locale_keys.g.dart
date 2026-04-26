@@ -17,16 +17,14 @@ abstract class  LocaleKeys {
   static const language_arabic = 'language.arabic';
   static const language = 'language';
   static const auth_login = 'auth.login';
+  static const auth_continue_as_guest = 'auth.continue_as_guest';
   static const auth_verify_phone = 'auth.verify_phone';
   static const auth_phone_number = 'auth.phone_number';
   static const auth_send_verification_code = 'auth.send_verification_code';
-  static const auth_already_have_account = 'auth.already_have_account';
-  static const auth_login_here = 'auth.login_here';
   static const auth_verify_otp = 'auth.verify_otp';
   static const auth_resend_code = 'auth.resend_code';
-  static const auth_didnt_receive_code = 'auth.didnt_receive_code';
+  static const auth_resend_code_button = 'auth.resend_code_button';
   static const auth_enter_verification_code = 'auth.enter_verification_code';
-  static const auth_seconds = 'auth.seconds';
   static const auth_verify = 'auth.verify';
   static const auth = 'auth';
 

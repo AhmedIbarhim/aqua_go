@@ -1,4 +1,7 @@
+import 'dart:ui' as ui;
 import 'dart:async';
+import 'package:aqua_go/generated/locale_keys.g.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../../core/components/custom_button.dart';
@@ -17,7 +20,7 @@ class _OtpContentState extends State<OtpContent> {
   late List<TextEditingController> _controllers;
   late List<FocusNode> _focusNodes;
   Timer? _timer;
-  int _start = 98; // 1:38 = 98 seconds
+  int _start = 60;
 
   @override
   void initState() {
@@ -25,12 +28,10 @@ class _OtpContentState extends State<OtpContent> {
     _controllers = List.generate(4, (index) => TextEditingController());
     _focusNodes = List.generate(4, (index) => FocusNode());
     startTimer();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _focusNodes[0].requestFocus();
-    });
   }
 
   void startTimer() {
+    _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_start == 0) {
         setState(() {
@@ -83,7 +84,7 @@ class _OtpContentState extends State<OtpContent> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Text(
-                'تحقق من رقم جوالك',
+                LocaleKeys.auth_verify_phone.tr(),
                 style: AppTextStyles.semiBold24.copyWith(
                   color: AppColors.textPrimary,
                 ),
@@ -95,7 +96,7 @@ class _OtpContentState extends State<OtpContent> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Text(
-                'أدخل رمز التحقق المرسل إلى',
+                LocaleKeys.auth_enter_verification_code.tr(),
                 style: AppTextStyles.regular16.copyWith(
                   color: AppColors.textSecondary,
                 ),
@@ -106,13 +107,12 @@ class _OtpContentState extends State<OtpContent> {
                 style: AppTextStyles.regular16.copyWith(
                   color: AppColors.textSecondary,
                 ),
-                textDirection: TextDirection.ltr,
               ),
             ],
           ),
           const SizedBox(height: 48),
           Directionality(
-            textDirection: TextDirection.ltr,
+            textDirection: ui.TextDirection.ltr,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(4, (index) => _buildOtpField(index)),
@@ -120,30 +120,45 @@ class _OtpContentState extends State<OtpContent> {
           ),
           const SizedBox(height: 24),
           CustomButton(
-            text: 'تحقق',
+            text: LocaleKeys.auth_verify.tr(),
             onPressed: _isOtpComplete ? () {} : null,
             enabled: _isOtpComplete,
           ),
           const SizedBox(height: 48),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            textDirection: TextDirection.rtl,
-            children: [
-              Text(
-                'إعادة ارسال الرمز خلال',
-                style: AppTextStyles.regular16.copyWith(
-                  color: AppColors.contentSecondaryLight,
+          _start == 0
+              ? GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _start = 60;
+                    });
+                    startTimer();
+                  },
+                  child: Text(
+                    LocaleKeys.auth_resend_code_button.tr(),
+                    style: AppTextStyles.regular16.copyWith(
+                      color: AppColors.primary,
+                    ),
+                  ),
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+
+                  children: [
+                    Text(
+                      LocaleKeys.auth_resend_code.tr(),
+                      style: AppTextStyles.regular16.copyWith(
+                        color: AppColors.contentSecondaryLight,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      _timerText,
+                      style: AppTextStyles.regular16.copyWith(
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                _timerText,
-                style: AppTextStyles.regular16.copyWith(
-                  color: AppColors.primary,
-                ),
-              ),
-            ],
-          ),
           const SizedBox(height: 16),
         ],
       ),
@@ -174,6 +189,9 @@ class _OtpContentState extends State<OtpContent> {
       ),
       alignment: Alignment.center,
       child: TextField(
+        onTapOutside: (event) {
+          _focusNodes[index].unfocus();
+        },
         controller: _controllers[index],
         focusNode: _focusNodes[index],
         onTap: () {
@@ -201,7 +219,7 @@ class _OtpContentState extends State<OtpContent> {
         keyboardType: TextInputType.number,
         inputFormatters: [
           LengthLimitingTextInputFormatter(1),
-          FilteringTextInputFormatter.digitsOnly,
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
         ],
         style: AppTextStyles.semiBold32.copyWith(
           color: _controllers[index].text.isNotEmpty

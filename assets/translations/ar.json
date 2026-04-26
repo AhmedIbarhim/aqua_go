@@ -16,16 +16,14 @@
     },
     "auth": {
         "login": "تسجيل الدخول",
-        "verify_phone": "التحقق من رقم الهاتف",
-        "phone_number": "رقم الهاتف",
-        "send_verification_code": "إرسال رمز التحقق",
-        "already_have_account": "هل لديك حساب بالفعل؟",
-        "login_here": "سجل الدخول هنا",
-        "verify_otp": "التحقق من رمز OTP",
-        "resend_code": "إعادة إرسال الرمز",
-        "didnt_receive_code": "لم تستلم رمزاً؟",
+        "continue_as_guest": "المتابعة كزائر",
+        "verify_phone": "تحقق من رقم جوالك",
+        "phone_number": "رقم التليفون",
+        "send_verification_code": "سنرسل لك رمز تحقق عبر رسالة نصية",
+        "verify_otp": "تحقق من رقم جوالك",
+        "resend_code": "إعادة إرسال الرمز خلال",
+        "resend_code_button": "إعادة إرسال الرمز",
         "enter_verification_code": "أدخل رمز التحقق المرسل إلى",
-        "seconds": "ثواني",
         "verify": "تحقق"
     }
 }
