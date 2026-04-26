@@ -1,0 +1,31 @@
+{
+    "skip": "skip",
+    "next": "next",
+    "get_started": "get started",
+    "onboarding": {
+        "title1": "Welcome to AquaGo",
+        "title2": "Premium Quality",
+        "title3": "Fast Delivery",
+        "desc1": "Your go-to platform for high-quality water products delivered right to your doorstep.",
+        "desc2": "Experience the best selection of premium water brands and related products.",
+        "desc3": "Get your orders quickly and reliably with our efficient delivery service."
+    },
+    "language": {
+        "english": "English",
+        "arabic": "Arabic"
+    },
+    "auth": {
+        "login": "Login",
+        "verify_phone": "Verify Phone Number",
+        "phone_number": "Phone Number",
+        "send_verification_code": "Send Verification Code",
+        "already_have_account": "Already have an account?",
+        "login_here": "Login here",
+        "verify_otp": "Verify OTP",
+        "resend_code": "Resend Code",
+        "didnt_receive_code": "Didn't receive a code?",
+        "enter_verification_code": "Enter verification code sent to",
+        "seconds": "seconds",
+        "verify": "Verify"
+    }
+}
