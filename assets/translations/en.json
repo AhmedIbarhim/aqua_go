@@ -3,12 +3,12 @@
     "next": "next",
     "get_started": "get started",
     "onboarding": {
-        "title1": "Welcome to AquaGo",
-        "title2": "Premium Quality",
-        "title3": "Fast Delivery",
-        "desc1": "Your go-to platform for high-quality water products delivered right to your doorstep.",
-        "desc2": "Experience the best selection of premium water brands and related products.",
-        "desc3": "Get your orders quickly and reliably with our efficient delivery service."
+        "title1": "Effortless Car Care",
+        "title2": "Shine Anytime, Anywhere",
+        "title3": "Trusted Wash Experts",
+        "desc1": "Professional car wash services delivered to your location with just a few taps.",
+        "desc2": "Book, track, and enjoy seamless car care from the comfort of your home or office.",
+        "desc3": "Premium cleaning solutions tailored to keep your car looking its best."
     },
     "language": {
         "english": "English",
@@ -25,5 +25,11 @@
         "resend_code_button": "Resend Code",
         "enter_verification_code": "Enter verification code sent to",
         "verify": "Verify"
+    },
+    "layout": {
+        "home": "Home",
+        "my_cars": "My Cars",
+        "reservations": "Reservations",
+        "profile": "Profile"
     }
 }

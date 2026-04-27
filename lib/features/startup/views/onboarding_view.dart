@@ -11,6 +11,7 @@ import '../../../core/config/shared_prefs.dart';
 import '../../../core/constants.dart';
 import '../../../core/controllers/language_controller/language_cubit.dart';
 import '../../../core/themes/app_colors.dart';
+import '../../../core/themes/app_text_styles.dart';
 import '../widgets/language_widget.dart';
 import '../widgets/onboarding_page_view.dart';
 
@@ -106,41 +107,26 @@ class _OnboardingViewState extends State<OnboardingView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            if (currentPage == 0)
-              Text(
-                LocaleKeys.onboarding_title1.tr(), // Using title1 as an example
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: AppColors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            if (currentPage == 1)
-              Text(
-                LocaleKeys.onboarding_title2.tr(), // Using title1 as an example
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: AppColors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            if (currentPage == 2)
-              Text(
-                LocaleKeys.onboarding_title3.tr(), // Using title1 as an example
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: AppColors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            const SizedBox(height: 16),
-            const Text(
-              ".موسبيإ ميرول صن نم خسن ىلع اًضيأ توح يتلاو ركيام جياب سودلأ لثم ينورتكلإلا رشنلا جمارب روهظ عم اَرخؤم ىرخأ ةرم رشتنيل داعو ،صنلا اذه",
+            Text(
+              currentPage == 0
+                  ? LocaleKeys.onboarding_title1.tr()
+                  : currentPage == 1
+                  ? LocaleKeys.onboarding_title2.tr()
+                  : LocaleKeys.onboarding_title3.tr(),
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.white, fontSize: 16),
+              style: AppTextStyles.semiBold24,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              currentPage == 0
+                  ? LocaleKeys.onboarding_desc1.tr()
+                  : currentPage == 1
+                  ? LocaleKeys.onboarding_desc2.tr()
+                  : LocaleKeys.onboarding_desc3.tr(),
+              textAlign: TextAlign.center,
+              style: AppTextStyles.regular16.copyWith(
+                color: AppColors.contentDisabled,
+              ),
             ),
             const SizedBox(height: 16),
             ListenableBuilder(

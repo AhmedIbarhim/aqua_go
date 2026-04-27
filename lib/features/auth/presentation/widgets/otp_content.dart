@@ -5,6 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../../core/components/custom_button.dart';
+import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_colors.dart';
 import '../../../../core/themes/app_text_styles.dart';
 
@@ -67,100 +68,110 @@ class _OtpContentState extends State<OtpContent> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-      decoration: const BoxDecoration(
-        color: AppColors.black,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(24),
-          topRight: Radius.circular(24),
+    return SafeArea(
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+        decoration: const BoxDecoration(
+          color: AppColors.black,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(24),
+            topRight: Radius.circular(24),
+          ),
         ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(
-                LocaleKeys.auth_verify_phone.tr(),
-                style: AppTextStyles.semiBold24.copyWith(
-                  color: AppColors.textPrimary,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(
-                LocaleKeys.auth_enter_verification_code.tr(),
-                style: AppTextStyles.regular16.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-              ),
-              const SizedBox(width: 4),
-              Text(
-                widget.phoneNumber,
-                style: AppTextStyles.regular16.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 48),
-          Directionality(
-            textDirection: ui.TextDirection.ltr,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(4, (index) => _buildOtpField(index)),
-            ),
-          ),
-          const SizedBox(height: 24),
-          CustomButton(
-            text: LocaleKeys.auth_verify.tr(),
-            onPressed: _isOtpComplete ? () {} : null,
-            enabled: _isOtpComplete,
-          ),
-          const SizedBox(height: 48),
-          _start == 0
-              ? GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _start = 60;
-                    });
-                    startTimer();
-                  },
-                  child: Text(
-                    LocaleKeys.auth_resend_code_button.tr(),
-                    style: AppTextStyles.regular16.copyWith(
-                      color: AppColors.primary,
-                    ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(
+                  LocaleKeys.auth_verify_phone.tr(),
+                  style: AppTextStyles.semiBold24.copyWith(
+                    color: AppColors.textPrimary,
                   ),
-                )
-              : Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-
-                  children: [
-                    Text(
-                      LocaleKeys.auth_resend_code.tr(),
-                      style: AppTextStyles.regular16.copyWith(
-                        color: AppColors.contentSecondaryLight,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      _timerText,
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(
+                  LocaleKeys.auth_enter_verification_code.tr(),
+                  style: AppTextStyles.regular16.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  widget.phoneNumber,
+                  style: AppTextStyles.regular16.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 48),
+            Directionality(
+              textDirection: ui.TextDirection.ltr,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(4, (index) => _buildOtpField(index)),
+              ),
+            ),
+            const SizedBox(height: 24),
+            CustomButton(
+              text: LocaleKeys.auth_verify.tr(),
+              onPressed: _isOtpComplete
+                  ? () {
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        Routes.layout,
+                        (route) => false,
+                      );
+                    }
+                  : null,
+              enabled: _isOtpComplete,
+            ),
+            const SizedBox(height: 48),
+            _start == 0
+                ? GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _start = 60;
+                      });
+                      startTimer();
+                    },
+                    child: Text(
+                      LocaleKeys.auth_resend_code_button.tr(),
                       style: AppTextStyles.regular16.copyWith(
                         color: AppColors.primary,
                       ),
                     ),
-                  ],
-                ),
-          const SizedBox(height: 16),
-        ],
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+
+                    children: [
+                      Text(
+                        LocaleKeys.auth_resend_code.tr(),
+                        style: AppTextStyles.regular16.copyWith(
+                          color: AppColors.contentSecondaryLight,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        _timerText,
+                        style: AppTextStyles.regular16.copyWith(
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+            const SizedBox(height: 16),
+          ],
+        ),
       ),
     );
   }

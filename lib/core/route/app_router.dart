@@ -1,4 +1,5 @@
 import 'package:aqua_go/features/auth/presentation/views/login_view.dart';
+import 'package:aqua_go/features/layout/presentation/views/main_layout.dart';
 import 'package:aqua_go/features/startup/views/onboarding_view.dart';
 import 'package:aqua_go/features/startup/views/splash_view.dart';
 import 'package:flutter/material.dart';
@@ -23,8 +24,8 @@ abstract class AppRouter {
           builder: (_) => OtpView(phoneNumber: settings.arguments as String),
         );
 
-      case Routes.home:
-        return MaterialPageRoute(builder: (_) => const Placeholder());
+      case Routes.layout:
+        return MaterialPageRoute(builder: (_) => const MainLayout());
 
       default:
         return MaterialPageRoute(builder: (_) => const Placeholder());

@@ -27,5 +27,10 @@ abstract class  LocaleKeys {
   static const auth_enter_verification_code = 'auth.enter_verification_code';
   static const auth_verify = 'auth.verify';
   static const auth = 'auth';
+  static const layout_home = 'layout.home';
+  static const layout_my_cars = 'layout.my_cars';
+  static const layout_reservations = 'layout.reservations';
+  static const layout_profile = 'layout.profile';
+  static const layout = 'layout';
 
 }
