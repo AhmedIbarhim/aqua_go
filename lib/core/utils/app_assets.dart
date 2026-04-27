@@ -25,4 +25,9 @@ abstract class AppAssets {
   static const String currency = 'assets/svg/currency.svg';
   static const String emptyFolder = 'assets/svg/empty_folder.svg';
   static const String raceCar = 'assets/svg/race_car.svg';
+
+  // Header Icons
+  static const String gift = 'assets/svg/gift.svg';
+  static const String notification = 'assets/svg/notification.svg';
+  static const String wavingHand = 'assets/images/waving_hand.png';
 }

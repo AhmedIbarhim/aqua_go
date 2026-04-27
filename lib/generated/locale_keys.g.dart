@@ -31,6 +31,8 @@ abstract class  LocaleKeys {
   static const layout_my_cars = 'layout.my_cars';
   static const layout_reservations = 'layout.reservations';
   static const layout_profile = 'layout.profile';
+  static const layout_welcome = 'layout.welcome';
+  static const layout_ready_to_serve = 'layout.ready_to_serve';
   static const layout = 'layout';
 
 }

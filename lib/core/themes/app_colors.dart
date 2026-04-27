@@ -9,6 +9,7 @@ abstract class AppColors {
   // Neutral Colors
   static const Color black = Color(0xFF171717);
   static const Color white = Color(0xFFFFFFFF);
+  static const Color background = Color(0xFF151515);
   static const Color screenBG = Color(0xFF0D0D0D);
   static const Color defaultSubtle = Color(0xFF262626);
   static const Color borderSecondary = Color(0xFF525252);

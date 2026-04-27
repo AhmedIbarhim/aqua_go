@@ -1,0 +1,79 @@
+import 'package:flutter/material.dart';
+import '../../../../core/themes/app_colors.dart';
+import '../../../../core/themes/app_text_styles.dart';
+import '../data/models/offer_model.dart';
+import 'offer_card.dart';
+
+class OffersListView extends StatefulWidget {
+  const OffersListView({super.key});
+
+  @override
+  State<OffersListView> createState() => _OffersListViewState();
+}
+
+class _OffersListViewState extends State<OffersListView> {
+  final List<OfferModel> offers = [
+    OfferModel(image: "assets/images/offer_demo.png"),
+    OfferModel(image: "assets/images/offer_demo.png"),
+    OfferModel(image: "assets/images/offer_demo.png"),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'اقوي العروض',
+                style: AppTextStyles.bold16.copyWith(color: AppColors.white),
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    'عرض المزيد',
+                    style: AppTextStyles.regular12.copyWith(
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 2,
+                      vertical: 1,
+                    ),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(3),
+                      border: Border.all(color: AppColors.primary, width: 1),
+                    ),
+                    child: const Icon(
+                      Icons.arrow_forward_ios,
+                      size: 10,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        SizedBox(
+          height: 180,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            itemCount: offers.length,
+            separatorBuilder: (context, index) => const SizedBox(width: 16),
+            itemBuilder: (context, index) =>
+                OfferCard(offerModel: offers[index]),
+          ),
+        ),
+      ],
+    );
+  }
+}

@@ -30,6 +30,8 @@
         "home": "Home",
         "my_cars": "My Cars",
         "reservations": "Reservations",
-        "profile": "Profile"
+        "profile": "Profile",
+        "welcome": "Welcome",
+        "ready_to_serve": "We are ready to serve you"
     }
 }

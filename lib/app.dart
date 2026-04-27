@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'core/themes/app_colors.dart';
+import 'features/layout/presentation/views/main_layout.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -21,16 +22,17 @@ class MyApp extends StatelessWidget {
           locale: state.locale,
           theme: ThemeData(
             brightness: Brightness.dark,
-            scaffoldBackgroundColor: AppColors.black,
+            scaffoldBackgroundColor: AppColors.screenBG,
             primaryColor: AppColors.primary,
             textTheme: GoogleFonts.ibmPlexSansArabicTextTheme(
               Theme.of(context).textTheme.apply(
-                    displayColor: AppColors.white,
-                    bodyColor: AppColors.white,
-                  ),
+                displayColor: AppColors.white,
+                bodyColor: AppColors.white,
+              ),
             ),
           ),
-          onGenerateRoute: AppRouter.generateRoute,
+          home: const MainLayout(),
+          // onGenerateRoute: AppRouter.generateRoute,
         );
       },
     );

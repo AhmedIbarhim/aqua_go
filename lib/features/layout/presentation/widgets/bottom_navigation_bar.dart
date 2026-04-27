@@ -18,53 +18,55 @@ class CustomBottomNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: AppColors.screenBG,
-        borderRadius: BorderRadius.circular(100),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x1A000000),
-            blurRadius: 24,
-            offset: Offset(0, 12),
-          ),
-          BoxShadow(
-            color: Color(0x14000000),
-            blurRadius: 10,
-            offset: Offset(0, 0),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _buildNavItem(
-            index: 0,
-            label: LocaleKeys.layout_home.tr(),
-            iconEnabled: AppAssets.homeEnabled,
-            iconDisabled: AppAssets.homeDisabled,
-          ),
-          _buildNavItem(
-            index: 1,
-            label: LocaleKeys.layout_my_cars.tr(),
-            iconEnabled: AppAssets.myCarsEnabled,
-            iconDisabled: AppAssets.myCarsDisabled,
-          ),
-          _buildNavItem(
-            index: 2,
-            label: LocaleKeys.layout_reservations.tr(),
-            iconEnabled: AppAssets.reservationsEnabled,
-            iconDisabled: AppAssets.reservationsDisabled,
-          ),
-          _buildNavItem(
-            index: 3,
-            label: LocaleKeys.layout_profile.tr(),
-            iconEnabled: AppAssets.accountEnabled,
-            iconDisabled: AppAssets.accountDisabled,
-          ),
-        ],
+    return SafeArea(
+      child: Container(
+        margin: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: AppColors.screenBG,
+          borderRadius: BorderRadius.circular(100),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x1A000000),
+              blurRadius: 24,
+              offset: Offset(0, 12),
+            ),
+            BoxShadow(
+              color: Color(0x14000000),
+              blurRadius: 10,
+              offset: Offset(0, 0),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildNavItem(
+              index: 0,
+              label: LocaleKeys.layout_home.tr(),
+              iconEnabled: AppAssets.homeEnabled,
+              iconDisabled: AppAssets.homeDisabled,
+            ),
+            _buildNavItem(
+              index: 1,
+              label: LocaleKeys.layout_my_cars.tr(),
+              iconEnabled: AppAssets.myCarsEnabled,
+              iconDisabled: AppAssets.myCarsDisabled,
+            ),
+            _buildNavItem(
+              index: 2,
+              label: LocaleKeys.layout_reservations.tr(),
+              iconEnabled: AppAssets.reservationsEnabled,
+              iconDisabled: AppAssets.reservationsDisabled,
+            ),
+            _buildNavItem(
+              index: 3,
+              label: LocaleKeys.layout_profile.tr(),
+              iconEnabled: AppAssets.accountEnabled,
+              iconDisabled: AppAssets.accountDisabled,
+            ),
+          ],
+        ),
       ),
     );
   }
