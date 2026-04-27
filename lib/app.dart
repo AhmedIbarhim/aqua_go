@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'core/route/routes.dart';
 import 'core/themes/app_colors.dart';
 import 'features/layout/presentation/views/main_layout.dart';
 
@@ -31,8 +32,9 @@ class MyApp extends StatelessWidget {
               ),
             ),
           ),
-          home: const MainLayout(),
-          // onGenerateRoute: AppRouter.generateRoute,
+          // home: const MainLayout(),
+          onGenerateRoute: AppRouter.generateRoute,
+          initialRoute: Routes.layout,
         );
       },
     );

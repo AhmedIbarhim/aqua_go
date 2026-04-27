@@ -39,7 +39,7 @@ class _MainLayoutState extends State<MainLayout> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _currentIndex == 0 ? const MainAppBar() : null,
+      appBar: const MainAppBar(),
       body: IndexedStack(index: _currentIndex, children: _pages),
       bottomNavigationBar: CustomBottomNavigationBar(
         currentIndex: _currentIndex,

@@ -49,6 +49,13 @@ class CodegenLoader extends AssetLoader{
     "profile": "البروفايل",
     "welcome": "مرحباً",
     "ready_to_serve": "نحن جاهزون لخدمتك"
+  },
+  "home": {
+    "available_packages": "الباقات المتاحة",
+    "best_offers": "أفضل العروض",
+    "available_offers": "العروض المتاحة",
+    "view_more": "عرض المزيد",
+    "notifications": "الإشعارات"
   }
 };
 static const Map<String,dynamic> _en = {
@@ -86,6 +93,13 @@ static const Map<String,dynamic> _en = {
     "profile": "Profile",
     "welcome": "Welcome",
     "ready_to_serve": "We are ready to serve you"
+  },
+  "home": {
+    "available_packages": "Available Packages",
+    "best_offers": "Best Offers",
+    "available_offers": "Available Offers",
+    "view_more": "View More",
+    "notifications": "Notifications"
   }
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"ar": _ar, "en": _en};

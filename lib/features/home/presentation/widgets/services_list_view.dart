@@ -38,50 +38,24 @@ class _ServicesListViewState extends State<ServicesListView> {
 
   @override
   Widget build(BuildContext context) {
+    var height = MediaQuery.of(context).size.height;
     return Column(
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Text(
                 'الخدمات',
                 style: AppTextStyles.bold16.copyWith(color: AppColors.white),
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    'عرض المزيد',
-                    style: AppTextStyles.regular12.copyWith(
-                      color: AppColors.primary,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 2,
-                      vertical: 1,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(3),
-                      border: Border.all(color: AppColors.primary, width: 1),
-                    ),
-                    child: const Icon(
-                      Icons.arrow_forward_ios,
-                      size: 10,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                ],
               ),
             ],
           ),
         ),
         const SizedBox(height: 16),
         SizedBox(
-          height: 160,
+          height: height * 0.16,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 24),

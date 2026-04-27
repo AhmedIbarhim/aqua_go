@@ -1,6 +1,10 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import '../../../../core/extentions/context_extentions.dart';
+import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_colors.dart';
 import '../../../../core/themes/app_text_styles.dart';
+import '../../../../generated/locale_keys.g.dart';
 import '../data/models/offer_model.dart';
 import 'offer_card.dart';
 
@@ -28,39 +32,47 @@ class _OffersListViewState extends State<OffersListView> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'اقوي العروض',
+                LocaleKeys.home_best_offers.tr(),
                 style: AppTextStyles.bold16.copyWith(color: AppColors.white),
               ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    'عرض المزيد',
-                    style: AppTextStyles.regular12.copyWith(
-                      color: AppColors.primary,
+              GestureDetector(
+                onTap: () {
+                  context.pushNamed(Routes.offers, arguments: offers);
+                },
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      LocaleKeys.home_view_more.tr(),
+                      style: AppTextStyles.regular12.copyWith(
+                        color: AppColors.primary,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 6),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 2,
-                      vertical: 1,
+                    const SizedBox(width: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 2,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(color: AppColors.primary, width: 1),
+                      ),
+                      child: Icon(
+                        context.isAr
+                            ? Icons.arrow_forward_ios
+                            : Icons.arrow_back_ios,
+                        size: 10,
+                        color: AppColors.primary,
+                      ),
                     ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(3),
-                      border: Border.all(color: AppColors.primary, width: 1),
-                    ),
-                    child: const Icon(
-                      Icons.arrow_forward_ios,
-                      size: 10,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),
         ),
+
         const SizedBox(height: 16),
         SizedBox(
           height: 180,

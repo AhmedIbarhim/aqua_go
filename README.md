@@ -1,6 +1,16 @@
 # aqua_go
 
-A new Flutter project.
+when cloning the project run from the project root
+
+# Generate Localization files
+
+```bash
+dart run easy_localization:generate --source-dir ./assets/translations
+
+dart run easy_localization:generate --source-dir ./assets/translations -f keys -o locale_keys.g.dart
+```
+
+
 
 ## Getting Started
 

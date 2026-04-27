@@ -33,5 +33,12 @@
         "profile": "البروفايل",
         "welcome": "مرحباً",
         "ready_to_serve": "نحن جاهزون لخدمتك"
+    },
+    "home": {
+        "available_packages": "الباقات المتاحة",
+        "best_offers": "أفضل العروض",
+        "available_offers": "العروض المتاحة",
+        "view_more": "عرض المزيد",
+        "notifications": "الإشعارات"
     }
 }

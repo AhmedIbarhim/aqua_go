@@ -30,4 +30,9 @@ abstract class AppAssets {
   static const String gift = 'assets/svg/gift.svg';
   static const String notification = 'assets/svg/notification.svg';
   static const String wavingHand = 'assets/images/waving_hand.png';
+
+  // Shadows
+  static const String shadows_1 = 'assets/images/shadows_1.png';
+  static const String shadows_2 = 'assets/images/shadows_2.png';
+  static const String shadows_3 = 'assets/images/shadows_3.png';
 }

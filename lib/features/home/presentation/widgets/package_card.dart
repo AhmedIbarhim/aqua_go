@@ -1,22 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:svg_flutter/svg.dart';
 import '../../../../core/themes/app_colors.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../data/models/package_model.dart';
 
 class PackageCard extends StatelessWidget {
-  const PackageCard({super.key, required this.packageModel});
+  const PackageCard({
+    super.key,
+    required this.packageModel,
+    this.atHome = true,
+  });
 
   final PackageModel packageModel;
+  final bool? atHome;
 
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
-    var height = MediaQuery.of(context).size.height;
     return Container(
-      width: width - 128,
-      height: height * 0.18,
+      width: atHome == true ? width - 96 : width,
+
       decoration: BoxDecoration(
         color: AppColors.background,
         borderRadius: BorderRadius.circular(20),
@@ -26,8 +30,19 @@ class PackageCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         child: Stack(
           children: [
-            // Background Pattern Layer (Optional)
-            // Note: If you have a pattern asset, you can add it here as a Positioned widget
+            Positioned(
+              top: 0,
+              left: 0,
+
+              child: Image.asset(AppAssets.shadows_1, fit: BoxFit.cover),
+            ),
+
+            Positioned(
+              bottom: 0,
+
+              right: 0,
+              child: Image.asset(AppAssets.shadows_2),
+            ),
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -95,19 +110,19 @@ class PackageCard extends StatelessWidget {
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
+                          Text(
+                            packageModel.price,
+                            style: AppTextStyles.bold18.copyWith(
+                              color: AppColors.white,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
                           SvgPicture.asset(
                             AppAssets.currency,
                             width: 24,
                             height: 24,
                             // ignore: deprecated_member_use
                             color: AppColors.white,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            packageModel.price,
-                            style: AppTextStyles.bold18.copyWith(
-                              color: AppColors.white,
-                            ),
                           ),
                         ],
                       ),

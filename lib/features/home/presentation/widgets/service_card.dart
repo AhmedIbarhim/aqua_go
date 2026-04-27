@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:svg_flutter/svg.dart';
 import '../../../../core/themes/app_colors.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
@@ -13,10 +13,8 @@ class ServiceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
-    var height = MediaQuery.of(context).size.height;
     return Container(
-      width: width - 48,
-      height: height * 0.18,
+      width: width - 30,
       decoration: BoxDecoration(
         color: AppColors.background,
         borderRadius: BorderRadius.circular(20),
@@ -26,6 +24,13 @@ class ServiceCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         child: Stack(
           children: [
+            Positioned(
+              top: 0,
+              left: 0,
+
+              child: Image.asset(AppAssets.shadows_3, fit: BoxFit.cover),
+            ),
+
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Row(
@@ -98,12 +103,7 @@ class ServiceCard extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     flex: 1,
-                    child: Center(
-                      child: Image.asset(
-                        serviceModel.image,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
+                    child: Image.asset(serviceModel.image, fit: BoxFit.contain),
                   ),
                 ],
               ),

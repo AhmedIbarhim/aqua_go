@@ -34,5 +34,11 @@ abstract class  LocaleKeys {
   static const layout_welcome = 'layout.welcome';
   static const layout_ready_to_serve = 'layout.ready_to_serve';
   static const layout = 'layout';
+  static const home_available_packages = 'home.available_packages';
+  static const home_best_offers = 'home.best_offers';
+  static const home_available_offers = 'home.available_offers';
+  static const home_view_more = 'home.view_more';
+  static const home_notifications = 'home.notifications';
+  static const home = 'home';
 
 }
