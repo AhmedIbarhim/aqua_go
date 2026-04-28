@@ -15,7 +15,7 @@ class EmptyCarsWidget extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        SvgPicture.asset(AppAssets.emptyFolder),
+        SvgPicture.asset(AppAssets.emptyCars),
         const SizedBox(height: 40),
         Text(
           LocaleKeys.my_cars_empty_state.tr(),

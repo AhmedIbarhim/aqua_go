@@ -60,20 +60,12 @@ class MyCarCard extends StatelessWidget {
                     children: [
                       GestureDetector(
                         onTap: onEdit,
-                        child: const Icon(
-                          Icons.edit_outlined,
-                          color: AppColors.white,
-                          size: 20,
-                        ),
+                        child: SvgPicture.asset(AppAssets.edit),
                       ),
                       const SizedBox(width: 16),
                       GestureDetector(
                         onTap: onDelete,
-                        child: const Icon(
-                          Icons.delete_outline,
-                          color: AppColors.error,
-                          size: 20,
-                        ),
+                        child: SvgPicture.asset(AppAssets.remove),
                       ),
                     ],
                   ),

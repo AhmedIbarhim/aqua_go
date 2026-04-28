@@ -74,6 +74,16 @@ class CodegenLoader extends AssetLoader{
     "total": "الإجمالي",
     "buy_package": "اشتراك في الباقة",
     "buy": "اشترك الآن"
+  },
+  "bookings": {
+    "previous_bookings": "حجوزات سابقة",
+    "current_bookings": "حجوزات حالية",
+    "upcoming": "القادمة",
+    "booking_details": "تفاصيل الحجز",
+    "car_location": "موقع السيارة",
+    "date_and_time": "التاريخ و التوقيت",
+    "total_amount": "المبلغ الإجمالي",
+    "view_details": "عرض التفاصيل"
   }
 };
 static const Map<String,dynamic> _en = {
@@ -136,6 +146,16 @@ static const Map<String,dynamic> _en = {
     "total": "Total",
     "buy_package": "Subscribe to Package",
     "buy": "Subscribe Now"
+  },
+  "bookings": {
+    "previous_bookings": "Previous Bookings",
+    "current_bookings": "Current Bookings",
+    "upcoming": "Upcoming",
+    "booking_details": "Booking Details",
+    "car_location": "Car Location",
+    "date_and_time": "Date and Time",
+    "total_amount": "Total Amount",
+    "view_details": "View Details"
   }
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"ar": _ar, "en": _en};

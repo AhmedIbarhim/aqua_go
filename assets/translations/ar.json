@@ -58,5 +58,15 @@
         "total": "الإجمالي",
         "buy_package": "اشتراك في الباقة",
         "buy": "اشترك الآن"
+    },
+    "bookings": {
+        "previous_bookings": "حجوزات سابقة",
+        "current_bookings": "حجوزات حالية",
+        "upcoming": "القادمة",
+        "booking_details": "تفاصيل الحجز",
+        "car_location": "موقع السيارة",
+        "date_and_time": "التاريخ و التوقيت",
+        "total_amount": "المبلغ الإجمالي",
+        "view_details": "عرض التفاصيل"
     }
 }

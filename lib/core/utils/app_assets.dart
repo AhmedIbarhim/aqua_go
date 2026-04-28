@@ -1,4 +1,13 @@
 abstract class AppAssets {
+  // General Icons
+  static const String edit = 'assets/svg/edit.svg';
+  static const String remove = 'assets/svg/remove.svg';
+
+  // Empty Screens
+  static const String emptyCars = 'assets/svg/empty_folder.svg';
+  static const String emptyBookings = 'assets/svg/empty_bookings.svg';
+
+  // Auth
   static const String logo = 'assets/svg/app_logo.svg';
   static const String logoTransparent = 'assets/svg/logo_transparent.svg';
   static const String onboarding1 = 'assets/svg/onboarding_1.svg';
@@ -23,7 +32,7 @@ abstract class AppAssets {
   static const String accountDisabled = 'assets/svg/account_disabled.svg';
 
   static const String currency = 'assets/svg/currency.svg';
-  static const String emptyFolder = 'assets/svg/empty_folder.svg';
+
   static const String raceCar = 'assets/svg/race_car.svg';
 
   // Header Icons

@@ -56,5 +56,14 @@ abstract class  LocaleKeys {
   static const booking_package_buy_package = 'booking_package.buy_package';
   static const booking_package_buy = 'booking_package.buy';
   static const booking_package = 'booking_package';
+  static const bookings_previous_bookings = 'bookings.previous_bookings';
+  static const bookings_current_bookings = 'bookings.current_bookings';
+  static const bookings_upcoming = 'bookings.upcoming';
+  static const bookings_booking_details = 'bookings.booking_details';
+  static const bookings_car_location = 'bookings.car_location';
+  static const bookings_date_and_time = 'bookings.date_and_time';
+  static const bookings_total_amount = 'bookings.total_amount';
+  static const bookings_view_details = 'bookings.view_details';
+  static const bookings = 'bookings';
 
 }

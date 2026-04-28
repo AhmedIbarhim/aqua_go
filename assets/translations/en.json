@@ -58,5 +58,15 @@
         "total": "Total",
         "buy_package": "Subscribe to Package",
         "buy": "Subscribe Now"
+    },
+    "bookings": {
+        "previous_bookings": "Previous Bookings",
+        "current_bookings": "Current Bookings",
+        "upcoming": "Upcoming",
+        "booking_details": "Booking Details",
+        "car_location": "Car Location",
+        "date_and_time": "Date and Time",
+        "total_amount": "Total Amount",
+        "view_details": "View Details"
     }
 }
