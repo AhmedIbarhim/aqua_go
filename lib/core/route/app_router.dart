@@ -14,8 +14,8 @@ import 'routes.dart';
 abstract class AppRouter {
   static Route generateRoute(RouteSettings settings) {
     switch (settings.name) {
-      // case Routes.splash:
-      //   return MaterialPageRoute(builder: (_) => const SplashView());
+      case Routes.splash:
+        return MaterialPageRoute(builder: (_) => const SplashView());
 
       case Routes.onboarding:
         return MaterialPageRoute(builder: (_) => const OnboardingView());

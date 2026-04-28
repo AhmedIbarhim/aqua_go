@@ -2,6 +2,8 @@
     "skip": "skip",
     "next": "next",
     "get_started": "get started",
+    "edit": "edit",
+    "delete": "delete",
     "onboarding": {
         "title1": "Effortless Car Care",
         "title2": "Shine Anytime, Anywhere",
@@ -40,5 +42,21 @@
         "available_offers": "Available Offers",
         "view_more": "View More",
         "notifications": "Notifications"
+    },
+    "my_cars": {
+        "empty_state": "No cars added yet",
+        "empty_desc": "Your vehicles will appear here once you add them",
+        "add_car": "Add New Car"
+    },
+    "booking_package": {
+        "success": "Successful process",
+        "description": "You have successfully subscribed to the package. You can use it starting now.",
+        "request_wash": "Request First Wash",
+        "go_to_home": "Go to Home",
+        "package_details": "Package Details",
+        "duration": "Duration: ",
+        "total": "Total",
+        "buy_package": "Subscribe to Package",
+        "buy": "Subscribe Now"
     }
 }

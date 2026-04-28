@@ -18,6 +18,8 @@ class CodegenLoader extends AssetLoader{
   "skip": "تخطي",
   "next": "التالي",
   "get_started": "ابدأ",
+  "edit": "تعديل",
+  "delete": "حذف",
   "onboarding": {
     "title1": "نظافة السيارة بسهولة",
     "title2": "تألق في أي وقت وأي مكان",
@@ -56,12 +58,30 @@ class CodegenLoader extends AssetLoader{
     "available_offers": "العروض المتاحة",
     "view_more": "عرض المزيد",
     "notifications": "الإشعارات"
+  },
+  "my_cars": {
+    "empty_state": "لا توجد سيارات مسجلة",
+    "empty_desc": "سيتم عرض السيارات الخاصة بك في هذه الصفحة في حالة اضافتها",
+    "add_car": "إضافة سيارة جديدة"
+  },
+  "booking_package": {
+    "success": "عملية ناجحة",
+    "description": "تم الاشتراك في الباقة بنجاح يمكنك استخدامها بدءاً من الان",
+    "request_wash": "اطلب اول غسلة",
+    "go_to_home": "الذهاب للرئيسية",
+    "package_details": "تفاصيل الباقة",
+    "duration": "لمدة : ",
+    "total": "الإجمالي",
+    "buy_package": "اشتراك في الباقة",
+    "buy": "اشترك الآن"
   }
 };
 static const Map<String,dynamic> _en = {
   "skip": "skip",
   "next": "next",
   "get_started": "get started",
+  "edit": "edit",
+  "delete": "delete",
   "onboarding": {
     "title1": "Effortless Car Care",
     "title2": "Shine Anytime, Anywhere",
@@ -100,6 +120,22 @@ static const Map<String,dynamic> _en = {
     "available_offers": "Available Offers",
     "view_more": "View More",
     "notifications": "Notifications"
+  },
+  "my_cars": {
+    "empty_state": "No cars added yet",
+    "empty_desc": "Your vehicles will appear here once you add them",
+    "add_car": "Add New Car"
+  },
+  "booking_package": {
+    "success": "Successful process",
+    "description": "You have successfully subscribed to the package. You can use it starting now.",
+    "request_wash": "Request First Wash",
+    "go_to_home": "Go to Home",
+    "package_details": "Package Details",
+    "duration": "Duration: ",
+    "total": "Total",
+    "buy_package": "Subscribe to Package",
+    "buy": "Subscribe Now"
   }
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"ar": _ar, "en": _en};

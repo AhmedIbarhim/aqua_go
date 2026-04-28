@@ -14,6 +14,7 @@ abstract class AppColors {
   static const Color screenBG = Color(0xFF0D0D0D);
   static const Color defaultSubtle = Color(0xFF262626);
   static const Color borderSecondary = Color(0xFF525252);
+  static const Color cardBackGround = Color(0xFF1C1C1C);
 
   // Text Colors
 

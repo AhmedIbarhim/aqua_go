@@ -11,6 +11,7 @@ class CustomButton extends StatelessWidget {
     this.enabled = true,
     this.color = AppColors.primary,
     this.textColor = AppColors.textDark,
+    this.borderColor,
     this.preWidget,
     this.postWidget,
   });
@@ -19,6 +20,7 @@ class CustomButton extends StatelessWidget {
   final bool enabled;
   final Color color;
   final Color textColor;
+  final Color? borderColor;
   final Widget? preWidget;
   final Widget? postWidget;
 
@@ -30,7 +32,9 @@ class CustomButton extends StatelessWidget {
       disabledColor: AppColors.brandSubtle,
       shape: RoundedRectangleBorder(
         side: BorderSide(
-          color: enabled ? AppColors.primary : AppColors.brandSubtle,
+          color: enabled 
+              ? (borderColor ?? AppColors.primary) 
+              : AppColors.brandSubtle,
           width: 1,
         ),
         borderRadius: BorderRadius.circular(16),

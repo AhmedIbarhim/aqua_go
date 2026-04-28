@@ -35,4 +35,17 @@ abstract class AppAssets {
   static const String shadows_1 = 'assets/images/shadows_1.png';
   static const String shadows_2 = 'assets/images/shadows_2.png';
   static const String shadows_3 = 'assets/images/shadows_3.png';
+
+  static const String successIcon = 'assets/svg/success_icon.svg';
+
+  // My Vehicles
+  static const String manfYear = 'assets/svg/manf_year.svg';
+  static const String colorSwatch = 'assets/svg/color_swatch.svg';
+  static const String boardNum = 'assets/svg/board_num.svg';
+  static const String demoLandcroser = 'assets/images/demo_landcroser.png';
+  static const String demoToyota = 'assets/images/demo_toyota.png';
+
+  // Booking
+  static const String bookingHeaderImage =
+      'assets/images/booking_header_image.png';
 }

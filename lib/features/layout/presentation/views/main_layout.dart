@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/themes/app_colors.dart';
 import '../../../home/presentation/views/home_view.dart';
+import '../../../my_cars/presentation/views/my_cars_view.dart';
 import '../widgets/bottom_navigation_bar.dart';
 import '../widgets/main_app_bar.dart';
 
@@ -16,12 +17,7 @@ class _MainLayoutState extends State<MainLayout> {
 
   final List<Widget> _pages = [
     const HomeView(),
-    Container(
-      height: double.infinity,
-      width: double.infinity,
-      color: AppColors.background,
-      child: const Center(child: Text('My Cars Page')),
-    ),
+    const MyCarsView(),
     Container(
       height: double.infinity,
       width: double.infinity,
