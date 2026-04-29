@@ -117,18 +117,24 @@ class _OnboardingViewState extends State<OnboardingView> {
               style: AppTextStyles.semiBold24,
             ),
             const SizedBox(height: 16),
-            Text(
-              currentPage == 0
-                  ? LocaleKeys.onboarding_desc1.tr()
-                  : currentPage == 1
-                  ? LocaleKeys.onboarding_desc2.tr()
-                  : LocaleKeys.onboarding_desc3.tr(),
-              textAlign: TextAlign.center,
-              style: AppTextStyles.regular16.copyWith(
-                color: AppColors.contentDisabled,
+            SizedBox(
+              height: MediaQuery.of(context).size.width * 0.16,
+              child: Text(
+                currentPage == 0
+                    ? LocaleKeys.onboarding_desc1.tr()
+                    : currentPage == 1
+                    ? LocaleKeys.onboarding_desc2.tr()
+                    : LocaleKeys.onboarding_desc3.tr(),
+                textAlign: TextAlign.center,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                style: AppTextStyles.regular16.copyWith(
+                  color: AppColors.contentDisabled,
+                ),
               ),
             ),
             const SizedBox(height: 16),
+
             ListenableBuilder(
               listenable: _pageController,
               builder: (context, child) {
@@ -153,7 +159,8 @@ class _OnboardingViewState extends State<OnboardingView> {
                 );
               },
             ),
-            const Spacer(),
+            const SizedBox(height: 16),
+
             _buildDownButton(context, currentPage),
           ],
         ),

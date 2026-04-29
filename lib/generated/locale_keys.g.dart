@@ -65,5 +65,26 @@ abstract class  LocaleKeys {
   static const bookings_total_amount = 'bookings.total_amount';
   static const bookings_view_details = 'bookings.view_details';
   static const bookings = 'bookings';
+  static const profile_account_info = 'profile.account_info';
+  static const profile_verified = 'profile.verified';
+  static const profile_my_addresses = 'profile.my_addresses';
+  static const profile_my_wallet = 'profile.my_wallet';
+  static const profile_add_email = 'profile.add_email';
+  static const profile_about_app = 'profile.about_app';
+  static const profile_about_us = 'profile.about_us';
+  static const profile_settings = 'profile.settings';
+  static const profile_technical_support = 'profile.technical_support';
+  static const profile = 'profile';
+  static const settings_more_settings = 'settings.more_settings';
+  static const settings_privacy_policy = 'settings.privacy_policy';
+  static const settings_terms_and_conditions = 'settings.terms_and_conditions';
+  static const settings_language = 'settings.language';
+  static const settings_dark_mode = 'settings.dark_mode';
+  static const settings_get_notifications = 'settings.get_notifications';
+  static const settings_marketing_notification = 'settings.marketing_notification';
+  static const settings_whatsapp_messages = 'settings.whatsapp_messages';
+  static const settings_sms_messages = 'settings.sms_messages';
+  static const settings_email_notifications = 'settings.email_notifications';
+  static const settings = 'settings';
 
 }

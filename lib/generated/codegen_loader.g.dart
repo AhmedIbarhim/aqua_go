@@ -84,6 +84,29 @@ class CodegenLoader extends AssetLoader{
     "date_and_time": "التاريخ و التوقيت",
     "total_amount": "المبلغ الإجمالي",
     "view_details": "عرض التفاصيل"
+  },
+  "profile": {
+    "account_info": "بيانات الحساب",
+    "verified": "موثق",
+    "my_addresses": "عناويني",
+    "my_wallet": "محفظتي",
+    "add_email": "إضافة البريد الكتروني",
+    "about_app": "عن التطبيق",
+    "about_us": "من نحن",
+    "settings": "الإعدادات",
+    "technical_support": "الدعم الفني والمساعدة"
+  },
+  "settings": {
+    "more_settings": "المزيد من الإعدادات",
+    "privacy_policy": "سياسة الخصوصية",
+    "terms_and_conditions": "الشروط والأحكام",
+    "language": "اللغة",
+    "dark_mode": "الوضع الليلي",
+    "get_notifications": "تلقي الإشعارات",
+    "marketing_notification": "الإشعارات التسويقية",
+    "whatsapp_messages": "رسائل الواتساب",
+    "sms_messages": "الرسائل النصية (SMS)",
+    "email_notifications": "إشعارات البريد الإلكتروني"
   }
 };
 static const Map<String,dynamic> _en = {
@@ -156,6 +179,29 @@ static const Map<String,dynamic> _en = {
     "date_and_time": "Date and Time",
     "total_amount": "Total Amount",
     "view_details": "View Details"
+  },
+  "profile": {
+    "account_info": "Account Information",
+    "verified": "Verified",
+    "my_addresses": "My Addresses",
+    "my_wallet": "My Wallet",
+    "add_email": "Add Email",
+    "about_app": "About App",
+    "about_us": "About Us",
+    "settings": "Settings",
+    "technical_support": "Technical Support & Help"
+  },
+  "settings": {
+    "more_settings": "More Settings",
+    "privacy_policy": "Privacy Policy",
+    "terms_and_conditions": "Terms and Conditions",
+    "language": "Language",
+    "dark_mode": "Dark Mode",
+    "get_notifications": "Get Notifications",
+    "marketing_notification": "Marketing Notification",
+    "whatsapp_messages": "WhatsApp Messages",
+    "sms_messages": "Text Messages (SMS)",
+    "email_notifications": "E-mail Notifications"
   }
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"ar": _ar, "en": _en};

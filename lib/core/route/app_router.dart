@@ -9,6 +9,7 @@ import '../../features/home/presentation/data/models/offer_model.dart';
 import '../../features/home/presentation/data/models/package_model.dart';
 import '../../features/home/presentation/views/offers_view.dart';
 import '../../features/home/presentation/views/packages_view.dart';
+import '../../features/profile/presentation/views/settings_view.dart';
 import 'routes.dart';
 
 abstract class AppRouter {
@@ -42,6 +43,24 @@ abstract class AppRouter {
           builder: (_) =>
               PackagesView(packages: settings.arguments as List<PackageModel>),
         );
+
+      case Routes.settings:
+        return MaterialPageRoute(builder: (_) => const SettingsView());
+
+      // case Routes.language:
+      //   return MaterialPageRoute(builder: (_) => const LanguageView());
+
+      //   case Routes.privacyPolicy:
+      //     return MaterialPageRoute(builder: (_) => const PrivacyPolicyView());
+
+      //     case Routes.termsAndConditions:
+      //       return MaterialPageRoute(builder: (_) => const TermsAndConditionsView());
+
+      //       case Routes.aboutUs:
+      //         return MaterialPageRoute(builder: (_) => const AboutUsView());
+
+      //         case Routes.support:
+      //           return MaterialPageRoute(builder: (_) => const SupportView());
 
       default:
         return MaterialPageRoute(builder: (_) => const Placeholder());

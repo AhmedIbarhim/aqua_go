@@ -68,5 +68,28 @@
         "date_and_time": "Date and Time",
         "total_amount": "Total Amount",
         "view_details": "View Details"
+    },
+    "profile": {
+        "account_info": "Account Information",
+        "verified": "Verified",
+        "my_addresses": "My Addresses",
+        "my_wallet": "My Wallet",
+        "add_email": "Add Email",
+        "about_app": "About App",
+        "about_us": "About Us",
+        "settings": "Settings",
+        "technical_support": "Technical Support & Help"
+    },
+    "settings": {
+        "more_settings": "More Settings",
+        "privacy_policy": "Privacy Policy",
+        "terms_and_conditions": "Terms and Conditions",
+        "language": "Language",
+        "dark_mode": "Dark Mode",
+        "get_notifications": "Get Notifications",
+        "marketing_notification": "Marketing Notification",
+        "whatsapp_messages": "WhatsApp Messages",
+        "sms_messages": "Text Messages (SMS)",
+        "email_notifications": "E-mail Notifications"
     }
 }

@@ -26,6 +26,7 @@ class _HomeViewState extends State<HomeView> {
   ];
   @override
   Widget build(BuildContext context) {
+    var height = MediaQuery.of(context).size.height;
     return RefreshIndicator(
       onRefresh: () async {
         // Reload data here
@@ -33,11 +34,13 @@ class _HomeViewState extends State<HomeView> {
       child: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(height: 20),
-            HomeBannersCarosal(
-              carouselController: _carouselController,
-              banners: banners,
-              width: MediaQuery.of(context).size.width,
+            SizedBox(
+              height: height * 0.2,
+              child: HomeBannersCarosal(
+                carouselController: _carouselController,
+                banners: banners,
+                width: MediaQuery.of(context).size.width,
+              ),
             ),
             Container(
               decoration: BoxDecoration(

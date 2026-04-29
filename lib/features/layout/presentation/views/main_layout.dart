@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../../../core/themes/app_colors.dart';
 import '../../../booking/presentation/views/bookings_view.dart';
 import '../../../home/presentation/views/home_view.dart';
 import '../../../my_cars/presentation/views/my_cars_view.dart';
+import '../../../profile/presentation/views/profile_view.dart';
 import '../widgets/bottom_navigation_bar.dart';
 import '../widgets/main_app_bar.dart';
 
@@ -20,19 +20,13 @@ class _MainLayoutState extends State<MainLayout> {
     const HomeView(),
     const MyCarsView(),
     const BookingsView(),
-
-    Container(
-      height: double.infinity,
-      width: double.infinity,
-      color: AppColors.background,
-      child: const Center(child: Text('Profile Page')),
-    ),
+    const ProfileView(),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const MainAppBar(),
+      appBar: _currentIndex == 3 ? null : const MainAppBar(),
       body: IndexedStack(index: _currentIndex, children: _pages),
       bottomNavigationBar: CustomBottomNavigationBar(
         currentIndex: _currentIndex,

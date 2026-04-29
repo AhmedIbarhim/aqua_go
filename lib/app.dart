@@ -4,8 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-import 'core/themes/app_colors.dart';
+import 'core/themes/app_colors_extension.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -19,14 +18,28 @@ class MyApp extends StatelessWidget {
           localizationsDelegates: context.localizationDelegates,
           supportedLocales: context.supportedLocales,
           locale: state.locale,
+          // themeMode: ThemeMode.system,
           theme: ThemeData(
-            brightness: Brightness.dark,
-            scaffoldBackgroundColor: AppColors.screenBG,
-            primaryColor: AppColors.primary,
+            brightness: Brightness.light,
+            scaffoldBackgroundColor: lightAppColors.screenBG,
+            primaryColor: lightAppColors.primary,
+            extensions: const <ThemeExtension<dynamic>>[lightAppColors],
             textTheme: GoogleFonts.ibmPlexSansArabicTextTheme(
               Theme.of(context).textTheme.apply(
-                displayColor: AppColors.white,
-                bodyColor: AppColors.white,
+                displayColor: lightAppColors.textPrimary,
+                bodyColor: lightAppColors.textPrimary,
+              ),
+            ),
+          ),
+          darkTheme: ThemeData(
+            brightness: Brightness.dark,
+            scaffoldBackgroundColor: darkAppColors.screenBG,
+            primaryColor: darkAppColors.primary,
+            extensions: const <ThemeExtension<dynamic>>[darkAppColors],
+            textTheme: GoogleFonts.ibmPlexSansArabicTextTheme(
+              Theme.of(context).textTheme.apply(
+                displayColor: darkAppColors.textPrimary,
+                bodyColor: darkAppColors.textPrimary,
               ),
             ),
           ),

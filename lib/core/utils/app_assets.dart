@@ -2,6 +2,8 @@ abstract class AppAssets {
   // General Icons
   static const String edit = 'assets/svg/edit.svg';
   static const String remove = 'assets/svg/remove.svg';
+  static const String notification = 'assets/svg/notification.svg';
+  static const String language = 'assets/svg/lang.svg';
 
   // Empty Screens
   static const String emptyCars = 'assets/svg/empty_folder.svg';
@@ -37,7 +39,6 @@ abstract class AppAssets {
 
   // Header Icons
   static const String gift = 'assets/svg/gift.svg';
-  static const String notification = 'assets/svg/notification.svg';
   static const String wavingHand = 'assets/images/waving_hand.png';
 
   // Shadows
@@ -57,4 +58,19 @@ abstract class AppAssets {
   // Booking
   static const String bookingHeaderImage =
       'assets/images/booking_header_image.png';
+
+  // Profile & Settings
+  static const String support = 'assets/svg/24-support.svg';
+  static const String aboutUs = 'assets/svg/about_us.svg';
+  static const String location = 'assets/svg/location.svg';
+  static const String mail = 'assets/svg/mail.svg';
+  static const String phone = 'assets/svg/phone.svg';
+  static const String settings = 'assets/svg/settings.svg';
+  static const String wallet = 'assets/svg/wallet.svg';
+
+  static const String darkMode = 'assets/svg/dark.svg';
+  static const String privacy = 'assets/svg/privacy.svg';
+  static const String terms = 'assets/svg/terms.svg';
+  static const String whatsppOutlined = 'assets/svg/whatsapp_outlined.svg';
+  static const String sms = 'assets/svg/sms.svg';
 }
