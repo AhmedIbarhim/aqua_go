@@ -2,10 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../controllers/language_controller/language_cubit.dart';
+import '../controllers/theme_controller/theme_cubit.dart';
 
 extension LocaleExtentions on BuildContext {
   bool get isEn => read<LanguageCubit>().state.locale.languageCode == 'en';
   bool get isAr => read<LanguageCubit>().state.locale.languageCode == 'ar';
+}
+
+extension ThemeExtentions on BuildContext {
+  bool get isDarkTheme => read<ThemeCubit>().state.themeMode == ThemeMode.dark;
+  bool get isLightTheme => !isDarkTheme;
 }
 
 extension NavigatorExtension on BuildContext {

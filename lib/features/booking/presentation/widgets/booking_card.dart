@@ -6,6 +6,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
 
+import '../../../../core/themes/app_colors_extension.dart';
 import '../../data/models/booking_model.dart';
 
 class BookingCard extends StatelessWidget {
@@ -18,8 +19,8 @@ class BookingCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.black,
-        border: Border.all(color: AppColors.borderSecondary),
+        color: context.colors.themeColor,
+        border: Border.all(color: context.colors.borderSecondary),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
@@ -49,7 +50,7 @@ class BookingCard extends StatelessWidget {
                   child: Text(
                     LocaleKeys.bookings_upcoming.tr(),
                     style: AppTextStyles.regular12.copyWith(
-                      color: AppColors.screenBG,
+                      color: context.colors.screenBG,
                     ),
                   ),
                 ),
@@ -62,17 +63,14 @@ class BookingCard extends StatelessWidget {
             children: [
               Text(
                 LocaleKeys.bookings_booking_details.tr(),
-                style: AppTextStyles.medium12.copyWith(
-                  color: AppColors.white,
-                  height: 16 / 12,
-                ),
+                style: AppTextStyles.medium12.copyWith(height: 16 / 12),
                 textAlign: TextAlign.start,
               ),
               const SizedBox(height: 8),
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppColors.cardBackGround,
+                  color: context.colors.cardBackGround,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Column(
@@ -113,7 +111,7 @@ class BookingCard extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: AppColors.black,
+                color: context.colors.themeColor,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -122,13 +120,13 @@ class BookingCard extends StatelessWidget {
                   Text(
                     LocaleKeys.bookings_view_details.tr(),
                     style: AppTextStyles.medium14.copyWith(
-                      color: AppColors.primary,
+                      color: context.colors.primary,
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const Icon(
+                  Icon(
                     Icons.arrow_forward, // Points left in RTL
-                    color: AppColors.primary,
+                    color: context.colors.primary,
                     size: 24,
                   ),
                 ],
@@ -155,12 +153,12 @@ class BookingCard extends StatelessWidget {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(iconData, size: 20, color: AppColors.textSecondary),
+            Icon(iconData, size: 20, color: context.colors.textSecondary),
             const SizedBox(width: 8),
             Text(
               title,
               style: AppTextStyles.regular12.copyWith(
-                color: AppColors.textSecondary,
+                color: context.colors.textSecondary,
               ),
             ),
           ],
@@ -171,13 +169,12 @@ class BookingCard extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.end,
-            // textDirection: TextDirection.ltr,
             children: [
               Flexible(
                 child: Text(
                   value,
                   style: AppTextStyles.regular12.copyWith(
-                    color: AppColors.contentSecondaryLight,
+                    color: context.colors.contentSecondaryLight,
                   ),
                   textAlign: TextAlign.end,
                   maxLines: 1,
@@ -187,7 +184,15 @@ class BookingCard extends StatelessWidget {
               ),
               if (isAmount) ...[
                 const SizedBox(width: 4),
-                SvgPicture.asset(AppAssets.currency, width: 16, height: 16),
+                SvgPicture.asset(
+                  AppAssets.currency,
+                  width: 16,
+                  height: 16,
+                  colorFilter: ColorFilter.mode(
+                    context.colors.contentSecondaryLight,
+                    BlendMode.srcIn,
+                  ),
+                ),
               ],
             ],
           ),

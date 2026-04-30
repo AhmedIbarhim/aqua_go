@@ -5,6 +5,9 @@ abstract class AppAssets {
   static const String notification = 'assets/svg/notification.svg';
   static const String language = 'assets/svg/lang.svg';
 
+  // Home
+  static const String homeLightHeader = 'assets/images/home_light_header.png';
+
   // Empty Screens
   static const String emptyCars = 'assets/svg/empty_folder.svg';
   static const String emptyBookings = 'assets/svg/empty_bookings.svg';

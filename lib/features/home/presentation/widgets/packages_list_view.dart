@@ -3,7 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/route/routes.dart';
-import '../../../../core/themes/app_colors.dart';
+import '../../../../core/themes/app_colors_extension.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../data/models/package_model.dart';
 import 'package_card.dart';
@@ -53,7 +53,7 @@ class _PackagesListViewState extends State<PackagesListView> {
             children: [
               Text(
                 LocaleKeys.home_available_packages.tr(),
-                style: AppTextStyles.bold16.copyWith(color: AppColors.white),
+                style: AppTextStyles.bold16,
               ),
               GestureDetector(
                 onTap: () {
@@ -65,7 +65,7 @@ class _PackagesListViewState extends State<PackagesListView> {
                     Text(
                       LocaleKeys.home_view_more.tr(),
                       style: AppTextStyles.regular12.copyWith(
-                        color: AppColors.primary,
+                        color: context.colors.primary,
                       ),
                     ),
                     const SizedBox(width: 6),
@@ -76,7 +76,10 @@ class _PackagesListViewState extends State<PackagesListView> {
                       ),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(4),
-                        border: Border.all(color: AppColors.primary, width: 1),
+                        border: Border.all(
+                          color: context.colors.primary,
+                          width: 1,
+                        ),
                       ),
                       child: Center(
                         child: Icon(
@@ -84,7 +87,7 @@ class _PackagesListViewState extends State<PackagesListView> {
                               ? Icons.arrow_forward_ios
                               : Icons.arrow_back_ios,
                           size: 10,
-                          color: AppColors.primary,
+                          color: context.colors.primary,
                         ),
                       ),
                     ),

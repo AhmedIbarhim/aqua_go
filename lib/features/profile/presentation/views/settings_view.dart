@@ -6,6 +6,8 @@ import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:aqua_go/core/controllers/theme_controller/theme_cubit.dart';
 
 class SettingsView extends StatefulWidget {
   const SettingsView({super.key});
@@ -15,7 +17,6 @@ class SettingsView extends StatefulWidget {
 }
 
 class _SettingsViewState extends State<SettingsView> {
-  bool isDarkMode = true;
   bool isMarketingNotif = true;
   bool isWhatsapp = true;
   bool isSms = true;
@@ -67,16 +68,19 @@ class _SettingsViewState extends State<SettingsView> {
                       icon: AppAssets.terms,
                     ),
                     const SizedBox(height: 8),
-                    _buildSettingsItem(
-                      context,
-                      title: LocaleKeys.settings_dark_mode.tr(),
-                      icon: AppAssets.darkMode,
-                      hasToggle: true,
-                      toggleValue: isDarkMode,
-                      onToggleChanged: (val) {
-                        setState(() {
-                          isDarkMode = val;
-                        });
+                    BlocBuilder<ThemeCubit, ThemeState>(
+                      builder: (context, themeState) {
+                        final isDarkMode = themeState.themeMode == ThemeMode.dark;
+                        return _buildSettingsItem(
+                          context,
+                          title: LocaleKeys.settings_dark_mode.tr(),
+                          icon: AppAssets.darkMode,
+                          hasToggle: true,
+                          toggleValue: isDarkMode,
+                          onToggleChanged: (val) {
+                            context.read<ThemeCubit>().toggleTheme(val);
+                          },
+                        );
                       },
                     ),
                     const SizedBox(height: 24),

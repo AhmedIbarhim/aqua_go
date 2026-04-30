@@ -7,8 +7,8 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
   final Color brandHover;
 
   // Neutral Colors
-  final Color black;
-  final Color white;
+  final Color themeColor;
+  final Color themeOpositeColor;
   final Color background;
   final Color screenBG;
   final Color defaultSubtle;
@@ -18,7 +18,7 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
   // Text Colors
   final Color textPrimary;
   final Color textSecondary;
-  final Color textDark;
+  final Color textTheme;
 
   // Content Colors
   final Color contentBlack;
@@ -37,8 +37,8 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
     required this.primary,
     required this.brandSubtle,
     required this.brandHover,
-    required this.black,
-    required this.white,
+    required this.themeColor,
+    required this.themeOpositeColor,
     required this.background,
     required this.screenBG,
     required this.defaultSubtle,
@@ -46,7 +46,7 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
     required this.cardBackGround,
     required this.textPrimary,
     required this.textSecondary,
-    required this.textDark,
+    required this.textTheme,
     required this.contentBlack,
     required this.contentPrimary,
     required this.contentSecondary,
@@ -87,8 +87,8 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
       primary: primary ?? this.primary,
       brandSubtle: brandSubtle ?? this.brandSubtle,
       brandHover: brandHover ?? this.brandHover,
-      black: black ?? this.black,
-      white: white ?? this.white,
+      themeColor: black ?? this.themeColor,
+      themeOpositeColor: white ?? this.themeOpositeColor,
       background: background ?? this.background,
       screenBG: screenBG ?? this.screenBG,
       defaultSubtle: defaultSubtle ?? this.defaultSubtle,
@@ -96,7 +96,7 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
       cardBackGround: cardBackGround ?? this.cardBackGround,
       textPrimary: textPrimary ?? this.textPrimary,
       textSecondary: textSecondary ?? this.textSecondary,
-      textDark: textDark ?? this.textDark,
+      textTheme: textDark ?? this.textTheme,
       contentBlack: contentBlack ?? this.contentBlack,
       contentPrimary: contentPrimary ?? this.contentPrimary,
       contentSecondary: contentSecondary ?? this.contentSecondary,
@@ -120,8 +120,12 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
       primary: Color.lerp(primary, other.primary, t)!,
       brandSubtle: Color.lerp(brandSubtle, other.brandSubtle, t)!,
       brandHover: Color.lerp(brandHover, other.brandHover, t)!,
-      black: Color.lerp(black, other.black, t)!,
-      white: Color.lerp(white, other.white, t)!,
+      themeColor: Color.lerp(themeColor, other.themeColor, t)!,
+      themeOpositeColor: Color.lerp(
+        themeOpositeColor,
+        other.themeOpositeColor,
+        t,
+      )!,
       background: Color.lerp(background, other.background, t)!,
       screenBG: Color.lerp(screenBG, other.screenBG, t)!,
       defaultSubtle: Color.lerp(defaultSubtle, other.defaultSubtle, t)!,
@@ -129,7 +133,7 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
       cardBackGround: Color.lerp(cardBackGround, other.cardBackGround, t)!,
       textPrimary: Color.lerp(textPrimary, other.textPrimary, t)!,
       textSecondary: Color.lerp(textSecondary, other.textSecondary, t)!,
-      textDark: Color.lerp(textDark, other.textDark, t)!,
+      textTheme: Color.lerp(textTheme, other.textTheme, t)!,
       contentBlack: Color.lerp(contentBlack, other.contentBlack, t)!,
       contentPrimary: Color.lerp(contentPrimary, other.contentPrimary, t)!,
       contentSecondary: Color.lerp(
@@ -158,8 +162,8 @@ const darkAppColors = AppColorsExtension(
   primary: Color(0xFF16F7FF),
   brandSubtle: Color(0xFF202222),
   brandHover: Color(0xFF0F1F22),
-  black: Color(0xFF171717),
-  white: Color(0xFFFFFFFF),
+  themeColor: Color(0xFF171717),
+  themeOpositeColor: Color(0xFFFFFFFF),
   background: Color(0xFF151515),
   screenBG: Color(0xFF0D0D0D),
   defaultSubtle: Color(0xFF262626),
@@ -167,7 +171,7 @@ const darkAppColors = AppColorsExtension(
   cardBackGround: Color(0xFF1C1C1C),
   textPrimary: Color(0xFFFFFFFF),
   textSecondary: Color(0xFFA3A3A3),
-  textDark: Colors.black,
+  textTheme: Colors.black,
   contentBlack: Color(0xFF171717),
   contentPrimary: Color(0xFF262C35),
   contentSecondary: Color(0xFF404A59),
@@ -183,19 +187,19 @@ const darkAppColors = AppColorsExtension(
 // Light Theme Colors (Suggested placeholders, adjust as needed)
 // -----------------------------------------------------------------------------
 const lightAppColors = AppColorsExtension(
-  primary: Color(0xFF008D91), // Darker cyan for contrast on light mode
+  primary: Color(0xFF00BEC3), // Darker cyan for contrast on light mode
   brandSubtle: Color(0xFFE0F7F8),
   brandHover: Color(0xFFBFFCFF),
-  black: Color(0xFFFFFFFF), // Inverted for light mode
-  white: Color(0xFF171717), // Inverted for light mode
+  themeColor: Color(0xFFFFFFFF), // Inverted for light mode
+  themeOpositeColor: Color(0xFF171717), // Inverted for light mode
   background: Color(0xFFF8FAFC),
   screenBG: Color(0xFFF3F4F6),
   defaultSubtle: Color(0xFFE2E8F0),
   borderSecondary: Color(0xFFCBD5E1),
-  cardBackGround: Color(0xFFFFFFFF),
+  cardBackGround: Color(0xFFE1E2E3),
   textPrimary: Color(0xFF0F172A),
   textSecondary: Color(0xFF64748B),
-  textDark: Colors.black,
+  textTheme: Colors.white,
   contentBlack: Color(0xFF171717),
   contentPrimary: Color(0xFFF1F5F9),
   contentSecondary: Color(0xFFE2E8F0),

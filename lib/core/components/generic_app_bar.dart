@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../themes/app_colors.dart';
+import '../themes/app_colors_extension.dart';
 
 class GenericAppBar extends StatelessWidget implements PreferredSizeWidget {
   const GenericAppBar({
@@ -37,7 +37,7 @@ class GenericAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: AppColors.screenBG,
+      backgroundColor: context.colors.screenBG,
       elevation: elevation ?? 0,
       shadowColor: shadowColor,
       automaticallyImplyLeading: automaticallyImplyLeading,

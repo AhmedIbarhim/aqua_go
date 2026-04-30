@@ -3,7 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/components/generic_app_bar.dart';
-import '../../../../core/themes/app_colors.dart';
+import '../../../../core/themes/app_colors_extension.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../widgets/package_card.dart';
 
@@ -18,7 +18,7 @@ class PackagesView extends StatelessWidget {
       appBar: GenericAppBar(title: LocaleKeys.home_available_packages.tr()),
       body: Container(
         decoration: BoxDecoration(
-          color: AppColors.background,
+          color: context.colors.background,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),

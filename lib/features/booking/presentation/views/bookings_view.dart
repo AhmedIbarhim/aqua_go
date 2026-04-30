@@ -1,5 +1,5 @@
-import 'package:aqua_go/core/themes/app_colors.dart';
 import 'package:flutter/material.dart';
+import '../../../../core/themes/app_colors_extension.dart';
 import '../../data/models/booking_model.dart';
 import '../widgets/bookings_list_view.dart';
 import '../widgets/bookings_tabs.dart';
@@ -36,13 +36,13 @@ class _BookingsViewState extends State<BookingsView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.screenBG,
+      backgroundColor: context.colors.screenBG,
       body: Container(
         height: double.infinity,
         width: double.infinity,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.background,
+          color: context.colors.background,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
-import '../../../../core/themes/app_colors.dart';
+import '../../../../core/themes/app_colors_extension.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../booking/presentation/widgets/booking_package_bottom_sheet.dart';
@@ -27,9 +27,9 @@ class PackageCard extends StatelessWidget {
         width: atHome == true ? width - 96 : width,
 
         decoration: BoxDecoration(
-          color: AppColors.background,
+          color: context.colors.screenBG,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.primary, width: 1),
+          border: Border.all(color: context.colors.primary, width: 1),
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20),
@@ -39,14 +39,21 @@ class PackageCard extends StatelessWidget {
                 top: 0,
                 left: 0,
 
-                child: Image.asset(AppAssets.shadows_1, fit: BoxFit.cover),
+                child: Image.asset(
+                  AppAssets.shadows_1,
+                  fit: BoxFit.cover,
+                  color: context.colors.primary,
+                ),
               ),
 
               Positioned(
                 bottom: 0,
 
                 right: 0,
-                child: Image.asset(AppAssets.shadows_2),
+                child: Image.asset(
+                  AppAssets.shadows_2,
+                  color: context.colors.primary,
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -63,10 +70,13 @@ class PackageCard extends StatelessWidget {
                           height: 48,
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: AppColors.primary,
+                            color: context.colors.primary,
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: Image.asset(packageModel.image),
+                          child: Image.asset(
+                            packageModel.image,
+                            color: context.colors.textTheme,
+                          ),
                         ),
                         // Duration Tag
                         Container(
@@ -75,13 +85,14 @@ class PackageCard extends StatelessWidget {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.white.withValues(alpha: 0.1),
+                            color: context.colors.textPrimary.withValues(
+                              alpha: 0.1,
+                            ),
                             borderRadius: BorderRadius.circular(100),
                           ),
                           child: Text(
                             'لمدة : ${packageModel.duration}',
                             style: AppTextStyles.medium12.copyWith(
-                              color: AppColors.white,
                               fontSize: 10,
                             ),
                           ),
@@ -98,28 +109,23 @@ class PackageCard extends StatelessWidget {
                           children: [
                             Text(
                               packageModel.title,
-                              style: AppTextStyles.medium16.copyWith(
-                                color: AppColors.white,
-                              ),
+                              style: AppTextStyles.medium16,
                             ),
                             const SizedBox(height: 2),
                             Text(
                               packageModel.description,
                               style: AppTextStyles.regular12.copyWith(
-                                color: AppColors.textSecondary,
+                                color: context.colors.textSecondary,
                               ),
                             ),
                           ],
                         ),
-                        // Price and Currency
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Text(
                               packageModel.price,
-                              style: AppTextStyles.bold18.copyWith(
-                                color: AppColors.white,
-                              ),
+                              style: AppTextStyles.bold18,
                             ),
                             const SizedBox(width: 4),
                             SvgPicture.asset(
@@ -127,7 +133,7 @@ class PackageCard extends StatelessWidget {
                               width: 24,
                               height: 24,
                               // ignore: deprecated_member_use
-                              color: AppColors.white,
+                              color: context.colors.textPrimary,
                             ),
                           ],
                         ),

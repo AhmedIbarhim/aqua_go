@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
 
 import '../../../../core/components/custom_button.dart';
-import '../../../../core/themes/app_colors.dart';
+import '../../../../core/themes/app_colors_extension.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../../generated/locale_keys.g.dart';
@@ -52,8 +52,8 @@ class BookingPackageBottomSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      decoration: const BoxDecoration(
-        color: AppColors.black,
+      decoration: BoxDecoration(
+        color: context.colors.background,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(24),
           topRight: Radius.circular(24),
@@ -85,7 +85,7 @@ class BookingPackageBottomSheet extends StatelessWidget {
                   ),
                   Text(
                     LocaleKeys.booking_package_package_details.tr(),
-                    style: AppTextStyles.regular20.copyWith(),
+                    style: AppTextStyles.regular20,
                   ),
                   const SizedBox(width: 32),
                 ],
@@ -108,7 +108,7 @@ class BookingPackageBottomSheet extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1C1C1C),
+                  color: context.colors.cardBackGround,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Column(
@@ -133,7 +133,9 @@ class BookingPackageBottomSheet extends StatelessWidget {
                             vertical: 8,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.white.withValues(alpha: 0.1),
+                            color: context.colors.themeOpositeColor.withValues(
+                              alpha: 0.1,
+                            ),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(
@@ -156,7 +158,7 @@ class BookingPackageBottomSheet extends StatelessWidget {
                     Text(
                       packageModel.description,
                       style: AppTextStyles.regular16.copyWith(
-                        color: AppColors.textSecondary,
+                        color: context.colors.textSecondary,
                         height: 1.5,
                       ),
                     ),
@@ -166,23 +168,18 @@ class BookingPackageBottomSheet extends StatelessWidget {
                     Text(
                       LocaleKeys.booking_package_total.tr(),
                       style: AppTextStyles.regular14.copyWith(
-                        color: AppColors.textSecondary,
+                        color: context.colors.textSecondary,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        Text(
-                          packageModel.price,
-                          style: AppTextStyles.medium24.copyWith(
-                            color: AppColors.white,
-                          ),
-                        ),
+                        Text(packageModel.price, style: AppTextStyles.medium24),
                         const SizedBox(width: 8),
                         SvgPicture.asset(
                           AppAssets.currency,
-                          colorFilter: const ColorFilter.mode(
-                            AppColors.white,
+                          colorFilter: ColorFilter.mode(
+                            context.colors.themeOpositeColor,
                             BlendMode.srcIn,
                           ),
                           width: 24,

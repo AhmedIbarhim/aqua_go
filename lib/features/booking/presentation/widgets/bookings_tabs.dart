@@ -1,8 +1,9 @@
-import 'package:aqua_go/core/themes/app_colors.dart';
 import 'package:aqua_go/core/themes/app_text_styles.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+
+import '../../../../core/themes/app_colors_extension.dart';
 
 class BookingsTabs extends StatelessWidget {
   final int selectedIndex;
@@ -19,7 +20,7 @@ class BookingsTabs extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
-        color: AppColors.cardBackGround,
+        color: context.colors.cardBackGround,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
@@ -31,7 +32,7 @@ class BookingsTabs extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                   color: selectedIndex == 0
-                      ? AppColors.defaultSubtle
+                      ? context.colors.defaultSubtle
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: selectedIndex == 0
@@ -52,7 +53,7 @@ class BookingsTabs extends StatelessWidget {
                   style: selectedIndex == 0
                       ? AppTextStyles.medium14
                       : AppTextStyles.regular14.copyWith(
-                          color: AppColors.contentDisabled,
+                          color: context.colors.contentDisabled,
                         ),
                 ),
               ),
@@ -66,7 +67,7 @@ class BookingsTabs extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                   color: selectedIndex == 1
-                      ? AppColors.defaultSubtle
+                      ? context.colors.defaultSubtle
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: selectedIndex == 1
@@ -85,9 +86,9 @@ class BookingsTabs extends StatelessWidget {
                 child: Text(
                   LocaleKeys.bookings_previous_bookings.tr(),
                   style: selectedIndex == 1
-                      ? AppTextStyles.medium14.copyWith(color: AppColors.white)
+                      ? AppTextStyles.medium14
                       : AppTextStyles.regular14.copyWith(
-                          color: AppColors.contentDisabled,
+                          color: context.colors.contentDisabled,
                         ),
                 ),
               ),

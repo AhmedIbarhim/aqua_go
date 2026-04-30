@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/controllers/language_controller/language_cubit.dart';
+import 'core/controllers/theme_controller/theme_cubit.dart';
 
 import 'core/config/shared_prefs.dart';
 import 'core/constants.dart';
@@ -25,8 +26,15 @@ void main() async {
       fallbackLocale: const Locale('ar'),
       startLocale: startLocale,
       assetLoader: const CodegenLoader(),
-      child: BlocProvider(
-        create: (context) => LanguageCubit(),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) => LanguageCubit(),
+          ),
+          BlocProvider(
+            create: (context) => ThemeCubit(),
+          ),
+        ],
         child: const MyApp(),
       ),
     ),

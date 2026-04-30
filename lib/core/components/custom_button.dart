@@ -2,6 +2,7 @@ import 'package:aqua_go/core/themes/app_text_styles.dart';
 import 'package:flutter/material.dart';
 
 import '../themes/app_colors.dart';
+import '../themes/app_colors_extension.dart';
 
 class CustomButton extends StatelessWidget {
   const CustomButton({
@@ -9,7 +10,7 @@ class CustomButton extends StatelessWidget {
     this.onPressed,
     required this.text,
     this.enabled = true,
-    this.color = AppColors.primary,
+    this.color,
     this.textColor = AppColors.textDark,
     this.borderColor,
     this.preWidget,
@@ -18,7 +19,7 @@ class CustomButton extends StatelessWidget {
   final void Function()? onPressed;
   final String text;
   final bool enabled;
-  final Color color;
+  final Color? color;
   final Color textColor;
   final Color? borderColor;
   final Widget? preWidget;
@@ -28,18 +29,18 @@ class CustomButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialButton(
       onPressed: enabled ? onPressed : null,
-      color: color,
-      disabledColor: AppColors.brandSubtle,
+      color: color ?? context.colors.primary,
+      disabledColor: context.colors.brandSubtle,
       shape: RoundedRectangleBorder(
         side: BorderSide(
-          color: enabled 
-              ? (borderColor ?? AppColors.primary) 
-              : AppColors.brandSubtle,
-          width: 1,
+          color: enabled
+              ? (borderColor ?? context.colors.primary)
+              : context.colors.brandSubtle,
+          width: 0.5,
         ),
         borderRadius: BorderRadius.circular(16),
       ),
-      textColor: enabled ? textColor : AppColors.contentDisabled,
+      textColor: enabled ? textColor : context.colors.contentDisabled,
 
       minWidth: double.infinity,
       height: 48,

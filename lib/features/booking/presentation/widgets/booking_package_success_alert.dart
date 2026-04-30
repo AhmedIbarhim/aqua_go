@@ -5,7 +5,7 @@ import 'package:svg_flutter/svg.dart';
 
 import '../../../../core/components/custom_button.dart';
 import '../../../../core/extentions/context_extentions.dart';
-import '../../../../core/themes/app_colors.dart';
+import '../../../../core/themes/app_colors_extension.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../../generated/locale_keys.g.dart';
@@ -17,7 +17,7 @@ class BookingPackageSuccessAlert extends StatelessWidget {
     return showGeneralDialog<T>(
       context: context,
       barrierDismissible: true,
-      // barrierLabel: 'Dismiss',
+      barrierLabel: 'Dismiss',
       transitionDuration: const Duration(milliseconds: 300),
       pageBuilder: (context, animation, secondaryAnimation) {
         return BackdropFilter(
@@ -47,7 +47,7 @@ class BookingPackageSuccessAlert extends StatelessWidget {
           margin: const EdgeInsets.symmetric(horizontal: 24),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppColors.black,
+            color: context.colors.cardBackGround,
             borderRadius: BorderRadius.circular(24),
           ),
           child: Column(
@@ -60,7 +60,7 @@ class BookingPackageSuccessAlert extends StatelessWidget {
               // Title
               Text(
                 LocaleKeys.booking_package_success.tr(),
-                style: AppTextStyles.medium16.copyWith(color: AppColors.white),
+                style: AppTextStyles.medium16,
               ),
               const SizedBox(height: 4),
 
@@ -69,7 +69,7 @@ class BookingPackageSuccessAlert extends StatelessWidget {
                 LocaleKeys.booking_package_description.tr(),
                 textAlign: TextAlign.center,
                 style: AppTextStyles.regular16.copyWith(
-                  color: AppColors.textSecondary,
+                  color: context.colors.textSecondary,
                   height: 1.5,
                 ),
               ),
@@ -88,9 +88,9 @@ class BookingPackageSuccessAlert extends StatelessWidget {
               // Secondary Button
               CustomButton(
                 text: LocaleKeys.booking_package_go_to_home.tr(),
-                color: Colors.transparent,
-                borderColor: AppColors.borderSecondary,
-                textColor: AppColors.primary,
+                color: context.colors.cardBackGround,
+                borderColor: context.colors.borderSecondary,
+                textColor: context.colors.primary,
                 onPressed: () {
                   context.pop();
                   // TODO: Implement navigation to home

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/themes/app_colors.dart';
+import '../../../../core/themes/app_colors_extension.dart';
 import '../widgets/my_cars_list_view.dart';
 
 class MyCarsView extends StatelessWidget {
@@ -13,13 +13,18 @@ class MyCarsView extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.background,
+        color: context.colors.background,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(20),
           topRight: Radius.circular(20),
         ),
       ),
-      child: Column(children: [const SizedBox(height: 12), Expanded(child: MyCarsListView())]),
+      child: Column(
+        children: [
+          const SizedBox(height: 12),
+          Expanded(child: MyCarsListView()),
+        ],
+      ),
     );
   }
 }

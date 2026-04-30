@@ -1,10 +1,11 @@
-import 'package:aqua_go/core/themes/app_colors.dart';
 import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:aqua_go/features/my_cars/data/models/my_car_model.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:svg_flutter/svg_flutter.dart';
 
+import '../../../../core/themes/app_colors_extension.dart'
+    show AppThemeExtension;
 import '../../../../core/themes/app_text_styles.dart';
 
 class MyCarCard extends StatelessWidget {
@@ -22,7 +23,7 @@ class MyCarCard extends StatelessWidget {
       height: height * 0.23,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.cardBackGround,
+        color: context.colors.cardBackGround,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
@@ -34,7 +35,7 @@ class MyCarCard extends StatelessWidget {
             height: height * 0.13,
             width: double.infinity,
             decoration: BoxDecoration(
-              color: AppColors.defaultSubtle,
+              color: context.colors.defaultSubtle,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Stack(
@@ -60,7 +61,13 @@ class MyCarCard extends StatelessWidget {
                     children: [
                       GestureDetector(
                         onTap: onEdit,
-                        child: SvgPicture.asset(AppAssets.edit),
+                        child: SvgPicture.asset(
+                          AppAssets.edit,
+                          colorFilter: ColorFilter.mode(
+                            context.colors.textSecondary,
+                            BlendMode.srcIn,
+                          ),
+                        ),
                       ),
                       const SizedBox(width: 16),
                       GestureDetector(
@@ -82,7 +89,6 @@ class MyCarCard extends StatelessWidget {
               style: GoogleFonts.ibmPlexSansArabic(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
-                color: AppColors.textPrimary,
               ),
               textAlign: TextAlign.right,
               maxLines: 1,
@@ -94,12 +100,20 @@ class MyCarCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              _buildSpecItem(text: car.year, icon: AppAssets.manfYear),
-              _buildDivider(),
-              _buildSpecItem(text: car.color, icon: AppAssets.colorSwatch),
-              _buildDivider(),
+              _buildSpecItem(context, text: car.year, icon: AppAssets.manfYear),
+              _buildDivider(context),
+              _buildSpecItem(
+                context,
+                text: car.color,
+                icon: AppAssets.colorSwatch,
+              ),
+              _buildDivider(context),
 
-              _buildSpecItem(text: car.boardNumber, icon: AppAssets.boardNum),
+              _buildSpecItem(
+                context,
+                text: car.boardNumber,
+                icon: AppAssets.boardNum,
+              ),
             ],
           ),
         ],
@@ -107,7 +121,11 @@ class MyCarCard extends StatelessWidget {
     );
   }
 
-  Widget _buildSpecItem({required String text, required String icon}) {
+  Widget _buildSpecItem(
+    BuildContext context, {
+    required String text,
+    required String icon,
+  }) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -115,8 +133,8 @@ class MyCarCard extends StatelessWidget {
           icon,
           width: 20,
           height: 20,
-          colorFilter: const ColorFilter.mode(
-            AppColors.contentSecondaryLight,
+          colorFilter: ColorFilter.mode(
+            context.colors.contentSecondaryLight,
             BlendMode.srcIn,
           ),
         ),
@@ -125,19 +143,19 @@ class MyCarCard extends StatelessWidget {
         Text(
           text,
           style: AppTextStyles.regular12.copyWith(
-            color: AppColors.textSecondary,
+            color: context.colors.textSecondary,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildDivider() {
+  Widget _buildDivider(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8),
       width: 1,
       height: 16,
-      color: AppColors.borderSecondary,
+      color: context.colors.borderSecondary,
     );
   }
 }

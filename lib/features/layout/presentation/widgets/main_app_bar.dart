@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
 import '../../../../core/themes/app_colors.dart';
+import '../../../../core/themes/app_colors_extension.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 
@@ -26,8 +27,9 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                   height: 40,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.primary, width: 1),
+                    border: Border.all(color: context.colors.primary, width: 1),
                   ),
+
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(20),
                     child: Image.network(
@@ -44,16 +46,14 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                     Text(
                       '${LocaleKeys.layout_welcome.tr()} محمد فيصل,',
                       style: AppTextStyles.regular12.copyWith(
-                        color: AppColors.textSecondary,
+                        color: context.colors.textSecondary,
                       ),
                     ),
                     Row(
                       children: [
                         Text(
                           LocaleKeys.layout_ready_to_serve.tr(),
-                          style: AppTextStyles.medium14.copyWith(
-                            color: AppColors.white,
-                          ),
+                          style: AppTextStyles.medium14,
                         ),
                         const SizedBox(width: 4),
                         Image.asset(
@@ -75,9 +75,26 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
               children: [
                 Stack(
                   children: [
-                    _buildIconButton(
-                      icon: AppAssets.notification,
+                    GestureDetector(
                       onTap: () {},
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: SvgPicture.asset(
+                          AppAssets.notification,
+                          width: 24,
+                          height: 24,
+                          placeholderBuilder: (context) =>
+                              const SizedBox(width: 24, height: 24),
+                          colorFilter: ColorFilter.mode(
+                            context.colors.textPrimary,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                      ),
                     ),
                     Positioned(
                       left: context.isEn ? 8 : null,
@@ -99,30 +116,26 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ],
                 ),
                 const SizedBox(width: 8),
-                _buildIconButton(icon: AppAssets.gift, onTap: () {}),
+                GestureDetector(
+                  onTap: () {},
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: SvgPicture.asset(
+                      AppAssets.gift,
+                      width: 24,
+                      height: 24,
+                      placeholderBuilder: (context) =>
+                          const SizedBox(width: 24, height: 24),
+                    ),
+                  ),
+                ),
               ],
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildIconButton({required String icon, required VoidCallback onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: SvgPicture.asset(
-          icon,
-          width: 24,
-          height: 24,
-          placeholderBuilder: (context) =>
-              const SizedBox(width: 24, height: 24),
         ),
       ),
     );
