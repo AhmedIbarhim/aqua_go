@@ -26,7 +26,10 @@
         "resend_code": "Resend Code within",
         "resend_code_button": "Resend Code",
         "enter_verification_code": "Enter verification code sent to",
-        "verify": "Verify"
+        "verify": "Verify",
+        "tech_error": "Temporary Technical Problem",
+        "tech_error_desc": "We are currently experiencing a technical issue. Please try again shortly",
+        "contact_support": "Contact Support"
     },
     "layout": {
         "home": "Home",

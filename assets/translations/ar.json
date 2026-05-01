@@ -26,7 +26,10 @@
         "resend_code": "إعادة إرسال الرمز خلال",
         "resend_code_button": "إعادة إرسال الرمز",
         "enter_verification_code": "أدخل رمز التحقق المرسل إلى",
-        "verify": "تحقق"
+        "verify": "تحقق",
+        "tech_error": "عطل فني مؤقت",
+        "tech_error_desc": "نعتذر، نواجه حاليًا مشكلة تقنية. يرجى المحاولة مرة أخرى بعد قليل",
+        "contact_support": "التواصل مع الدعم"
     },
     "layout": {
         "home": "الرئيسية",

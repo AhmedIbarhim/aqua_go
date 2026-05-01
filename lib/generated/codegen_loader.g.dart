@@ -42,7 +42,10 @@ class CodegenLoader extends AssetLoader{
     "resend_code": "إعادة إرسال الرمز خلال",
     "resend_code_button": "إعادة إرسال الرمز",
     "enter_verification_code": "أدخل رمز التحقق المرسل إلى",
-    "verify": "تحقق"
+    "verify": "تحقق",
+    "tech_error": "عطل فني مؤقت",
+    "tech_error_desc": "نعتذر، نواجه حاليًا مشكلة تقنية. يرجى المحاولة مرة أخرى بعد قليل",
+    "contact_support": "التواصل مع الدعم"
   },
   "layout": {
     "home": "الرئيسية",
@@ -137,7 +140,10 @@ static const Map<String,dynamic> _en = {
     "resend_code": "Resend Code within",
     "resend_code_button": "Resend Code",
     "enter_verification_code": "Enter verification code sent to",
-    "verify": "Verify"
+    "verify": "Verify",
+    "tech_error": "Temporary Technical Problem",
+    "tech_error_desc": "We are currently experiencing a technical issue. Please try again shortly",
+    "contact_support": "Contact Support"
   },
   "layout": {
     "home": "Home",

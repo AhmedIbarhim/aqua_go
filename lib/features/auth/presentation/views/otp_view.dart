@@ -42,6 +42,7 @@ class OtpView extends StatelessWidget {
             left: 0,
             right: 0,
             child: OtpContent(phoneNumber: phoneNumber),
+            // child: ErrorContent(),
           ),
         ],
       ),

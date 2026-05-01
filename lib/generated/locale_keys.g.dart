@@ -28,6 +28,9 @@ abstract class  LocaleKeys {
   static const auth_resend_code_button = 'auth.resend_code_button';
   static const auth_enter_verification_code = 'auth.enter_verification_code';
   static const auth_verify = 'auth.verify';
+  static const auth_tech_error = 'auth.tech_error';
+  static const auth_tech_error_desc = 'auth.tech_error_desc';
+  static const auth_contact_support = 'auth.contact_support';
   static const auth = 'auth';
   static const layout_home = 'layout.home';
   static const layout_my_cars = 'layout.my_cars';

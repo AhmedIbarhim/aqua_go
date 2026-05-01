@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../../core/extentions/context_extentions.dart';
+import '../../../../core/utils/app_assets.dart';
 import '../../../booking/presentation/views/bookings_view.dart';
 import '../../../home/presentation/views/home_view.dart';
 import '../../../my_cars/presentation/views/my_cars_view.dart';
@@ -25,19 +27,36 @@ class _MainLayoutState extends State<MainLayout> {
 
   @override
   Widget build(BuildContext context) {
+    var height = MediaQuery.of(context).size.height;
     return Scaffold(
-      extendBodyBehindAppBar: _currentIndex == 0 ? true : false,
-      appBar: _currentIndex == 3 ? null : const MainAppBar(),
-      body: IndexedStack(index: _currentIndex, children: _pages),
-      bottomNavigationBar: MainNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
+      body: Stack(
+        children: [
+          if (_currentIndex == 0)
+            context.isLightTheme
+                ? Image.asset(
+                    AppAssets.homeLightHeader,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: height * 0.36,
+                  )
+                : SizedBox(height: height * 0.36),
+          Scaffold(
+            backgroundColor: Colors.transparent,
+            appBar: _currentIndex == 3 ? null : const MainAppBar(),
+            // extendBodyBehindAppBar: _currentIndex == 0 ? true : false,
+            body: IndexedStack(index: _currentIndex, children: _pages),
+            bottomNavigationBar: MainNavigationBar(
+              currentIndex: _currentIndex,
+              onTap: (index) {
+                setState(() {
+                  _currentIndex = index;
+                });
+              },
+            ),
+            extendBody: true,
+          ),
+        ],
       ),
-      extendBody: true,
     );
   }
 }

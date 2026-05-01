@@ -23,6 +23,7 @@ abstract class AppAssets {
   static const String authBackImage = 'assets/svg/auth_background.svg';
   static const String ksaFlag = 'assets/svg/ksa.svg';
   static const String usFlag = 'assets/svg/us.svg';
+  static const String offline = 'assets/svg/offline.svg';
 
   // Bottom Navigation Bar Icons
   static const String homeEnabled = 'assets/svg/home_enabled.svg';
