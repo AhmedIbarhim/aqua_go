@@ -94,5 +94,12 @@
         "whatsapp_messages": "رسائل الواتساب",
         "sms_messages": "الرسائل النصية (SMS)",
         "email_notifications": "إشعارات البريد الإلكتروني"
+    },
+    "notifications": {
+        "notifications": "الإشعارات",
+        "no_notifications": "لا توجد اشعارات حالية",
+        "no_notification_desc": "سيتم عرض الإشعارات الخاصة بك في هذه الصفحة",
+        "today": "اليوم",
+        "yesterday": "أمس"
     }
 }

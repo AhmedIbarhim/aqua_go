@@ -1,7 +1,6 @@
 import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:flutter/material.dart';
-import 'package:svg_flutter/svg_flutter.dart';
 
 import '../../../core/route/routes.dart';
 
@@ -28,7 +27,7 @@ class _SplashViewState extends State<SplashView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Center(child: SvgPicture.asset(AppAssets.logo)),
+      body: Center(child: Image.asset(AppAssets.logo)),
     );
   }
 }

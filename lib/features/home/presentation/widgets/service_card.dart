@@ -1,4 +1,3 @@
-import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
 import '../../../../core/themes/app_colors_extension.dart';
@@ -34,6 +33,8 @@ class ServiceCard extends StatelessWidget {
                 AppAssets.shadows_3,
                 fit: BoxFit.cover,
                 color: context.colors.primary,
+                width: 200,
+                height: 200,
               ),
             ),
 
@@ -113,9 +114,7 @@ class ServiceCard extends StatelessWidget {
                     child: Image.asset(
                       serviceModel.image,
                       fit: BoxFit.fill,
-                      color: context.isDarkTheme
-                          ? darkAppColors.primary
-                          : darkAppColors.themeColor,
+                      color: context.colors.primary,
                     ),
                   ),
                 ],

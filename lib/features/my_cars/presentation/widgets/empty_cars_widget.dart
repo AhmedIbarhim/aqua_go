@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
 
 import '../../../../core/components/custom_button.dart';
+import '../../../../core/themes/app_colors_extension.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../generated/locale_keys.g.dart';
 
@@ -12,30 +13,37 @@ class EmptyCarsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        SvgPicture.asset(AppAssets.emptyCars),
-        const SizedBox(height: 40),
-        Text(
-          LocaleKeys.my_cars_empty_state.tr(),
-          style: AppTextStyles.regular16,
+    return SizedBox(
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SvgPicture.asset(AppAssets.emptyCars),
+            const SizedBox(height: 40),
+            Text(
+              LocaleKeys.my_cars_empty_state.tr(),
+              style: AppTextStyles.semiBold16,
+            ),
+            const SizedBox(height: 20),
+            Text(
+              LocaleKeys.my_cars_empty_desc.tr(),
+              textAlign: TextAlign.center,
+              style: AppTextStyles.regular14.copyWith(
+                color: context.colors.textSecondary,
+              ),
+            ),
+            SizedBox(height: 30),
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.6,
+              child: CustomButton(
+                onPressed: () {},
+                text: LocaleKeys.my_cars_add_car.tr(),
+                preWidget: Icon(Icons.add),
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 20),
-        Text(
-          LocaleKeys.my_cars_empty_desc.tr(),
-          style: AppTextStyles.regular14,
-        ),
-        SizedBox(height: 30),
-        SizedBox(
-          width: MediaQuery.of(context).size.width * 0.6,
-          child: CustomButton(
-            onPressed: () {},
-            text: LocaleKeys.my_cars_add_car.tr(),
-            preWidget: Icon(Icons.add),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

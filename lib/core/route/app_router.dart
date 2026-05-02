@@ -1,14 +1,14 @@
-import 'package:aqua_go/features/auth/presentation/views/login_view.dart';
-import 'package:aqua_go/features/layout/presentation/views/main_layout.dart';
-import 'package:aqua_go/features/startup/views/onboarding_view.dart';
-import 'package:aqua_go/features/startup/views/splash_view.dart';
 import 'package:flutter/material.dart';
-
+import '../../features/auth/presentation/views/login_view.dart';
 import '../../features/auth/presentation/views/otp_view.dart';
 import '../../features/home/presentation/data/models/offer_model.dart';
 import '../../features/home/presentation/data/models/package_model.dart';
 import '../../features/home/presentation/views/offers_view.dart';
 import '../../features/home/presentation/views/packages_view.dart';
+import '../../features/layout/presentation/views/main_layout.dart';
+import '../../features/startup/views/onboarding_view.dart';
+import '../../features/startup/views/splash_view.dart';
+import '../../features/notifications/presentation/views/notification_view.dart';
 import '../../features/profile/presentation/views/settings_view.dart';
 import 'routes.dart';
 
@@ -46,6 +46,9 @@ abstract class AppRouter {
 
       case Routes.settings:
         return MaterialPageRoute(builder: (_) => const SettingsView());
+
+      case Routes.notification:
+        return MaterialPageRoute(builder: (_) => const NotificationView());
 
       // case Routes.language:
       //   return MaterialPageRoute(builder: (_) => const LanguageView());

@@ -43,6 +43,8 @@ class PackageCard extends StatelessWidget {
                   AppAssets.shadows_1,
                   fit: BoxFit.cover,
                   color: context.colors.primary,
+                  width: 200,
+                  height: 200,
                 ),
               ),
 
@@ -53,6 +55,8 @@ class PackageCard extends StatelessWidget {
                 child: Image.asset(
                   AppAssets.shadows_2,
                   color: context.colors.primary,
+                  width: 150,
+                  height: 150,
                 ),
               ),
               Padding(

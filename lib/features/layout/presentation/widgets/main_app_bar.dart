@@ -3,6 +3,7 @@ import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
+import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_colors.dart';
 import '../../../../core/themes/app_colors_extension.dart';
 import '../../../../core/themes/app_text_styles.dart';
@@ -76,7 +77,9 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                 Stack(
                   children: [
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        context.pushNamed(Routes.notification);
+                      },
                       child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(

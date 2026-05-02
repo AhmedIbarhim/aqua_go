@@ -110,6 +110,13 @@ class CodegenLoader extends AssetLoader{
     "whatsapp_messages": "رسائل الواتساب",
     "sms_messages": "الرسائل النصية (SMS)",
     "email_notifications": "إشعارات البريد الإلكتروني"
+  },
+  "notifications": {
+    "notifications": "الإشعارات",
+    "no_notifications": "لا توجد اشعارات حالية",
+    "no_notification_desc": "سيتم عرض الإشعارات الخاصة بك في هذه الصفحة",
+    "today": "اليوم",
+    "yesterday": "أمس"
   }
 };
 static const Map<String,dynamic> _en = {
@@ -208,6 +215,13 @@ static const Map<String,dynamic> _en = {
     "whatsapp_messages": "WhatsApp Messages",
     "sms_messages": "Text Messages (SMS)",
     "email_notifications": "E-mail Notifications"
+  },
+  "notifications": {
+    "notifications": "Notifications",
+    "no_notifications": "There are no notifications yet",
+    "no_notification_desc": "Your notifications will appear here once you have any",
+    "today": "Today",
+    "yesterday": "Yesterday"
   }
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"ar": _ar, "en": _en};

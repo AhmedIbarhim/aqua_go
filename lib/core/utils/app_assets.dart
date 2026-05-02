@@ -2,9 +2,11 @@ abstract class AppAssets {
   // General Icons
   static const String edit = 'assets/svg/edit.svg';
   static const String remove = 'assets/svg/remove.svg';
-  static const String notification = 'assets/svg/notification.svg';
   static const String language = 'assets/svg/lang.svg';
-
+  // Notifications
+  static const String notification = 'assets/svg/notification.svg';
+  static const String notificationActive = 'assets/svg/notification_active.svg';
+  static const String notificationsEmpty = 'assets/svg/notifications_empty.svg';
   // Home
   static const String homeLightHeader = 'assets/images/home_light_header.png';
 
@@ -13,8 +15,8 @@ abstract class AppAssets {
   static const String emptyBookings = 'assets/svg/empty_bookings.svg';
 
   // Auth
-  static const String logo = 'assets/svg/app_logo.svg';
-  static const String logoTransparent = 'assets/svg/logo_transparent.svg';
+  static const String logo = 'assets/images/app_logo.png';
+  static const String logoTransparent = 'assets/images/logo_transparent.png';
   static const String onboarding1 = 'assets/svg/onboarding_1.svg';
   static const String onboarding2 = 'assets/svg/onboarding_2.svg';
   static const String onboarding3 = 'assets/svg/onboarding_3.svg';
@@ -71,7 +73,6 @@ abstract class AppAssets {
   static const String phone = 'assets/svg/phone.svg';
   static const String settings = 'assets/svg/settings.svg';
   static const String wallet = 'assets/svg/wallet.svg';
-
   static const String darkMode = 'assets/svg/dark.svg';
   static const String privacy = 'assets/svg/privacy.svg';
   static const String terms = 'assets/svg/terms.svg';

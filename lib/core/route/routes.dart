@@ -12,4 +12,5 @@ abstract class Routes {
   static const String termsAndConditions = '/terms_and_conditions_view';
   static const String aboutUs = '/about_us_view';
   static const String support = '/support_view';
+  static const String notification = '/notification_view';
 }

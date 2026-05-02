@@ -89,5 +89,11 @@ abstract class  LocaleKeys {
   static const settings_sms_messages = 'settings.sms_messages';
   static const settings_email_notifications = 'settings.email_notifications';
   static const settings = 'settings';
+  static const notifications_notifications = 'notifications.notifications';
+  static const notifications_no_notifications = 'notifications.no_notifications';
+  static const notifications_no_notification_desc = 'notifications.no_notification_desc';
+  static const notifications_today = 'notifications.today';
+  static const notifications_yesterday = 'notifications.yesterday';
+  static const notifications = 'notifications';
 
 }

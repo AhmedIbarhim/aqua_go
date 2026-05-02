@@ -34,7 +34,7 @@ class LoginView extends StatelessWidget {
 
             child: SizedBox(
               width: 100,
-              child: Center(child: SvgPicture.asset(AppAssets.logoTransparent)),
+              child: Center(child: Image.asset(AppAssets.logoTransparent)),
             ),
           ),
           Positioned(bottom: 0, left: 0, right: 0, child: LoginContent()),
