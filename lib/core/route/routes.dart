@@ -13,4 +13,5 @@ abstract class Routes {
   static const String aboutUs = '/about_us_view';
   static const String support = '/support_view';
   static const String notification = '/notification_view';
+  static const String addVehicle = '/add_vehicle_view';
 }

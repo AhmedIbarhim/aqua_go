@@ -1,0 +1,94 @@
+import 'dart:ui' as ui;
+import 'package:flutter/material.dart';
+import '../themes/app_colors_extension.dart';
+import '../themes/app_text_styles.dart';
+
+class CustomBottomSheet extends StatelessWidget {
+  final String title;
+  final Widget child;
+  final EdgeInsets? padding;
+
+  const CustomBottomSheet({
+    super.key,
+    required this.title,
+    required this.child,
+    this.padding,
+  });
+
+  static Future<T?> show<T>({
+    required BuildContext context,
+    required String title,
+    required Widget child,
+    EdgeInsets? padding,
+  }) {
+    return showModalBottomSheet<T>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => BackdropFilter(
+        filter: ui.ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => Navigator.pop(context),
+                  child: const SizedBox.expand(),
+                ),
+              ),
+              CustomBottomSheet(title: title, padding: padding, child: child),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: context.colors.background,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(24),
+        ),
+      ),
+      child: SafeArea(
+        child: Padding(
+          padding:
+              padding ??
+              const EdgeInsets.only(top: 24, left: 24, right: 24, bottom: 64),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      width: 32,
+                      height: 32,
+                      alignment: Alignment.center,
+                      child: const Icon(Icons.arrow_back, size: 24),
+                    ),
+                  ),
+                  Text(title, style: AppTextStyles.regular20),
+                  const SizedBox(width: 32),
+                ],
+              ),
+              const SizedBox(height: 48),
+              child,
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

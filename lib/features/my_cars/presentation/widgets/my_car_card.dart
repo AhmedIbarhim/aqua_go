@@ -1,12 +1,15 @@
+import 'package:aqua_go/core/components/custom_alert_box.dart';
 import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:aqua_go/features/my_cars/data/models/my_car_model.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:svg_flutter/svg_flutter.dart';
 
 import '../../../../core/themes/app_colors_extension.dart'
-    show AppThemeExtension;
+    show AppThemeExtension, lightAppColors;
 import '../../../../core/themes/app_text_styles.dart';
+import '../../../../generated/locale_keys.g.dart';
 
 class MyCarCard extends StatelessWidget {
   final MyCarModel car;
@@ -18,6 +21,7 @@ class MyCarCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
+    var width = MediaQuery.of(context).size.width;
     return Container(
       width: double.infinity,
       height: height * 0.23,
@@ -35,13 +39,27 @@ class MyCarCard extends StatelessWidget {
             height: height * 0.13,
             width: double.infinity,
             decoration: BoxDecoration(
-              color: context.colors.defaultSubtle,
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Stack(
               children: [
+                Positioned(
+                  left: 0,
+                  top: 0,
+                  child: Image.asset(AppAssets.shadows_1, width: width * 0.75),
+                ),
                 // Car Image
-                Center(child: Image.asset(car.image, fit: BoxFit.contain)),
+                Center(
+                  child: SizedBox(
+                    height: height * 0.08,
+                    child: Image.asset(
+                      AppAssets.myCar,
+                      color: Color(car.colorCode),
+                      fit: BoxFit.fill,
+                    ),
+                  ),
+                ),
                 // Toyota Logo
                 Positioned(
                   right: 4,
@@ -64,15 +82,29 @@ class MyCarCard extends StatelessWidget {
                         child: SvgPicture.asset(
                           AppAssets.edit,
                           colorFilter: ColorFilter.mode(
-                            context.colors.textSecondary,
+                            context.colors.themeOpositeColor,
                             BlendMode.srcIn,
                           ),
                         ),
                       ),
                       const SizedBox(width: 16),
                       GestureDetector(
-                        onTap: onDelete,
-                        child: SvgPicture.asset(AppAssets.remove),
+                        onTap: () {
+                          WarningBox.show(
+                            context: context,
+                            primaryButtonText: LocaleKeys.delete_confirm.tr(),
+
+                            title: LocaleKeys.delete_confirm.tr(),
+                            message: LocaleKeys.my_cars_delete_message.tr(),
+                          );
+                        },
+                        child: SvgPicture.asset(
+                          AppAssets.remove,
+                          colorFilter: ColorFilter.mode(
+                            lightAppColors.error,
+                            BlendMode.srcIn,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -104,7 +136,7 @@ class MyCarCard extends StatelessWidget {
               _buildDivider(context),
               _buildSpecItem(
                 context,
-                text: car.color,
+                text: car.colorName,
                 icon: AppAssets.colorSwatch,
               ),
               _buildDivider(context),

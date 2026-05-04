@@ -18,29 +18,29 @@ class NotificationView extends StatefulWidget {
 class _NotificationViewState extends State<NotificationView> {
   List<NotificationModel> notifications = [
     NotificationModel(
-      title: 'notification1',
-      description: 'description1',
+      title: 'تم تأكيد الطلب',
+      description: 'العامل في طريقه إلى موقع السيارة',
       createdAt: DateTime.now(),
       isRead: false,
       serviceDone: false,
     ),
     NotificationModel(
-      title: 'notification2',
-      description: 'description2',
+      title: 'تمت الخدمة بنجاح',
+      description: 'كيف كانت تجربتك؟ شاركنا تقييمك',
       createdAt: DateTime.now(),
       isRead: false,
       serviceDone: true,
     ),
     NotificationModel(
-      title: 'notification3',
-      description: 'description3',
+      title: 'تم تأكيد الطلب',
+      description: 'العامل في طريقه إلى موقع السيارة',
       createdAt: DateTime.now().subtract(const Duration(days: 2)),
       isRead: false,
       serviceDone: false,
     ),
     NotificationModel(
-      title: 'notification4',
-      description: 'description4',
+      title: 'تمت الخدمة بنجاح',
+      description: 'كيف كانت تجربتك؟ شاركنا تقييمك',
       createdAt: DateTime.now().subtract(const Duration(days: 1)),
       isRead: false,
       serviceDone: true,

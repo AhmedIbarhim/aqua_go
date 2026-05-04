@@ -17,7 +17,7 @@ class NotificationCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: notification.serviceDone
+        color: !notification.serviceDone
             ? context.colors.cardBackGround
             : context.colors.brandHover,
         borderRadius: BorderRadius.circular(16),
@@ -30,7 +30,7 @@ class NotificationCard extends StatelessWidget {
             height: 40,
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: notification.serviceDone
+              color: !notification.serviceDone
                   ? context.colors.defaultSubtle
                   : context.colors.themeOpositeColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
@@ -38,7 +38,7 @@ class NotificationCard extends StatelessWidget {
             child: Opacity(
               opacity: 0.8,
               child: SvgPicture.asset(
-                notification.serviceDone
+                !notification.serviceDone
                     ? AppAssets.notification
                     : AppAssets.notificationActive,
                 width: 20,

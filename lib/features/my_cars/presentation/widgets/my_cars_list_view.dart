@@ -2,6 +2,7 @@ import 'package:aqua_go/core/components/custom_button.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../../../../generated/locale_keys.g.dart';
+import '../../../../core/route/routes.dart';
 import '../../data/models/my_car_model.dart';
 import 'my_car_card.dart';
 
@@ -16,7 +17,9 @@ class MyCarsListView extends StatelessWidget {
         CustomButton(
           text: LocaleKeys.my_cars_add_car.tr(),
           preWidget: Icon(Icons.add),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pushNamed(context, Routes.addVehicle);
+          },
         ),
         const SizedBox(height: 24),
         Expanded(

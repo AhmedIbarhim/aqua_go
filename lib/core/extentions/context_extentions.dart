@@ -14,6 +14,17 @@ extension ThemeExtentions on BuildContext {
   bool get isLightTheme => !isDarkTheme;
 }
 
+extension BottomSheetExtension on BuildContext {
+  void showCustomBottomSheet({required Widget child}) {
+    showModalBottomSheet(
+      context: this,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => child,
+    );
+  }
+}
+
 extension NavigatorExtension on BuildContext {
   Future<T?> pushNamed<T extends Object?>(
     String routeName, {

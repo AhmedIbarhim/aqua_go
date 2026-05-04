@@ -10,6 +10,7 @@ import '../../features/startup/views/onboarding_view.dart';
 import '../../features/startup/views/splash_view.dart';
 import '../../features/notifications/presentation/views/notification_view.dart';
 import '../../features/profile/presentation/views/settings_view.dart';
+import '../../features/my_cars/presentation/views/add_car_view.dart';
 import 'routes.dart';
 
 abstract class AppRouter {
@@ -49,6 +50,9 @@ abstract class AppRouter {
 
       case Routes.notification:
         return MaterialPageRoute(builder: (_) => const NotificationView());
+
+      case Routes.addVehicle:
+        return MaterialPageRoute(builder: (_) => const AddCarView());
 
       // case Routes.language:
       //   return MaterialPageRoute(builder: (_) => const LanguageView());

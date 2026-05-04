@@ -19,18 +19,44 @@ class _MyCarsViewState extends State<MyCarsView> {
   @override
   void initState() {
     super.initState();
-    cars = List.generate(
-      3,
-      (index) => MyCarModel(
-        name: "تويوتا",
-        color: "أسود",
-        model: "لاند كروزر",
-        year: "2023",
-        image: AppAssets.demoLandcroser,
+    cars = [
+      MyCarModel(
+        name: "نيسان",
+        colorCode: 0xFF7f1d1d,
+        model: "صني",
+        year: "2022",
+        image: AppAssets.myCar,
         typeImage: AppAssets.demoToyota,
         boardNumber: "W E F 5846",
       ),
-    );
+      MyCarModel(
+        name: "نيسان",
+        colorCode: 0xFF4b5563,
+        model: "صني",
+        year: "2022",
+        image: AppAssets.myCar,
+        typeImage: AppAssets.demoToyota,
+        boardNumber: "W E F 5846",
+      ),
+      MyCarModel(
+        name: "تويوتا",
+        colorCode: 0xFF7c4a2d,
+        model: "لاند كروزر",
+        year: "2023",
+        image: AppAssets.myCar,
+        typeImage: AppAssets.demoToyota,
+        boardNumber: "W E F 5846",
+      ),
+      MyCarModel(
+        name: "هيونداي",
+        colorCode: 0xFF1e3a8a,
+        model: "توسان",
+        year: "2024",
+        image: AppAssets.myCar,
+        typeImage: AppAssets.demoToyota,
+        boardNumber: "W E F 5846",
+      ),
+    ];
   }
 
   @override

@@ -7,6 +7,7 @@ import '../../../../core/components/custom_button.dart';
 import '../../../../core/themes/app_colors_extension.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../generated/locale_keys.g.dart';
+import '../../../../core/route/routes.dart';
 
 class EmptyCarsWidget extends StatelessWidget {
   const EmptyCarsWidget({super.key});
@@ -36,7 +37,9 @@ class EmptyCarsWidget extends StatelessWidget {
             SizedBox(
               width: MediaQuery.of(context).size.width * 0.6,
               child: CustomButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pushNamed(context, Routes.addVehicle);
+                },
                 text: LocaleKeys.my_cars_add_car.tr(),
                 preWidget: Icon(Icons.add),
               ),

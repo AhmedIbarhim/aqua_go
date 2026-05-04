@@ -53,11 +53,14 @@ abstract class AppAssets {
   static const String shadows_3 = 'assets/images/shadows_3.png';
 
   static const String successIcon = 'assets/svg/success_icon.svg';
+  static const String warningIcon = 'assets/svg/warning_icon.svg';
 
   // My Vehicles
   static const String manfYear = 'assets/svg/manf_year.svg';
   static const String colorSwatch = 'assets/svg/color_swatch.svg';
+  static const String colorDropper = 'assets/images/color_dropper.png';
   static const String boardNum = 'assets/svg/board_num.svg';
+  static const String myCar = 'assets/images/my_car.png';
   static const String demoLandcroser = 'assets/images/demo_landcroser.png';
   static const String demoToyota = 'assets/images/demo_toyota.png';
 
