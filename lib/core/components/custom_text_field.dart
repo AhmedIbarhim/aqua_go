@@ -3,8 +3,6 @@ import 'package:aqua_go/core/themes/app_text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../generated/locale_keys.g.dart';
-
 class CustomTextField extends StatelessWidget {
   final String label;
   final String hint;
@@ -48,12 +46,12 @@ class CustomTextField extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         TextFormField(
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return "LocaleKeys.required_field.tr()";
-            }
-            return null;
-          },
+          // validator: (value) {
+          //   if (value == null || value.isEmpty) {
+          //     return "LocaleKeys.required_field.tr()";
+          //   }
+          //   return null;
+          // },
           textCapitalization: mustCapitalize == true
               ? TextCapitalization.characters
               : TextCapitalization.none,

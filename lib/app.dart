@@ -17,6 +17,7 @@ class MyApp extends StatelessWidget {
         return BlocBuilder<ThemeCubit, ThemeState>(
           builder: (context, themeState) {
             return MaterialApp(
+              title: 'Aqua Go',
               debugShowCheckedModeBanner: false,
               localizationsDelegates: context.localizationDelegates,
               supportedLocales: context.supportedLocales,
