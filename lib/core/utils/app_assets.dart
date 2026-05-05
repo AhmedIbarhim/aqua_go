@@ -75,6 +75,12 @@ abstract class AppAssets {
   static const String pedals = 'assets/svg/pedals.svg';
   static const String wibes = 'assets/svg/wibes.svg';
   static const String tissues = 'assets/svg/tissues.svg';
+  static const String noCalls = 'assets/svg/no_calls.svg';
+  static const String adding = 'assets/svg/add.svg';
+  static const String applePay = 'assets/images/apple_pay.png';
+  static const String mastercardPay = 'assets/images/mastercard_pay.png';
+  static const String visaPay = 'assets/images/visa_pay.png';
+  static const String madaPay = 'assets/images/mada_pay.png';
 
   // Profile & Settings
   static const String support = 'assets/svg/24-support.svg';

@@ -119,7 +119,21 @@
         "total": "الإجمالي",
         "book_now": "احجز الآن",
         "choose_car_location": "اختر موقع السيارة",
-        "save_car_location": "حفظ موقع السيارة"
+        "save_car_location": "حفظ موقع السيارة",
+        "booking_summary": "ملخص الحجز",
+        "service_name": "اسم الخدمة",
+        "selected_car": "السيارة المحددة",
+        "notes_for_biker": "ملاحظات للبايكر",
+        "payment_summary": "ملخص الدفع",
+        "subtotal": "المبلغ قبل الضريبة",
+        "vat": "ضريبة القيمة المضافة",
+        "confirm_booking": "تأكيد الحجز",
+        "dont_call": "لا تتصل بالهاتف",
+        "outside_only": "غسيل خارجي فقط",
+        "special_note": "ملاحظة خاصة",
+        "pay_through": "الدفع من خلال",
+        "apple_pay": "Apple Pay",
+        "credit_card": "البطاقة الائتمانية"
     },
     "address": {
         "map": "الخريطة",

@@ -4,6 +4,7 @@ import '../../features/auth/presentation/views/otp_view.dart';
 import '../../features/booking/presentation/views/booking_details_view.dart';
 import '../../features/booking/presentation/views/booking_location_view.dart';
 
+import '../../features/booking/presentation/views/booking_summary_view.dart';
 import '../../features/home/presentation/data/models/offer_model.dart';
 import '../../features/home/presentation/data/models/package_model.dart';
 import '../../features/home/presentation/views/offers_view.dart';
@@ -66,6 +67,9 @@ abstract class AppRouter {
 
       case Routes.bookingLocation:
         return MaterialPageRoute(builder: (_) => const BookingLocationView());
+
+      case Routes.bookingSummary:
+        return MaterialPageRoute(builder: (_) => const BookingSummaryView());
 
       // case Routes.language:
       //   return MaterialPageRoute(builder: (_) => const LanguageView());

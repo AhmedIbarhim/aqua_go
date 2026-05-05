@@ -1,3 +1,5 @@
+import 'package:aqua_go/core/extentions/context_extentions.dart';
+import 'package:aqua_go/core/route/routes.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
@@ -153,7 +155,9 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
             const SizedBox(height: 8),
             CustomButton(
               text: LocaleKeys.bookings_book_now.tr(),
-              onPressed: () {},
+              onPressed: () {
+                context.pushNamed(Routes.bookingSummary);
+              },
             ),
           ],
         ),

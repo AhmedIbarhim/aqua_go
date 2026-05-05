@@ -1,4 +1,5 @@
 import 'package:aqua_go/core/components/generic_app_bar.dart';
+import 'package:aqua_go/core/components/custom_radio_widget.dart';
 import 'package:aqua_go/core/constants.dart';
 import 'package:aqua_go/core/themes/app_text_styles.dart';
 import 'package:aqua_go/core/utils/app_assets.dart';
@@ -123,31 +124,7 @@ class _LanguageItem extends StatelessWidget {
             ),
 
             const Spacer(),
-            Container(
-              width: 20,
-              height: 20,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: isSelected
-                      ? context.colors.primary
-                      : context.colors.textSecondary,
-                  width: 2,
-                ),
-              ),
-              child: isSelected
-                  ? Center(
-                      child: Container(
-                        width: 10,
-                        height: 10,
-                        decoration: BoxDecoration(
-                          color: context.colors.primary,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                    )
-                  : null,
-            ),
+            CustomRadioWidget(isSelected: isSelected),
           ],
         ),
       ),

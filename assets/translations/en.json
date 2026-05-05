@@ -119,7 +119,21 @@
         "total": "Total",
         "book_now": "Book Now",
         "choose_car_location": "Choose Car Location",
-        "save_car_location": "Save Car Location"
+        "save_car_location": "Save Car Location",
+        "booking_summary": "Booking Summary",
+        "service_name": "Service Name",
+        "selected_car": "Selected Car",
+        "notes_for_biker": "Notes for Biker",
+        "payment_summary": "Payment Summary",
+        "subtotal": "Subtotal",
+        "vat": "VAT",
+        "confirm_booking": "Confirm Booking",
+        "dont_call": "Don't call",
+        "outside_only": "Outside only",
+        "special_note": "Special note",
+        "pay_through": "Pay through",
+        "apple_pay": "Apple Pay",
+        "credit_card": "Credit Card"
     },
     "address": {
         "map": "Map",
