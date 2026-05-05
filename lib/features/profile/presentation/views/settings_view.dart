@@ -1,4 +1,5 @@
 import 'package:aqua_go/core/components/generic_app_bar.dart';
+import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/core/themes/app_colors_extension.dart';
 import 'package:aqua_go/core/themes/app_text_styles.dart';
 import 'package:aqua_go/core/utils/app_assets.dart';
@@ -8,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:aqua_go/core/controllers/theme_controller/theme_cubit.dart';
+
+import '../../../../core/route/routes.dart';
 
 class SettingsView extends StatefulWidget {
   const SettingsView({super.key});
@@ -54,6 +57,9 @@ class _SettingsViewState extends State<SettingsView> {
                       context,
                       title: LocaleKeys.settings_language.tr(),
                       icon: AppAssets.language,
+                      onTap: () {
+                        context.pushNamed(Routes.languageSelect);
+                      },
                     ),
                     const SizedBox(height: 8),
                     _buildSettingsItem(
@@ -70,7 +76,8 @@ class _SettingsViewState extends State<SettingsView> {
                     const SizedBox(height: 8),
                     BlocBuilder<ThemeCubit, ThemeState>(
                       builder: (context, themeState) {
-                        final isDarkMode = themeState.themeMode == ThemeMode.dark;
+                        final isDarkMode =
+                            themeState.themeMode == ThemeMode.dark;
                         return _buildSettingsItem(
                           context,
                           title: LocaleKeys.settings_dark_mode.tr(),

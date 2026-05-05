@@ -67,11 +67,18 @@ abstract class AppAssets {
   // Booking
   static const String bookingHeaderImage =
       'assets/images/booking_header_image.png';
+  static const String addCarIcon = 'assets/svg/add_car.svg';
+  static const String date = 'assets/svg/date.svg';
+  static const String document = 'assets/svg/document.svg';
+  static const String time = 'assets/svg/time.svg';
+  static const String fragant = 'assets/svg/fragant.svg';
+  static const String pedals = 'assets/svg/pedals.svg';
+  static const String wibes = 'assets/svg/wibes.svg';
+  static const String tissues = 'assets/svg/tissues.svg';
 
   // Profile & Settings
   static const String support = 'assets/svg/24-support.svg';
   static const String aboutUs = 'assets/svg/about_us.svg';
-  static const String location = 'assets/svg/location.svg';
   static const String mail = 'assets/svg/mail.svg';
   static const String phone = 'assets/svg/phone.svg';
   static const String settings = 'assets/svg/settings.svg';
@@ -81,4 +88,9 @@ abstract class AppAssets {
   static const String terms = 'assets/svg/terms.svg';
   static const String whatsppOutlined = 'assets/svg/whatsapp_outlined.svg';
   static const String sms = 'assets/svg/sms.svg';
+
+  // Address
+  static const String mapOutlined = 'assets/svg/map.svg';
+  static const String location = 'assets/svg/location.svg';
+  static const String gps = 'assets/svg/gps.svg';
 }

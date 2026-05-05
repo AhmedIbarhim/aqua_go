@@ -20,6 +20,7 @@
         "desc3": "حلول تنظيف عالية الجودة مصممة للحفاظ على سيارتك في أفضل حالاتها."
     },
     "language": {
+        "language": "اللغة",
         "english": "الانجليزية",
         "arabic": "العربية"
     },
@@ -48,6 +49,7 @@
     },
     "home": {
         "available_packages": "الباقات المتاحة",
+        "services": "الخدمات",
         "best_offers": "أفضل العروض",
         "available_offers": "العروض المتاحة",
         "view_more": "عرض المزيد",
@@ -103,9 +105,28 @@
         "upcoming": "القادمة",
         "booking_details": "تفاصيل الحجز",
         "car_location": "موقع السيارة",
+        "add_car": "أضف سيارة",
         "date_and_time": "التاريخ و التوقيت",
         "total_amount": "المبلغ الإجمالي",
-        "view_details": "عرض التفاصيل"
+        "view_details": "عرض التفاصيل",
+        "available_times": "المواعيد المتاحة",
+        "choose_day": "اختر اليوم المناسب",
+        "save_choice": "حفظ الاختيار",
+        "time": "الوقت",
+        "date": "التاريخ",
+        "choose_car": "اختر السيارة",
+        "additional_services": "الخدمات الإضافية",
+        "total": "الإجمالي",
+        "book_now": "احجز الآن",
+        "choose_car_location": "اختر موقع السيارة",
+        "save_car_location": "حفظ موقع السيارة"
+    },
+    "address": {
+        "map": "الخريطة",
+        "current_location": "الموقع الحالي",
+        "select_on_map": "اختر على الخريطة",
+        "my_addresses": "عناويني",
+        "add_new_location": "إضافة عنوان جديد"
     },
     "profile": {
         "account_info": "بيانات الحساب",

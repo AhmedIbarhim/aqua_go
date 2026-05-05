@@ -15,6 +15,40 @@ abstract class AppTextStyles {
     fontSize: 16,
   );
 
+  static const TextStyle regular10 = TextStyle(
+    fontWeight: FontWeight.w400,
+    fontSize: 10,
+  );
+  static const TextStyle medium10 = TextStyle(
+    fontWeight: FontWeight.w500,
+    fontSize: 10,
+  );
+  static const TextStyle semiBold10 = TextStyle(
+    fontWeight: FontWeight.w600,
+    fontSize: 10,
+  );
+  static const TextStyle bold10 = TextStyle(
+    fontWeight: FontWeight.w700,
+    fontSize: 10,
+  );
+
+  static const TextStyle regular11 = TextStyle(
+    fontWeight: FontWeight.w400,
+    fontSize: 11,
+  );
+  static const TextStyle medium11 = TextStyle(
+    fontWeight: FontWeight.w500,
+    fontSize: 11,
+  );
+  static const TextStyle semiBold11 = TextStyle(
+    fontWeight: FontWeight.w600,
+    fontSize: 11,
+  );
+  static const TextStyle bold11 = TextStyle(
+    fontWeight: FontWeight.w700,
+    fontSize: 11,
+  );
+
   // Extracted from Figma
   // XS (12px)
   static const TextStyle regular12 = TextStyle(

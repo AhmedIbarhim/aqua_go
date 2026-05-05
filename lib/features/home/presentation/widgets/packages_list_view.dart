@@ -83,9 +83,8 @@ class _PackagesListViewState extends State<PackagesListView> {
                       ),
                       child: Center(
                         child: Icon(
-                          context.isAr
-                              ? Icons.arrow_forward_ios
-                              : Icons.arrow_back_ios,
+                          Icons.arrow_forward_ios,
+
                           size: 10,
                           color: context.colors.primary,
                         ),

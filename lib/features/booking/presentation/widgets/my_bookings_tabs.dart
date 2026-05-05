@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/themes/app_colors_extension.dart';
 
-class BookingsTabs extends StatelessWidget {
+class MyBookingsTabs extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onTabChanged;
 
-  const BookingsTabs({
+  const MyBookingsTabs({
     super.key,
     required this.selectedIndex,
     required this.onTabChanged,

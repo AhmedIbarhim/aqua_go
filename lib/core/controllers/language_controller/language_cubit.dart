@@ -26,4 +26,12 @@ class LanguageCubit extends Cubit<LanguageState> {
     await context.setLocale(newLocale);
     emit(LanguageChanged(newLocale));
   }
+
+  Future<void> changeLanguage(BuildContext context, String lang) async {
+    final newLocale = Locale(lang);
+
+    await SharedPrefs.setString(kLanguage, newLocale.languageCode);
+    await context.setLocale(newLocale);
+    emit(LanguageChanged(newLocale));
+  }
 }

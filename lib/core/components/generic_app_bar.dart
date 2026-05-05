@@ -18,6 +18,8 @@ class GenericAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.shadowColor,
     this.automaticallyImplyLeading = true,
     this.centerTitle = false,
+    this.hasBackground = false,
+    this.backgroundImage,
   });
 
   final String? title;
@@ -33,11 +35,16 @@ class GenericAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Color? shadowColor;
   final bool automaticallyImplyLeading;
   final bool centerTitle;
+  final bool hasBackground;
+  final String? backgroundImage;
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
       backgroundColor: context.colors.screenBG,
+      flexibleSpace: hasBackground && backgroundImage != null
+          ? Image.asset(backgroundImage!, fit: BoxFit.cover)
+          : null,
       elevation: elevation ?? 0,
       shadowColor: shadowColor,
       automaticallyImplyLeading: automaticallyImplyLeading,

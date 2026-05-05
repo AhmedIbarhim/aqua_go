@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import '../../../../core/themes/app_colors_extension.dart';
-import '../../data/models/booking_model.dart';
-import '../widgets/bookings_list_view.dart';
-import '../widgets/bookings_tabs.dart';
+import '../../data/models/my_bookings_model.dart';
+import '../widgets/my_bookings_list_view.dart';
+import '../widgets/my_bookings_tabs.dart';
 
-class BookingsView extends StatefulWidget {
-  const BookingsView({super.key});
+class MyBookingsView extends StatefulWidget {
+  const MyBookingsView({super.key});
 
   @override
-  State<BookingsView> createState() => _BookingsViewState();
+  State<MyBookingsView> createState() => _MyBookingsViewState();
 }
 
-class _BookingsViewState extends State<BookingsView> {
+class _MyBookingsViewState extends State<MyBookingsView> {
   int _selectedIndex = 0;
 
-  final List<BookingModel> dummyBookings = [
-    const BookingModel(
+  final List<MyBookingsModel> dummyBookings = [
+    const MyBookingsModel(
       id: '1234',
       title: 'غسلة (داخلي و خارجي). #1234',
       location: 'شارع احمد عبد الخالق, نجران السعودية',
@@ -23,7 +23,7 @@ class _BookingsViewState extends State<BookingsView> {
       totalAmount: 122.00,
       isUpcoming: true,
     ),
-    const BookingModel(
+    const MyBookingsModel(
       id: '1235',
       title: 'التلميع الداخلي. #1235',
       location: 'شارع الملك فهد, الرياض السعودية',
@@ -50,7 +50,7 @@ class _BookingsViewState extends State<BookingsView> {
         ),
         child: Column(
           children: [
-            BookingsTabs(
+            MyBookingsTabs(
               selectedIndex: _selectedIndex,
               onTabChanged: (index) {
                 setState(() {
@@ -61,7 +61,7 @@ class _BookingsViewState extends State<BookingsView> {
 
             const SizedBox(height: 16),
 
-            Expanded(child: BookingsListView(bookings: dummyBookings)),
+            Expanded(child: MyBookingsListView(bookings: dummyBookings)),
           ],
         ),
       ),

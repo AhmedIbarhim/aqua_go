@@ -1,4 +1,4 @@
-class BookingModel {
+class MyBookingsModel {
   final String id;
   final String title;
   final String location;
@@ -6,7 +6,7 @@ class BookingModel {
   final double totalAmount;
   final bool isUpcoming;
 
-  const BookingModel({
+  const MyBookingsModel({
     required this.id,
     required this.title,
     required this.location,

@@ -36,6 +36,7 @@ class CodegenLoader extends AssetLoader{
     "desc3": "حلول تنظيف عالية الجودة مصممة للحفاظ على سيارتك في أفضل حالاتها."
   },
   "language": {
+    "language": "اللغة",
     "english": "الانجليزية",
     "arabic": "العربية"
   },
@@ -64,6 +65,7 @@ class CodegenLoader extends AssetLoader{
   },
   "home": {
     "available_packages": "الباقات المتاحة",
+    "services": "الخدمات",
     "best_offers": "أفضل العروض",
     "available_offers": "العروض المتاحة",
     "view_more": "عرض المزيد",
@@ -119,9 +121,28 @@ class CodegenLoader extends AssetLoader{
     "upcoming": "القادمة",
     "booking_details": "تفاصيل الحجز",
     "car_location": "موقع السيارة",
+    "add_car": "أضف سيارة",
     "date_and_time": "التاريخ و التوقيت",
     "total_amount": "المبلغ الإجمالي",
-    "view_details": "عرض التفاصيل"
+    "view_details": "عرض التفاصيل",
+    "available_times": "المواعيد المتاحة",
+    "choose_day": "اختر اليوم المناسب",
+    "save_choice": "حفظ الاختيار",
+    "time": "الوقت",
+    "date": "التاريخ",
+    "choose_car": "اختر السيارة",
+    "additional_services": "الخدمات الإضافية",
+    "total": "الإجمالي",
+    "book_now": "احجز الآن",
+    "choose_car_location": "اختر موقع السيارة",
+    "save_car_location": "حفظ موقع السيارة"
+  },
+  "address": {
+    "map": "الخريطة",
+    "current_location": "الموقع الحالي",
+    "select_on_map": "اختر على الخريطة",
+    "my_addresses": "عناويني",
+    "add_new_location": "إضافة عنوان جديد"
   },
   "profile": {
     "account_info": "بيانات الحساب",
@@ -176,6 +197,7 @@ static const Map<String,dynamic> _en = {
     "desc3": "Premium cleaning solutions tailored to keep your car looking its best."
   },
   "language": {
+    "language": "language",
     "english": "English",
     "arabic": "Arabic"
   },
@@ -204,6 +226,7 @@ static const Map<String,dynamic> _en = {
   },
   "home": {
     "available_packages": "Available Packages",
+    "services": "Services",
     "best_offers": "Best Offers",
     "available_offers": "Available Offers",
     "view_more": "View More",
@@ -259,9 +282,28 @@ static const Map<String,dynamic> _en = {
     "upcoming": "Upcoming",
     "booking_details": "Booking Details",
     "car_location": "Car Location",
+    "add_car": "Add Car",
     "date_and_time": "Date and Time",
     "total_amount": "Total Amount",
-    "view_details": "View Details"
+    "view_details": "View Details",
+    "available_times": "Available Times",
+    "choose_day": "Choose Day",
+    "save_choice": "Save Choice",
+    "time": "Time",
+    "date": "Date",
+    "choose_car": "Choose Car",
+    "additional_services": "Additional Services",
+    "total": "Total",
+    "book_now": "Book Now",
+    "choose_car_location": "Choose Car Location",
+    "save_car_location": "Save Car Location"
+  },
+  "address": {
+    "map": "Map",
+    "current_location": "Current Location",
+    "select_on_map": "Select on Map",
+    "my_addresses": "My Addresses",
+    "add_new_location": "Add New Location"
   },
   "profile": {
     "account_info": "Account Information",

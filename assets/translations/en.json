@@ -20,6 +20,7 @@
         "desc3": "Premium cleaning solutions tailored to keep your car looking its best."
     },
     "language": {
+        "language": "language",
         "english": "English",
         "arabic": "Arabic"
     },
@@ -48,6 +49,7 @@
     },
     "home": {
         "available_packages": "Available Packages",
+        "services": "Services",
         "best_offers": "Best Offers",
         "available_offers": "Available Offers",
         "view_more": "View More",
@@ -103,9 +105,28 @@
         "upcoming": "Upcoming",
         "booking_details": "Booking Details",
         "car_location": "Car Location",
+        "add_car": "Add Car",
         "date_and_time": "Date and Time",
         "total_amount": "Total Amount",
-        "view_details": "View Details"
+        "view_details": "View Details",
+        "available_times": "Available Times",
+        "choose_day": "Choose Day",
+        "save_choice": "Save Choice",
+        "time": "Time",
+        "date": "Date",
+        "choose_car": "Choose Car",
+        "additional_services": "Additional Services",
+        "total": "Total",
+        "book_now": "Book Now",
+        "choose_car_location": "Choose Car Location",
+        "save_car_location": "Save Car Location"
+    },
+    "address": {
+        "map": "Map",
+        "current_location": "Current Location",
+        "select_on_map": "Select on Map",
+        "my_addresses": "My Addresses",
+        "add_new_location": "Add New Location"
     },
     "profile": {
         "account_info": "Account Information",

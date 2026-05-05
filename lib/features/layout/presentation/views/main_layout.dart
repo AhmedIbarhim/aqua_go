@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/utils/app_assets.dart';
-import '../../../booking/presentation/views/bookings_view.dart';
+import '../../../booking/presentation/views/my_bookings_view.dart';
 import '../../../home/presentation/views/home_view.dart';
 import '../../../my_cars/presentation/views/my_cars_view.dart';
 import '../../../profile/presentation/views/profile_view.dart';
@@ -21,7 +21,7 @@ class _MainLayoutState extends State<MainLayout> {
   final List<Widget> _pages = [
     const HomeView(),
     const MyCarsView(),
-    const BookingsView(),
+    const MyBookingsView(),
     const ProfileView(),
   ];
 

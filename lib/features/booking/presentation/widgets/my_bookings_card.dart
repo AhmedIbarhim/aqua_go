@@ -7,12 +7,12 @@ import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
 
 import '../../../../core/themes/app_colors_extension.dart';
-import '../../data/models/booking_model.dart';
+import '../../data/models/my_bookings_model.dart';
 
-class BookingCard extends StatelessWidget {
-  final BookingModel booking;
+class MyBookingsCard extends StatelessWidget {
+  final MyBookingsModel booking;
 
-  const BookingCard({super.key, required this.booking});
+  const MyBookingsCard({super.key, required this.booking});
 
   @override
   Widget build(BuildContext context) {
