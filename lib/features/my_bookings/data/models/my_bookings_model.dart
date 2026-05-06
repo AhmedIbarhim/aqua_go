@@ -14,6 +14,4 @@ class MyBookingsModel {
     required this.totalAmount,
     this.isUpcoming = false,
   });
-
-  // You can add fromJson and toJson methods here when integrating with API
 }

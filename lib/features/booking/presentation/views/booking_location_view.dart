@@ -24,14 +24,12 @@ class _BookingLocationViewState extends State<BookingLocationView> {
 
   final List<MyAddressesModel> myAddresses = [
     MyAddressesModel(
-      title: 'HOME',
+      title: 'المنزل',
       address: '12شارع الماسة, الرياض السعودية',
-      icon: AppAssets.location,
     ),
     MyAddressesModel(
-      title: 'OFFICE',
+      title: 'المكتب',
       address: '1شارع الدار البيضاء, الرياض السعودية',
-      icon: AppAssets.location,
     ),
   ];
 

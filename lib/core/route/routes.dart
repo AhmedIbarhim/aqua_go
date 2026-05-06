@@ -19,4 +19,6 @@ abstract class Routes {
   static const String bookingDetails = '/booking_details_view';
   static const String bookingLocation = '/booking_location_view';
   static const String bookingSummary = '/booking_summary_view';
+
+  static const String addNewAddress = '/add_new_address_view';
 }
