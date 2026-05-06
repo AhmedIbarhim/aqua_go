@@ -3,6 +3,8 @@ abstract class AppAssets {
   static const String edit = 'assets/svg/edit.svg';
   static const String remove = 'assets/svg/remove.svg';
   static const String language = 'assets/svg/lang.svg';
+  static const String search = 'assets/svg/search.svg';
+  static const String close = 'assets/svg/close.svg';
   // Notifications
   static const String notification = 'assets/svg/notification.svg';
   static const String notificationActive = 'assets/svg/notification_active.svg';

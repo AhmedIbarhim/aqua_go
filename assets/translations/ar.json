@@ -140,7 +140,14 @@
         "current_location": "الموقع الحالي",
         "select_on_map": "اختر على الخريطة",
         "my_addresses": "عناويني",
-        "add_new_location": "إضافة عنوان جديد"
+        "add_new_location": "إضافة عنوان جديد",
+        "continue": "الاستمرار",
+        "search_hint": "إبحث عن موقع ...",
+        "search_results": "نتائج البحث",
+        "address_label": "العنوان",
+        "address_name_label": "اسم العنوان",
+        "access_notes_label": "ملاحظات الوصول",
+        "save_address": "حفظ العنوان"
     },
     "profile": {
         "account_info": "بيانات الحساب",

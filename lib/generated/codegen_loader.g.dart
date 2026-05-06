@@ -156,7 +156,14 @@ class CodegenLoader extends AssetLoader{
     "current_location": "الموقع الحالي",
     "select_on_map": "اختر على الخريطة",
     "my_addresses": "عناويني",
-    "add_new_location": "إضافة عنوان جديد"
+    "add_new_location": "إضافة عنوان جديد",
+    "continue": "الاستمرار",
+    "search_hint": "إبحث عن موقع ...",
+    "search_results": "نتائج البحث",
+    "address_label": "العنوان",
+    "address_name_label": "اسم العنوان",
+    "access_notes_label": "ملاحظات الوصول",
+    "save_address": "حفظ العنوان"
   },
   "profile": {
     "account_info": "بيانات الحساب",
@@ -331,7 +338,14 @@ static const Map<String,dynamic> _en = {
     "current_location": "Current Location",
     "select_on_map": "Select on Map",
     "my_addresses": "My Addresses",
-    "add_new_location": "Add New Location"
+    "add_new_location": "Add New Location",
+    "continue": "Continue",
+    "search_hint": "Search location...",
+    "search_results": "Search Results",
+    "address_label": "Address",
+    "address_name_label": "Address Name",
+    "access_notes_label": "Access Notes",
+    "save_address": "Save Address"
   },
   "profile": {
     "account_info": "Account Information",

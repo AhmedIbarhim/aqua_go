@@ -62,30 +62,37 @@ class CustomBottomSheet extends StatelessWidget {
         child: Padding(
           padding:
               padding ??
-              const EdgeInsets.only(top: 24, left: 24, right: 24, bottom: 64),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Container(
-                      width: 32,
-                      height: 32,
-                      alignment: Alignment.center,
-                      child: const Icon(Icons.arrow_back, size: 24),
-                    ),
-                  ),
-                  Text(title, style: AppTextStyles.regular20),
-                  const SizedBox(width: 32),
-                ],
+              EdgeInsets.only(
+                top: 24,
+                left: 24,
+                right: 24,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 5,
               ),
-              const SizedBox(height: 48),
-              child,
-            ],
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Header
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        width: 32,
+                        height: 32,
+                        alignment: Alignment.center,
+                        child: const Icon(Icons.arrow_back, size: 24),
+                      ),
+                    ),
+                    Text(title, style: AppTextStyles.regular20),
+                    const SizedBox(width: 32),
+                  ],
+                ),
+                const SizedBox(height: 48),
+                child,
+              ],
+            ),
           ),
         ),
       ),

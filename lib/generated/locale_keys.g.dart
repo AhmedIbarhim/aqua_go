@@ -135,6 +135,13 @@ abstract class  LocaleKeys {
   static const address_select_on_map = 'address.select_on_map';
   static const address_my_addresses = 'address.my_addresses';
   static const address_add_new_location = 'address.add_new_location';
+  static const address_continue = 'address.continue';
+  static const address_search_hint = 'address.search_hint';
+  static const address_search_results = 'address.search_results';
+  static const address_address_label = 'address.address_label';
+  static const address_address_name_label = 'address.address_name_label';
+  static const address_access_notes_label = 'address.access_notes_label';
+  static const address_save_address = 'address.save_address';
   static const address = 'address';
   static const profile_account_info = 'profile.account_info';
   static const profile_verified = 'profile.verified';

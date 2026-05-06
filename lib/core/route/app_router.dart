@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../features/adress/presentation/views/add_new_address_view.dart';
+import '../../features/adress/presentation/views/new_address_map_view.dart';
 import '../../features/auth/presentation/views/login_view.dart';
 import '../../features/auth/presentation/views/otp_view.dart';
 import '../../features/booking/presentation/views/booking_details_view.dart';
@@ -72,8 +72,11 @@ abstract class AppRouter {
       case Routes.bookingSummary:
         return MaterialPageRoute(builder: (_) => const BookingSummaryView());
 
-      case Routes.addNewAddress:
-        return MaterialPageRoute(builder: (_) => const AddNewAddressView());
+      case Routes.newAddressMap:
+        return MaterialPageRoute(
+          builder: (_) =>
+              NewAddressMapView(forAddingAddess: settings.arguments as bool),
+        );
 
       // case Routes.language:
       //   return MaterialPageRoute(builder: (_) => const LanguageView());

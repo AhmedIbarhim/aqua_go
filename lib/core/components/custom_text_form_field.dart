@@ -13,6 +13,9 @@ class CustomTextFormField extends StatelessWidget {
     required this.label,
     this.keyboardType,
     this.suffixIcon,
+    this.prefixIcon,
+    this.maxLines,
+    this.minLines,
     this.obscureText = false,
     this.onSaved,
   });
@@ -20,6 +23,9 @@ class CustomTextFormField extends StatelessWidget {
   final String label;
   final TextInputType? keyboardType;
   final Widget? suffixIcon;
+  final Widget? prefixIcon;
+  final int? maxLines;
+  final int? minLines;
   final bool obscureText;
   final TextEditingController? controller;
   final void Function(String?)? onSaved;
@@ -29,26 +35,30 @@ class CustomTextFormField extends StatelessWidget {
     return TextFormField(
       controller: controller,
       onSaved: onSaved,
-      onTapOutside: (_) {
+      onTapOutside: (event) {
         FocusScope.of(context).unfocus();
       },
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'هذا الحقل مطلوب';
-        }
-        return null;
-      },
+
+      // validator: (value) {
+      //   if (value == null || value.isEmpty) {
+      //     return 'هذا الحقل مطلوب';
+      //   }
+      //   return null;
+      // },
       keyboardType: keyboardType,
       decoration: InputDecoration(
-        filled: true,
-        fillColor: AppColors.black,
+        // filled: true,
+        // fillColor: AppColors.black,
         border: buildBorder(),
         enabledBorder: buildBorder(),
         labelText: label,
         labelStyle: AppTextStyles.regular12,
         suffixIcon: suffixIcon,
+        prefixIcon: prefixIcon,
       ),
       obscureText: obscureText,
+      maxLines: maxLines,
+      minLines: minLines,
     );
   }
 

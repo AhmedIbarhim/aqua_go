@@ -48,12 +48,12 @@ class CustomButton extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         spacing: 8,
         children: [
-          ?preWidget,
+          if (preWidget != null) preWidget!,
           FittedBox(
             fit: BoxFit.scaleDown,
             child: Text(text, style: AppTextStyles.regular16),
           ),
-          ?postWidget,
+          if (postWidget != null) postWidget!,
         ],
       ),
     );

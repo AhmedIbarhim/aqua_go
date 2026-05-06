@@ -110,7 +110,12 @@ class _BookingLocationViewState extends State<BookingLocationView> {
                         ),
                         AddNewAddressButton(
                           text: LocaleKeys.address_add_new_location.tr(),
-                          onTap: () {},
+                          onTap: () {
+                            context.pushNamed(
+                              Routes.newAddressMap,
+                              arguments: true,
+                            );
+                          },
                         ),
                       ],
                     ),
@@ -127,7 +132,9 @@ class _BookingLocationViewState extends State<BookingLocationView> {
 
   Widget _buildAddressSelectOnMapCard(BuildContext context) {
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        context.pushNamed(Routes.newAddressMap, arguments: false);
+      },
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.all(16),

@@ -20,5 +20,5 @@ abstract class Routes {
   static const String bookingLocation = '/booking_location_view';
   static const String bookingSummary = '/booking_summary_view';
 
-  static const String addNewAddress = '/add_new_address_view';
+  static const String newAddressMap = '/new_address_map_view';
 }
