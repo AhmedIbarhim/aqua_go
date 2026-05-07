@@ -8,14 +8,14 @@ class APIClient {
   Dio get dio => _dio;
 
   APIClient({
-    required String baseUrl,
+    String? baseUrl,
 
     Duration connectTimeout = const Duration(seconds: 30),
     Duration receiveTimeout = const Duration(seconds: 30),
   }) {
     _dio = Dio(
       BaseOptions(
-        baseUrl: baseUrl,
+        baseUrl: baseUrl ?? '',
         connectTimeout: connectTimeout,
         receiveTimeout: receiveTimeout,
         contentType: 'application/json',

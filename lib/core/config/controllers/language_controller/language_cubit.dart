@@ -1,4 +1,4 @@
-import 'package:aqua_go/core/config/shared_prefs.dart';
+import 'package:aqua_go/core/config/local_storage/shared_prefs.dart';
 import 'package:aqua_go/core/constants.dart';
 import 'package:bloc/bloc.dart';
 import 'package:easy_localization/easy_localization.dart';

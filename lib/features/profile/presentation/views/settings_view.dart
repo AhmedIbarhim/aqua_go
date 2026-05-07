@@ -8,7 +8,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:aqua_go/core/controllers/theme_controller/theme_cubit.dart';
+import 'package:aqua_go/core/config/controllers/theme_controller/theme_cubit.dart';
 
 import '../../../../core/route/routes.dart';
 

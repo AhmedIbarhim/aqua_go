@@ -1,4 +1,4 @@
-import 'package:aqua_go/core/config/shared_prefs.dart';
+import 'package:aqua_go/core/config/local_storage/shared_prefs.dart';
 import 'package:aqua_go/core/constants.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -16,7 +16,8 @@ class ThemeCubit extends Cubit<ThemeState> {
     } else if (themeStr == 'light') {
       return ThemeMode.light;
     }
-    return ThemeMode.dark; // Defaulting to dark as requested by design previously
+    return ThemeMode
+        .dark; // Defaulting to dark as requested by design previously
   }
 
   Future<void> toggleTheme(bool isDark) async {

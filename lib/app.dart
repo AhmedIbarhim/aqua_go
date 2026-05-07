@@ -1,5 +1,5 @@
-import 'package:aqua_go/core/controllers/language_controller/language_cubit.dart';
-import 'package:aqua_go/core/controllers/theme_controller/theme_cubit.dart';
+import 'package:aqua_go/core/config/controllers/language_controller/language_cubit.dart';
+import 'package:aqua_go/core/config/controllers/theme_controller/theme_cubit.dart';
 import 'package:aqua_go/core/route/app_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';

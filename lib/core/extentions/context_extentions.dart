@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../controllers/language_controller/language_cubit.dart';
-import '../controllers/theme_controller/theme_cubit.dart';
+import '../config/controllers/language_controller/language_cubit.dart';
+import '../config/controllers/theme_controller/theme_cubit.dart';
 
 extension LocaleExtentions on BuildContext {
   bool get isEn => read<LanguageCubit>().state.locale.languageCode == 'en';

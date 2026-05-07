@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:svg_flutter/svg.dart';
 
-import '../../../../core/controllers/language_controller/language_cubit.dart';
+import '../../../../core/config/controllers/language_controller/language_cubit.dart';
 import '../../../../core/themes/app_colors_extension.dart';
 import '../../../../generated/locale_keys.g.dart';
 

@@ -7,9 +7,9 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../core/config/shared_prefs.dart';
+import '../../../core/config/local_storage/shared_prefs.dart';
 import '../../../core/constants.dart';
-import '../../../core/controllers/language_controller/language_cubit.dart';
+import '../../../core/config/controllers/language_controller/language_cubit.dart';
 import '../../../core/themes/app_colors.dart';
 import '../../../core/themes/app_text_styles.dart';
 import '../widgets/language_widget.dart';

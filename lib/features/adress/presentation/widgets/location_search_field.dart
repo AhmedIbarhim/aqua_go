@@ -7,9 +7,11 @@ import 'package:aqua_go/core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../../generated/locale_keys.g.dart';
 
+import 'package:aqua_go/features/adress/data/models/place_prediction_model.dart';
+
 class LocationSearchField extends StatelessWidget {
   final TextEditingController controller;
-  final List<dynamic> predictions;
+  final List<PlacePredictionModel> predictions;
   final bool showResults;
   final ValueChanged<String> onSearchChanged;
   final VoidCallback onClear;
@@ -76,7 +78,7 @@ class LocationSearchField extends StatelessWidget {
                       ),
                     ),
                   ),
-                  hintText: 'address.search_hint'.tr(),
+                  hintText: LocaleKeys.address_search_hint.tr(),
                   hintStyle: AppTextStyles.regular14.copyWith(
                     color: darkAppColors.contentSecondaryLight,
                   ),
@@ -114,9 +116,9 @@ class LocationSearchField extends StatelessWidget {
                     ...predictions.map((prediction) {
                       return _buildSearchResultItem(
                         context,
-                        prediction['description'],
+                        prediction.description,
                         false,
-                        onTap: () => onPredictionTap(prediction['place_id']),
+                        onTap: () => onPredictionTap(prediction.placeId),
                       );
                     }),
                   ],
