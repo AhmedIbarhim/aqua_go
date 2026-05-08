@@ -72,7 +72,6 @@ class ServiceCard extends StatelessWidget {
                                 style: AppTextStyles.regular12.copyWith(
                                   color: context.colors.textSecondary,
                                 ),
-                                textAlign: TextAlign.right,
                                 maxLines: 3,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -116,10 +115,14 @@ class ServiceCard extends StatelessWidget {
                     SizedBox(
                       width: width * 0.43,
                       height: height * 0.26,
-                      child: Image.asset(
-                        serviceModel.image,
-                        fit: BoxFit.fill,
-                        color: context.colors.primary,
+                      child: Transform.flip(
+                        flipX: context.isEn,
+                        child: Image.asset(
+                          serviceModel.image,
+
+                          fit: BoxFit.fill,
+                          color: context.colors.primary,
+                        ),
                       ),
                     ),
                   ],

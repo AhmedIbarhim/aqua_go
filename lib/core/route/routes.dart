@@ -17,7 +17,9 @@ abstract class Routes {
   static const String notification = '/notification_view';
   static const String addVehicle = '/add_vehicle_view';
   static const String bookingDetails = '/booking_details_view';
+  static const String complain = '/complain_view';
   static const String bookingLocation = '/booking_location_view';
+  static const String myBookingDetails = '/my_booking_details_view';
   static const String bookingSummary = '/booking_summary_view';
 
   static const String newAddressMap = '/new_address_map_view';

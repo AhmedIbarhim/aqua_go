@@ -11,6 +11,9 @@ import '../../features/home/presentation/data/models/package_model.dart';
 import '../../features/home/presentation/views/offers_view.dart';
 import '../../features/home/presentation/views/packages_view.dart';
 import '../../features/layout/presentation/views/main_layout.dart';
+import '../../features/my_bookings/data/models/my_bookings_model.dart';
+import '../../features/my_bookings/presentation/views/complain_view.dart';
+import '../../features/my_bookings/presentation/views/my_booking_deatails_view.dart';
 import '../../features/profile/presentation/views/language_select_view.dart';
 import '../../features/startup/views/onboarding_view.dart';
 import '../../features/startup/views/splash_view.dart';
@@ -76,6 +79,18 @@ abstract class AppRouter {
         return MaterialPageRoute(
           builder: (_) =>
               NewAddressMapView(forAddingAddess: settings.arguments as bool),
+        );
+      case Routes.complain:
+        return MaterialPageRoute(
+          builder: (_) =>
+              ComplainView(booking: settings.arguments as MyBookingsModel),
+        );
+
+      case Routes.myBookingDetails:
+        return MaterialPageRoute(
+          builder: (_) => MyBookingDetailsView(
+            booking: settings.arguments as MyBookingsModel,
+          ),
         );
 
       // case Routes.language:

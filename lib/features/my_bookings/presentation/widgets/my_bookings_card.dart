@@ -1,3 +1,5 @@
+import 'package:aqua_go/core/extentions/context_extentions.dart';
+import 'package:aqua_go/core/route/routes.dart';
 import 'package:aqua_go/core/themes/app_colors.dart';
 import 'package:aqua_go/core/themes/app_text_styles.dart';
 import 'package:aqua_go/core/utils/app_assets.dart';
@@ -107,7 +109,9 @@ class MyBookingsCard extends StatelessWidget {
           const SizedBox(height: 16),
           // Actions
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              context.pushNamed(Routes.myBookingDetails, arguments: booking);
+            },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(

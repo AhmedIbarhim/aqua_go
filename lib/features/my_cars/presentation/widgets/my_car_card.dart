@@ -144,7 +144,7 @@ class MyCarCard extends StatelessWidget {
               _buildSpecItem(
                 context,
                 text: car.boardNumber,
-                icon: AppAssets.boardNum,
+                icon: AppAssets.note,
               ),
             ],
           ),

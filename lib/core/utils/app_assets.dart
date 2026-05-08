@@ -5,6 +5,8 @@ abstract class AppAssets {
   static const String language = 'assets/svg/lang.svg';
   static const String search = 'assets/svg/search.svg';
   static const String close = 'assets/svg/close.svg';
+  static const String boardNum = 'assets/svg/board_num.svg';
+  static const String imageNotFound = 'assets/svg/image_not_found.svg';
   // Notifications
   static const String notification = 'assets/svg/notification.svg';
   static const String notificationActive = 'assets/svg/notification_active.svg';
@@ -38,8 +40,8 @@ abstract class AppAssets {
       'assets/svg/reservations_disabled.svg';
   static const String myCarsEnabled = 'assets/svg/my_cars_enabled.svg';
   static const String myCarsDisabled = 'assets/svg/my_cars_disabled.svg';
-  static const String accountEnabled = 'assets/svg/account_enabled.svg';
-  static const String accountDisabled = 'assets/svg/account_disabled.svg';
+  static const String personEnabled = 'assets/svg/account_enabled.svg';
+  static const String personDisabled = 'assets/svg/account_disabled.svg';
 
   static const String currency = 'assets/svg/currency.svg';
 
@@ -61,7 +63,7 @@ abstract class AppAssets {
   static const String manfYear = 'assets/svg/manf_year.svg';
   static const String colorSwatch = 'assets/svg/color_swatch.svg';
   static const String colorDropper = 'assets/images/color_dropper.png';
-  static const String boardNum = 'assets/svg/board_num.svg';
+  static const String note = 'assets/svg/note.svg';
   static const String myCar = 'assets/images/my_car.png';
   static const String demoLandcroser = 'assets/images/demo_landcroser.png';
   static const String demoToyota = 'assets/images/demo_toyota.png';
@@ -83,6 +85,8 @@ abstract class AppAssets {
   static const String mastercardPay = 'assets/images/mastercard_pay.png';
   static const String visaPay = 'assets/images/visa_pay.png';
   static const String madaPay = 'assets/images/mada_pay.png';
+
+  static const String addImage = 'assets/svg/add_image.svg';
 
   // Profile & Settings
   static const String support = 'assets/svg/24-support.svg';
