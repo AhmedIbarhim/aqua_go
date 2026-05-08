@@ -8,6 +8,8 @@ import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
+import 'rating_bottom_sheet.dart';
+
 class MyBookingProceduresBottomSheet extends StatelessWidget {
   final MyBookingsModel booking;
   const MyBookingProceduresBottomSheet({super.key, required this.booking});
@@ -29,8 +31,8 @@ class MyBookingProceduresBottomSheet extends StatelessWidget {
           context,
           title: LocaleKeys.bookings_rate_service.tr(),
           onTap: () {
-            // TODO: Implement rate service logic
             Navigator.pop(context);
+            RatingBottomSheet.show(context);
           },
         ),
         const SizedBox(height: 12),

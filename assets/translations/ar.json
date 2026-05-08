@@ -153,6 +153,15 @@
         "complain_details": "تفاصيل الشكوى",
         "upload_images": "انقر هنا لرفع الصور",
         "add_image": "أضف صورة",
+        "share_opinion": "شاركنا برأيك نرغب بمعرفة كيف كانت تجربتك؟",
+        "rating_reason": "سبب التقييم",
+        "rating_reasons": {
+            "staff_behavior": "سلوك العاملين",
+            "damage": "التلف",
+            "delivery_delay": "التأخير في التسليم",
+            "poor_quality": "الجودة الرديئة",
+            "other_reason": "أخرى"
+        },
         "complaint_types": {
             "poor_wash_quality": "جودة غسيل رديئة",
             "arrival_delay": "تأخير في الوصول",

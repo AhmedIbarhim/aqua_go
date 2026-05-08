@@ -153,6 +153,15 @@
         "complain_details": "Complain Details",
         "upload_images": "Click Here To Upload Images",
         "add_image": "Add Image",
+        "share_opinion": "Share your opinion, we'd like to know how your experience was?",
+        "rating_reason": "Rating Reason",
+        "rating_reasons": {
+            "staff_behavior": "Staff Behavior",
+            "damage": "Damage",
+            "delivery_delay": "Delivery Delay",
+            "poor_quality": "Poor Quality",
+            "other_reason": "Other"
+        },
         "complaint_types": {
             "poor_wash_quality": "Poor wash quality",
             "arrival_delay": "Arrival delay",

@@ -169,6 +169,15 @@ class CodegenLoader extends AssetLoader{
     "complain_details": "تفاصيل الشكوى",
     "upload_images": "انقر هنا لرفع الصور",
     "add_image": "أضف صورة",
+    "share_opinion": "شاركنا برأيك نرغب بمعرفة كيف كانت تجربتك؟",
+    "rating_reason": "سبب التقييم",
+    "rating_reasons": {
+      "staff_behavior": "سلوك العاملين",
+      "damage": "التلف",
+      "delivery_delay": "التأخير في التسليم",
+      "poor_quality": "الجودة الرديئة",
+      "other_reason": "أخرى"
+    },
     "complaint_types": {
       "poor_wash_quality": "جودة غسيل رديئة",
       "arrival_delay": "تأخير في الوصول",
@@ -380,6 +389,15 @@ static const Map<String,dynamic> _en = {
     "complain_details": "Complain Details",
     "upload_images": "Click Here To Upload Images",
     "add_image": "Add Image",
+    "share_opinion": "Share your opinion, we'd like to know how your experience was?",
+    "rating_reason": "Rating Reason",
+    "rating_reasons": {
+      "staff_behavior": "Staff Behavior",
+      "damage": "Damage",
+      "delivery_delay": "Delivery Delay",
+      "poor_quality": "Poor Quality",
+      "other_reason": "Other"
+    },
     "complaint_types": {
       "poor_wash_quality": "Poor wash quality",
       "arrival_delay": "Arrival delay",

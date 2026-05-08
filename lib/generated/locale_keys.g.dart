@@ -148,6 +148,14 @@ abstract class  LocaleKeys {
   static const bookings_complain_details = 'bookings.complain_details';
   static const bookings_upload_images = 'bookings.upload_images';
   static const bookings_add_image = 'bookings.add_image';
+  static const bookings_share_opinion = 'bookings.share_opinion';
+  static const bookings_rating_reason = 'bookings.rating_reason';
+  static const bookings_rating_reasons_staff_behavior = 'bookings.rating_reasons.staff_behavior';
+  static const bookings_rating_reasons_damage = 'bookings.rating_reasons.damage';
+  static const bookings_rating_reasons_delivery_delay = 'bookings.rating_reasons.delivery_delay';
+  static const bookings_rating_reasons_poor_quality = 'bookings.rating_reasons.poor_quality';
+  static const bookings_rating_reasons_other_reason = 'bookings.rating_reasons.other_reason';
+  static const bookings_rating_reasons = 'bookings.rating_reasons';
   static const bookings_complaint_types_poor_wash_quality = 'bookings.complaint_types.poor_wash_quality';
   static const bookings_complaint_types_arrival_delay = 'bookings.complaint_types.arrival_delay';
   static const bookings_complaint_types_worker_behavior = 'bookings.complaint_types.worker_behavior';
