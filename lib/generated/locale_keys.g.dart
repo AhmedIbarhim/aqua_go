@@ -5,12 +5,14 @@
 abstract class  LocaleKeys {
   static const skip = 'skip';
   static const next = 'next';
-  static const get_started = 'get_started';
   static const cancel = 'cancel';
+  static const ok = 'ok';
+  static const go_to_home = 'go_to_home';
   static const select_here = 'select_here';
   static const write_here = 'write_here';
   static const save = 'save';
   static const submit = 'submit';
+  static const get_started = 'get_started';
   static const edit = 'edit';
   static const delete = 'delete';
   static const back = 'back';
@@ -89,7 +91,6 @@ abstract class  LocaleKeys {
   static const my_cars = 'my_cars';
   static const booking_package_booking_success = 'booking_package.booking_success';
   static const booking_package_request_wash = 'booking_package.request_wash';
-  static const booking_package_go_to_home = 'booking_package.go_to_home';
   static const booking_package_package_details = 'booking_package.package_details';
   static const booking_package_duration = 'booking_package.duration';
   static const booking_package_total = 'booking_package.total';
@@ -147,9 +148,12 @@ abstract class  LocaleKeys {
   static const bookings_select_complaint_type = 'bookings.select_complaint_type';
   static const bookings_complain_details = 'bookings.complain_details';
   static const bookings_upload_images = 'bookings.upload_images';
+  static const bookings_complaint_submitted = 'bookings.complaint_submitted';
   static const bookings_add_image = 'bookings.add_image';
   static const bookings_share_opinion = 'bookings.share_opinion';
   static const bookings_rating_reason = 'bookings.rating_reason';
+  static const bookings_rating_submitted = 'bookings.rating_submitted';
+  static const bookings_rating_submitted_desc = 'bookings.rating_submitted_desc';
   static const bookings_rating_reasons_staff_behavior = 'bookings.rating_reasons.staff_behavior';
   static const bookings_rating_reasons_damage = 'bookings.rating_reasons.damage';
   static const bookings_rating_reasons_delivery_delay = 'bookings.rating_reasons.delivery_delay';
@@ -165,6 +169,9 @@ abstract class  LocaleKeys {
   static const bookings_complaint_types_safety_incident = 'bookings.complaint_types.safety_incident';
   static const bookings_complaint_types_other_type = 'bookings.complaint_types.other_type';
   static const bookings_complaint_types = 'bookings.complaint_types';
+  static const bookings_before_washing = 'bookings.before_washing';
+  static const bookings_after_washing = 'bookings.after_washing';
+  static const bookings_photo_gallery = 'bookings.photo_gallery';
   static const bookings = 'bookings';
   static const address_map = 'address.map';
   static const address_current_location = 'address.current_location';

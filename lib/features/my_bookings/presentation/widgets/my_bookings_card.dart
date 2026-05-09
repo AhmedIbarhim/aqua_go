@@ -1,6 +1,5 @@
 import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/core/route/routes.dart';
-import 'package:aqua_go/core/themes/app_colors.dart';
 import 'package:aqua_go/core/themes/app_text_styles.dart';
 import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
@@ -46,7 +45,7 @@ class MyBookingsCard extends StatelessWidget {
                     vertical: 8,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.warning,
+                    color: context.colors.warning,
                     borderRadius: BorderRadius.circular(100),
                   ),
                   child: Text(

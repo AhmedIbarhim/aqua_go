@@ -2,6 +2,8 @@
     "skip": "skip",
     "next": "next",
     "cancel": "Cancel",
+    "ok": "OK",
+    "go_to_home": "Go to Home",
     "select_here": "Select here",
     "write_here": "Write here",
     "save": "Save",
@@ -93,7 +95,6 @@
     "booking_package": {
         "booking_success": "You have successfully subscribed to the package. You can use it starting now.",
         "request_wash": "Request First Wash",
-        "go_to_home": "Go to Home",
         "package_details": "Package Details",
         "duration": "Duration: ",
         "total": "Total",
@@ -152,9 +153,12 @@
         "select_complaint_type": "Select Complaint Type",
         "complain_details": "Complain Details",
         "upload_images": "Click Here To Upload Images",
+        "complaint_submitted": "Complaint Submitted",
         "add_image": "Add Image",
         "share_opinion": "Share your opinion, we'd like to know how your experience was?",
         "rating_reason": "Rating Reason",
+        "rating_submitted": "Rating Submitted",
+        "rating_submitted_desc": "Your feedback helps us improve our services and provide you with a better experience",
         "rating_reasons": {
             "staff_behavior": "Staff Behavior",
             "damage": "Damage",
@@ -171,7 +175,10 @@
             "billing_issue": "Billing issue",
             "safety_incident": "Safety-related incident",
             "other_type": "Other"
-        }
+        },
+        "before_washing": "Before Washing",
+        "after_washing": "After Washing",
+        "photo_gallery": "Photo Gallery"
     },
     "address": {
         "map": "Map",

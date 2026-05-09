@@ -9,9 +9,9 @@ import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
-
-import '../../../../core/components/custom_network_image.dart';
 import '../widgets/my_booking_procedures_bottom_sheet.dart';
+import '../widgets/my_booking_photos_section.dart';
+import '../widgets/my_booking_location_section.dart';
 
 class MyBookingDetailsView extends StatelessWidget {
   final MyBookingsModel booking;
@@ -25,11 +25,12 @@ class MyBookingDetailsView extends StatelessWidget {
       appBar: GenericAppBar(
         title: LocaleKeys.bookings_booking_details.tr(),
         actions: [
-          IconButton(
-            onPressed: () =>
-                MyBookingProceduresBottomSheet.show(context, booking),
-            icon: const Icon(Icons.more_vert),
-          ),
+          if (!booking.isUpcoming)
+            IconButton(
+              onPressed: () =>
+                  MyBookingProceduresBottomSheet.show(context, booking),
+              icon: const Icon(Icons.more_vert),
+            ),
         ],
       ),
       body: Column(
@@ -48,16 +49,23 @@ class MyBookingDetailsView extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildSummarySection(context),
                   const SizedBox(height: 16),
-                  _buildLocationSection(context),
+                  if (!booking.isUpcoming) _buildLocationSection(context),
                   const SizedBox(height: 16),
-                  _buildPhotosSection(context),
+                  if (!booking.isUpcoming) const MyBookingPhotosSection(),
+                  if (booking.isUpcoming)
+                    MyBookingLocationSection(
+                      address: booking.location,
+                      latitude: booking.latitude,
+                      longitude: booking.longitude,
+                    ),
                   const SizedBox(height: 16),
                   _buildInvoicesLink(context),
+                  const SizedBox(height: 24),
                 ],
               ),
             ),
           ),
-          _buildActionSheet(context),
+          if (booking.isUpcoming) _buildActionSheet(context),
         ],
       ),
     );
@@ -345,57 +353,8 @@ class MyBookingDetailsView extends StatelessWidget {
                   style: AppTextStyles.regular14.copyWith(
                     color: context.colors.contentSecondaryLight,
                   ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPhotosSection(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        RichText(
-          text: TextSpan(
-            children: [
-              TextSpan(
-                text: LocaleKeys.bookings_car_images.tr(),
-                style: AppTextStyles.regular16.copyWith(
-                  color: context.colors.textPrimary,
-                ),
-              ),
-              TextSpan(
-                text: '(${LocaleKeys.bookings_before_and_after_washing.tr()})',
-                style: AppTextStyles.regular12.copyWith(
-                  color: context.colors.contentDisabled,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: context.colors.cardBackGround,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: CustomNetworkImage(""),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: CustomNetworkImage(""),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],

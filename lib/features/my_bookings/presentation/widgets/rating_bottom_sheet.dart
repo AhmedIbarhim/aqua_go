@@ -8,6 +8,7 @@ import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../../../../generated/locale_keys.g.dart';
+import 'rating_success_alert_box.dart';
 
 class RatingBottomSheet extends StatefulWidget {
   const RatingBottomSheet({super.key});
@@ -64,8 +65,8 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
         ),
         const SizedBox(height: 24),
         _buildBikerInfo(),
-        const SizedBox(height: 24),
-        _buildRatingReasons(),
+
+        if (_rating < 5) ...[const SizedBox(height: 24), _buildRatingReasons()],
         const SizedBox(height: 32),
         Row(
           children: [
@@ -75,6 +76,7 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
                 onPressed: () {
                   // TODO: Handle rating submission
                   Navigator.pop(context);
+                  RatingSuccessAlertBox.show(context);
                 },
                 text: LocaleKeys.submit.tr(),
               ),

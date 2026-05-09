@@ -5,6 +5,8 @@ class MyBookingsModel {
   final String formattedDateTime;
   final double totalAmount;
   final bool isUpcoming;
+  final double latitude;
+  final double longitude;
 
   const MyBookingsModel({
     required this.id,
@@ -12,6 +14,8 @@ class MyBookingsModel {
     required this.location,
     required this.formattedDateTime,
     required this.totalAmount,
-    this.isUpcoming = false,
+    required this.isUpcoming,
+    required this.latitude,
+    required this.longitude,
   });
 }

@@ -22,6 +22,8 @@ class _MyBookingsViewState extends State<MyBookingsView> {
       formattedDateTime: '9:00 م . 4/22/2026',
       totalAmount: 122.00,
       isUpcoming: true,
+      latitude: 24.7136,
+      longitude: 46.6753,
     ),
     const MyBookingsModel(
       id: '1235',
@@ -30,6 +32,50 @@ class _MyBookingsViewState extends State<MyBookingsView> {
       formattedDateTime: '4:00 م . 4/25/2026',
       totalAmount: 150.00,
       isUpcoming: true,
+      latitude: 24.7136,
+      longitude: 46.6753,
+    ),
+    const MyBookingsModel(
+      id: '1235',
+      title: 'التلميع الداخلي. #1235',
+      location:
+          'شارع الملك فهد, الرياض السعودdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddية',
+      formattedDateTime: '4:00 م . 4/25/2026',
+      totalAmount: 150.00,
+      isUpcoming: true,
+      latitude: 24.7136,
+      longitude: 46.6753,
+    ),
+    const MyBookingsModel(
+      id: '1235',
+      title: 'التلميع الداخلي. #1235',
+      location: 'شارع الملك فهد, الرياض السعودية',
+      formattedDateTime: '4:00 م . 4/25/2026',
+      totalAmount: 150.00,
+      isUpcoming: false,
+      latitude: 24.7136,
+      longitude: 46.6753,
+    ),
+    const MyBookingsModel(
+      id: '1235',
+      title: 'التلميع الداخلي. #1235',
+      location: 'شارع الملك فهد, الرياض السعودية',
+      formattedDateTime: '4:00 م . 4/25/2026',
+      totalAmount: 150.00,
+      isUpcoming: false,
+      latitude: 24.7136,
+      longitude: 46.6753,
+    ),
+    const MyBookingsModel(
+      id: '1235',
+      title: 'التلميع الداخلي. #1235',
+      location:
+          'شارع الملك فهد,hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh الرياض السعودية',
+      formattedDateTime: '4:00 م . 4/25/2026',
+      totalAmount: 150.00,
+      isUpcoming: false,
+      latitude: 24.7136,
+      longitude: 46.6753,
     ),
   ];
 
@@ -61,7 +107,17 @@ class _MyBookingsViewState extends State<MyBookingsView> {
 
             const SizedBox(height: 16),
 
-            Expanded(child: MyBookingsListView(bookings: dummyBookings)),
+            Expanded(
+              child: MyBookingsListView(
+                bookings: dummyBookings
+                    .where(
+                      (booking) => _selectedIndex == 0
+                          ? booking.isUpcoming
+                          : !booking.isUpcoming,
+                    )
+                    .toList(),
+              ),
+            ),
           ],
         ),
       ),

@@ -13,6 +13,7 @@ import '../../features/home/presentation/views/packages_view.dart';
 import '../../features/layout/presentation/views/main_layout.dart';
 import '../../features/my_bookings/data/models/my_bookings_model.dart';
 import '../../features/my_bookings/presentation/views/complain_view.dart';
+import '../../features/my_bookings/presentation/views/gallery_view.dart';
 import '../../features/my_bookings/presentation/views/my_booking_deatails_view.dart';
 import '../../features/profile/presentation/views/language_select_view.dart';
 import '../../features/startup/views/onboarding_view.dart';
@@ -93,6 +94,19 @@ abstract class AppRouter {
           ),
         );
 
+      case Routes.gallery:
+        final args = settings.arguments;
+        if (args is Map<String, dynamic>) {
+          return MaterialPageRoute(
+            builder: (_) => GalleryView(
+              images: args['images'] as List<String>,
+              initialIndex: args['initialIndex'] as int? ?? 0,
+            ),
+          );
+        }
+        return MaterialPageRoute(
+          builder: (_) => GalleryView(images: args as List<String>),
+        );
       // case Routes.language:
       //   return MaterialPageRoute(builder: (_) => const LanguageView());
 

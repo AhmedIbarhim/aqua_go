@@ -1,12 +1,14 @@
 {
     "skip": "تخطي",
     "next": "التالي",
-    "get_started": "ابدأ",
     "cancel": "الغاء",
+    "ok": "حسنا",
+    "go_to_home": "الذهاب للرئيسية",
     "select_here": "اختر هنا",
     "write_here": "اكتب هنا",
     "save": "حفظ",
     "submit": "ارسال",
+    "get_started": "ابدأ",
     "edit": "تعديل",
     "delete": "حذف",
     "back": "العودة",
@@ -93,7 +95,6 @@
     "booking_package": {
         "booking_success": "تم الاشتراك في الباقة بنجاح يمكنك استخدامها بدءاً من الان",
         "request_wash": "اطلب اول غسلة",
-        "go_to_home": "الذهاب للرئيسية",
         "package_details": "تفاصيل الباقة",
         "duration": "لمدة : ",
         "total": "الإجمالي",
@@ -152,9 +153,12 @@
         "select_complaint_type": "اختر نوع الشكوي",
         "complain_details": "تفاصيل الشكوى",
         "upload_images": "انقر هنا لرفع الصور",
+        "complaint_submitted": "تم تسجيل شكواك بنجاح",
         "add_image": "أضف صورة",
         "share_opinion": "شاركنا برأيك نرغب بمعرفة كيف كانت تجربتك؟",
         "rating_reason": "سبب التقييم",
+        "rating_submitted": "تم تسجيل تقييمك بنجاح",
+        "rating_submitted_desc": "رأيك يساعدنا في تحسين خدماتنا وتقديم تجربة أفضل لك",
         "rating_reasons": {
             "staff_behavior": "سلوك العاملين",
             "damage": "التلف",
@@ -171,7 +175,10 @@
             "billing_issue": "مشكلة في الفواتير",
             "safety_incident": "حادث متعلق بالسلامة",
             "other_type": "أخرى"
-        }
+        },
+        "before_washing": "قبل الغسيل",
+        "after_washing": "بعد الغسيل",
+        "photo_gallery": "معرض الصور"
     },
     "address": {
         "map": "الخريطة",

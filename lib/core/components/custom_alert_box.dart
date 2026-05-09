@@ -80,20 +80,20 @@ class SuccessAlertBox extends StatelessWidget {
   const SuccessAlertBox({
     super.key,
     this.title,
-    required this.message,
+    this.message,
     this.buttonText,
     // this.onPressed,
   });
 
   final String? title;
-  final String message;
+  final String? message;
   final String? buttonText;
   // final VoidCallback? onPressed;
 
   static Future<T?> show<T>({
     required BuildContext context,
     String? title,
-    required String message,
+    String? message,
     String? buttonText,
     // VoidCallback? onPressed,
   }) {
@@ -122,14 +122,15 @@ class SuccessAlertBox extends StatelessWidget {
         const SizedBox(height: 4),
 
         // Description
-        Text(
-          message,
-          textAlign: TextAlign.center,
-          style: AppTextStyles.regular16.copyWith(
-            color: context.colors.textSecondary,
-            height: 1.5,
+        if (message != null)
+          Text(
+            message!,
+            textAlign: TextAlign.center,
+            style: AppTextStyles.regular16.copyWith(
+              color: context.colors.textSecondary,
+              height: 1.5,
+            ),
           ),
-        ),
         const SizedBox(height: 24),
       ],
     );

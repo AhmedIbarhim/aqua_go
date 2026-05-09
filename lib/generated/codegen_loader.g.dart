@@ -17,12 +17,14 @@ class CodegenLoader extends AssetLoader{
   static const Map<String,dynamic> _ar = {
   "skip": "تخطي",
   "next": "التالي",
-  "get_started": "ابدأ",
   "cancel": "الغاء",
+  "ok": "حسنا",
+  "go_to_home": "الذهاب للرئيسية",
   "select_here": "اختر هنا",
   "write_here": "اكتب هنا",
   "save": "حفظ",
   "submit": "ارسال",
+  "get_started": "ابدأ",
   "edit": "تعديل",
   "delete": "حذف",
   "back": "العودة",
@@ -109,7 +111,6 @@ class CodegenLoader extends AssetLoader{
   "booking_package": {
     "booking_success": "تم الاشتراك في الباقة بنجاح يمكنك استخدامها بدءاً من الان",
     "request_wash": "اطلب اول غسلة",
-    "go_to_home": "الذهاب للرئيسية",
     "package_details": "تفاصيل الباقة",
     "duration": "لمدة : ",
     "total": "الإجمالي",
@@ -168,9 +169,12 @@ class CodegenLoader extends AssetLoader{
     "select_complaint_type": "اختر نوع الشكوي",
     "complain_details": "تفاصيل الشكوى",
     "upload_images": "انقر هنا لرفع الصور",
+    "complaint_submitted": "تم تسجيل شكواك بنجاح",
     "add_image": "أضف صورة",
     "share_opinion": "شاركنا برأيك نرغب بمعرفة كيف كانت تجربتك؟",
     "rating_reason": "سبب التقييم",
+    "rating_submitted": "تم تسجيل تقييمك بنجاح",
+    "rating_submitted_desc": "رأيك يساعدنا في تحسين خدماتنا وتقديم تجربة أفضل لك",
     "rating_reasons": {
       "staff_behavior": "سلوك العاملين",
       "damage": "التلف",
@@ -187,7 +191,10 @@ class CodegenLoader extends AssetLoader{
       "billing_issue": "مشكلة في الفواتير",
       "safety_incident": "حادث متعلق بالسلامة",
       "other_type": "أخرى"
-    }
+    },
+    "before_washing": "قبل الغسيل",
+    "after_washing": "بعد الغسيل",
+    "photo_gallery": "معرض الصور"
   },
   "address": {
     "map": "الخريطة",
@@ -238,6 +245,8 @@ static const Map<String,dynamic> _en = {
   "skip": "skip",
   "next": "next",
   "cancel": "Cancel",
+  "ok": "OK",
+  "go_to_home": "Go to Home",
   "select_here": "Select here",
   "write_here": "Write here",
   "save": "Save",
@@ -329,7 +338,6 @@ static const Map<String,dynamic> _en = {
   "booking_package": {
     "booking_success": "You have successfully subscribed to the package. You can use it starting now.",
     "request_wash": "Request First Wash",
-    "go_to_home": "Go to Home",
     "package_details": "Package Details",
     "duration": "Duration: ",
     "total": "Total",
@@ -388,9 +396,12 @@ static const Map<String,dynamic> _en = {
     "select_complaint_type": "Select Complaint Type",
     "complain_details": "Complain Details",
     "upload_images": "Click Here To Upload Images",
+    "complaint_submitted": "Complaint Submitted",
     "add_image": "Add Image",
     "share_opinion": "Share your opinion, we'd like to know how your experience was?",
     "rating_reason": "Rating Reason",
+    "rating_submitted": "Rating Submitted",
+    "rating_submitted_desc": "Your feedback helps us improve our services and provide you with a better experience",
     "rating_reasons": {
       "staff_behavior": "Staff Behavior",
       "damage": "Damage",
@@ -407,7 +418,10 @@ static const Map<String,dynamic> _en = {
       "billing_issue": "Billing issue",
       "safety_incident": "Safety-related incident",
       "other_type": "Other"
-    }
+    },
+    "before_washing": "Before Washing",
+    "after_washing": "After Washing",
+    "photo_gallery": "Photo Gallery"
   },
   "address": {
     "map": "Map",
