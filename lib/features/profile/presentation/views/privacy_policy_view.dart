@@ -1,0 +1,120 @@
+import 'package:aqua_go/core/components/custom_alert_box.dart';
+import 'package:aqua_go/core/themes/app_colors_extension.dart';
+import 'package:aqua_go/generated/locale_keys.g.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
+
+import '../../../../core/components/custom_button.dart';
+import '../../../../core/components/generic_app_bar.dart';
+import '../../../../core/themes/app_text_styles.dart';
+
+class PrivacyPolicyView extends StatelessWidget {
+  const PrivacyPolicyView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: context.colors.screenBG,
+      appBar: GenericAppBar(
+        title: LocaleKeys.privacy_title.tr(),
+        centerTitle: true,
+      ),
+      body: Column(
+        children: [
+          const SizedBox(height: 16),
+          Expanded(
+            child: Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: context.colors.background,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(24),
+                  topRight: Radius.circular(24),
+                ),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      LocaleKeys.privacy_intro.tr(),
+                      style: AppTextStyles.regular14.copyWith(
+                        color: context.colors.textSecondary,
+                        height: 1.5,
+                      ),
+                    ),
+                    _buildDivider(context),
+                    ...List.generate(10, (index) {
+                      final sectionIndex = index + 1;
+                      final titleKey = 'privacy.section${sectionIndex}_title';
+                      final contentKey =
+                          'privacy.section${sectionIndex}_content';
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            titleKey.tr(),
+                            style: AppTextStyles.medium16.copyWith(
+                              color: context.colors.textPrimary,
+                              height: 1.5,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            contentKey.tr(),
+                            style: AppTextStyles.regular16.copyWith(
+                              color: context.colors.textSecondary,
+                              height: 1.5,
+                            ),
+                          ),
+                          if (index < 9) _buildDivider(context),
+                        ],
+                      );
+                    }),
+                    const SizedBox(height: 24),
+                    Text(
+                      LocaleKeys.privacy_footer.tr(),
+                      style: AppTextStyles.medium16.copyWith(height: 1.5),
+                    ),
+                    const SizedBox(height: 48),
+                    CustomButton(
+                      text: LocaleKeys.auth_delete_account.tr(),
+                      color: context.colors.error,
+                      textColor: lightAppColors.themeColor,
+                      borderColor: context.colors.error,
+                      onPressed: () {
+                        WarningBox.show(
+                          context: context,
+                          title: LocaleKeys.auth_delete_account.tr(),
+                          message: LocaleKeys.auth_delete_account_confirmation
+                              .tr(),
+                          onPrimaryPressed: () {
+                            // context.read<LoginCubit>().logout();
+                          },
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 48),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDivider(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      child: Divider(
+        color: context.colors.borderSecondary.withAlpha(50),
+        thickness: 1,
+      ),
+    );
+  }
+}

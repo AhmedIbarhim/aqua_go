@@ -21,6 +21,9 @@ import '../../features/startup/views/splash_view.dart';
 import '../../features/notifications/presentation/views/notification_view.dart';
 import '../../features/profile/presentation/views/settings_view.dart';
 import '../../features/my_cars/presentation/views/add_car_view.dart';
+import '../../features/profile/presentation/views/privacy_policy_view.dart';
+import '../../features/profile/presentation/views/about_us_view.dart';
+import '../../features/profile/presentation/views/terms_view.dart';
 import 'routes.dart';
 
 abstract class AppRouter {
@@ -113,14 +116,14 @@ abstract class AppRouter {
       // case Routes.language:
       //   return MaterialPageRoute(builder: (_) => const LanguageView());
 
-      //   case Routes.privacyPolicy:
-      //     return MaterialPageRoute(builder: (_) => const PrivacyPolicyView());
+      case Routes.privacyPolicy:
+        return MaterialPageRoute(builder: (_) => const PrivacyPolicyView());
 
-      //     case Routes.termsAndConditions:
-      //       return MaterialPageRoute(builder: (_) => const TermsAndConditionsView());
+      case Routes.termsAndConditions:
+        return MaterialPageRoute(builder: (_) => const TermsView());
 
-      //       case Routes.aboutUs:
-      //         return MaterialPageRoute(builder: (_) => const AboutUsView());
+      case Routes.aboutUs:
+        return MaterialPageRoute(builder: (_) => const AboutUsView());
 
       //         case Routes.support:
       //           return MaterialPageRoute(builder: (_) => const SupportView());

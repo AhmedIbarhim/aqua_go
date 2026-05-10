@@ -50,7 +50,11 @@
         "add_email": "Add Email Address",
         "verify_email": "Verify Email",
         "back_to_profile": "Back to Profile",
-        "email_added_successfully": "Email Added Successfully"
+        "email_added_successfully": "Email Added Successfully",
+        "logout": "Logout",
+        "logout_confirmation": "Are you sure you want to logout?",
+        "delete_account": "Delete Account",
+        "delete_account_confirmation": "Are you sure you want to delete your account?"
     },
     "layout": {
         "home": "Home",
@@ -219,7 +223,6 @@
         "settings": "Settings",
         "technical_support": "Technical Support & Help",
         "my_packages": "My Packages",
-        "logout": "Log Out",
         "edit_profile": "Edit",
         "view_profile": "View Profile Data",
         "edit_profile_data": "Edit Profile Data",
@@ -247,5 +250,51 @@
         "no_notification_desc": "Your notifications will appear here once you have any",
         "today": "Today",
         "yesterday": "Yesterday"
+    },
+    "privacy": {
+        "title": "Privacy Policy",
+        "intro": "This Privacy Policy explains how AquaGo collects and uses personal data of users who use the AquaGo app or benefit from mobile washing services (collectively referred to as the \"Platform\").\n\nWe place great importance on protecting your personal data and are committed to handling it with care, maintaining its security, and complying with applicable laws and regulations. Please read this policy carefully, as it contains important information about how your data is used and your rights related to it.",
+        "section1_title": "Scope of Application",
+        "section1_content": "This policy applies only to the AquaGo platform and does not extend to any third-party sites or services that may be accessed through links within the app. Upon leaving the Platform, we do not control how those entities use your data.",
+        "section2_title": "Consent",
+        "section2_content": "By using the AquaGo app or requesting our services, you agree – where applicable – to the collection, use, and transfer of your personal data as described in this policy.",
+        "section3_title": "Data We Collect",
+        "section3_content": "We may collect the following types of data:\n- Name\n- Mobile Number\n- Geographical Location (to perform the service)\n- Vehicle Details\n- Order and Payment Data",
+        "section4_title": "How We Use Data",
+        "section4_content": "We use your data for the following purposes:\n- Providing mobile washing services\n- Managing orders and reservations\n- Improving service quality\n- Communicating with you regarding orders or offers",
+        "section5_title": "Data Sharing",
+        "section5_content": "We do not sell your data to any third party.\nWe may share your data only with:\n- Operations team (to perform the service)\n- Payment service providers",
+        "section6_title": "Data Protection",
+        "section6_content": "We are committed to taking appropriate technical and organizational measures to protect your data from unauthorized access or illegal use.",
+        "section7_title": "Data Retention",
+        "section7_content": "We retain your data only for as long as necessary to provide the service or comply with legal requirements.",
+        "section8_title": "Your Rights",
+        "section8_content": "You have the right to:\n- Request access to your data\n- Request its modification\n- Request its deletion",
+        "section9_title": "Modifications",
+        "section9_content": "We reserve the right to modify this policy at any time, and the updated version will be published via the app.",
+        "section10_title": "Contact",
+        "section10_content": "For privacy-related inquiries: admin@aquago.sa",
+        "footer": "By using the Platform, you acknowledge your agreement to this policy"
+    },
+    "about": {
+        "title": "About Us",
+        "intro_title": "About AquaGo",
+        "intro_p1": "AquaGo is a mobile car wash application that provides you with a professional cleaning experience for your car wherever you are, with ease and speed. We aim to provide high-quality service that combines convenience, technology, and attention to detail, without the need to wait or visit traditional wash centers.",
+        "intro_p2": "Through the app, you can book a wash service in minutes, specify your location, choose the right type of service, and follow the order status moment by moment until the service is complete.",
+        "intro_p3": "AquaGo relies on a specialized team equipped with the latest cleaning equipment and car care products to ensure professional results and a reliable experience every time.",
+        "features_title": "AquaGo Features",
+        "feature1": "Fast and easy booking via the app",
+        "feature2": "Mobile wash service that reaches your location",
+        "feature3": "Multiple options to suit all needs",
+        "feature4": "Live tracking of order status",
+        "feature5": "High quality and competitive prices",
+        "feature6": "Fully comfortable and safe experience",
+        "footer": "AquaGo — Professional cleanliness starts from your place."
+    },
+    "refund": {
+        "title": "Refund Policy",
+        "content_p1": "At AquaGo, we are committed to providing a high-quality and professional mobile car wash service. If there are any observations regarding the service provided, the customer can contact the support team within 48 hours of the service completion.",
+        "content_p2": "After reviewing the request and verifying any issues with the service, the service will be re-performed for free without any additional fees.",
+        "footer": "AquaGo — Your satisfaction is the foundation of our service."
     }
 }

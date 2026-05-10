@@ -66,12 +66,18 @@ class _SettingsViewState extends State<SettingsView> {
                       context,
                       title: LocaleKeys.settings_privacy_policy.tr(),
                       icon: AppAssets.privacy,
+                      onTap: () {
+                        context.pushNamed(Routes.privacyPolicy);
+                      },
                     ),
                     const SizedBox(height: 8),
                     _buildSettingsItem(
                       context,
                       title: LocaleKeys.settings_terms_and_conditions.tr(),
                       icon: AppAssets.terms,
+                      onTap: () {
+                        context.pushNamed(Routes.termsAndConditions);
+                      },
                     ),
                     const SizedBox(height: 8),
                     BlocBuilder<ThemeCubit, ThemeState>(

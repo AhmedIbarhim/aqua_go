@@ -112,6 +112,9 @@ class ProfileView extends StatelessWidget {
                     context,
                     title: LocaleKeys.profile_about_us.tr(),
                     icon: AppAssets.aboutUs,
+                    onTap: () {
+                      context.pushNamed(Routes.aboutUs);
+                    },
                   ),
                   const SizedBox(height: 8),
                   _buildProfileItem(

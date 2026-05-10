@@ -66,7 +66,11 @@ class CodegenLoader extends AssetLoader{
     "add_email": "اضافة البريد الإلكتروني",
     "verify_email": "تحقق من البريد الإلكتروني",
     "back_to_profile": "العودة الي قائمة البروفايل",
-    "email_added_successfully": "تم اضافة البريد الالكتروني بنجاح"
+    "email_added_successfully": "تم اضافة البريد الالكتروني بنجاح",
+    "logout": "تسجيل الخروج",
+    "logout_confirmation": "هل أنت متأكد من تسجيل الخروج؟",
+    "delete_account": "حذف الحساب",
+    "delete_account_confirmation": "هل أنت متأكد من حذف الحساب؟"
   },
   "layout": {
     "home": "الرئيسية",
@@ -235,7 +239,6 @@ class CodegenLoader extends AssetLoader{
     "settings": "الإعدادات",
     "technical_support": "الدعم الفني والمساعدة",
     "my_packages": "باقاتي",
-    "logout": "تسجيل الخروج",
     "edit_profile": "تعديل",
     "view_profile": "عرض بيانات الحساب",
     "edit_profile_data": "تعديل بيانات الحساب",
@@ -263,6 +266,52 @@ class CodegenLoader extends AssetLoader{
     "no_notification_desc": "سيتم عرض الإشعارات الخاصة بك في هذه الصفحة",
     "today": "اليوم",
     "yesterday": "أمس"
+  },
+  "privacy": {
+    "title": "سياسة الخصوصية",
+    "intro": "سياسة الخصوصية توضح كيف تقوم شركة AquaGo بجمع واستخدام البيانات الشخصية للمستخدمين الذين يستخدمون تطبيق AquaGo أو يستفيدون من خدمات الغسيل المتنقل (ويُشار إليها مجتمعة بـ \"المنصة\").\n\nنحن نولي حماية بياناتك الشخصية أهمية كبيرة، ونلتزم بالتعامل معها بعناية، والحفاظ على أمنها، والامتثال للأنظمة واللوائح المعمول بها. يرجى قراءة هذه السياسة بعناية، حيث تحتوي على معلومات مهمة حول كيفية استخدام بياناتك وحقوقك المتعلقة بها.",
+    "section1_title": "نطاق التطبيق",
+    "section1_content": "تنطبق هذه السياسة فقط على منصة AquaGo، ولا تمتد إلى أي مواقع أو خدمات تابعة لأطراف ثالثة قد يتم الوصول إليها من خلال روابط داخل التطبيق. عند مغادرتك للمنصة، فإننا لا نتحكم في كيفية استخدام تلك الجهات لبياناتك.",
+    "section2_title": "الموافقة",
+    "section2_content": "باستخدامك لتطبيق AquaGo أو طلبك لخدماتنا، فإنك توافق – حيثما يلزم – على جمع واستخدام ونقل بياناتك الشخصية وفقًا لما هو موضح في هذه السياسة.",
+    "section3_title": "البيانات التي نقوم بجمعها",
+    "section3_content": "قد نقوم بجمع الأنواع التالية من البيانات:\n- الاسم\n- رقم الجوال\n- الموقع الجغرافي (لتنفيذ الخدمة)\n- تفاصيل المركبة\n- بيانات الطلبات والدفع",
+    "section4_title": "كيفية استخدام البيانات",
+    "section4_content": "نستخدم بياناتك للأغراض التالية:\n- تقديم خدمات الغسيل المتنقل\n- إدارة الطلبات والحجوزات\n- تحسين جودة الخدمة\n- التواصل معك بخصوص الطلبات أو العروض",
+    "section5_title": "مشاركة البيانات",
+    "section5_content": "لا نقوم ببيع بياناتك لأي طرف ثالث.\nقد نشارك بياناتك فقط مع:\n- فريق التشغيل (لتنفيذ الخدمة)\n- مزودي خدمات الدفع",
+    "section6_title": "حماية البيانات",
+    "section6_content": "نلتزم باتخاذ التدابير التقنية والتنظيمية المناسبة لحماية بياناتك من الوصول غير المصرح به أو الاستخدام غير القانوني.",
+    "section7_title": "الاحتفاظ بالبيانات",
+    "section7_content": "نحتفظ ببياناتك فقط للمدة اللازمة لتقديم الخدمة أو للامتثال للمتطلبات النظامية.",
+    "section8_title": "حقوقك",
+    "section8_content": "يحق لك:\n- طلب الوصول إلى بياناتك\n- طلب تعديلها\n- طلب حذفها",
+    "section9_title": "التعديلات",
+    "section9_content": "نحتفظ بحق تعديل هذه السياسة في أي وقت، وسيتم نشر النسخة المحدثة عبر التطبيق.",
+    "section10_title": "التواصل",
+    "section10_content": "للاستفسارات المتعلقة بالخصوصية: admin@aquago.sa",
+    "footer": "باستخدامك للمنصة، فإنك تقر بموافقتك على هذه السياسة"
+  },
+  "about": {
+    "title": "من نحن",
+    "intro_title": "نبذة عن AquaGo",
+    "intro_p1": "AquaGo هو تطبيق غسيل متنقل يوفر لك تجربة تنظيف احترافية لسيارتك أينما كنت، بكل سهولة وسرعة. نهدف إلى تقديم خدمة عالية الجودة تجمع بين الراحة، التقنية، والاهتمام بالتفاصيل، دون الحاجة للانتظار أو زيارة مراكز الغسيل التقليدية.",
+    "intro_p2": "من خلال التطبيق، يمكنك حجز خدمة الغسيل في دقائق، تحديد موقعك، اختيار نوع الخدمة المناسبة، ومتابعة حالة الطلب لحظة بلحظة حتى اكتمال الخدمة.",
+    "intro_p3": "يعتمد AquaGo على فريق متخصص ومجهز بأحدث معدات التنظيف ومنتجات العناية بالسيارات، لضمان نتائج احترافية وتجربة موثوقة في كل مرة.",
+    "features_title": "مميزات AquaGo",
+    "feature1": "حجز سريع وسهل عبر التطبيق",
+    "feature2": "خدمة غسيل متنقلة تصل إلى موقعك",
+    "feature3": "خيارات متعددة تناسب جميع الاحتياجات",
+    "feature4": "متابعة مباشرة لحالة الطلب",
+    "feature5": "جودة عالية وأسعار تنافسية",
+    "feature6": "تجربة مريحة وآمنة بالكامل",
+    "footer": "AquaGo — النظافة الاحترافية تبدأ من مكانك."
+  },
+  "refund": {
+    "title": "سياسة الاسترجاع",
+    "content_p1": "في AquaGo نحرص على تقديم خدمة غسيل متنقلة بجودة عالية واحترافية. وفي حال وجود أي ملاحظة على الخدمة المقدمة، يمكن للعميل التواصل مع فريق الدعم خلال مدة لا تتجاوز 48 ساعة من وقت انتهاء الخدمة.",
+    "content_p2": "بعد مراجعة الطلب والتأكد من وجود مشكلة في الخدمة، سيتم إعادة تنفيذ الخدمة مجانًا دون أي رسوم إضافية.",
+    "footer": "AquaGo — رضاك هو أساس خدمتنا."
   }
 };
 static const Map<String,dynamic> _en = {
@@ -317,7 +366,11 @@ static const Map<String,dynamic> _en = {
     "add_email": "Add Email Address",
     "verify_email": "Verify Email",
     "back_to_profile": "Back to Profile",
-    "email_added_successfully": "Email Added Successfully"
+    "email_added_successfully": "Email Added Successfully",
+    "logout": "Logout",
+    "logout_confirmation": "Are you sure you want to logout?",
+    "delete_account": "Delete Account",
+    "delete_account_confirmation": "Are you sure you want to delete your account?"
   },
   "layout": {
     "home": "Home",
@@ -486,7 +539,6 @@ static const Map<String,dynamic> _en = {
     "settings": "Settings",
     "technical_support": "Technical Support & Help",
     "my_packages": "My Packages",
-    "logout": "Log Out",
     "edit_profile": "Edit",
     "view_profile": "View Profile Data",
     "edit_profile_data": "Edit Profile Data",
@@ -514,6 +566,52 @@ static const Map<String,dynamic> _en = {
     "no_notification_desc": "Your notifications will appear here once you have any",
     "today": "Today",
     "yesterday": "Yesterday"
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "intro": "This Privacy Policy explains how AquaGo collects and uses personal data of users who use the AquaGo app or benefit from mobile washing services (collectively referred to as the \"Platform\").\n\nWe place great importance on protecting your personal data and are committed to handling it with care, maintaining its security, and complying with applicable laws and regulations. Please read this policy carefully, as it contains important information about how your data is used and your rights related to it.",
+    "section1_title": "Scope of Application",
+    "section1_content": "This policy applies only to the AquaGo platform and does not extend to any third-party sites or services that may be accessed through links within the app. Upon leaving the Platform, we do not control how those entities use your data.",
+    "section2_title": "Consent",
+    "section2_content": "By using the AquaGo app or requesting our services, you agree – where applicable – to the collection, use, and transfer of your personal data as described in this policy.",
+    "section3_title": "Data We Collect",
+    "section3_content": "We may collect the following types of data:\n- Name\n- Mobile Number\n- Geographical Location (to perform the service)\n- Vehicle Details\n- Order and Payment Data",
+    "section4_title": "How We Use Data",
+    "section4_content": "We use your data for the following purposes:\n- Providing mobile washing services\n- Managing orders and reservations\n- Improving service quality\n- Communicating with you regarding orders or offers",
+    "section5_title": "Data Sharing",
+    "section5_content": "We do not sell your data to any third party.\nWe may share your data only with:\n- Operations team (to perform the service)\n- Payment service providers",
+    "section6_title": "Data Protection",
+    "section6_content": "We are committed to taking appropriate technical and organizational measures to protect your data from unauthorized access or illegal use.",
+    "section7_title": "Data Retention",
+    "section7_content": "We retain your data only for as long as necessary to provide the service or comply with legal requirements.",
+    "section8_title": "Your Rights",
+    "section8_content": "You have the right to:\n- Request access to your data\n- Request its modification\n- Request its deletion",
+    "section9_title": "Modifications",
+    "section9_content": "We reserve the right to modify this policy at any time, and the updated version will be published via the app.",
+    "section10_title": "Contact",
+    "section10_content": "For privacy-related inquiries: admin@aquago.sa",
+    "footer": "By using the Platform, you acknowledge your agreement to this policy"
+  },
+  "about": {
+    "title": "About Us",
+    "intro_title": "About AquaGo",
+    "intro_p1": "AquaGo is a mobile car wash application that provides you with a professional cleaning experience for your car wherever you are, with ease and speed. We aim to provide high-quality service that combines convenience, technology, and attention to detail, without the need to wait or visit traditional wash centers.",
+    "intro_p2": "Through the app, you can book a wash service in minutes, specify your location, choose the right type of service, and follow the order status moment by moment until the service is complete.",
+    "intro_p3": "AquaGo relies on a specialized team equipped with the latest cleaning equipment and car care products to ensure professional results and a reliable experience every time.",
+    "features_title": "AquaGo Features",
+    "feature1": "Fast and easy booking via the app",
+    "feature2": "Mobile wash service that reaches your location",
+    "feature3": "Multiple options to suit all needs",
+    "feature4": "Live tracking of order status",
+    "feature5": "High quality and competitive prices",
+    "feature6": "Fully comfortable and safe experience",
+    "footer": "AquaGo — Professional cleanliness starts from your place."
+  },
+  "refund": {
+    "title": "Refund Policy",
+    "content_p1": "At AquaGo, we are committed to providing a high-quality and professional mobile car wash service. If there are any observations regarding the service provided, the customer can contact the support team within 48 hours of the service completion.",
+    "content_p2": "After reviewing the request and verifying any issues with the service, the service will be re-performed for free without any additional fees.",
+    "footer": "AquaGo — Your satisfaction is the foundation of our service."
   }
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"ar": _ar, "en": _en};
