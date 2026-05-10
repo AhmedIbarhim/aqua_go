@@ -166,7 +166,7 @@ class _NewAddressMapViewState extends State<NewAddressMapView> {
                       ),
                       decoration: BoxDecoration(color: context.colors.screenBG),
                       child: CustomButton(
-                        text: LocaleKeys.address_continue.tr(),
+                        text: LocaleKeys.proceed.tr(),
                         onPressed: () {
                           if (widget.forAddingAddess) {
                             AddAddressBottomSheet.show(

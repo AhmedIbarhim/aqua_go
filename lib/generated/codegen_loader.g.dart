@@ -24,6 +24,7 @@ class CodegenLoader extends AssetLoader{
   "write_here": "اكتب هنا",
   "save": "حفظ",
   "submit": "ارسال",
+  "proceed": "استمرار",
   "get_started": "ابدأ",
   "edit": "تعديل",
   "delete": "حذف",
@@ -49,6 +50,7 @@ class CodegenLoader extends AssetLoader{
     "verify_phone": "تحقق من رقم جوالك",
     "phone_number": "رقم التليفون",
     "send_verification_code": "سنرسل لك رمز تحقق عبر رسالة نصية",
+    "send_verification_mail": "سنرسل لك رمز تحقق عبر البريد الإلكتروني",
     "verify_otp": "تحقق من رقم جوالك",
     "resend_code": "إعادة إرسال الرمز خلال",
     "resend_code_button": "إعادة إرسال الرمز",
@@ -56,7 +58,13 @@ class CodegenLoader extends AssetLoader{
     "verify": "تحقق",
     "tech_error": "عطل فني مؤقت",
     "tech_error_desc": "نعتذر، نواجه حاليًا مشكلة تقنية. يرجى المحاولة مرة أخرى بعد قليل",
-    "contact_support": "التواصل مع الدعم"
+    "contact_support": "التواصل مع الدعم",
+    "enter_email": "أدخل البريد الإلكتروني",
+    "email_address": "البريد الإلكتروني",
+    "add_email": "اضافة البريد الإلكتروني",
+    "verify_email": "تحقق من البريد الإلكتروني",
+    "back_to_profile": "العودة الي قائمة البروفايل",
+    "email_added_successfully": "تم اضافة البريد الالكتروني بنجاح"
   },
   "layout": {
     "home": "الرئيسية",
@@ -202,7 +210,6 @@ class CodegenLoader extends AssetLoader{
     "select_on_map": "اختر على الخريطة",
     "my_addresses": "عناويني",
     "add_new_location": "إضافة عنوان جديد",
-    "continue": "الاستمرار",
     "search_hint": "إبحث عن موقع ...",
     "search_results": "نتائج البحث",
     "address_label": "العنوان",
@@ -211,6 +218,8 @@ class CodegenLoader extends AssetLoader{
     "save_address": "حفظ العنوان"
   },
   "profile": {
+    "male": "ذكر",
+    "female": "أنثى",
     "account_info": "بيانات الحساب",
     "verified": "موثق",
     "my_addresses": "عناويني",
@@ -219,7 +228,17 @@ class CodegenLoader extends AssetLoader{
     "about_app": "عن التطبيق",
     "about_us": "من نحن",
     "settings": "الإعدادات",
-    "technical_support": "الدعم الفني والمساعدة"
+    "technical_support": "الدعم الفني والمساعدة",
+    "my_packages": "باقاتي",
+    "logout": "تسجيل الخروج",
+    "edit_profile": "تعديل",
+    "view_profile": "عرض بيانات الحساب",
+    "edit_profile_data": "تعديل بيانات الحساب",
+    "full_name": "الاسم بالكامل",
+    "dob": "تاريخ الميلاد",
+    "gender": "النوع",
+    "edit_data": "تعديل البيانات",
+    "save_changes": "حفظ التعديلات"
   },
   "settings": {
     "more_settings": "المزيد من الإعدادات",
@@ -251,6 +270,7 @@ static const Map<String,dynamic> _en = {
   "write_here": "Write here",
   "save": "Save",
   "submit": "Submit",
+  "proceed": "Proceed",
   "get_started": "get started",
   "edit": "edit",
   "delete": "delete",
@@ -276,6 +296,7 @@ static const Map<String,dynamic> _en = {
     "verify_phone": "Verify Phone Number",
     "phone_number": "Phone Number",
     "send_verification_code": "We'll send you a verification code via SMS",
+    "send_verification_mail": "We'll send you a verification code via email",
     "verify_otp": "Verify your phone number",
     "resend_code": "Resend Code within",
     "resend_code_button": "Resend Code",
@@ -283,7 +304,13 @@ static const Map<String,dynamic> _en = {
     "verify": "Verify",
     "tech_error": "Temporary Technical Problem",
     "tech_error_desc": "We are currently experiencing a technical issue. Please try again shortly",
-    "contact_support": "Contact Support"
+    "contact_support": "Contact Support",
+    "enter_email": "Enter Email",
+    "email_address": "Email Address",
+    "add_email": "Add Email Address",
+    "verify_email": "Verify Email",
+    "back_to_profile": "Back to Profile",
+    "email_added_successfully": "Email Added Successfully"
   },
   "layout": {
     "home": "Home",
@@ -429,7 +456,6 @@ static const Map<String,dynamic> _en = {
     "select_on_map": "Select on Map",
     "my_addresses": "My Addresses",
     "add_new_location": "Add New Location",
-    "continue": "Continue",
     "search_hint": "Search location...",
     "search_results": "Search Results",
     "address_label": "Address",
@@ -438,6 +464,8 @@ static const Map<String,dynamic> _en = {
     "save_address": "Save Address"
   },
   "profile": {
+    "male": "Male",
+    "female": "Female",
     "account_info": "Account Information",
     "verified": "Verified",
     "my_addresses": "My Addresses",
@@ -446,7 +474,17 @@ static const Map<String,dynamic> _en = {
     "about_app": "About App",
     "about_us": "About Us",
     "settings": "Settings",
-    "technical_support": "Technical Support & Help"
+    "technical_support": "Technical Support & Help",
+    "my_packages": "My Packages",
+    "logout": "Log Out",
+    "edit_profile": "Edit",
+    "view_profile": "View Profile Data",
+    "edit_profile_data": "Edit Profile Data",
+    "full_name": "Full Name",
+    "dob": "Date of Birth",
+    "gender": "Gender",
+    "edit_data": "Edit Data",
+    "save_changes": "Save Changes"
   },
   "settings": {
     "more_settings": "More Settings",

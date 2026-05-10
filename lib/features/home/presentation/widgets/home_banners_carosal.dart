@@ -1,8 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
-
-import '../../../../core/themes/app_colors.dart';
+import '../../../../core/themes/app_colors_extension.dart';
 import '../data/models/banner_model.dart';
 
 class HomeBannersCarosal extends StatefulWidget {
@@ -71,8 +70,8 @@ class _HomeBannersCarosalState extends State<HomeBannersCarosal> {
             dotsCount: widget.banners.length,
             position: _currentIndex.toDouble(),
             decorator: DotsDecorator(
-              activeColor: AppColors.contentSecondaryLight,
-              color: AppColors.contentSecondary,
+              activeColor: context.colors.contentSecondaryLight,
+              color: context.colors.contentSecondary,
               size: const Size(6, 6),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(6),

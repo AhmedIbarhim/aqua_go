@@ -1,10 +1,10 @@
 import 'package:aqua_go/core/components/custom_button.dart';
+import 'package:aqua_go/core/themes/app_colors_extension.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/components/custom_text_form_field.dart';
 import '../../../../core/route/routes.dart';
-import '../../../../core/themes/app_colors.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../generated/locale_keys.g.dart';
 
@@ -45,8 +45,8 @@ class _LoginContentState extends State<LoginContent> {
     return Container(
       width: double.infinity,
       height: MediaQuery.of(context).size.height * 0.43,
-      decoration: const BoxDecoration(
-        color: AppColors.black,
+      decoration: BoxDecoration(
+        color: darkAppColors.themeColor,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(32),
           topRight: Radius.circular(32),
@@ -62,7 +62,7 @@ class _LoginContentState extends State<LoginContent> {
             Text(
               LocaleKeys.auth_send_verification_code.tr(),
               style: AppTextStyles.regular16.copyWith(
-                color: AppColors.textSecondary,
+                color: darkAppColors.textSecondary,
               ),
             ),
             const SizedBox(height: 36),
@@ -78,7 +78,7 @@ class _LoginContentState extends State<LoginContent> {
                   ? () {
                       Navigator.pushNamed(
                         context,
-                        Routes.otp,
+                        Routes.phoneOtp,
                         arguments: _phoneController.text,
                       );
                     }
@@ -89,8 +89,8 @@ class _LoginContentState extends State<LoginContent> {
             const SizedBox(height: 16),
             CustomButton(
               text: LocaleKeys.auth_continue_as_guest.tr(),
-              color: AppColors.black,
-              textColor: AppColors.primary,
+              color: darkAppColors.themeColor,
+              textColor: context.colors.primary,
               onPressed: () {},
             ),
           ],

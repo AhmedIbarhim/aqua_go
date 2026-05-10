@@ -1,6 +1,5 @@
 import 'package:aqua_go/core/components/custom_button.dart';
 import 'package:aqua_go/core/components/generic_app_bar.dart';
-import 'package:aqua_go/core/themes/app_colors.dart';
 import 'package:aqua_go/core/themes/app_colors_extension.dart';
 import 'package:aqua_go/core/themes/app_text_styles.dart';
 import 'package:aqua_go/core/utils/app_assets.dart';
@@ -9,6 +8,7 @@ import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
+import '../../../../core/components/rating_widget.dart';
 import '../widgets/my_booking_procedures_bottom_sheet.dart';
 import '../widgets/my_booking_photos_section.dart';
 import '../widgets/my_booking_location_section.dart';
@@ -103,7 +103,7 @@ class MyBookingDetailsView extends StatelessWidget {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.warning,
+                  color: context.colors.warning,
                   borderRadius: BorderRadius.circular(100),
                 ),
                 child: Text(
@@ -201,19 +201,11 @@ class MyBookingDetailsView extends StatelessWidget {
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Row(
-                        children: [
-                          Icon(Icons.star, color: Colors.amber, size: 16),
-                          Icon(Icons.star, color: Colors.amber, size: 16),
-                          Icon(Icons.star, color: Colors.amber, size: 16),
-                          Icon(Icons.star, color: Colors.amber, size: 16),
-                          Icon(Icons.star_half, color: Colors.amber, size: 16),
-                        ],
-                      ),
+                      RatingWidget(rating: 3.5, starSize: 16),
                       const SizedBox(width: 4),
 
                       Text(
-                        '(4.5)',
+                        '(3.5)',
                         style: AppTextStyles.regular12.copyWith(
                           color: context.colors.contentDisabled,
                         ),

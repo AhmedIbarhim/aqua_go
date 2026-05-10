@@ -12,7 +12,6 @@ abstract class  LocaleKeys {
   static const write_here = 'write_here';
   static const save = 'save';
   static const submit = 'submit';
-  static const proceed = 'proceed';
   static const get_started = 'get_started';
   static const edit = 'edit';
   static const delete = 'delete';
@@ -35,7 +34,6 @@ abstract class  LocaleKeys {
   static const auth_verify_phone = 'auth.verify_phone';
   static const auth_phone_number = 'auth.phone_number';
   static const auth_send_verification_code = 'auth.send_verification_code';
-  static const auth_send_verification_mail = 'auth.send_verification_mail';
   static const auth_verify_otp = 'auth.verify_otp';
   static const auth_resend_code = 'auth.resend_code';
   static const auth_resend_code_button = 'auth.resend_code_button';
@@ -44,12 +42,6 @@ abstract class  LocaleKeys {
   static const auth_tech_error = 'auth.tech_error';
   static const auth_tech_error_desc = 'auth.tech_error_desc';
   static const auth_contact_support = 'auth.contact_support';
-  static const auth_enter_email = 'auth.enter_email';
-  static const auth_email_address = 'auth.email_address';
-  static const auth_add_email = 'auth.add_email';
-  static const auth_verify_email = 'auth.verify_email';
-  static const auth_back_to_profile = 'auth.back_to_profile';
-  static const auth_email_added_successfully = 'auth.email_added_successfully';
   static const auth = 'auth';
   static const layout_home = 'layout.home';
   static const layout_my_cars = 'layout.my_cars';
@@ -186,6 +178,7 @@ abstract class  LocaleKeys {
   static const address_select_on_map = 'address.select_on_map';
   static const address_my_addresses = 'address.my_addresses';
   static const address_add_new_location = 'address.add_new_location';
+  static const address_continue = 'address.continue';
   static const address_search_hint = 'address.search_hint';
   static const address_search_results = 'address.search_results';
   static const address_address_label = 'address.address_label';

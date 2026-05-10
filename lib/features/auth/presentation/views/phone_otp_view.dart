@@ -1,10 +1,10 @@
 import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg_flutter.dart';
-import '../widgets/otp_content.dart';
+import '../widgets/phone_otp_content.dart';
 
-class OtpView extends StatelessWidget {
-  const OtpView({super.key, required this.phoneNumber});
+class PhoneOtpView extends StatelessWidget {
+  const PhoneOtpView({super.key, required this.phoneNumber});
   final String phoneNumber;
 
   @override
@@ -41,7 +41,7 @@ class OtpView extends StatelessWidget {
             bottom: 0,
             left: 0,
             right: 0,
-            child: OtpContent(phoneNumber: phoneNumber),
+            child: PhoneOtpContent(phoneNumber: phoneNumber),
             // child: ErrorContent(),
           ),
         ],

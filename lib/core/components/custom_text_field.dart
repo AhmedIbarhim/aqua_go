@@ -10,6 +10,13 @@ class CustomTextField extends StatelessWidget {
   final bool isRequired;
   final TextInputType? keyboardType;
   final bool? mustCapitalize;
+  final bool enabled;
+  final bool readOnly;
+  final VoidCallback? onTap;
+  final Color? fillColor;
+  final Widget? prefixIcon;
+  final Widget? suffixIcon;
+  final TextStyle? style;
 
   const CustomTextField({
     super.key,
@@ -19,6 +26,13 @@ class CustomTextField extends StatelessWidget {
     this.isRequired = false,
     this.keyboardType,
     this.mustCapitalize,
+    this.enabled = true,
+    this.readOnly = false,
+    this.onTap,
+    this.fillColor,
+    this.prefixIcon,
+    this.suffixIcon,
+    this.style,
   });
 
   @override
@@ -46,19 +60,16 @@ class CustomTextField extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         TextFormField(
-          // validator: (value) {
-          //   if (value == null || value.isEmpty) {
-          //     return "LocaleKeys.required_field.tr()";
-          //   }
-          //   return null;
-          // },
+          onTap: onTap,
+          onTapOutside: (_) => FocusScope.of(context).unfocus(),
+          readOnly: readOnly,
+          enabled: enabled,
           textCapitalization: mustCapitalize == true
               ? TextCapitalization.characters
               : TextCapitalization.none,
           inputFormatters: mustCapitalize == true
               ? [
                   FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9-]')),
-
                   TextInputFormatter.withFunction((oldValue, newValue) {
                     return newValue.copyWith(text: newValue.text.toUpperCase());
                   }),
@@ -67,25 +78,33 @@ class CustomTextField extends StatelessWidget {
           controller: controller,
           textAlign: TextAlign.right,
           keyboardType: keyboardType,
-          style: AppTextStyles.regular14.copyWith(
-            color: context.colors.textPrimary,
-          ),
+          style:
+              style ??
+              AppTextStyles.regular14.copyWith(
+                color: context.colors.textPrimary,
+              ),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: AppTextStyles.regular14.copyWith(
               color: context.colors.contentDisabled,
             ),
             filled: true,
-            fillColor: context.colors.background,
+            fillColor: fillColor ?? context.colors.background,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 12,
               vertical: 12,
             ),
+            prefixIcon: prefixIcon,
+            suffixIcon: suffixIcon,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(color: context.colors.borderSecondary),
             ),
             enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: context.colors.borderSecondary),
+            ),
+            disabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(color: context.colors.borderSecondary),
             ),

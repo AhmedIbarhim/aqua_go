@@ -4,7 +4,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
 import '../../../../core/route/routes.dart';
-import '../../../../core/themes/app_colors.dart';
 import '../../../../core/themes/app_colors_extension.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
@@ -107,10 +106,10 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                         width: 10,
                         height: 10,
                         decoration: BoxDecoration(
-                          color: AppColors.warning,
+                          color: context.colors.warning,
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: AppColors.screenBG,
+                            color: context.colors.screenBG,
                             width: 1.5,
                           ),
                         ),

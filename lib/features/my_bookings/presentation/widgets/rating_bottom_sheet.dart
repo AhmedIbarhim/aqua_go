@@ -1,7 +1,7 @@
+import 'package:aqua_go/core/components/rating_widget.dart';
 import 'package:aqua_go/core/components/custom_bottom_sheet.dart';
 import 'package:aqua_go/core/components/custom_button.dart';
 import 'package:aqua_go/core/extentions/context_extentions.dart';
-import 'package:aqua_go/core/themes/app_colors.dart';
 import 'package:aqua_go/core/themes/app_colors_extension.dart';
 import 'package:aqua_go/core/themes/app_text_styles.dart';
 import 'package:aqua_go/core/utils/app_assets.dart';
@@ -174,17 +174,7 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Row(
-                        children: List.generate(5, (index) {
-                          return Icon(
-                            Icons.star_rounded,
-                            color: index < 4
-                                ? AppColors.warning
-                                : context.colors.contentDisabled,
-                            size: 16,
-                          );
-                        }),
-                      ),
+                      RatingWidget(rating: 4.0, starSize: 16),
                       const SizedBox(width: 4),
                       Text(
                         "(4.0)",

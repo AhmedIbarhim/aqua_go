@@ -8,6 +8,7 @@
     "write_here": "اكتب هنا",
     "save": "حفظ",
     "submit": "ارسال",
+    "proceed": "استمرار",
     "get_started": "ابدأ",
     "edit": "تعديل",
     "delete": "حذف",
@@ -33,6 +34,7 @@
         "verify_phone": "تحقق من رقم جوالك",
         "phone_number": "رقم التليفون",
         "send_verification_code": "سنرسل لك رمز تحقق عبر رسالة نصية",
+        "send_verification_mail": "سنرسل لك رمز تحقق عبر البريد الإلكتروني",
         "verify_otp": "تحقق من رقم جوالك",
         "resend_code": "إعادة إرسال الرمز خلال",
         "resend_code_button": "إعادة إرسال الرمز",
@@ -40,7 +42,13 @@
         "verify": "تحقق",
         "tech_error": "عطل فني مؤقت",
         "tech_error_desc": "نعتذر، نواجه حاليًا مشكلة تقنية. يرجى المحاولة مرة أخرى بعد قليل",
-        "contact_support": "التواصل مع الدعم"
+        "contact_support": "التواصل مع الدعم",
+        "enter_email": "أدخل البريد الإلكتروني",
+        "email_address": "البريد الإلكتروني",
+        "add_email": "اضافة البريد الإلكتروني",
+        "verify_email": "تحقق من البريد الإلكتروني",
+        "back_to_profile": "العودة الي قائمة البروفايل",
+        "email_added_successfully": "تم اضافة البريد الالكتروني بنجاح"
     },
     "layout": {
         "home": "الرئيسية",
@@ -186,7 +194,6 @@
         "select_on_map": "اختر على الخريطة",
         "my_addresses": "عناويني",
         "add_new_location": "إضافة عنوان جديد",
-        "continue": "الاستمرار",
         "search_hint": "إبحث عن موقع ...",
         "search_results": "نتائج البحث",
         "address_label": "العنوان",
@@ -195,6 +202,8 @@
         "save_address": "حفظ العنوان"
     },
     "profile": {
+        "male": "ذكر",
+        "female": "أنثى",
         "account_info": "بيانات الحساب",
         "verified": "موثق",
         "my_addresses": "عناويني",
@@ -203,7 +212,17 @@
         "about_app": "عن التطبيق",
         "about_us": "من نحن",
         "settings": "الإعدادات",
-        "technical_support": "الدعم الفني والمساعدة"
+        "technical_support": "الدعم الفني والمساعدة",
+        "my_packages": "باقاتي",
+        "logout": "تسجيل الخروج",
+        "edit_profile": "تعديل",
+        "view_profile": "عرض بيانات الحساب",
+        "edit_profile_data": "تعديل بيانات الحساب",
+        "full_name": "الاسم بالكامل",
+        "dob": "تاريخ الميلاد",
+        "gender": "النوع",
+        "edit_data": "تعديل البيانات",
+        "save_changes": "حفظ التعديلات"
     },
     "settings": {
         "more_settings": "المزيد من الإعدادات",

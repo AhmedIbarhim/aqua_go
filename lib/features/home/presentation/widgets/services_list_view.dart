@@ -1,6 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import '../../../../core/themes/app_colors.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../data/models/service_model.dart';
@@ -48,10 +47,7 @@ class _ServicesListViewState extends State<ServicesListView> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Text(
-                LocaleKeys.home_services.tr(),
-                style: AppTextStyles.bold16.copyWith(color: AppColors.white),
-              ),
+              Text(LocaleKeys.home_services.tr(), style: AppTextStyles.bold16),
             ],
           ),
         ),

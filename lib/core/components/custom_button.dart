@@ -1,7 +1,6 @@
 import 'package:aqua_go/core/themes/app_text_styles.dart';
 import 'package:flutter/material.dart';
 
-import '../themes/app_colors.dart';
 import '../themes/app_colors_extension.dart';
 
 class CustomButton extends StatelessWidget {
@@ -11,7 +10,7 @@ class CustomButton extends StatelessWidget {
     required this.text,
     this.enabled = true,
     this.color,
-    this.textColor = AppColors.textDark,
+    this.textColor = Colors.black,
     this.borderColor,
     this.preWidget,
     this.postWidget,
@@ -48,12 +47,12 @@ class CustomButton extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         spacing: 8,
         children: [
-          if (preWidget != null) preWidget!,
+          ?preWidget,
           FittedBox(
             fit: BoxFit.scaleDown,
             child: Text(text, style: AppTextStyles.regular16),
           ),
-          if (postWidget != null) postWidget!,
+          ?postWidget,
         ],
       ),
     );

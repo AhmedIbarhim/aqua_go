@@ -1,5 +1,5 @@
 import 'package:aqua_go/core/config/controllers/language_controller/language_cubit.dart';
-import 'package:aqua_go/core/themes/app_colors.dart';
+import 'package:aqua_go/core/themes/app_colors_extension.dart';
 import 'package:aqua_go/core/themes/app_text_styles.dart';
 import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:flutter/material.dart';
@@ -24,8 +24,8 @@ class LanguageWidget extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(100),
-          border: Border.all(color: AppColors.blueGrey50),
-          color: AppColors.white.withValues(alpha: 0.8),
+          border: Border.all(color: darkAppColors.contentTertiary),
+          color: darkAppColors.themeOpositeColor.withValues(alpha: 0.8),
         ),
         child: Directionality(
           textDirection: TextDirection.rtl,
@@ -35,7 +35,7 @@ class LanguageWidget extends StatelessWidget {
               if (context.isEn) ...[
                 CircleAvatar(
                   radius: 8,
-                  backgroundColor: AppColors.white,
+                  backgroundColor: darkAppColors.themeOpositeColor,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: SvgPicture.asset(
@@ -53,7 +53,7 @@ class LanguageWidget extends StatelessWidget {
                 const SizedBox(width: 8),
                 CircleAvatar(
                   radius: 8,
-                  backgroundColor: AppColors.white,
+                  backgroundColor: darkAppColors.themeOpositeColor,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: SvgPicture.asset(
@@ -70,7 +70,7 @@ class LanguageWidget extends StatelessWidget {
               Text(
                 targetLanguageName,
                 style: AppTextStyles.regular14.copyWith(
-                  color: AppColors.contentSecondary,
+                  color: darkAppColors.contentSecondary,
                 ),
               ),
             ],

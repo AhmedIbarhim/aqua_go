@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../features/adress/presentation/views/new_address_map_view.dart';
+import '../../features/auth/presentation/views/add_email_view.dart';
+import '../../features/auth/presentation/views/email_otp_view.dart';
 import '../../features/auth/presentation/views/login_view.dart';
-import '../../features/auth/presentation/views/otp_view.dart';
+import '../../features/auth/presentation/views/phone_otp_view.dart';
 import '../../features/booking/presentation/views/booking_details_view.dart';
 import '../../features/booking/presentation/views/booking_location_view.dart';
 
@@ -16,6 +18,7 @@ import '../../features/my_bookings/presentation/views/complain_view.dart';
 import '../../features/my_bookings/presentation/views/gallery_view.dart';
 import '../../features/my_bookings/presentation/views/my_booking_deatails_view.dart';
 import '../../features/profile/presentation/views/language_select_view.dart';
+import '../../features/profile/presentation/views/profile_data_view.dart';
 import '../../features/startup/views/onboarding_view.dart';
 import '../../features/startup/views/splash_view.dart';
 import '../../features/notifications/presentation/views/notification_view.dart';
@@ -35,10 +38,19 @@ abstract class AppRouter {
       case Routes.login:
         return MaterialPageRoute(builder: (_) => const LoginView());
 
-      case Routes.otp:
+      case Routes.phoneOtp:
         return MaterialPageRoute(
-          builder: (_) => OtpView(phoneNumber: settings.arguments as String),
+          builder: (_) =>
+              PhoneOtpView(phoneNumber: settings.arguments as String),
         );
+
+      case Routes.emailOtp:
+        return MaterialPageRoute(
+          builder: (_) => EmailOtpView(email: settings.arguments as String),
+        );
+
+      case Routes.addEmail:
+        return MaterialPageRoute(builder: (_) => const AddEmailView());
 
       case Routes.layout:
         return MaterialPageRoute(builder: (_) => const MainLayout());
@@ -121,6 +133,9 @@ abstract class AppRouter {
 
       //         case Routes.support:
       //           return MaterialPageRoute(builder: (_) => const SupportView());
+
+      case Routes.profileData:
+        return MaterialPageRoute(builder: (_) => const ProfileDataView());
 
       default:
         return MaterialPageRoute(builder: (_) => const Placeholder());

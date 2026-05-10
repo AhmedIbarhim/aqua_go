@@ -57,7 +57,7 @@ class _HomeViewState extends State<HomeView> {
                   const ServicesListView(),
                   const SizedBox(height: 24),
                   const OffersListView(),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 150),
                 ],
               ),
             ),

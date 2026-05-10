@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:svg_flutter/svg.dart';
 
-import '../themes/app_colors.dart';
+import '../themes/app_colors_extension.dart';
 import '../themes/app_text_styles.dart';
 
 class CustomTextFormField extends StatelessWidget {
@@ -92,8 +92,8 @@ class _CustomPhoneTextFieldState extends State<CustomPhoneTextField> {
     return Container(
       height: 48,
       decoration: BoxDecoration(
-        color: AppColors.black,
-        border: Border.all(color: AppColors.borderSecondary),
+        color: context.colors.background,
+        border: Border.all(color: context.colors.borderSecondary),
         borderRadius: BorderRadius.circular(8),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -122,7 +122,7 @@ class _CustomPhoneTextFieldState extends State<CustomPhoneTextField> {
                   Text(
                     "+966",
                     style: AppTextStyles.regular16.copyWith(
-                      color: AppColors.white,
+                      color: context.colors.background,
                     ),
                   ),
                 ],
@@ -144,7 +144,7 @@ class _CustomPhoneTextFieldState extends State<CustomPhoneTextField> {
 
                 onSaved: widget.onSaved,
                 style: AppTextStyles.medium16.copyWith(
-                  color: AppColors.contentSecondaryLight,
+                  color: context.colors.contentSecondaryLight,
                 ),
                 onTapOutside: (_) {
                   FocusScope.of(context).unfocus();

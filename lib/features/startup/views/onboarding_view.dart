@@ -1,5 +1,6 @@
 import 'package:aqua_go/core/components/custom_button.dart';
 import 'package:aqua_go/core/route/routes.dart';
+import 'package:aqua_go/core/themes/app_colors_extension.dart';
 import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:dots_indicator/dots_indicator.dart';
@@ -10,7 +11,6 @@ import 'package:provider/provider.dart';
 import '../../../core/config/local_storage/shared_prefs.dart';
 import '../../../core/constants.dart';
 import '../../../core/config/controllers/language_controller/language_cubit.dart';
-import '../../../core/themes/app_colors.dart';
 import '../../../core/themes/app_text_styles.dart';
 import '../widgets/language_widget.dart';
 import '../widgets/onboarding_page_view.dart';
@@ -53,7 +53,7 @@ class _OnboardingViewState extends State<OnboardingView> {
     context.watch<LanguageCubit>(); // Force rebuild on language change
     var height = MediaQuery.of(context).size.height;
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: darkAppColors.themeOpositeColor,
       body: Stack(
         children: [
           Positioned(
@@ -90,8 +90,8 @@ class _OnboardingViewState extends State<OnboardingView> {
     return Container(
       width: double.infinity,
       height: MediaQuery.of(context).size.height * 0.33,
-      decoration: const BoxDecoration(
-        color: AppColors.black,
+      decoration: BoxDecoration(
+        color: darkAppColors.themeColor,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(32),
           topRight: Radius.circular(32),
@@ -129,7 +129,7 @@ class _OnboardingViewState extends State<OnboardingView> {
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
                 style: AppTextStyles.regular16.copyWith(
-                  color: AppColors.contentDisabled,
+                  color: darkAppColors.contentDisabled,
                 ),
               ),
             ),
@@ -144,7 +144,7 @@ class _OnboardingViewState extends State<OnboardingView> {
                       ? _pageController.page!
                       : 0,
                   decorator: DotsDecorator(
-                    activeColor: AppColors.primary,
+                    activeColor: context.colors.primary,
                     color: Colors.white54.withValues(alpha: 0.2),
                     size: const Size(18, 6),
                     shape: RoundedRectangleBorder(
@@ -180,7 +180,7 @@ class _OnboardingViewState extends State<OnboardingView> {
             child: Text(
               LocaleKeys.skip.tr(),
               style: TextStyle(
-                color: AppColors.white,
+                color: darkAppColors.themeOpositeColor,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -190,9 +190,9 @@ class _OnboardingViewState extends State<OnboardingView> {
             width: MediaQuery.of(context).size.width * 0.3,
             child: CustomButton(
               text: LocaleKeys.next.tr(),
-              postWidget: const Icon(
+              postWidget: Icon(
                 Icons.arrow_forward,
-                color: AppColors.black,
+                color: darkAppColors.themeOpositeColor,
               ),
               onPressed: () {
                 _pageController.nextPage(

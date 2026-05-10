@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
 
+import '../../../../core/components/rating_widget.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_text_styles.dart';
@@ -35,9 +36,9 @@ class ProfileView extends StatelessWidget {
         // Phone
         Text(
           '+966 123333478',
-          style: Theme.of(
-            context,
-          ).textTheme.bodyMedium?.copyWith(color: context.colors.textSecondary),
+          style: AppTextStyles.regular14.copyWith(
+            color: context.colors.textSecondary,
+          ),
         ),
         const SizedBox(height: 32),
         Expanded(
@@ -55,6 +56,9 @@ class ProfileView extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  _buildRatingCard(context),
+                  const SizedBox(height: 24),
+
                   _buildSectionTitle(
                     LocaleKeys.profile_account_info.tr(),
                     context,
@@ -64,6 +68,9 @@ class ProfileView extends StatelessWidget {
                     context,
                     title: LocaleKeys.profile_add_email.tr(),
                     icon: AppAssets.mail,
+                    onTap: () {
+                      context.pushNamed(Routes.addEmail);
+                    },
                   ),
                   const SizedBox(height: 8),
                   _buildProfileItem(
@@ -110,13 +117,86 @@ class ProfileView extends StatelessWidget {
                     title: LocaleKeys.profile_technical_support.tr(),
                     icon: AppAssets.support,
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 150),
                 ],
               ),
             ),
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildRatingCard(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        context.pushNamed(Routes.profileData);
+      },
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: context.colors.cardBackGround,
+          border: Border.all(color: context.colors.borderSecondary),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withAlpha(25),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Center(
+                        child: SvgPicture.asset(
+                          AppAssets.personDisabled,
+                          colorFilter: ColorFilter.mode(
+                            context.colors.textPrimary,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(width: 12),
+
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'فيصل محمد',
+                          style: AppTextStyles.regular14.copyWith(
+                            color: context.colors.textPrimary,
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            RatingWidget(rating: 4.5),
+                            const SizedBox(width: 4),
+                            Text(
+                              '(4.5)',
+                              style: AppTextStyles.regular12.copyWith(
+                                color: context.colors.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 

@@ -1,9 +1,11 @@
 abstract class Routes {
   static const String splash = '/';
-  static const String onboarding = '/onboarding';
-  static const String login = '/login';
-  static const String otp = '/otp';
-  static const String layout = '/layout';
+  static const String onboarding = '/onboarding_view';
+  static const String login = '/login_view';
+  static const String phoneOtp = '/phone_otp_view';
+  static const String emailOtp = '/email_otp_view';
+  static const String addEmail = '/add_email_view';
+  static const String layout = '/layout_view';
   static const String offers = '/offers_view';
   static const String packages = '/packages_view';
   static const String settings = '/settings_view';
@@ -24,4 +26,5 @@ abstract class Routes {
 
   static const String gallery = '/gallery_view';
   static const String newAddressMap = '/new_address_map_view';
+  static const String profileData = '/profile_data_view';
 }

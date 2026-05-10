@@ -8,6 +8,7 @@
     "write_here": "Write here",
     "save": "Save",
     "submit": "Submit",
+    "proceed": "Proceed",
     "get_started": "get started",
     "edit": "edit",
     "delete": "delete",
@@ -33,6 +34,7 @@
         "verify_phone": "Verify Phone Number",
         "phone_number": "Phone Number",
         "send_verification_code": "We'll send you a verification code via SMS",
+        "send_verification_mail": "We'll send you a verification code via email",
         "verify_otp": "Verify your phone number",
         "resend_code": "Resend Code within",
         "resend_code_button": "Resend Code",
@@ -40,7 +42,13 @@
         "verify": "Verify",
         "tech_error": "Temporary Technical Problem",
         "tech_error_desc": "We are currently experiencing a technical issue. Please try again shortly",
-        "contact_support": "Contact Support"
+        "contact_support": "Contact Support",
+        "enter_email": "Enter Email",
+        "email_address": "Email Address",
+        "add_email": "Add Email Address",
+        "verify_email": "Verify Email",
+        "back_to_profile": "Back to Profile",
+        "email_added_successfully": "Email Added Successfully"
     },
     "layout": {
         "home": "Home",
@@ -186,7 +194,6 @@
         "select_on_map": "Select on Map",
         "my_addresses": "My Addresses",
         "add_new_location": "Add New Location",
-        "continue": "Continue",
         "search_hint": "Search location...",
         "search_results": "Search Results",
         "address_label": "Address",
@@ -195,6 +202,8 @@
         "save_address": "Save Address"
     },
     "profile": {
+        "male": "Male",
+        "female": "Female",
         "account_info": "Account Information",
         "verified": "Verified",
         "my_addresses": "My Addresses",
@@ -203,7 +212,17 @@
         "about_app": "About App",
         "about_us": "About Us",
         "settings": "Settings",
-        "technical_support": "Technical Support & Help"
+        "technical_support": "Technical Support & Help",
+        "my_packages": "My Packages",
+        "logout": "Log Out",
+        "edit_profile": "Edit",
+        "view_profile": "View Profile Data",
+        "edit_profile_data": "Edit Profile Data",
+        "full_name": "Full Name",
+        "dob": "Date of Birth",
+        "gender": "Gender",
+        "edit_data": "Edit Data",
+        "save_changes": "Save Changes"
     },
     "settings": {
         "more_settings": "More Settings",
