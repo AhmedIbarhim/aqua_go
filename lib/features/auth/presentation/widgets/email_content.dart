@@ -10,6 +10,7 @@ import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../../generated/locale_keys.g.dart';
+import '../views/email_otp_view.dart';
 
 class EmailContent extends StatefulWidget {
   const EmailContent({super.key});
@@ -87,7 +88,7 @@ class _EmailContentState extends State<EmailContent> {
                   ? () {
                       context.pushNamed(
                         Routes.emailOtp,
-                        arguments: _emailController.text,
+                        arguments: EmailOtpArgs(email: _emailController.text),
                       );
                     }
                   : null,

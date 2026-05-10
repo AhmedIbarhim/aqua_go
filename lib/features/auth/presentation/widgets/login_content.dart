@@ -7,6 +7,7 @@ import '../../../../core/components/custom_text_form_field.dart';
 import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../generated/locale_keys.g.dart';
+import '../views/phone_otp_view.dart';
 
 class LoginContent extends StatefulWidget {
   const LoginContent({super.key});
@@ -79,7 +80,7 @@ class _LoginContentState extends State<LoginContent> {
                       Navigator.pushNamed(
                         context,
                         Routes.phoneOtp,
-                        arguments: _phoneController.text,
+                        arguments: PhoneOtpArgs(phoneNumber: _phoneController.text),
                       );
                     }
                   : null,

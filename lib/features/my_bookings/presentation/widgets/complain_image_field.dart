@@ -54,7 +54,7 @@ class _ComplainImageFieldState extends State<ComplainImageField> {
             isLoading = true;
           });
           try {
-            final pickedFile = await ImagePickerHelper.pickImage();
+            final pickedFile = await ImagePickerHelper.pickWithCamera();
             if (pickedFile != null) {
               imageFile = pickedFile;
               widget.onFileChanged(imageFile);

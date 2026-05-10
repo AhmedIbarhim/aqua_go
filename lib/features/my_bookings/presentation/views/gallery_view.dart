@@ -8,6 +8,12 @@ import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../../generated/locale_keys.g.dart';
 
+class GalleryArgs {
+  final List<String> images;
+  final int initialIndex;
+  GalleryArgs({required this.images, this.initialIndex = 0});
+}
+
 class GalleryView extends StatefulWidget {
   final List<String> images;
   final int initialIndex;

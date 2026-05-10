@@ -7,6 +7,7 @@ import '../../../../core/themes/app_colors_extension.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../data/models/package_model.dart';
 import 'package_card.dart';
+import '../views/packages_view.dart';
 
 class PackagesListView extends StatefulWidget {
   const PackagesListView({super.key});
@@ -57,7 +58,10 @@ class _PackagesListViewState extends State<PackagesListView> {
               ),
               GestureDetector(
                 onTap: () {
-                  context.pushNamed(Routes.packages, arguments: packages);
+                  context.pushNamed(
+                    Routes.packages,
+                    arguments: PackagesArgs(packages: packages),
+                  );
                 },
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.end,

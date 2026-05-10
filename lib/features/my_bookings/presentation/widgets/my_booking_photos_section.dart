@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import '../views/gallery_view.dart';
 import '../../../../core/components/custom_network_image.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/route/routes.dart';
@@ -50,10 +51,11 @@ class MyBookingPhotosSection extends StatelessWidget {
               Expanded(
                 child: GestureDetector(
                   onTap: () {
-                    context.pushNamed(Routes.gallery, arguments: {
-                      'images': dummyImages,
-                      'initialIndex': 0,
-                    });
+                    context.pushNamed(
+                      Routes.gallery,
+                      arguments:
+                          GalleryArgs(images: dummyImages, initialIndex: 0),
+                    );
                   },
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
@@ -65,10 +67,11 @@ class MyBookingPhotosSection extends StatelessWidget {
               Expanded(
                 child: GestureDetector(
                   onTap: () {
-                    context.pushNamed(Routes.gallery, arguments: {
-                      'images': dummyImages,
-                      'initialIndex': 1,
-                    });
+                    context.pushNamed(
+                      Routes.gallery,
+                      arguments:
+                          GalleryArgs(images: dummyImages, initialIndex: 1),
+                    );
                   },
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),

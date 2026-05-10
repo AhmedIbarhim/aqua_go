@@ -15,6 +15,11 @@ import 'package:svg_flutter/svg.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../widgets/complain_images_section.dart';
 
+class ComplainArgs {
+  final MyBookingsModel booking;
+  ComplainArgs({required this.booking});
+}
+
 class ComplainView extends StatefulWidget {
   final MyBookingsModel booking;
 

@@ -84,12 +84,23 @@ class ProfileView extends StatelessWidget {
                     context,
                     title: LocaleKeys.profile_my_addresses.tr(),
                     icon: AppAssets.location,
+                    onTap: () {
+                      context.pushNamed(Routes.myAddresses);
+                    },
                   ),
                   const SizedBox(height: 8),
                   _buildProfileItem(
                     context,
                     title: LocaleKeys.profile_my_wallet.tr(),
                     icon: AppAssets.wallet,
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  _buildProfileItem(
+                    context,
+                    title: LocaleKeys.profile_my_packages.tr(),
+                    icon: AppAssets.packages,
                   ),
                   const SizedBox(height: 24),
                   _buildSectionTitle(

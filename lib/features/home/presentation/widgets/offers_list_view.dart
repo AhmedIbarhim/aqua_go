@@ -7,6 +7,7 @@ import '../../../../core/themes/app_text_styles.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../data/models/offer_model.dart';
 import 'offer_card.dart';
+import '../views/offers_view.dart';
 
 class OffersListView extends StatefulWidget {
   const OffersListView({super.key});
@@ -37,7 +38,10 @@ class _OffersListViewState extends State<OffersListView> {
               ),
               GestureDetector(
                 onTap: () {
-                  context.pushNamed(Routes.offers, arguments: offers);
+                  context.pushNamed(
+                    Routes.offers,
+                    arguments: OffersArgs(offers: offers),
+                  );
                 },
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.end,

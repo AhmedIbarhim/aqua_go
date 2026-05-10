@@ -13,6 +13,11 @@ import '../widgets/my_booking_procedures_bottom_sheet.dart';
 import '../widgets/my_booking_photos_section.dart';
 import '../widgets/my_booking_location_section.dart';
 
+class MyBookingDetailsArgs {
+  final MyBookingsModel booking;
+  MyBookingDetailsArgs({required this.booking});
+}
+
 class MyBookingDetailsView extends StatelessWidget {
   final MyBookingsModel booking;
 

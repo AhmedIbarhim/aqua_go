@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../features/adress/presentation/views/my_addresses_view.dart';
 import '../../features/adress/presentation/views/new_address_map_view.dart';
 import '../../features/auth/presentation/views/add_email_view.dart';
 import '../../features/auth/presentation/views/email_otp_view.dart';
@@ -6,14 +7,10 @@ import '../../features/auth/presentation/views/login_view.dart';
 import '../../features/auth/presentation/views/phone_otp_view.dart';
 import '../../features/booking/presentation/views/booking_details_view.dart';
 import '../../features/booking/presentation/views/booking_location_view.dart';
-
 import '../../features/booking/presentation/views/booking_summary_view.dart';
-import '../../features/home/presentation/data/models/offer_model.dart';
-import '../../features/home/presentation/data/models/package_model.dart';
 import '../../features/home/presentation/views/offers_view.dart';
 import '../../features/home/presentation/views/packages_view.dart';
 import '../../features/layout/presentation/views/main_layout.dart';
-import '../../features/my_bookings/data/models/my_bookings_model.dart';
 import '../../features/my_bookings/presentation/views/complain_view.dart';
 import '../../features/my_bookings/presentation/views/gallery_view.dart';
 import '../../features/my_bookings/presentation/views/my_booking_deatails_view.dart';
@@ -39,14 +36,15 @@ abstract class AppRouter {
         return MaterialPageRoute(builder: (_) => const LoginView());
 
       case Routes.phoneOtp:
+        final args = settings.arguments as PhoneOtpArgs;
         return MaterialPageRoute(
-          builder: (_) =>
-              PhoneOtpView(phoneNumber: settings.arguments as String),
+          builder: (_) => PhoneOtpView(phoneNumber: args.phoneNumber),
         );
 
       case Routes.emailOtp:
+        final args = settings.arguments as EmailOtpArgs;
         return MaterialPageRoute(
-          builder: (_) => EmailOtpView(email: settings.arguments as String),
+          builder: (_) => EmailOtpView(email: args.email),
         );
 
       case Routes.addEmail:
@@ -56,15 +54,15 @@ abstract class AppRouter {
         return MaterialPageRoute(builder: (_) => const MainLayout());
 
       case Routes.offers:
+        final args = settings.arguments as OffersArgs;
         return MaterialPageRoute(
-          builder: (_) =>
-              OffersView(offers: settings.arguments as List<OfferModel>),
+          builder: (_) => OffersView(offers: args.offers),
         );
 
       case Routes.packages:
+        final args = settings.arguments as PackagesArgs;
         return MaterialPageRoute(
-          builder: (_) =>
-              PackagesView(packages: settings.arguments as List<PackageModel>),
+          builder: (_) => PackagesView(packages: args.packages),
         );
 
       case Routes.settings:
@@ -89,35 +87,28 @@ abstract class AppRouter {
         return MaterialPageRoute(builder: (_) => const BookingSummaryView());
 
       case Routes.newAddressMap:
+        final args = settings.arguments as NewAddressMapArgs;
         return MaterialPageRoute(
           builder: (_) =>
-              NewAddressMapView(forAddingAddess: settings.arguments as bool),
+              NewAddressMapView(forAddingAddess: args.forAddingAddress),
         );
       case Routes.complain:
+        final args = settings.arguments as ComplainArgs;
         return MaterialPageRoute(
-          builder: (_) =>
-              ComplainView(booking: settings.arguments as MyBookingsModel),
+          builder: (_) => ComplainView(booking: args.booking),
         );
 
       case Routes.myBookingDetails:
+        final args = settings.arguments as MyBookingDetailsArgs;
         return MaterialPageRoute(
-          builder: (_) => MyBookingDetailsView(
-            booking: settings.arguments as MyBookingsModel,
-          ),
+          builder: (_) => MyBookingDetailsView(booking: args.booking),
         );
 
       case Routes.gallery:
-        final args = settings.arguments;
-        if (args is Map<String, dynamic>) {
-          return MaterialPageRoute(
-            builder: (_) => GalleryView(
-              images: args['images'] as List<String>,
-              initialIndex: args['initialIndex'] as int? ?? 0,
-            ),
-          );
-        }
+        final args = settings.arguments as GalleryArgs;
         return MaterialPageRoute(
-          builder: (_) => GalleryView(images: args as List<String>),
+          builder: (_) =>
+              GalleryView(images: args.images, initialIndex: args.initialIndex),
         );
       // case Routes.language:
       //   return MaterialPageRoute(builder: (_) => const LanguageView());
@@ -136,6 +127,9 @@ abstract class AppRouter {
 
       case Routes.profileData:
         return MaterialPageRoute(builder: (_) => const ProfileDataView());
+
+      case Routes.myAddresses:
+        return MaterialPageRoute(builder: (_) => const MyAddressesView());
 
       default:
         return MaterialPageRoute(builder: (_) => const Placeholder());

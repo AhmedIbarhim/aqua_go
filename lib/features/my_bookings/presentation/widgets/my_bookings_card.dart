@@ -9,6 +9,7 @@ import 'package:svg_flutter/svg.dart';
 
 import '../../../../core/themes/app_colors_extension.dart';
 import '../../data/models/my_bookings_model.dart';
+import '../views/my_booking_deatails_view.dart';
 
 class MyBookingsCard extends StatelessWidget {
   final MyBookingsModel booking;
@@ -109,7 +110,10 @@ class MyBookingsCard extends StatelessWidget {
           // Actions
           GestureDetector(
             onTap: () {
-              context.pushNamed(Routes.myBookingDetails, arguments: booking);
+              context.pushNamed(
+                Routes.myBookingDetails,
+                arguments: MyBookingDetailsArgs(booking: booking),
+              );
             },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

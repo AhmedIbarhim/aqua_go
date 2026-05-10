@@ -3,6 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg_flutter.dart';
 import '../widgets/phone_otp_content.dart';
 
+class PhoneOtpArgs {
+  final String phoneNumber;
+  PhoneOtpArgs({required this.phoneNumber});
+}
+
 class PhoneOtpView extends StatelessWidget {
   const PhoneOtpView({super.key, required this.phoneNumber});
   final String phoneNumber;

@@ -31,6 +31,8 @@ class CodegenLoader extends AssetLoader{
   "back": "العودة",
   "success": "عملية ناجحة",
   "delete_confirm": "تأكيد الحذف",
+  "take_photo": "التقاط صورة",
+  "select_from_gallery": "اختر من المعرض",
   "onboarding": {
     "title1": "نظافة السيارة بسهولة",
     "title2": "تألق في أي وقت وأي مكان",
@@ -215,7 +217,10 @@ class CodegenLoader extends AssetLoader{
     "address_label": "العنوان",
     "address_name_label": "اسم العنوان",
     "access_notes_label": "ملاحظات الوصول",
-    "save_address": "حفظ العنوان"
+    "save_address": "حفظ العنوان",
+    "confirm_delete": "هل انت متأكد من حذف العنوان؟",
+    "no_addresses": "لا توجد عناوين حالية",
+    "no_addresses_desc": "سيتم عرض العناوين الخاصة بك في هذه الصفحة"
   },
   "profile": {
     "male": "ذكر",
@@ -277,6 +282,8 @@ static const Map<String,dynamic> _en = {
   "back": "Back",
   "success": "Success",
   "delete_confirm": "Confirm Delete",
+  "take_photo": "Take Photo",
+  "select_from_gallery": "Select From Gallery",
   "onboarding": {
     "title1": "Effortless Car Care",
     "title2": "Shine Anytime, Anywhere",
@@ -461,7 +468,10 @@ static const Map<String,dynamic> _en = {
     "address_label": "Address",
     "address_name_label": "Address Name",
     "access_notes_label": "Access Notes",
-    "save_address": "Save Address"
+    "save_address": "Save Address",
+    "confirm_delete": "Are you sure you want to delete the address?",
+    "no_addresses": "No Current Addresses",
+    "no_addresses_desc": "Your addresses will be displayed here"
   },
   "profile": {
     "male": "Male",

@@ -13,6 +13,11 @@ import 'package:aqua_go/core/components/custom_button.dart';
 import '../widgets/location_search_field.dart';
 import '../widgets/add_address_bottom_sheet.dart';
 
+class NewAddressMapArgs {
+  final bool forAddingAddress;
+  NewAddressMapArgs({required this.forAddingAddress});
+}
+
 class NewAddressMapView extends StatefulWidget {
   const NewAddressMapView({super.key, this.forAddingAddess = false});
 

@@ -15,6 +15,8 @@
     "back": "Back",
     "success": "Success",
     "delete_confirm": "Confirm Delete",
+    "take_photo": "Take Photo",
+    "select_from_gallery": "Select From Gallery",
     "onboarding": {
         "title1": "Effortless Car Care",
         "title2": "Shine Anytime, Anywhere",
@@ -199,7 +201,10 @@
         "address_label": "Address",
         "address_name_label": "Address Name",
         "access_notes_label": "Access Notes",
-        "save_address": "Save Address"
+        "save_address": "Save Address",
+        "confirm_delete": "Are you sure you want to delete the address?",
+        "no_addresses": "No Current Addresses",
+        "no_addresses_desc": "Your addresses will be displayed here"
     },
     "profile": {
         "male": "Male",

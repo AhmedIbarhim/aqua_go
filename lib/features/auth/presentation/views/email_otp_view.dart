@@ -3,6 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg_flutter.dart';
 import '../widgets/email_otp_content.dart';
 
+class EmailOtpArgs {
+  final String email;
+  EmailOtpArgs({required this.email});
+}
+
 class EmailOtpView extends StatelessWidget {
   const EmailOtpView({super.key, required this.email});
   final String email;

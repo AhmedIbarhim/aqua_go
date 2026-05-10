@@ -101,6 +101,7 @@ abstract class AppAssets {
   static const String darkMode = 'assets/svg/dark.svg';
   static const String privacy = 'assets/svg/privacy.svg';
   static const String terms = 'assets/svg/terms.svg';
+  static const String packages = 'assets/svg/packages.svg';
   static const String whatsppOutlined = 'assets/svg/whatsapp_outlined.svg';
   static const String sms = 'assets/svg/sms.svg';
 
@@ -108,4 +109,5 @@ abstract class AppAssets {
   static const String mapOutlined = 'assets/svg/map.svg';
   static const String location = 'assets/svg/location.svg';
   static const String gps = 'assets/svg/gps.svg';
+  static const String noAddresses = 'assets/svg/no_addresses.svg';
 }

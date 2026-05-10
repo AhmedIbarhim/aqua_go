@@ -19,6 +19,8 @@ abstract class  LocaleKeys {
   static const back = 'back';
   static const success = 'success';
   static const delete_confirm = 'delete_confirm';
+  static const take_photo = 'take_photo';
+  static const select_from_gallery = 'select_from_gallery';
   static const onboarding_title1 = 'onboarding.title1';
   static const onboarding_title2 = 'onboarding.title2';
   static const onboarding_title3 = 'onboarding.title3';
@@ -192,6 +194,9 @@ abstract class  LocaleKeys {
   static const address_address_name_label = 'address.address_name_label';
   static const address_access_notes_label = 'address.access_notes_label';
   static const address_save_address = 'address.save_address';
+  static const address_confirm_delete = 'address.confirm_delete';
+  static const address_no_addresses = 'address.no_addresses';
+  static const address_no_addresses_desc = 'address.no_addresses_desc';
   static const address = 'address';
   static const profile_account_info = 'profile.account_info';
   static const profile_verified = 'profile.verified';

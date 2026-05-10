@@ -9,8 +9,9 @@ import '../../../../core/utils/app_assets.dart';
 import '../../../../core/components/custom_button.dart';
 import '../../../../core/components/generic_app_bar.dart';
 import '../../../../generated/locale_keys.g.dart';
-import '../../data/models/my_addresses_model.dart';
+import '../../../adress/data/models/address_model.dart';
 import '../widgets/location_selection_card.dart';
+import '../../../adress/presentation/views/new_address_map_view.dart';
 
 class BookingLocationView extends StatefulWidget {
   const BookingLocationView({super.key});
@@ -22,14 +23,18 @@ class BookingLocationView extends StatefulWidget {
 class _BookingLocationViewState extends State<BookingLocationView> {
   int selectedLocationIndex = 0;
 
-  final List<MyAddressesModel> myAddresses = [
-    MyAddressesModel(
-      title: 'المنزل',
-      address: '12شارع الماسة, الرياض السعودية',
+  final List<AddressModel> myAddresses = [
+    AddressModel(
+      name: 'المنزل',
+      formattedAddress: '12شارع الماسة, الرياض السعودية',
+      lat: 24.7136,
+      lng: 46.6753,
     ),
-    MyAddressesModel(
-      title: 'المكتب',
-      address: '1شارع الدار البيضاء, الرياض السعودية',
+    AddressModel(
+      name: 'المكتب',
+      formattedAddress: '1شارع الدار البيضاء, الرياض السعودية',
+      lat: 24.7136,
+      lng: 46.6753,
     ),
   ];
 
@@ -95,8 +100,8 @@ class _BookingLocationViewState extends State<BookingLocationView> {
                               padding: const EdgeInsets.only(bottom: 8),
                               child: LocationSelectionCard(
                                 icon: AppAssets.location,
-                                title: address.title.tr(),
-                                subtitle: address.address,
+                                title: address.name.tr(),
+                                subtitle: address.formattedAddress,
                                 isSelected: selectedLocationIndex == index + 1,
                                 onTap: () {
                                   setState(() {
@@ -113,7 +118,8 @@ class _BookingLocationViewState extends State<BookingLocationView> {
                           onTap: () {
                             context.pushNamed(
                               Routes.newAddressMap,
-                              arguments: true,
+                              arguments:
+                                  NewAddressMapArgs(forAddingAddress: true),
                             );
                           },
                         ),
@@ -133,7 +139,10 @@ class _BookingLocationViewState extends State<BookingLocationView> {
   Widget _buildAddressSelectOnMapCard(BuildContext context) {
     return InkWell(
       onTap: () {
-        context.pushNamed(Routes.newAddressMap, arguments: false);
+        context.pushNamed(
+          Routes.newAddressMap,
+          arguments: NewAddressMapArgs(forAddingAddress: false),
+        );
       },
       borderRadius: BorderRadius.circular(12),
       child: Container(

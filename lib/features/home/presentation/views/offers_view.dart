@@ -7,6 +7,11 @@ import '../../../../core/themes/app_colors_extension.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../widgets/offer_card.dart';
 
+class OffersArgs {
+  final List<OfferModel> offers;
+  OffersArgs({required this.offers});
+}
+
 class OffersView extends StatelessWidget {
   const OffersView({super.key, required this.offers});
 
