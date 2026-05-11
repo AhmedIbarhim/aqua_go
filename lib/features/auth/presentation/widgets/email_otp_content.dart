@@ -67,109 +67,114 @@ class _EmailOtpContentState extends State<EmailOtpContent> {
 
   @override
   Widget build(BuildContext context) {
-    var height = MediaQuery.of(context).size.height;
-
+    final height = MediaQuery.sizeOf(context).height;
     return Container(
       width: double.infinity,
-      height: height * 0.43,
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+      padding: EdgeInsets.symmetric(
+        horizontal: 24,
+        vertical: height * 0.03,
+      ),
       decoration: BoxDecoration(
         color: darkAppColors.themeColor,
-        borderRadius: BorderRadius.only(
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(24),
           topRight: Radius.circular(24),
         ),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(
-                LocaleKeys.auth_verify_email.tr(),
-                style: AppTextStyles.semiBold24.copyWith(
-                  color: darkAppColors.textPrimary,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(
-                LocaleKeys.auth_enter_verification_code.tr(),
-                style: AppTextStyles.regular16.copyWith(
-                  color: darkAppColors.textSecondary,
-                ),
-              ),
-              const SizedBox(width: 4),
-              Text(
-                widget.email,
-                style: AppTextStyles.regular16.copyWith(
-                  color: darkAppColors.textSecondary,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 48),
-          CustomOtpFields(
-            controllers: _controllers,
-            focusNodes: _focusNodes,
-            onChanged: (value) => setState(() {}),
-          ),
-          const SizedBox(height: 24),
-          CustomButton(
-            text: LocaleKeys.auth_verify.tr(),
-            onPressed: _isOtpComplete
-                ? () {
-                    Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      Routes.layout,
-                      (route) => false,
-                    );
-                  }
-                : null,
-            enabled: _isOtpComplete,
-          ),
-          const SizedBox(height: 48),
-          _start == 0
-              ? GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _start = 120;
-                    });
-                    startTimer();
-                  },
-                  child: Text(
-                    LocaleKeys.auth_resend_code_button.tr(),
-                    style: AppTextStyles.regular16.copyWith(
-                      color: context.colors.primary,
-                    ),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(
+                  LocaleKeys.auth_verify_email.tr(),
+                  style: AppTextStyles.semiBold24.copyWith(
+                    color: darkAppColors.textPrimary,
                   ),
-                )
-              : Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-
-                  children: [
-                    Text(
-                      LocaleKeys.auth_resend_code.tr(),
-                      style: AppTextStyles.regular16.copyWith(
-                        color: darkAppColors.contentSecondaryLight,
-                      ),
+                ),
+              ],
+            ),
+            SizedBox(height: height * 0.01),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(
+                  LocaleKeys.auth_enter_verification_code.tr(),
+                  style: AppTextStyles.regular16.copyWith(
+                    color: darkAppColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    widget.email,
+                    style: AppTextStyles.regular16.copyWith(
+                      color: darkAppColors.textSecondary,
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      _timerText,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: height * 0.06),
+            CustomOtpFields(
+              controllers: _controllers,
+              focusNodes: _focusNodes,
+              onChanged: (value) => setState(() {}),
+            ),
+            SizedBox(height: height * 0.03),
+            CustomButton(
+              text: LocaleKeys.auth_verify.tr(),
+              onPressed: _isOtpComplete
+                  ? () {
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        Routes.layout,
+                        (route) => false,
+                      );
+                    }
+                  : null,
+              enabled: _isOtpComplete,
+            ),
+            SizedBox(height: height * 0.06),
+            _start == 0
+                ? GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _start = 120;
+                      });
+                      startTimer();
+                    },
+                    child: Text(
+                      LocaleKeys.auth_resend_code_button.tr(),
                       style: AppTextStyles.regular16.copyWith(
                         color: context.colors.primary,
                       ),
                     ),
-                  ],
-                ),
-          const SizedBox(height: 24),
-        ],
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        LocaleKeys.auth_resend_code.tr(),
+                        style: AppTextStyles.regular16.copyWith(
+                          color: darkAppColors.contentSecondaryLight,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        _timerText,
+                        style: AppTextStyles.regular16.copyWith(
+                          color: context.colors.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+            SizedBox(height: height * 0.03),
+          ],
+        ),
       ),
     );
   }

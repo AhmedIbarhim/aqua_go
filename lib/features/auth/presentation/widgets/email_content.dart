@@ -45,9 +45,9 @@ class _EmailContentState extends State<EmailContent> {
 
   @override
   Widget build(BuildContext context) {
+    final height = MediaQuery.sizeOf(context).height;
     return Container(
       width: double.infinity,
-      height: MediaQuery.of(context).size.height * 0.43,
       decoration: BoxDecoration(
         color: darkAppColors.themeColor,
         borderRadius: const BorderRadius.only(
@@ -56,56 +56,63 @@ class _EmailContentState extends State<EmailContent> {
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              LocaleKeys.auth_add_email.tr(),
-              style: AppTextStyles.semiBold24,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              LocaleKeys.auth_send_verification_mail.tr(),
-              style: AppTextStyles.regular16.copyWith(
-                color: darkAppColors.textSecondary,
+        padding: EdgeInsets.symmetric(
+          horizontal: 24,
+          vertical: height * 0.03,
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                LocaleKeys.auth_add_email.tr(),
+                style: AppTextStyles.semiBold24,
               ),
-            ),
-            const SizedBox(height: 24),
-            CustomTextField(
-              controller: _emailController,
-              label: LocaleKeys.auth_email_address.tr(),
-              hint: LocaleKeys.auth_enter_email.tr(),
-              keyboardType: TextInputType.emailAddress,
-              prefixIcon: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: SvgPicture.asset(AppAssets.mail),
+              SizedBox(height: height * 0.01),
+              Text(
+                LocaleKeys.auth_send_verification_mail.tr(),
+                style: AppTextStyles.regular16.copyWith(
+                  color: darkAppColors.textSecondary,
+                ),
               ),
-            ),
-            const SizedBox(height: 24),
-            CustomButton(
-              onPressed: _isEmailValid
-                  ? () {
-                      context.pushNamed(
-                        Routes.emailOtp,
-                        arguments: EmailOtpArgs(email: _emailController.text),
-                      );
-                    }
-                  : null,
-              text: LocaleKeys.proceed.tr(),
-              enabled: _isEmailValid,
-            ),
-            const SizedBox(height: 24),
-            CustomButton(
-              onPressed: () {
-                context.pop();
-              },
-              text: LocaleKeys.auth_back_to_profile.tr(),
-              textColor: context.colors.primary,
-              color: Colors.transparent,
-              enabled: true,
-            ),
-          ],
+              SizedBox(height: height * 0.03),
+              CustomTextField(
+                controller: _emailController,
+                label: LocaleKeys.auth_email_address.tr(),
+                hint: LocaleKeys.auth_enter_email.tr(),
+                keyboardType: TextInputType.emailAddress,
+                prefixIcon: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: SvgPicture.asset(AppAssets.mail),
+                ),
+              ),
+              SizedBox(height: height * 0.03),
+              CustomButton(
+                onPressed: _isEmailValid
+                    ? () {
+                        context.pushNamed(
+                          Routes.emailOtp,
+                          arguments: EmailOtpArgs(email: _emailController.text),
+                        );
+                      }
+                    : null,
+                text: LocaleKeys.proceed.tr(),
+                enabled: _isEmailValid,
+              ),
+              SizedBox(height: height * 0.03),
+              CustomButton(
+                onPressed: () {
+                  context.pop();
+                },
+                text: LocaleKeys.auth_back_to_profile.tr(),
+                textColor: context.colors.primary,
+                color: Colors.transparent,
+                enabled: true,
+              ),
+              SizedBox(height: height * 0.03),
+            ],
+          ),
         ),
       ),
     );

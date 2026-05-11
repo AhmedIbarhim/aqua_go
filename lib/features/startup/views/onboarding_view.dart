@@ -99,10 +99,10 @@ class _OnboardingViewState extends State<OnboardingView> {
       ),
       child: Padding(
         padding: EdgeInsets.only(
-          top: isSmallScreen ? 20.0 : 32.0,
+          top: size.height * 0.04,
           left: 24.0,
           right: 24.0,
-          bottom: isSmallScreen ? 24.0 : 48.0,
+          bottom: size.height * 0.05,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -117,9 +117,9 @@ class _OnboardingViewState extends State<OnboardingView> {
               textAlign: TextAlign.center,
               style: AppTextStyles.semiBold24,
             ),
-            SizedBox(height: isSmallScreen ? 12 : 16),
+            SizedBox(height: size.height * 0.015),
             SizedBox(
-              height: isSmallScreen ? size.height * 0.07 : size.height * 0.08,
+              height: size.height * 0.07,
               child: Text(
                 currentPage == 0
                     ? LocaleKeys.onboarding_desc1.tr()
@@ -134,7 +134,7 @@ class _OnboardingViewState extends State<OnboardingView> {
                 ),
               ),
             ),
-            SizedBox(height: isSmallScreen ? 16 : 24),
+            SizedBox(height: size.height * 0.02),
             ListenableBuilder(
               listenable: _pageController,
               builder: (context, child) {
@@ -164,7 +164,7 @@ class _OnboardingViewState extends State<OnboardingView> {
                 );
               },
             ),
-            SizedBox(height: isSmallScreen ? 20 : 32),
+            SizedBox(height: size.height * 0.03),
             _buildDownButton(context, currentPage),
           ],
         ),

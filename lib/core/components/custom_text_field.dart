@@ -37,6 +37,7 @@ class CustomTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var height = MediaQuery.sizeOf(context).height;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -59,58 +60,63 @@ class CustomTextField extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 8),
-        TextFormField(
-          onTap: onTap,
-          onTapOutside: (_) => FocusScope.of(context).unfocus(),
-          readOnly: readOnly,
-          enabled: enabled,
-          textCapitalization: mustCapitalize == true
-              ? TextCapitalization.characters
-              : TextCapitalization.none,
-          inputFormatters: mustCapitalize == true
-              ? [
-                  FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9-]')),
-                  TextInputFormatter.withFunction((oldValue, newValue) {
-                    return newValue.copyWith(text: newValue.text.toUpperCase());
-                  }),
-                ]
-              : null,
-          controller: controller,
-          textAlign: TextAlign.right,
-          keyboardType: keyboardType,
-          style:
-              style ??
-              AppTextStyles.regular14.copyWith(
-                color: context.colors.textPrimary,
+        SizedBox(
+          height: height * 0.07,
+          child: TextFormField(
+            onTap: onTap,
+            onTapOutside: (_) => FocusScope.of(context).unfocus(),
+            readOnly: readOnly,
+            enabled: enabled,
+            textCapitalization: mustCapitalize == true
+                ? TextCapitalization.characters
+                : TextCapitalization.none,
+            inputFormatters: mustCapitalize == true
+                ? [
+                    FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9-]')),
+                    TextInputFormatter.withFunction((oldValue, newValue) {
+                      return newValue.copyWith(
+                        text: newValue.text.toUpperCase(),
+                      );
+                    }),
+                  ]
+                : null,
+            controller: controller,
+            textAlign: TextAlign.right,
+            keyboardType: keyboardType,
+            style:
+                style ??
+                AppTextStyles.regular14.copyWith(
+                  color: context.colors.textPrimary,
+                ),
+            decoration: InputDecoration(
+              hintText: hint,
+              hintStyle: AppTextStyles.regular14.copyWith(
+                color: context.colors.contentDisabled,
               ),
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: AppTextStyles.regular14.copyWith(
-              color: context.colors.contentDisabled,
-            ),
-            filled: true,
-            fillColor: fillColor ?? context.colors.background,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 12,
-            ),
-            prefixIcon: prefixIcon,
-            suffixIcon: suffixIcon,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: context.colors.borderSecondary),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: context.colors.borderSecondary),
-            ),
-            disabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: context.colors.borderSecondary),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: context.colors.primary),
+              filled: true,
+              fillColor: fillColor ?? context.colors.background,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 12,
+              ),
+              prefixIcon: prefixIcon,
+              suffixIcon: suffixIcon,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: context.colors.borderSecondary),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: context.colors.borderSecondary),
+              ),
+              disabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: context.colors.borderSecondary),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: context.colors.primary),
+              ),
             ),
           ),
         ),

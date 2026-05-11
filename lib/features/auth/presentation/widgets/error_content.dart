@@ -13,45 +13,44 @@ class ErrorContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var height = MediaQuery.of(context).size.height;
-    var width = MediaQuery.of(context).size.width;
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: darkAppColors.background,
-        borderRadius: BorderRadius.only(
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(16),
           topRight: Radius.circular(16),
         ),
       ),
-      height: height * 0.8,
-      width: width,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const SizedBox(height: 100),
-          SvgPicture.asset(AppAssets.offline),
-          const SizedBox(height: 20),
-          Text(
-            LocaleKeys.auth_tech_error.tr(),
-            style: AppTextStyles.semiBold18,
-          ),
-          const SizedBox(height: 30),
-          Text(
-            LocaleKeys.auth_tech_error_desc.tr(),
-            style: AppTextStyles.regular16.copyWith(
-              color: darkAppColors.textSecondary,
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const SizedBox(height: 40),
+            SvgPicture.asset(AppAssets.offline),
+            const SizedBox(height: 20),
+            Text(
+              LocaleKeys.auth_tech_error.tr(),
+              style: AppTextStyles.semiBold18,
             ),
-            textAlign: TextAlign.center,
-          ),
-          const Spacer(),
-          CustomButton(
-            text: LocaleKeys.auth_contact_support.tr(),
-            onPressed: () {},
-          ),
-          const SizedBox(height: 50),
-        ],
+            const SizedBox(height: 30),
+            Text(
+              LocaleKeys.auth_tech_error_desc.tr(),
+              style: AppTextStyles.regular16.copyWith(
+                color: darkAppColors.textSecondary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 40),
+            CustomButton(
+              text: LocaleKeys.auth_contact_support.tr(),
+              onPressed: () {},
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }

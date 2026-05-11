@@ -32,33 +32,37 @@ class CustomTextFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      controller: controller,
-      onSaved: onSaved,
-      onTapOutside: (event) {
-        FocusScope.of(context).unfocus();
-      },
+    final height = MediaQuery.sizeOf(context).height;
+    return SizedBox(
+      height: height * 0.07,
+      child: TextFormField(
+        controller: controller,
+        onSaved: onSaved,
+        onTapOutside: (event) {
+          FocusScope.of(context).unfocus();
+        },
 
-      // validator: (value) {
-      //   if (value == null || value.isEmpty) {
-      //     return 'هذا الحقل مطلوب';
-      //   }
-      //   return null;
-      // },
-      keyboardType: keyboardType,
-      decoration: InputDecoration(
-        // filled: true,
-        // fillColor: AppColors.black,
-        border: buildBorder(),
-        enabledBorder: buildBorder(),
-        labelText: label,
-        labelStyle: AppTextStyles.regular12,
-        suffixIcon: suffixIcon,
-        prefixIcon: prefixIcon,
+        // validator: (value) {
+        //   if (value == null || value.isEmpty) {
+        //     return 'هذا الحقل مطلوب';
+        //   }
+        //   return null;
+        // },
+        keyboardType: keyboardType,
+        decoration: InputDecoration(
+          // filled: true,
+          // fillColor: AppColors.black,
+          border: buildBorder(),
+          enabledBorder: buildBorder(),
+          labelText: label,
+          labelStyle: AppTextStyles.regular12,
+          suffixIcon: suffixIcon,
+          prefixIcon: prefixIcon,
+        ),
+        obscureText: obscureText,
+        maxLines: maxLines,
+        minLines: minLines,
       ),
-      obscureText: obscureText,
-      maxLines: maxLines,
-      minLines: minLines,
     );
   }
 
@@ -91,8 +95,9 @@ class CustomPhoneTextField extends StatefulWidget {
 class _CustomPhoneTextFieldState extends State<CustomPhoneTextField> {
   @override
   Widget build(BuildContext context) {
+    final height = MediaQuery.sizeOf(context).height;
     return Container(
-      height: 48,
+      height: height * 0.07,
       decoration: BoxDecoration(
         color: context.colors.background,
         border: Border.all(color: context.colors.borderSecondary),

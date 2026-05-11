@@ -43,58 +43,67 @@ class _LoginContentState extends State<LoginContent> {
 
   @override
   Widget build(BuildContext context) {
+    final height = MediaQuery.sizeOf(context).height;
     return Container(
       width: double.infinity,
-      height: MediaQuery.of(context).size.height * 0.43,
       decoration: BoxDecoration(
         color: darkAppColors.themeColor,
-        borderRadius: BorderRadius.only(
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(32),
           topRight: Radius.circular(32),
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(LocaleKeys.auth_login.tr(), style: AppTextStyles.semiBold24),
-            const SizedBox(height: 8),
-            Text(
-              LocaleKeys.auth_send_verification_code.tr(),
-              style: AppTextStyles.regular16.copyWith(
-                color: darkAppColors.textSecondary,
+        padding: EdgeInsets.symmetric(
+          horizontal: 24,
+          vertical: height * 0.03,
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(LocaleKeys.auth_login.tr(), style: AppTextStyles.semiBold24),
+              SizedBox(height: height * 0.01),
+              Text(
+                LocaleKeys.auth_send_verification_code.tr(),
+                style: AppTextStyles.regular16.copyWith(
+                  color: darkAppColors.textSecondary,
+                ),
               ),
-            ),
-            const SizedBox(height: 36),
-            Text(
-              LocaleKeys.auth_phone_number.tr(),
-              style: AppTextStyles.regular14,
-            ),
-            const SizedBox(height: 16),
-            CustomPhoneTextField(controller: _phoneController),
-            const SizedBox(height: 24),
-            CustomButton(
-              onPressed: _isPhoneValid
-                  ? () {
-                      Navigator.pushNamed(
-                        context,
-                        Routes.phoneOtp,
-                        arguments: PhoneOtpArgs(phoneNumber: _phoneController.text),
-                      );
-                    }
-                  : null,
-              text: LocaleKeys.auth_login.tr(),
-              enabled: _isPhoneValid,
-            ),
-            const SizedBox(height: 16),
-            CustomButton(
-              text: LocaleKeys.auth_continue_as_guest.tr(),
-              color: darkAppColors.themeColor,
-              textColor: context.colors.primary,
-              onPressed: () {},
-            ),
-          ],
+              SizedBox(height: height * 0.03),
+              Text(
+                LocaleKeys.auth_phone_number.tr(),
+                style: AppTextStyles.regular14,
+              ),
+              SizedBox(height: height * 0.015),
+              CustomPhoneTextField(controller: _phoneController),
+              SizedBox(height: height * 0.03),
+              CustomButton(
+                onPressed: _isPhoneValid
+                    ? () {
+                        Navigator.pushNamed(
+                          context,
+                          Routes.phoneOtp,
+                          arguments: PhoneOtpArgs(
+                            phoneNumber: _phoneController.text,
+                          ),
+                        );
+                      }
+                    : null,
+                text: LocaleKeys.auth_login.tr(),
+                enabled: _isPhoneValid,
+              ),
+              SizedBox(height: height * 0.02),
+              CustomButton(
+                text: LocaleKeys.auth_continue_as_guest.tr(),
+                color: darkAppColors.themeColor,
+                textColor: context.colors.primary,
+                onPressed: () {},
+              ),
+              SizedBox(height: height * 0.03),
+            ],
+          ),
         ),
       ),
     );

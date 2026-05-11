@@ -83,6 +83,7 @@ class _SingleOtpFieldState extends State<_SingleOtpField> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.sizeOf(context).height;
     final colors = context.colors;
     final controller = widget.controllers[widget.index];
     final focusNode = widget.focusNodes[widget.index];
@@ -90,8 +91,8 @@ class _SingleOtpFieldState extends State<_SingleOtpField> {
         controller.text.isNotEmpty || focusNode.hasFocus;
 
     return Container(
-      width: 64,
-      height: 64,
+      width: screenHeight * 0.07,
+      height: screenHeight * 0.07,
       margin: const EdgeInsets.symmetric(horizontal: 6),
       decoration: BoxDecoration(
         color: isFocusedOrNotEmpty ? colors.brandHover : Colors.transparent,

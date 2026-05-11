@@ -9,36 +9,40 @@ class LoginView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var height = MediaQuery.of(context).size.height;
+    final height = MediaQuery.sizeOf(context).height;
+    final width = MediaQuery.sizeOf(context).width;
     return Scaffold(
       extendBodyBehindAppBar: true,
-      body: Stack(
-        children: [
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: SizedBox(
-              height: height * 0.63,
-
-              child: SvgPicture.asset(
-                AppAssets.authBackImage,
-                fit: BoxFit.fill,
+      body: SingleChildScrollView(
+        child: SizedBox(
+          height: height,
+          child: Stack(
+            children: [
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                height: height * 0.63,
+                child: SvgPicture.asset(
+                  AppAssets.authBackImage,
+                  fit: BoxFit.fill,
+                ),
               ),
-            ),
+              Positioned(
+                top: height * 0.08,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: Image.asset(AppAssets.logoTransparent, width: width * 0.8),
+                ),
+              ),
+              const Align(
+                alignment: Alignment.bottomCenter,
+                child: LoginContent(),
+              ),
+            ],
           ),
-          Positioned(
-            top: height * 0.12,
-            left: 0,
-            right: 0,
-
-            child: SizedBox(
-              width: 100,
-              child: Center(child: Image.asset(AppAssets.logoTransparent)),
-            ),
-          ),
-          Positioned(bottom: 0, left: 0, right: 0, child: LoginContent()),
-        ],
+        ),
       ),
     );
   }

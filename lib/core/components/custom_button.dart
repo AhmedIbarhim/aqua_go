@@ -42,7 +42,7 @@ class CustomButton extends StatelessWidget {
       textColor: enabled ? textColor : context.colors.contentDisabled,
 
       minWidth: double.infinity,
-      height: 48,
+      height: MediaQuery.sizeOf(context).height * 0.06,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         spacing: 8,
