@@ -104,6 +104,10 @@ abstract class AppAssets {
   static const String packages = 'assets/svg/packages.svg';
   static const String whatsppOutlined = 'assets/svg/whatsapp_outlined.svg';
   static const String sms = 'assets/svg/sms.svg';
+  static const String whatsapp = 'assets/svg/whatsapp.svg';
+  static const String question = 'assets/svg/question.svg';
+  static const String documentCopy = 'assets/svg/document_copy.svg';
+  static const String logout = 'assets/svg/logout.svg';
 
   // Address
   static const String mapOutlined = 'assets/svg/map.svg';

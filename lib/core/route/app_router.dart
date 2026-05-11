@@ -24,6 +24,7 @@ import '../../features/my_cars/presentation/views/add_car_view.dart';
 import '../../features/profile/presentation/views/privacy_policy_view.dart';
 import '../../features/profile/presentation/views/about_us_view.dart';
 import '../../features/profile/presentation/views/terms_view.dart';
+import '../../features/profile/presentation/views/support_view.dart';
 import 'routes.dart';
 
 abstract class AppRouter {
@@ -125,8 +126,8 @@ abstract class AppRouter {
       case Routes.aboutUs:
         return MaterialPageRoute(builder: (_) => const AboutUsView());
 
-      //         case Routes.support:
-      //           return MaterialPageRoute(builder: (_) => const SupportView());
+      case Routes.support:
+        return MaterialPageRoute(builder: (_) => const SupportView());
 
       case Routes.profileData:
         return MaterialPageRoute(builder: (_) => const ProfileDataView());

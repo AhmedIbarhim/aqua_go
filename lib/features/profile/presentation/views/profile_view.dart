@@ -130,7 +130,18 @@ class ProfileView extends StatelessWidget {
                     context,
                     title: LocaleKeys.profile_technical_support.tr(),
                     icon: AppAssets.support,
+                    onTap: () {
+                      context.pushNamed(Routes.support);
+                    },
                   ),
+                  const SizedBox(height: 8),
+                  _buildProfileItem(
+                    context,
+                    title: LocaleKeys.auth_logout.tr(),
+                    icon: AppAssets.logout,
+                    textColor: context.colors.error,
+                  ),
+
                   const SizedBox(height: 150),
                 ],
               ),
@@ -227,6 +238,7 @@ class ProfileView extends StatelessWidget {
     BuildContext context, {
     required String title,
     required String icon,
+    Color? textColor,
     bool isVerified = false,
     void Function()? onTap,
   }) {
@@ -249,7 +261,7 @@ class ProfileView extends StatelessWidget {
                 SvgPicture.asset(
                   icon,
                   colorFilter: ColorFilter.mode(
-                    context.colors.textPrimary,
+                    textColor ?? context.colors.textPrimary,
                     BlendMode.srcIn,
                   ),
                 ),
@@ -257,7 +269,7 @@ class ProfileView extends StatelessWidget {
                 Text(
                   title,
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: context.colors.textPrimary,
+                    color: textColor ?? context.colors.textPrimary,
                   ),
                 ),
               ],

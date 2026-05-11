@@ -305,13 +305,19 @@ class CodegenLoader extends AssetLoader{
     "feature4": "متابعة مباشرة لحالة الطلب",
     "feature5": "جودة عالية وأسعار تنافسية",
     "feature6": "تجربة مريحة وآمنة بالكامل",
-    "footer": "AquaGo — النظافة الاحترافية تبدأ من مكانك."
+    "footer": "AquaGo .. النظافة الاحترافية تبدأ من مكانك."
   },
   "refund": {
     "title": "سياسة الاسترجاع",
     "content_p1": "في AquaGo نحرص على تقديم خدمة غسيل متنقلة بجودة عالية واحترافية. وفي حال وجود أي ملاحظة على الخدمة المقدمة، يمكن للعميل التواصل مع فريق الدعم خلال مدة لا تتجاوز 48 ساعة من وقت انتهاء الخدمة.",
     "content_p2": "بعد مراجعة الطلب والتأكد من وجود مشكلة في الخدمة، سيتم إعادة تنفيذ الخدمة مجانًا دون أي رسوم إضافية.",
-    "footer": "AquaGo — رضاك هو أساس خدمتنا."
+    "footer": "AquaGo .. رضاك هو أساس خدمتنا."
+  },
+  "support": {
+    "title": "الدعم الفني والمساعدة",
+    "faq": "الأسئلة الشائعة",
+    "complaint_log": "سجل الشكاوي",
+    "whatsapp_contact": "التواصل عن طريق الواتس اب"
   }
 };
 static const Map<String,dynamic> _en = {
@@ -605,13 +611,19 @@ static const Map<String,dynamic> _en = {
     "feature4": "Live tracking of order status",
     "feature5": "High quality and competitive prices",
     "feature6": "Fully comfortable and safe experience",
-    "footer": "AquaGo — Professional cleanliness starts from your place."
+    "footer": "AquaGo .. Professional cleanliness starts from your place."
   },
   "refund": {
     "title": "Refund Policy",
     "content_p1": "At AquaGo, we are committed to providing a high-quality and professional mobile car wash service. If there are any observations regarding the service provided, the customer can contact the support team within 48 hours of the service completion.",
     "content_p2": "After reviewing the request and verifying any issues with the service, the service will be re-performed for free without any additional fees.",
-    "footer": "AquaGo — Your satisfaction is the foundation of our service."
+    "footer": "AquaGo .. Your satisfaction is the foundation of our service."
+  },
+  "support": {
+    "title": "Technical Support & Help",
+    "faq": "FAQ",
+    "complaint_log": "Complaint Log",
+    "whatsapp_contact": "Contact via WhatsApp"
   }
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"ar": _ar, "en": _en};

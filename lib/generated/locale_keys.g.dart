@@ -281,5 +281,10 @@ abstract class  LocaleKeys {
   static const refund_content_p2 = 'refund.content_p2';
   static const refund_footer = 'refund.footer';
   static const refund = 'refund';
+  static const support_title = 'support.title';
+  static const support_faq = 'support.faq';
+  static const support_complaint_log = 'support.complaint_log';
+  static const support_whatsapp_contact = 'support.whatsapp_contact';
+  static const support = 'support';
 
 }

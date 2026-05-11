@@ -289,12 +289,18 @@
         "feature4": "Live tracking of order status",
         "feature5": "High quality and competitive prices",
         "feature6": "Fully comfortable and safe experience",
-        "footer": "AquaGo — Professional cleanliness starts from your place."
+        "footer": "AquaGo .. Professional cleanliness starts from your place."
     },
     "refund": {
         "title": "Refund Policy",
         "content_p1": "At AquaGo, we are committed to providing a high-quality and professional mobile car wash service. If there are any observations regarding the service provided, the customer can contact the support team within 48 hours of the service completion.",
         "content_p2": "After reviewing the request and verifying any issues with the service, the service will be re-performed for free without any additional fees.",
-        "footer": "AquaGo — Your satisfaction is the foundation of our service."
+        "footer": "AquaGo .. Your satisfaction is the foundation of our service."
+    },
+    "support": {
+        "title": "Technical Support & Help",
+        "faq": "FAQ",
+        "complaint_log": "Complaint Log",
+        "whatsapp_contact": "Contact via WhatsApp"
     }
 }
