@@ -76,11 +76,13 @@ class CustomPhoneTextField extends StatefulWidget {
     this.controller,
     this.onSaved,
     this.label = "رقم التليفون",
+    this.textColor,
   });
 
   final TextEditingController? controller;
   final void Function(String?)? onSaved;
   final String label;
+  final Color? textColor;
 
   @override
   State<CustomPhoneTextField> createState() => _CustomPhoneTextFieldState();
@@ -119,12 +121,7 @@ class _CustomPhoneTextFieldState extends State<CustomPhoneTextField> {
                     ),
                   ),
                   const SizedBox(width: 4),
-                  Text(
-                    "+966",
-                    style: AppTextStyles.regular16.copyWith(
-                      color: context.colors.background,
-                    ),
-                  ),
+                  Text("+966", style: AppTextStyles.regular16),
                 ],
               ),
             ),

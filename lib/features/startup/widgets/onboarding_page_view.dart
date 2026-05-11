@@ -6,23 +6,19 @@ class OnboardingPageView extends StatelessWidget {
   const OnboardingPageView({super.key, required this.pageController});
   final PageController pageController;
 
-  List<Widget> get pages => [
-    SvgPicture.asset(AppAssets.onboarding1, fit: BoxFit.fill),
-    SvgPicture.asset(AppAssets.onboarding2, fit: BoxFit.fill),
-    SvgPicture.asset(AppAssets.onboarding3, fit: BoxFit.fill),
+  List<String> get assetPages => [
+    AppAssets.onboarding1,
+    AppAssets.onboarding2,
+    AppAssets.onboarding3,
   ];
 
   @override
   Widget build(BuildContext context) {
-    var height = MediaQuery.of(context).size.height;
-    return SizedBox(
-      height: height * 0.35,
-      width: double.infinity,
-      child: PageView.builder(
-        controller: pageController,
-        itemCount: 3,
-        itemBuilder: (context, index) => pages[index],
-      ),
+    return PageView.builder(
+      controller: pageController,
+      itemCount: assetPages.length,
+      itemBuilder: (context, index) =>
+          SvgPicture.asset(assetPages[index], fit: BoxFit.contain),
     );
   }
 }

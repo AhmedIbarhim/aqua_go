@@ -60,8 +60,8 @@ class SupportView extends StatelessWidget {
                     onTap: () {
                       // TODO: Open WhatsApp link
                     },
-                    textColor: const Color(0xFF2A8D36),
-                    borderColor: const Color(0xFF2A8D36),
+                    textColor: context.colors.success,
+                    borderColor: context.colors.success,
                   ),
                 ],
               ),

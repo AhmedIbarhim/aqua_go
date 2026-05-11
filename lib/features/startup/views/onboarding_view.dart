@@ -51,7 +51,9 @@ class _OnboardingViewState extends State<OnboardingView> {
   @override
   Widget build(BuildContext context) {
     context.watch<LanguageCubit>(); // Force rebuild on language change
-    var height = MediaQuery.of(context).size.height;
+    final size = MediaQuery.sizeOf(context);
+    final isSmallScreen = size.height < 700;
+
     return Scaffold(
       backgroundColor: darkAppColors.themeOpositeColor,
       body: Stack(
@@ -68,44 +70,43 @@ class _OnboardingViewState extends State<OnboardingView> {
               ),
             ),
           ),
-          Positioned(top: 60, left: 24, child: const LanguageWidget()),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: _buildBottomContainer(context),
+
+          Column(
+            children: [
+              SizedBox(height: MediaQuery.of(context).size.height * 0.2),
+              Expanded(
+                child: OnboardingPageView(pageController: _pageController),
+              ),
+              _buildBottomContainer(context, isSmallScreen),
+            ],
           ),
-          Positioned(
-            top: height * 0.30,
-            left: 0,
-            right: 0,
-            child: OnboardingPageView(pageController: _pageController),
-          ),
+          Positioned(top: 48, left: 24, child: LanguageWidget()),
         ],
       ),
     );
   }
 
-  Container _buildBottomContainer(BuildContext context) {
+  Widget _buildBottomContainer(BuildContext context, bool isSmallScreen) {
+    final size = MediaQuery.sizeOf(context);
     return Container(
       width: double.infinity,
-      height: MediaQuery.of(context).size.height * 0.33,
       decoration: BoxDecoration(
         color: darkAppColors.themeColor,
-        borderRadius: BorderRadius.only(
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(32),
           topRight: Radius.circular(32),
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.only(
-          top: 24.0,
+        padding: EdgeInsets.only(
+          top: isSmallScreen ? 20.0 : 32.0,
           left: 24.0,
           right: 24.0,
-          bottom: 48.0,
+          bottom: isSmallScreen ? 24.0 : 48.0,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Text(
               currentPage == 0
@@ -114,11 +115,13 @@ class _OnboardingViewState extends State<OnboardingView> {
                   ? LocaleKeys.onboarding_title2.tr()
                   : LocaleKeys.onboarding_title3.tr(),
               textAlign: TextAlign.center,
-              style: AppTextStyles.semiBold24,
+              style: AppTextStyles.semiBold24.copyWith(
+                fontSize: isSmallScreen ? 20 : 24,
+              ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: isSmallScreen ? 12 : 16),
             SizedBox(
-              height: MediaQuery.of(context).size.width * 0.16,
+              height: isSmallScreen ? size.height * 0.07 : size.height * 0.08,
               child: Text(
                 currentPage == 0
                     ? LocaleKeys.onboarding_desc1.tr()
@@ -130,21 +133,26 @@ class _OnboardingViewState extends State<OnboardingView> {
                 overflow: TextOverflow.ellipsis,
                 style: AppTextStyles.regular16.copyWith(
                   color: darkAppColors.contentDisabled,
+                  fontSize: isSmallScreen ? 14 : 16,
                 ),
               ),
             ),
-            const SizedBox(height: 16),
-
+            SizedBox(height: isSmallScreen ? 16 : 24),
             ListenableBuilder(
               listenable: _pageController,
               builder: (context, child) {
+                double position = 0;
+                if (_pageController.hasClients &&
+                    _pageController.position.hasContentDimensions) {
+                  position = _pageController.page ?? currentPage.toDouble();
+                } else {
+                  position = currentPage.toDouble();
+                }
                 return DotsIndicator(
                   dotsCount: 3,
-                  position: _pageController.hasClients
-                      ? _pageController.page!
-                      : 0,
+                  position: position,
                   decorator: DotsDecorator(
-                    activeColor: context.colors.primary,
+                    activeColor: darkAppColors.primary,
                     color: Colors.white54.withValues(alpha: 0.2),
                     size: const Size(18, 6),
                     shape: RoundedRectangleBorder(
@@ -159,8 +167,7 @@ class _OnboardingViewState extends State<OnboardingView> {
                 );
               },
             ),
-            const SizedBox(height: 16),
-
+            SizedBox(height: isSmallScreen ? 20 : 32),
             _buildDownButton(context, currentPage),
           ],
         ),
@@ -192,7 +199,7 @@ class _OnboardingViewState extends State<OnboardingView> {
               text: LocaleKeys.next.tr(),
               postWidget: Icon(
                 Icons.arrow_forward,
-                color: darkAppColors.themeOpositeColor,
+                color: darkAppColors.themeColor,
               ),
               onPressed: () {
                 _pageController.nextPage(
