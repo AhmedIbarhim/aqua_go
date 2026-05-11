@@ -34,7 +34,7 @@ class CustomTextFormField extends StatelessWidget {
   Widget build(BuildContext context) {
     final height = MediaQuery.sizeOf(context).height;
     return SizedBox(
-      height: height * 0.07,
+      height: height * 0.055,
       child: TextFormField(
         controller: controller,
         onSaved: onSaved,
@@ -49,6 +49,7 @@ class CustomTextFormField extends StatelessWidget {
         //   return null;
         // },
         keyboardType: keyboardType,
+        textAlignVertical: TextAlignVertical.center,
         decoration: InputDecoration(
           // filled: true,
           // fillColor: AppColors.black,
@@ -58,6 +59,7 @@ class CustomTextFormField extends StatelessWidget {
           labelStyle: AppTextStyles.regular12,
           suffixIcon: suffixIcon,
           prefixIcon: prefixIcon,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12),
         ),
         obscureText: obscureText,
         maxLines: maxLines,
@@ -79,13 +81,11 @@ class CustomPhoneTextField extends StatefulWidget {
     super.key,
     this.controller,
     this.onSaved,
-    this.label = "رقم التليفون",
     this.textColor,
   });
 
   final TextEditingController? controller;
   final void Function(String?)? onSaved;
-  final String label;
   final Color? textColor;
 
   @override
@@ -97,7 +97,7 @@ class _CustomPhoneTextFieldState extends State<CustomPhoneTextField> {
   Widget build(BuildContext context) {
     final height = MediaQuery.sizeOf(context).height;
     return Container(
-      height: height * 0.07,
+      height: height * 0.055,
       decoration: BoxDecoration(
         color: context.colors.background,
         border: Border.all(color: context.colors.borderSecondary),
@@ -134,24 +134,25 @@ class _CustomPhoneTextFieldState extends State<CustomPhoneTextField> {
             Expanded(
               child: TextFormField(
                 controller: widget.controller,
-                validator: (value) {
-                  final fullValue = "+966${value ?? ""}";
-                  if (value!.isEmpty) {
-                    return "context.locale.pleaseFillAllFields";
-                  } else if (fullValue.length < 13) {
-                    return "context.locale.pleaseEnterCorrectPhoneNumber";
-                  }
-                  return null;
-                },
 
+                // validator: (value) {
+                //   final fullValue = "+966${value ?? ""}";
+                //   if (value!.isEmpty) {
+                //     return "context.locale.pleaseFillAllFields";
+                //   } else if (fullValue.length < 13) {
+                //     return "context.locale.pleaseEnterCorrectPhoneNumber";
+                //   }
+                //   return null;
+                // },
                 onSaved: widget.onSaved,
-                style: AppTextStyles.medium16.copyWith(
+                style: AppTextStyles.regular16.copyWith(
                   color: context.colors.contentSecondaryLight,
                 ),
                 onTapOutside: (_) {
                   FocusScope.of(context).unfocus();
                 },
                 keyboardType: TextInputType.phone,
+                textAlignVertical: TextAlignVertical.center,
                 inputFormatters: [
                   FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
                   LengthLimitingTextInputFormatter(9),
@@ -162,6 +163,7 @@ class _CustomPhoneTextFieldState extends State<CustomPhoneTextField> {
                   enabledBorder: InputBorder.none,
                   focusedBorder: InputBorder.none,
                   contentPadding: EdgeInsets.zero,
+                  isDense: true,
                 ),
               ),
             ),

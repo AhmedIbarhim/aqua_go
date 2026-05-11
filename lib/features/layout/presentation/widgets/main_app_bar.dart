@@ -13,9 +13,17 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    final double screenWidth = size.width;
+    final double screenHeight = size.height;
+
+    // Scaling helpers
+    double sw(double width) => (width / 414) * screenWidth;
+    double sh(double height) => (height / 896) * screenHeight;
+
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        padding: EdgeInsets.symmetric(horizontal: sw(16), vertical: sh(16)),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -23,22 +31,21 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
             Row(
               children: [
                 Container(
-                  width: 40,
-                  height: 40,
+                  width: sw(40),
+                  height: sw(40),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(color: context.colors.primary, width: 1),
                   ),
-
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(sw(20)),
                     child: Image.network(
                       'https://ui-avatars.com/api/?name=Mohamed+Faisal&background=00D5DD&color=fff',
                       fit: BoxFit.cover,
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: sw(8)),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
@@ -55,13 +62,11 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                           LocaleKeys.layout_ready_to_serve.tr(),
                           style: AppTextStyles.medium14,
                         ),
-                        const SizedBox(width: 4),
+                        SizedBox(width: sw(4)),
                         Image.asset(
                           AppAssets.wavingHand,
-                          width: 16,
-                          height: 16,
-                          // errorBuilder: (context, error, stackTrace) =>
-                          //     const SizedBox(width: 16, height: 16),
+                          width: sw(16),
+                          height: sw(16),
                         ),
                       ],
                     ),
@@ -80,17 +85,17 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                         context.pushNamed(Routes.notification);
                       },
                       child: Container(
-                        padding: const EdgeInsets.all(8),
+                        padding: EdgeInsets.all(sw(8)),
                         decoration: BoxDecoration(
                           color: Colors.transparent,
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(sw(8)),
                         ),
                         child: SvgPicture.asset(
                           AppAssets.notification,
-                          width: 24,
-                          height: 24,
+                          width: sw(24),
+                          height: sw(24),
                           placeholderBuilder: (context) =>
-                              const SizedBox(width: 24, height: 24),
+                              SizedBox(width: sw(24), height: sw(24)),
                           colorFilter: ColorFilter.mode(
                             context.colors.textPrimary,
                             BlendMode.srcIn,
@@ -99,12 +104,12 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                       ),
                     ),
                     Positioned(
-                      left: context.isEn ? 8 : null,
-                      right: context.isAr ? 8 : null,
-                      top: 8,
+                      left: context.isEn ? sw(8) : null,
+                      right: context.isAr ? sw(8) : null,
+                      top: sw(8),
                       child: Container(
-                        width: 10,
-                        height: 10,
+                        width: sw(10),
+                        height: sw(10),
                         decoration: BoxDecoration(
                           color: context.colors.warning,
                           shape: BoxShape.circle,
@@ -117,21 +122,21 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                     ),
                   ],
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: sw(8)),
                 GestureDetector(
                   onTap: () {},
                   child: Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: EdgeInsets.all(sw(8)),
                     decoration: BoxDecoration(
                       color: Colors.transparent,
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(sw(8)),
                     ),
                     child: SvgPicture.asset(
                       AppAssets.gift,
-                      width: 24,
-                      height: 24,
+                      width: sw(24),
+                      height: sw(24),
                       placeholderBuilder: (context) =>
-                          const SizedBox(width: 24, height: 24),
+                          SizedBox(width: sw(24), height: sw(24)),
                     ),
                   ),
                 ),

@@ -3,6 +3,7 @@ import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/route/routes.dart';
+import '../../../core/themes/app_colors_extension.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({super.key});
@@ -18,15 +19,15 @@ class _SplashViewState extends State<SplashView> {
     Future.delayed(const Duration(seconds: 2), () {
       if (!mounted) return;
 
-      context.pushReplacementNamed(Routes.onboarding);
-      // context.pushReplacementNamed(Routes.layout);
+      // context.pushReplacementNamed(Routes.onboarding);
+      context.pushReplacementNamed(Routes.layout);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF000000),
+      backgroundColor: context.colors.splashColor,
       body: Center(child: Image.asset(AppAssets.logo)),
     );
   }

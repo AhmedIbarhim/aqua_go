@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
-class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
+class AppColors extends ThemeExtension<AppColors> {
+  // Splash Colors
+  final Color splashColor;
+
   // Brand Colors
   final Color primary;
   final Color brandSubtle;
@@ -33,7 +36,8 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
   final Color error;
   final Color warning;
 
-  const AppColorsExtension({
+  const AppColors({
+    required this.splashColor,
     required this.primary,
     required this.brandSubtle,
     required this.brandHover,
@@ -59,7 +63,7 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
   });
 
   @override
-  ThemeExtension<AppColorsExtension> copyWith({
+  ThemeExtension<AppColors> copyWith({
     Color? primary,
     Color? brandSubtle,
     Color? brandHover,
@@ -83,7 +87,8 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
     Color? error,
     Color? warning,
   }) {
-    return AppColorsExtension(
+    return AppColors(
+      splashColor: splashColor,
       primary: primary ?? this.primary,
       brandSubtle: brandSubtle ?? this.brandSubtle,
       brandHover: brandHover ?? this.brandHover,
@@ -111,12 +116,13 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
   }
 
   @override
-  ThemeExtension<AppColorsExtension> lerp(
-    covariant ThemeExtension<AppColorsExtension>? other,
+  ThemeExtension<AppColors> lerp(
+    covariant ThemeExtension<AppColors>? other,
     double t,
   ) {
-    if (other is! AppColorsExtension) return this;
-    return AppColorsExtension(
+    if (other is! AppColors) return this;
+    return AppColors(
+      splashColor: Color.lerp(splashColor, other.splashColor, t)!,
       primary: Color.lerp(primary, other.primary, t)!,
       brandSubtle: Color.lerp(brandSubtle, other.brandSubtle, t)!,
       brandHover: Color.lerp(brandHover, other.brandHover, t)!,
@@ -158,7 +164,8 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
 // -----------------------------------------------------------------------------
 // Dark Theme Colors (Matching your existing AppColors)
 // -----------------------------------------------------------------------------
-const darkAppColors = AppColorsExtension(
+const darkAppColors = AppColors(
+  splashColor: Color(0xFF0D0D0D),
   primary: Color(0xFF16F7FF),
   brandSubtle: Color(0xFF202222),
   brandHover: Color(0xFF0F1F22),
@@ -186,7 +193,8 @@ const darkAppColors = AppColorsExtension(
 // -----------------------------------------------------------------------------
 // Light Theme Colors (Suggested placeholders, adjust as needed)
 // -----------------------------------------------------------------------------
-const lightAppColors = AppColorsExtension(
+const lightAppColors = AppColors(
+  splashColor: Color(0xFF0D0D0D),
   primary: Color(0xFF00BEC3), // Darker cyan for contrast on light mode
   brandSubtle: Color(0xFFE0F7F8),
   brandHover: Color(0xFFBFFCFF),
@@ -215,6 +223,5 @@ const lightAppColors = AppColorsExtension(
 // BuildContext Helper for easy access
 // -----------------------------------------------------------------------------
 extension AppThemeExtension on BuildContext {
-  AppColorsExtension get colors =>
-      Theme.of(this).extension<AppColorsExtension>()!;
+  AppColors get colors => Theme.of(this).extension<AppColors>()!;
 }

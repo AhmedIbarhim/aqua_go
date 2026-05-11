@@ -26,7 +26,7 @@ abstract class AppAssets {
   static const String onboarding3 = 'assets/svg/onboarding_3.svg';
   static const String onboardingShadowTop =
       'assets/images/onboarding_shadow_top.png';
-  static const String authBackImage = 'assets/svg/auth_background.svg';
+  static const String authBackImage = 'assets/images/auth_background.png';
   static const String ksaFlag = 'assets/svg/ksa.svg';
   static const String usFlag = 'assets/svg/us.svg';
   static const String offline = 'assets/svg/offline.svg';

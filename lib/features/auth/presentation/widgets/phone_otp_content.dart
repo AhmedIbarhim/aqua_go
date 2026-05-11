@@ -70,33 +70,26 @@ class _PhoneOtpContentState extends State<PhoneOtpContent> {
     final height = MediaQuery.sizeOf(context).height;
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(
-        horizontal: 24,
-        vertical: height * 0.03,
-      ),
+      padding: EdgeInsets.symmetric(horizontal: 24, vertical: height * 0.02),
       decoration: BoxDecoration(
         color: darkAppColors.themeColor,
         borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(24),
-          topRight: Radius.circular(24),
+          topLeft: Radius.circular(32),
+          topRight: Radius.circular(32),
         ),
       ),
       child: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text(
-                  LocaleKeys.auth_verify_phone.tr(),
-                  style: AppTextStyles.semiBold24.copyWith(
-                    color: darkAppColors.textPrimary,
-                  ),
-                ),
-              ],
+            Text(
+              LocaleKeys.auth_verify_phone.tr(),
+              style: AppTextStyles.semiBold24.copyWith(
+                color: darkAppColors.textPrimary,
+              ),
             ),
-            SizedBox(height: height * 0.01),
+            SizedBox(height: height * 0.02),
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -118,7 +111,7 @@ class _PhoneOtpContentState extends State<PhoneOtpContent> {
                 ),
               ],
             ),
-            SizedBox(height: height * 0.06),
+            SizedBox(height: height * 0.03),
             CustomOtpFields(
               controllers: _controllers,
               focusNodes: _focusNodes,
@@ -138,41 +131,43 @@ class _PhoneOtpContentState extends State<PhoneOtpContent> {
                   : null,
               enabled: _isOtpComplete,
             ),
-            SizedBox(height: height * 0.06),
-            _start == 0
-                ? GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _start = 60;
-                      });
-                      startTimer();
-                    },
-                    child: Text(
-                      LocaleKeys.auth_resend_code_button.tr(),
-                      style: AppTextStyles.regular16.copyWith(
-                        color: context.colors.primary,
-                      ),
-                    ),
-                  )
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        LocaleKeys.auth_resend_code.tr(),
-                        style: AppTextStyles.regular16.copyWith(
-                          color: darkAppColors.contentSecondaryLight,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        _timerText,
+            SizedBox(height: height * 0.025),
+            Center(
+              child: _start == 0
+                  ? GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _start = 60;
+                        });
+                        startTimer();
+                      },
+                      child: Text(
+                        LocaleKeys.auth_resend_code_button.tr(),
                         style: AppTextStyles.regular16.copyWith(
                           color: context.colors.primary,
                         ),
                       ),
-                    ],
-                  ),
-            SizedBox(height: height * 0.03),
+                    )
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          LocaleKeys.auth_resend_code.tr(),
+                          style: AppTextStyles.regular16.copyWith(
+                            color: darkAppColors.contentSecondaryLight,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          _timerText,
+                          style: AppTextStyles.regular16.copyWith(
+                            color: context.colors.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+            ),
+            SizedBox(height: height * 0.02),
           ],
         ),
       ),

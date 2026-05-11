@@ -19,13 +19,21 @@ class MainNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    final double screenWidth = size.width;
+    final double screenHeight = size.height;
+
+    // Scaling helpers
+    double sw(double width) => (width / 414) * screenWidth;
+    double sh(double height) => (height / 896) * screenHeight;
+
     return SafeArea(
       child: Container(
-        margin: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-        padding: const EdgeInsets.all(10),
+        margin: EdgeInsets.fromLTRB(sw(24), 0, sw(24), sh(24)),
+        padding: EdgeInsets.all(sw(10)),
         decoration: BoxDecoration(
           color: darkAppColors.screenBG,
-          borderRadius: BorderRadius.circular(100),
+          borderRadius: BorderRadius.circular(sw(100)),
           boxShadow: const [
             BoxShadow(
               color: Color(0x1A000000),
@@ -44,6 +52,8 @@ class MainNavigationBar extends StatelessWidget {
           children: [
             _buildNavItem(
               context,
+              sw,
+              sh,
               index: 0,
               label: LocaleKeys.layout_home.tr(),
               iconEnabled: AppAssets.homeEnabled,
@@ -51,6 +61,8 @@ class MainNavigationBar extends StatelessWidget {
             ),
             _buildNavItem(
               context,
+              sw,
+              sh,
               index: 1,
               label: LocaleKeys.layout_my_cars.tr(),
               iconEnabled: AppAssets.myCarsEnabled,
@@ -58,6 +70,8 @@ class MainNavigationBar extends StatelessWidget {
             ),
             _buildNavItem(
               context,
+              sw,
+              sh,
               index: 2,
               label: LocaleKeys.layout_reservations.tr(),
               iconEnabled: AppAssets.reservationsEnabled,
@@ -65,6 +79,8 @@ class MainNavigationBar extends StatelessWidget {
             ),
             _buildNavItem(
               context,
+              sw,
+              sh,
               index: 3,
               label: LocaleKeys.layout_profile.tr(),
               iconEnabled: AppAssets.personEnabled,
@@ -77,7 +93,9 @@ class MainNavigationBar extends StatelessWidget {
   }
 
   Widget _buildNavItem(
-    BuildContext context, {
+    BuildContext context,
+    double Function(double) sw,
+    double Function(double) sh, {
     required int index,
     required String label,
     required String iconEnabled,
@@ -90,34 +108,33 @@ class MainNavigationBar extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInSine,
-
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        padding: EdgeInsets.symmetric(horizontal: sw(12), vertical: sh(12)),
         decoration: BoxDecoration(
           color: !isActive
               ? Colors.transparent
               : context.isDarkTheme
-              ? Colors.transparent
-              : context.colors.primary,
-          borderRadius: BorderRadius.circular(100),
+                  ? Colors.transparent
+                  : context.colors.primary,
+          borderRadius: BorderRadius.circular(sw(100)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             SvgPicture.asset(
               isActive ? iconEnabled : iconDisabled,
-              width: 24,
-              height: 24,
+              width: sw(24),
+              height: sw(24),
               colorFilter: ColorFilter.mode(
                 isActive
                     ? context.isDarkTheme
-                          ? context.colors.primary
-                          : context.colors.themeColor
+                        ? context.colors.primary
+                        : context.colors.themeColor
                     : context.colors.contentDisabled,
                 BlendMode.srcIn,
               ),
             ),
             if (isActive) ...[
-              const SizedBox(width: 8),
+              SizedBox(width: sw(8)),
               Text(
                 label,
                 style: AppTextStyles.regular14.copyWith(
@@ -133,3 +150,4 @@ class MainNavigationBar extends StatelessWidget {
     );
   }
 }
+

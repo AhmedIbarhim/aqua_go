@@ -28,7 +28,6 @@ class _LoginContentState extends State<LoginContent> {
 
   void _validatePhone() {
     final text = _phoneController.text;
-    // KSA mobile: starts with 5 and has 9 digits total
     final regex = RegExp(r'^5[0-9]{8}$');
     setState(() {
       _isPhoneValid = regex.hasMatch(text);
@@ -54,10 +53,7 @@ class _LoginContentState extends State<LoginContent> {
         ),
       ),
       child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: 24,
-          vertical: height * 0.03,
-        ),
+        padding: EdgeInsets.symmetric(horizontal: 24, vertical: height * 0.02),
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -71,14 +67,14 @@ class _LoginContentState extends State<LoginContent> {
                   color: darkAppColors.textSecondary,
                 ),
               ),
-              SizedBox(height: height * 0.03),
+              SizedBox(height: height * 0.02),
               Text(
                 LocaleKeys.auth_phone_number.tr(),
                 style: AppTextStyles.regular14,
               ),
-              SizedBox(height: height * 0.015),
+              SizedBox(height: height * 0.01),
               CustomPhoneTextField(controller: _phoneController),
-              SizedBox(height: height * 0.03),
+              SizedBox(height: height * 0.02),
               CustomButton(
                 onPressed: _isPhoneValid
                     ? () {
@@ -94,14 +90,14 @@ class _LoginContentState extends State<LoginContent> {
                 text: LocaleKeys.auth_login.tr(),
                 enabled: _isPhoneValid,
               ),
-              SizedBox(height: height * 0.02),
+              SizedBox(height: height * 0.01),
               CustomButton(
                 text: LocaleKeys.auth_continue_as_guest.tr(),
                 color: darkAppColors.themeColor,
                 textColor: context.colors.primary,
                 onPressed: () {},
               ),
-              SizedBox(height: height * 0.03),
+              SizedBox(height: height * 0.02),
             ],
           ),
         ),

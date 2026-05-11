@@ -56,10 +56,7 @@ class _EmailContentState extends State<EmailContent> {
         ),
       ),
       child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: 24,
-          vertical: height * 0.03,
-        ),
+        padding: EdgeInsets.symmetric(horizontal: 24, vertical: height * 0.02),
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -76,7 +73,7 @@ class _EmailContentState extends State<EmailContent> {
                   color: darkAppColors.textSecondary,
                 ),
               ),
-              SizedBox(height: height * 0.03),
+              SizedBox(height: height * 0.02),
               CustomTextField(
                 controller: _emailController,
                 label: LocaleKeys.auth_email_address.tr(),
@@ -87,7 +84,7 @@ class _EmailContentState extends State<EmailContent> {
                   child: SvgPicture.asset(AppAssets.mail),
                 ),
               ),
-              SizedBox(height: height * 0.03),
+              SizedBox(height: height * 0.02),
               CustomButton(
                 onPressed: _isEmailValid
                     ? () {
@@ -100,7 +97,7 @@ class _EmailContentState extends State<EmailContent> {
                 text: LocaleKeys.proceed.tr(),
                 enabled: _isEmailValid,
               ),
-              SizedBox(height: height * 0.03),
+              SizedBox(height: height * 0.01),
               CustomButton(
                 onPressed: () {
                   context.pop();
@@ -110,7 +107,7 @@ class _EmailContentState extends State<EmailContent> {
                 color: Colors.transparent,
                 enabled: true,
               ),
-              SizedBox(height: height * 0.03),
+              SizedBox(height: height * 0.02),
             ],
           ),
         ),

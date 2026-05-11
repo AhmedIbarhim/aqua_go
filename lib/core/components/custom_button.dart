@@ -37,12 +37,12 @@ class CustomButton extends StatelessWidget {
               : context.colors.brandSubtle,
           width: 0.5,
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
       ),
       textColor: enabled ? textColor : context.colors.contentDisabled,
 
       minWidth: double.infinity,
-      height: MediaQuery.sizeOf(context).height * 0.06,
+      height: MediaQuery.sizeOf(context).height * 0.055,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         spacing: 8,

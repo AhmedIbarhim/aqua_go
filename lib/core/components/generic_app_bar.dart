@@ -40,6 +40,11 @@ class GenericAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    final double screenWidth = size.width;
+
+    double sw(double width) => (width / 414) * screenWidth;
+
     return AppBar(
       backgroundColor: context.colors.screenBG,
       flexibleSpace: hasBackground && backgroundImage != null
@@ -55,7 +60,7 @@ class GenericAppBar extends StatelessWidget implements PreferredSizeWidget {
           [
             if (trailing != null)
               Container(
-                margin: const EdgeInsetsDirectional.only(end: 18),
+                margin: EdgeInsetsDirectional.only(end: sw(18)),
                 child: trailing,
               ),
           ],

@@ -1,6 +1,5 @@
 import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:flutter/material.dart';
-import 'package:svg_flutter/svg_flutter.dart';
 import '../widgets/email_otp_content.dart';
 
 class EmailOtpArgs {
@@ -15,6 +14,7 @@ class EmailOtpView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.sizeOf(context).height;
+    final width = MediaQuery.sizeOf(context).width;
     return Scaffold(
       extendBodyBehindAppBar: true,
       body: SingleChildScrollView(
@@ -27,25 +27,24 @@ class EmailOtpView extends StatelessWidget {
                 left: 0,
                 right: 0,
                 height: height * 0.63,
-                child: SvgPicture.asset(
-                  AppAssets.authBackImage,
-                  fit: BoxFit.fill,
-                ),
+                child: Image.asset(AppAssets.authBackImage, fit: BoxFit.fill),
               ),
-              Positioned(
-                top: height * 0.08,
-                left: 0,
-                right: 0,
-                child: Center(
-                  child: Image.asset(
-                    AppAssets.logoTransparent,
-                    width: MediaQuery.sizeOf(context).width * 0.8,
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(height: height * 0.1),
+                  Center(
+                    child: Image.asset(
+                      AppAssets.logoTransparent,
+                      width: width * 0.8,
+                    ),
                   ),
-                ),
-              ),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: EmailOtpContent(email: email),
+                  const Spacer(),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: EmailOtpContent(email: email),
+                  ),
+                ],
               ),
             ],
           ),

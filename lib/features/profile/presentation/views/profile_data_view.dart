@@ -212,21 +212,11 @@ class _ProfileDataViewState extends State<ProfileDataView> {
 
                 Expanded(
                   flex: 1,
-                  child: OutlinedButton(
+                  child: CustomButton(
+                    text: LocaleKeys.cancel.tr(),
+                    color: context.colors.background,
+                    textColor: context.colors.primary,
                     onPressed: () => setState(() => isEditing = false),
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: context.colors.borderSecondary),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                    child: Text(
-                      LocaleKeys.cancel.tr(),
-                      style: AppTextStyles.medium16.copyWith(
-                        color: context.colors.primary,
-                      ),
-                    ),
                   ),
                 ),
               ],
