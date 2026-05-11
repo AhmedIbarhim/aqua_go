@@ -140,7 +140,7 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
                   ),
                 ),
                 const Spacer(),
-                const Text('94.99', style: AppTextStyles.medium24),
+                Text('94.99', style: AppTextStyles.medium24),
 
                 SvgPicture.asset(
                   AppAssets.currency,

@@ -1,138 +1,156 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 
-abstract class AppTextStyles {
+class AppTextStyles {
+  static double get _scaleFactor {
+    final dispatcher = PlatformDispatcher.instance;
+    final view = dispatcher.implicitView;
+    if (view == null) return 1.0;
+    double width = view.physicalSize.width / view.devicePixelRatio;
+    if (width == 0) return 1.0;
+
+    // Base width 414 (iPhone 11/12/13/14)
+    if (width < 600) return width / 414;
+    // For tablets, don't scale too much
+    if (width < 900) return width / 750;
+    return 1.2; // Max scale for large screens
+  }
+
+  static double _sp(double fontSize) =>
+      (fontSize * _scaleFactor).clamp(fontSize * 0.8, fontSize * 1.4);
+
   // User provided examples
-  static const TextStyle bold13 = TextStyle(
-    fontWeight: FontWeight.bold,
-    fontSize: 13,
-  );
-  static const TextStyle bold23 = TextStyle(
-    fontWeight: FontWeight.bold,
-    fontSize: 23,
-  );
-  static const TextStyle bold16 = TextStyle(
-    fontWeight: FontWeight.bold,
-    fontSize: 16,
-  );
+  static TextStyle get bold13 => TextStyle(
+        fontWeight: FontWeight.bold,
+        fontSize: _sp(13),
+      );
+  static TextStyle get bold23 => TextStyle(
+        fontWeight: FontWeight.bold,
+        fontSize: _sp(23),
+      );
+  static TextStyle get bold16 => TextStyle(
+        fontWeight: FontWeight.bold,
+        fontSize: _sp(16),
+      );
 
-  static const TextStyle regular10 = TextStyle(
-    fontWeight: FontWeight.w400,
-    fontSize: 10,
-  );
-  static const TextStyle medium10 = TextStyle(
-    fontWeight: FontWeight.w500,
-    fontSize: 10,
-  );
-  static const TextStyle semiBold10 = TextStyle(
-    fontWeight: FontWeight.w600,
-    fontSize: 10,
-  );
-  static const TextStyle bold10 = TextStyle(
-    fontWeight: FontWeight.w700,
-    fontSize: 10,
-  );
+  static TextStyle get regular10 => TextStyle(
+        fontWeight: FontWeight.w400,
+        fontSize: _sp(10),
+      );
+  static TextStyle get medium10 => TextStyle(
+        fontWeight: FontWeight.w500,
+        fontSize: _sp(10),
+      );
+  static TextStyle get semiBold10 => TextStyle(
+        fontWeight: FontWeight.w600,
+        fontSize: _sp(10),
+      );
+  static TextStyle get bold10 => TextStyle(
+        fontWeight: FontWeight.w700,
+        fontSize: _sp(10),
+      );
 
-  static const TextStyle regular11 = TextStyle(
-    fontWeight: FontWeight.w400,
-    fontSize: 11,
-  );
-  static const TextStyle medium11 = TextStyle(
-    fontWeight: FontWeight.w500,
-    fontSize: 11,
-  );
-  static const TextStyle semiBold11 = TextStyle(
-    fontWeight: FontWeight.w600,
-    fontSize: 11,
-  );
-  static const TextStyle bold11 = TextStyle(
-    fontWeight: FontWeight.w700,
-    fontSize: 11,
-  );
+  static TextStyle get regular11 => TextStyle(
+        fontWeight: FontWeight.w400,
+        fontSize: _sp(11),
+      );
+  static TextStyle get medium11 => TextStyle(
+        fontWeight: FontWeight.w500,
+        fontSize: _sp(11),
+      );
+  static TextStyle get semiBold11 => TextStyle(
+        fontWeight: FontWeight.w600,
+        fontSize: _sp(11),
+      );
+  static TextStyle get bold11 => TextStyle(
+        fontWeight: FontWeight.w700,
+        fontSize: _sp(11),
+      );
 
   // Extracted from Figma
   // XS (12px)
-  static const TextStyle regular12 = TextStyle(
-    fontWeight: FontWeight.w400,
-    fontSize: 12,
-  );
-  static const TextStyle medium12 = TextStyle(
-    fontWeight: FontWeight.w500,
-    fontSize: 12,
-  );
+  static TextStyle get regular12 => TextStyle(
+        fontWeight: FontWeight.w400,
+        fontSize: _sp(12),
+      );
+  static TextStyle get medium12 => TextStyle(
+        fontWeight: FontWeight.w500,
+        fontSize: _sp(12),
+      );
 
   // SM (14px)
-  static const TextStyle regular14 = TextStyle(
-    fontWeight: FontWeight.w400,
-    fontSize: 14,
-  );
-  static const TextStyle medium14 = TextStyle(
-    fontWeight: FontWeight.w500,
-    fontSize: 14,
-  );
-  static const TextStyle leading6Regular14 = TextStyle(
-    fontWeight: FontWeight.w400,
-    fontSize: 14,
-  );
-  static const TextStyle leading6Medium14 = TextStyle(
-    fontWeight: FontWeight.w500,
-    fontSize: 14,
-  );
+  static TextStyle get regular14 => TextStyle(
+        fontWeight: FontWeight.w400,
+        fontSize: _sp(14),
+      );
+  static TextStyle get medium14 => TextStyle(
+        fontWeight: FontWeight.w500,
+        fontSize: _sp(14),
+      );
+  static TextStyle get leading6Regular14 => TextStyle(
+        fontWeight: FontWeight.w400,
+        fontSize: _sp(14),
+      );
+  static TextStyle get leading6Medium14 => TextStyle(
+        fontWeight: FontWeight.w500,
+        fontSize: _sp(14),
+      );
 
   // Base (16px)
-  static const TextStyle regular16 = TextStyle(
-    fontWeight: FontWeight.w400,
-    fontSize: 16,
-  );
-  static const TextStyle medium16 = TextStyle(
-    fontWeight: FontWeight.w500,
-    fontSize: 16,
-  );
-  static const TextStyle semiBold16 = TextStyle(
-    fontWeight: FontWeight.w600,
-    fontSize: 16,
-  );
+  static TextStyle get regular16 => TextStyle(
+        fontWeight: FontWeight.w400,
+        fontSize: _sp(16),
+      );
+  static TextStyle get medium16 => TextStyle(
+        fontWeight: FontWeight.w500,
+        fontSize: _sp(16),
+      );
+  static TextStyle get semiBold16 => TextStyle(
+        fontWeight: FontWeight.w600,
+        fontSize: _sp(16),
+      );
 
   // LG (18px)
-  static const TextStyle regular18 = TextStyle(
-    fontWeight: FontWeight.w400,
-    fontSize: 18,
-  );
-  static const TextStyle medium18 = TextStyle(
-    fontWeight: FontWeight.w500,
-    fontSize: 18,
-  );
-  static const TextStyle semiBold18 = TextStyle(
-    fontWeight: FontWeight.w600,
-    fontSize: 18,
-  );
-  static const TextStyle bold18 = TextStyle(
-    fontWeight: FontWeight.w700,
-    fontSize: 18,
-  );
+  static TextStyle get regular18 => TextStyle(
+        fontWeight: FontWeight.w400,
+        fontSize: _sp(18),
+      );
+  static TextStyle get medium18 => TextStyle(
+        fontWeight: FontWeight.w500,
+        fontSize: _sp(18),
+      );
+  static TextStyle get semiBold18 => TextStyle(
+        fontWeight: FontWeight.w600,
+        fontSize: _sp(18),
+      );
+  static TextStyle get bold18 => TextStyle(
+        fontWeight: FontWeight.w700,
+        fontSize: _sp(18),
+      );
 
   // XL (20px)
-  static const TextStyle regular20 = TextStyle(
-    fontWeight: FontWeight.w400,
-    fontSize: 20,
-  );
+  static TextStyle get regular20 => TextStyle(
+        fontWeight: FontWeight.w400,
+        fontSize: _sp(20),
+      );
 
   // 3XL (24px)
-  static const TextStyle medium24 = TextStyle(
-    fontWeight: FontWeight.w500,
-    fontSize: 24,
-  );
-  static const TextStyle semiBold24 = TextStyle(
-    fontWeight: FontWeight.w600,
-    fontSize: 24,
-  );
+  static TextStyle get medium24 => TextStyle(
+        fontWeight: FontWeight.w500,
+        fontSize: _sp(24),
+      );
+  static TextStyle get semiBold24 => TextStyle(
+        fontWeight: FontWeight.w600,
+        fontSize: _sp(24),
+      );
 
   // 7XL (32px)
-  static const TextStyle regular32 = TextStyle(
-    fontWeight: FontWeight.w400,
-    fontSize: 32,
-  );
-  static const TextStyle semiBold32 = TextStyle(
-    fontWeight: FontWeight.w600,
-    fontSize: 32,
-  );
+  static TextStyle get regular32 => TextStyle(
+        fontWeight: FontWeight.w400,
+        fontSize: _sp(32),
+      );
+  static TextStyle get semiBold32 => TextStyle(
+        fontWeight: FontWeight.w600,
+        fontSize: _sp(32),
+      );
 }
