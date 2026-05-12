@@ -25,6 +25,7 @@ class _OffersListViewState extends State<OffersListView> {
 
   @override
   Widget build(BuildContext context) {
+    final height = MediaQuery.sizeOf(context).height;
     return Column(
       children: [
         Padding(
@@ -80,7 +81,7 @@ class _OffersListViewState extends State<OffersListView> {
 
         const SizedBox(height: 16),
         SizedBox(
-          height: 180,
+          height: height * 0.25,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 24),

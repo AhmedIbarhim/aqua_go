@@ -53,7 +53,7 @@ class _ServicesListViewState extends State<ServicesListView> {
         ),
         const SizedBox(height: 16),
         SizedBox(
-          height: height * 0.16,
+          height: height * 0.18,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 24),

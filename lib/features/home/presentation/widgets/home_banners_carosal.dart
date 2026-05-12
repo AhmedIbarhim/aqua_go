@@ -8,11 +8,11 @@ class HomeBannersCarosal extends StatefulWidget {
   const HomeBannersCarosal({
     super.key,
     required this.banners,
-    required this.width,
+    // required this.width,
     required this.carouselController,
   });
   final List<BannerModel> banners;
-  final double width;
+  // final double width;
   final CarouselSliderController carouselController;
 
   @override
@@ -24,6 +24,7 @@ class _HomeBannersCarosalState extends State<HomeBannersCarosal> {
 
   @override
   Widget build(BuildContext context) {
+    var height = MediaQuery.sizeOf(context).height;
     return Column(
       children: [
         CarouselSlider.builder(
@@ -31,7 +32,7 @@ class _HomeBannersCarosalState extends State<HomeBannersCarosal> {
           itemCount: widget.banners.length,
           itemBuilder: (context, index, realIndex) {
             return Container(
-              width: widget.width,
+              // width: widget.width,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -65,7 +66,7 @@ class _HomeBannersCarosalState extends State<HomeBannersCarosal> {
           ),
         ),
         if (widget.banners.isNotEmpty) ...[
-          const SizedBox(height: 12),
+          SizedBox(height: height * 0.01),
           DotsIndicator(
             dotsCount: widget.banners.length,
             position: _currentIndex.toDouble(),

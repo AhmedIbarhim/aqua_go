@@ -14,14 +14,13 @@ class ServiceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var width = MediaQuery.of(context).size.width;
-    var height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
     return InkWell(
       onTap: () {
         context.pushNamed(Routes.bookingLocation);
       },
       child: Container(
-        width: width - 30,
+        width: width * 0.85,
         decoration: BoxDecoration(
           color: context.colors.screenBG,
           borderRadius: BorderRadius.circular(20),
@@ -45,38 +44,37 @@ class ServiceCard extends StatelessWidget {
               ),
 
               Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: EdgeInsets.all(width * 0.035),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(
-                      width: width * 0.4,
+                    Expanded(
+                      flex: 5,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               Text(
                                 serviceModel.title,
                                 style: AppTextStyles.bold16,
-
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
-                              const SizedBox(height: 6),
+                              const SizedBox(height: 4),
                               Text(
                                 serviceModel.description,
                                 style: AppTextStyles.regular12.copyWith(
                                   color: context.colors.textSecondary,
                                 ),
-                                maxLines: 3,
+                                maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ],
                           ),
+                          const Spacer(),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.center,
@@ -84,7 +82,7 @@ class ServiceCard extends StatelessWidget {
                               if (serviceModel.oldPrice.isNotEmpty)
                                 Text(
                                   serviceModel.oldPrice,
-                                  style: AppTextStyles.regular14.copyWith(
+                                  style: AppTextStyles.regular12.copyWith(
                                     color: context.colors.textPrimary
                                         .withValues(alpha: 0.5),
                                     decoration: TextDecoration.lineThrough,
@@ -93,7 +91,6 @@ class ServiceCard extends StatelessWidget {
                                   ),
                                 ),
                               const SizedBox(width: 8),
-
                               Text(
                                 serviceModel.price,
                                 style: AppTextStyles.bold18,
@@ -101,8 +98,8 @@ class ServiceCard extends StatelessWidget {
                               const SizedBox(width: 4),
                               SvgPicture.asset(
                                 AppAssets.currency,
-                                width: 20,
-                                height: 20,
+                                width: 18,
+                                height: 18,
                                 // ignore: deprecated_member_use
                                 color: context.colors.textPrimary,
                               ),
@@ -111,15 +108,12 @@ class ServiceCard extends StatelessWidget {
                         ],
                       ),
                     ),
-                    const Spacer(),
-                    SizedBox(
-                      width: width * 0.43,
-                      height: height * 0.26,
+                    Expanded(
+                      flex: 5,
                       child: Transform.flip(
                         flipX: context.isEn,
                         child: Image.asset(
                           serviceModel.image,
-
                           fit: BoxFit.fill,
                           color: context.colors.primary,
                         ),

@@ -102,7 +102,7 @@ class _PackagesListViewState extends State<PackagesListView> {
         ),
         const SizedBox(height: 16),
         SizedBox(
-          height: height * 0.16,
+          height: height * 0.2,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 24),

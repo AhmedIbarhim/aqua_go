@@ -13,11 +13,11 @@ class OfferCard extends StatelessWidget {
     var height = MediaQuery.of(context).size.height;
     return Container(
       width: atHome == true ? width - 82 : width,
-      height: height * 0.20,
+      height: height * 0.2,
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
-        child: Image.asset(offerModel.image, fit: BoxFit.cover),
+        child: Image.asset(offerModel.image, fit: BoxFit.fill),
       ),
     );
   }

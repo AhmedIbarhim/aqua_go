@@ -34,7 +34,7 @@ class PackagesView extends StatelessWidget {
           itemCount: packages.length,
           separatorBuilder: (context, index) => const SizedBox(height: 24),
           itemBuilder: (context, index) =>
-              PackageCard(packageModel: packages[index]),
+              PackageCard(packageModel: packages[index], atHome: false),
         ),
       ),
     );

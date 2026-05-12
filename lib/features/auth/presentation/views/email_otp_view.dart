@@ -32,14 +32,16 @@ class EmailOtpView extends StatelessWidget {
               Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  SizedBox(height: height * 0.1),
-                  Center(
-                    child: Image.asset(
-                      AppAssets.logoTransparent,
-                      width: width * 0.8,
+                  Expanded(
+                    child: SizedBox(
+                      child: Center(
+                        child: Image.asset(
+                          AppAssets.logoTransparent,
+                          width: width * 0.8,
+                        ),
+                      ),
                     ),
                   ),
-                  const Spacer(),
                   Align(
                     alignment: Alignment.bottomCenter,
                     child: EmailOtpContent(email: email),

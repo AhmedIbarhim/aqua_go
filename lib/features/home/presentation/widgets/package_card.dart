@@ -18,13 +18,13 @@ class PackageCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var width = MediaQuery.of(context).size.width;
+    final width = MediaQuery.of(context).size.width;
     return GestureDetector(
       onTap: () {
         BookingPackageBottomSheet.show(context, packageModel: packageModel);
       },
       child: Container(
-        width: atHome == true ? width - 96 : width,
+        width: atHome == true ? width * 0.75 : width,
 
         decoration: BoxDecoration(
           color: context.colors.screenBG,
@@ -60,7 +60,7 @@ class PackageCard extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: EdgeInsets.all(width * 0.035),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -70,8 +70,8 @@ class PackageCard extends StatelessWidget {
                       children: [
                         // Gift Icon Box
                         Container(
-                          width: 48,
-                          height: 48,
+                          width: 44,
+                          height: 44,
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             color: context.colors.primary,
@@ -83,21 +83,23 @@ class PackageCard extends StatelessWidget {
                           ),
                         ),
                         // Duration Tag
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: context.colors.textPrimary.withValues(
-                              alpha: 0.1,
+                        Flexible(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
                             ),
-                            borderRadius: BorderRadius.circular(100),
-                          ),
-                          child: Text(
-                            'لمدة : ${packageModel.duration}',
-                            style: AppTextStyles.medium12.copyWith(
-                              fontSize: 10,
+                            decoration: BoxDecoration(
+                              color: context.colors.textPrimary.withValues(
+                                alpha: 0.1,
+                              ),
+                              borderRadius: BorderRadius.circular(100),
+                            ),
+                            child: Text(
+                              'لمدة : ${packageModel.duration}',
+                              style: AppTextStyles.medium12.copyWith(
+                                fontSize: 10,
+                              ),
                             ),
                           ),
                         ),
@@ -108,22 +110,30 @@ class PackageCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         // Title and Subtitle
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              packageModel.title,
-                              style: AppTextStyles.medium16,
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              packageModel.description,
-                              style: AppTextStyles.regular12.copyWith(
-                                color: context.colors.textSecondary,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                packageModel.title,
+                                style: AppTextStyles.medium16,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 2),
+                              Text(
+                                packageModel.description,
+                                style: AppTextStyles.regular12.copyWith(
+                                  color: context.colors.textSecondary,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
                         ),
+                        const SizedBox(width: 8),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
@@ -134,8 +144,8 @@ class PackageCard extends StatelessWidget {
                             const SizedBox(width: 4),
                             SvgPicture.asset(
                               AppAssets.currency,
-                              width: 24,
-                              height: 24,
+                              width: 20,
+                              height: 20,
                               // ignore: deprecated_member_use
                               color: context.colors.textPrimary,
                             ),
