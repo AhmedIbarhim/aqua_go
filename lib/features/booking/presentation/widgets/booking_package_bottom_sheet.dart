@@ -30,21 +30,23 @@ class BookingPackageBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         // Image
         SizedBox(
-          height: 200,
-          width: 316,
+          height: height * 0.25,
+          width: width * 0.75,
           child: SvgPicture.asset(AppAssets.onboarding1, fit: BoxFit.fill),
         ),
-        const SizedBox(height: 48),
+        SizedBox(height: height * 0.05),
 
         // Details Container
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(12),
+          padding: EdgeInsets.all(width * 0.03),
           decoration: BoxDecoration(
             color: context.colors.cardBackGround,
             borderRadius: BorderRadius.circular(16),
@@ -60,15 +62,15 @@ class BookingPackageBottomSheet extends StatelessWidget {
                   Expanded(
                     child: Text(
                       packageModel.title,
-                      style: AppTextStyles.semiBold24.copyWith(),
+                      style: AppTextStyles.semiBold24,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   const SizedBox(width: 16),
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 8,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: width * 0.02,
+                      vertical: width * 0.02,
                     ),
                     decoration: BoxDecoration(
                       color: context.colors.themeOpositeColor.withValues(
@@ -81,7 +83,7 @@ class BookingPackageBottomSheet extends StatelessWidget {
                       children: [
                         Text(
                           '${LocaleKeys.booking_package_duration.tr()} ${packageModel.duration}',
-                          style: AppTextStyles.medium12.copyWith(),
+                          style: AppTextStyles.medium12,
                         ),
                         const SizedBox(width: 4),
                         const Icon(Icons.timer_outlined, size: 20),
@@ -128,7 +130,7 @@ class BookingPackageBottomSheet extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: height * 0.02),
 
         // Subscribe Button
         CustomButton(

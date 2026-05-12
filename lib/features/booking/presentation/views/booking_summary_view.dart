@@ -5,6 +5,7 @@ import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../../core/components/custom_button.dart';
 import '../../../../core/components/generic_app_bar.dart';
+import '../../../../core/components/bottom_action_sheet_container.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../widgets/booking_summary_card.dart';
 import '../widgets/biker_notes_selection.dart';
@@ -23,6 +24,7 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
     return Scaffold(
       backgroundColor: context.colors.screenBG,
       appBar: GenericAppBar(
@@ -31,23 +33,20 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
         backgroundImage: AppAssets.bookingHeaderImage,
         centerTitle: true,
       ),
-      body: Stack(
+      body: Column(
         children: [
-          CustomScrollView(
-            slivers: [
-              SliverToBoxAdapter(child: _buildContent(context)),
-              const SliverPadding(padding: EdgeInsets.only(bottom: 120)),
-            ],
+          Expanded(
+            child: SingleChildScrollView(child: _buildContent(context, width)),
           ),
-          _buildBottomActionSheet(context),
+          _buildBottomActionSheet(),
         ],
       ),
     );
   }
 
-  Widget _buildContent(BuildContext context) {
+  Widget _buildContent(BuildContext context, double width) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(width * 0.06),
       decoration: BoxDecoration(color: context.colors.themeColor),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -104,29 +103,13 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
     );
   }
 
-  Widget _buildBottomActionSheet(BuildContext context) {
-    return Positioned(
-      bottom: 0,
-      left: 0,
-      right: 0,
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(24, 24, 24, 48),
-        decoration: BoxDecoration(
-          color: context.colors.screenBG,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 12,
-              offset: const Offset(0, -12),
-            ),
-          ],
-        ),
-        child: CustomButton(
-          text: LocaleKeys.bookings_confirm_booking.tr(),
-          onPressed: () {
-            // TODO: Handle booking confirmation
-          },
-        ),
+  Widget _buildBottomActionSheet() {
+    return BottomActionSheetContainer(
+      child: CustomButton(
+        text: LocaleKeys.bookings_confirm_booking.tr(),
+        onPressed: () {
+          // TODO: Handle booking confirmation
+        },
       ),
     );
   }

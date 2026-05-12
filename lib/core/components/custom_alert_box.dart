@@ -52,6 +52,7 @@ class CustomAlertBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
     return GestureDetector(
       onTap: () => Navigator.pop(context),
       child: Material(
@@ -61,8 +62,8 @@ class CustomAlertBox extends StatelessWidget {
             onTap: () {}, // Prevent tap from bubbling up to background
             child: Container(
               width: double.infinity,
-              margin: margin ?? const EdgeInsets.symmetric(horizontal: 24),
-              padding: padding ?? const EdgeInsets.all(16),
+              margin: margin ?? EdgeInsets.symmetric(horizontal: width * 0.06),
+              padding: padding ?? EdgeInsets.all(width * 0.04),
               decoration: BoxDecoration(
                 color: context.colors.cardBackGround,
                 borderRadius: BorderRadius.circular(24),
@@ -110,12 +111,17 @@ class SuccessAlertBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         // Success Icon
-        SvgPicture.asset(AppAssets.successIcon, width: 112, height: 112),
-        const SizedBox(height: 16),
+        SvgPicture.asset(
+          AppAssets.successIcon,
+          width: width * 0.28,
+          height: width * 0.28,
+        ),
+        SizedBox(height: width * 0.04),
 
         // Title
         Text(title ?? LocaleKeys.success.tr(), style: AppTextStyles.medium16),
@@ -131,7 +137,7 @@ class SuccessAlertBox extends StatelessWidget {
               height: 1.5,
             ),
           ),
-        const SizedBox(height: 24),
+        SizedBox(height: width * 0.06),
       ],
     );
   }
@@ -179,12 +185,17 @@ class WarningBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         // Warning Icon
-        SvgPicture.asset(AppAssets.warningIcon, width: 112, height: 112),
-        const SizedBox(height: 16),
+        SvgPicture.asset(
+          AppAssets.warningIcon,
+          width: width * 0.28,
+          height: width * 0.28,
+        ),
+        SizedBox(height: width * 0.04),
 
         // Title
         if (title != null) ...[
@@ -201,19 +212,20 @@ class WarningBox extends StatelessWidget {
             height: 1.5,
           ),
         ),
-        const SizedBox(height: 24),
+        SizedBox(height: width * 0.06),
 
         Row(
           children: [
             Expanded(
               child: CustomButton(
                 color: context.colors.error,
+                borderColor: context.colors.error,
                 text: primaryButtonText ?? LocaleKeys.delete.tr(),
                 textColor: lightAppColors.themeColor,
                 onPressed: onPrimaryPressed ?? () => Navigator.pop(context),
               ),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: width * 0.02),
 
             Expanded(
               child: CustomButton(

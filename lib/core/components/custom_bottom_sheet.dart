@@ -49,6 +49,8 @@ class CustomBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -63,9 +65,9 @@ class CustomBottomSheet extends StatelessWidget {
           padding:
               padding ??
               EdgeInsets.only(
-                top: 24,
-                left: 24,
-                right: 24,
+                top: height * 0.03,
+                left: width * 0.06,
+                right: width * 0.06,
                 bottom: MediaQuery.of(context).viewInsets.bottom + 5,
               ),
           child: SingleChildScrollView(
@@ -89,7 +91,7 @@ class CustomBottomSheet extends StatelessWidget {
                     const SizedBox(width: 32),
                   ],
                 ),
-                const SizedBox(height: 48),
+                SizedBox(height: height * 0.05),
                 child,
               ],
             ),

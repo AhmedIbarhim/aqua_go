@@ -48,24 +48,26 @@ class CarSelectionList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
     return SizedBox(
-      height: 100,
+      height: height * 0.14,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: myCars.length + 1,
-        separatorBuilder: (context, index) => const SizedBox(width: 8),
+        separatorBuilder: (context, index) => SizedBox(width: width * 0.02),
         itemBuilder: (context, index) {
           if (index == 0) {
             return GestureDetector(
               onTap: onAddCar,
-              child: _buildAddCarCard(context),
+              child: _buildAddCarCard(context, width, height),
             );
           }
           final car = myCars[index - 1];
           final isSelected = selectedCarIndex == index - 1;
           return GestureDetector(
             onTap: () => onCarSelected(index - 1),
-            child: _buildCarCard(context, car, isSelected: isSelected),
+            child: _buildCarCard(context, car, width, height, isSelected: isSelected),
           );
         },
       ),
@@ -74,13 +76,14 @@ class CarSelectionList extends StatelessWidget {
 
   Widget _buildCarCard(
     BuildContext context,
-    MyCarModel car, {
+    MyCarModel car,
+    double width,
+    double height, {
     bool isSelected = false,
   }) {
     return Container(
-      width: MediaQuery.of(context).size.width * 0.28,
-      height: MediaQuery.of(context).size.height * 0.15,
-      padding: const EdgeInsets.all(12),
+      width: width * 0.28,
+      padding: EdgeInsets.all(width * 0.03),
       decoration: BoxDecoration(
         color: isSelected
             ? context.colors.brandHover
@@ -95,12 +98,12 @@ class CarSelectionList extends StatelessWidget {
             opacity: isSelected ? 1.0 : 0.5,
             child: Image.asset(
               car.typeImage,
-              height: 40,
-              width: 60,
+              height: height * 0.045,
+              width: width * 0.15,
               fit: BoxFit.fitWidth,
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: height * 0.01),
           Text(
             '${car.name} ${car.model}',
             style: AppTextStyles.regular12.copyWith(
@@ -117,10 +120,9 @@ class CarSelectionList extends StatelessWidget {
     );
   }
 
-  Widget _buildAddCarCard(BuildContext context) {
+  Widget _buildAddCarCard(BuildContext context, double width, double height) {
     return Container(
-      width: MediaQuery.of(context).size.width * 0.28,
-      height: MediaQuery.of(context).size.height * 0.15,
+      width: width * 0.28,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: context.colors.borderSecondary),
@@ -130,13 +132,13 @@ class CarSelectionList extends StatelessWidget {
         children: [
           SvgPicture.asset(
             AppAssets.addCarIcon,
-            width: 40,
+            width: width * 0.1,
             colorFilter: ColorFilter.mode(
               context.colors.textPrimary,
               BlendMode.srcIn,
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: height * 0.01),
           Text(
             LocaleKeys.bookings_add_car.tr(),
             style: AppTextStyles.medium12.copyWith(

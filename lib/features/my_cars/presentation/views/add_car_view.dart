@@ -5,6 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../widgets/vehicle_color_picker.dart';
+import '../../../../core/components/bottom_action_sheet_container.dart';
 import '../../../../core/components/custom_dropdown_field.dart';
 import '../../../../core/components/custom_text_field.dart';
 
@@ -47,6 +48,7 @@ class _AddCarViewState extends State<AddCarView> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
     return Scaffold(
       backgroundColor: context.colors.screenBG,
       appBar: GenericAppBar(
@@ -67,7 +69,7 @@ class _AddCarViewState extends State<AddCarView> {
                 ),
               ),
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
+                padding: EdgeInsets.all(width * 0.06),
                 child: Form(
                   key: formKey,
                   child: Column(
@@ -128,23 +130,21 @@ class _AddCarViewState extends State<AddCarView> {
                         controller: _plateNumberController,
                         isRequired: true,
                       ),
-                      const SizedBox(height: 120), // Space for bottom buttons
+                      const SizedBox(height: 24),
                     ],
                   ),
                 ),
               ),
             ),
           ),
+          _buildBottomActions(),
         ],
       ),
-      bottomSheet: _buildBottomActions(),
     );
   }
 
   Widget _buildBottomActions() {
-    return Container(
-      color: context.colors.screenBG,
-      padding: const EdgeInsets.fromLTRB(24, 24, 24, 48),
+    return BottomActionSheetContainer(
       child: Row(
         children: [
           Expanded(

@@ -25,6 +25,7 @@ class MyBookingProceduresBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -36,7 +37,7 @@ class MyBookingProceduresBottomSheet extends StatelessWidget {
             RatingBottomSheet.show(context);
           },
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: height * 0.015),
         _buildActionItem(
           context,
           title: LocaleKeys.bookings_submit_complaint.tr(),
@@ -47,7 +48,7 @@ class MyBookingProceduresBottomSheet extends StatelessWidget {
             );
           },
         ),
-        const SizedBox(height: 32),
+        SizedBox(height: height * 0.04),
       ],
     );
   }
@@ -57,11 +58,15 @@ class MyBookingProceduresBottomSheet extends StatelessWidget {
     required String title,
     required VoidCallback onTap,
   }) {
+    final width = MediaQuery.of(context).size.width;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        padding: EdgeInsets.symmetric(
+          horizontal: width * 0.04,
+          vertical: width * 0.04,
+        ),
         decoration: BoxDecoration(
           color: context.colors.defaultSubtle,
           border: Border.all(color: context.colors.borderSecondary, width: 0.5),

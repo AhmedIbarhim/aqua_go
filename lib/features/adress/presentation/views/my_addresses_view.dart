@@ -9,6 +9,7 @@ import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/route/routes.dart';
 import '../widgets/empty_addresses_widget.dart';
 import '../widgets/my_addresses_list.dart';
+import '../../../../core/components/bottom_action_sheet_container.dart';
 import 'new_address_map_view.dart';
 
 class MyAddressesView extends StatelessWidget {
@@ -16,6 +17,7 @@ class MyAddressesView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
     // Mock data based on design
     final List<AddressModel> myAddresses = [
       AddressModel(
@@ -38,45 +40,40 @@ class MyAddressesView extends StatelessWidget {
         title: LocaleKeys.address_my_addresses.tr(),
         centerTitle: true,
       ),
-      body: Stack(
+      body: Column(
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-            decoration: BoxDecoration(
-              color: context.colors.background,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(24),
-                topRight: Radius.circular(24),
-              ),
-            ),
-            child: myAddresses.isEmpty
-                ? const EmptyAddressesWidget()
-                : MyAddressesList(myAddresses: myAddresses),
-          ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
+          Expanded(
             child: Container(
-              padding: const EdgeInsets.fromLTRB(24, 24, 24, 48),
-              decoration: BoxDecoration(color: context.colors.screenBG),
-              child: CustomButton(
-                text: LocaleKeys.address_add_new_location.tr(),
-                preWidget: Icon(
-                  Icons.add,
-                  // color: context.colors.textTheme,
-                  size: 24,
+              padding: EdgeInsets.all(width * 0.06),
+              decoration: BoxDecoration(
+                color: context.colors.background,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(24),
+                  topRight: Radius.circular(24),
                 ),
-                onPressed: () {
-                  context.pushNamed(
-                    Routes.newAddressMap,
-                    arguments: NewAddressMapArgs(forAddingAddress: true),
-                  );
-                },
               ),
+              child: myAddresses.isEmpty
+                  ? const SingleChildScrollView(child: EmptyAddressesWidget())
+                  : MyAddressesList(myAddresses: myAddresses),
             ),
           ),
+          _buildBottomActionSheet(context),
         ],
+      ),
+    );
+  }
+
+  Widget _buildBottomActionSheet(BuildContext context) {
+    return BottomActionSheetContainer(
+      child: CustomButton(
+        text: LocaleKeys.address_add_new_location.tr(),
+        preWidget: const Icon(Icons.add, size: 24),
+        onPressed: () {
+          context.pushNamed(
+            Routes.newAddressMap,
+            arguments: NewAddressMapArgs(forAddingAddress: true),
+          );
+        },
       ),
     );
   }

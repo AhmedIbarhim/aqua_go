@@ -38,6 +38,8 @@ class _AddAddressBottomSheetState extends State<AddAddressBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,10 +48,10 @@ class _AddAddressBottomSheetState extends State<AddAddressBottomSheet> {
           LocaleKeys.address_address_label.tr(),
           isRequired: true,
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: height * 0.01),
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(12),
+          padding: EdgeInsets.all(width * 0.03),
           decoration: BoxDecoration(
             color: context.colors.background,
             border: Border.all(color: context.colors.borderSecondary),
@@ -69,7 +71,7 @@ class _AddAddressBottomSheetState extends State<AddAddressBottomSheet> {
               const SizedBox(width: 8),
 
               SizedBox(
-                width: MediaQuery.of(context).size.width * 0.7,
+                width: width * 0.7,
                 child: Text(
                   widget.address,
                   style: AppTextStyles.medium16.copyWith(
@@ -83,13 +85,13 @@ class _AddAddressBottomSheetState extends State<AddAddressBottomSheet> {
             ],
           ),
         ),
-        const SizedBox(height: 24),
+        SizedBox(height: height * 0.03),
 
         _buildSectionLabel(
           LocaleKeys.address_address_name_label.tr(),
           isRequired: true,
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: height * 0.01),
         CustomTextFormField(
           controller: _addressNameController,
           label: LocaleKeys.address_address_name_label.tr(),
@@ -106,17 +108,17 @@ class _AddAddressBottomSheetState extends State<AddAddressBottomSheet> {
             ),
           ),
         ),
-        const SizedBox(height: 24),
+        SizedBox(height: height * 0.03),
 
         _buildSectionLabel(LocaleKeys.address_access_notes_label.tr()),
-        const SizedBox(height: 8),
+        SizedBox(height: height * 0.01),
         CustomTextFormField(
           controller: _accessNotesController,
           label: LocaleKeys.address_access_notes_label.tr(),
           keyboardType: TextInputType.multiline,
           minLines: 3,
         ),
-        const SizedBox(height: 32),
+        SizedBox(height: height * 0.04),
 
         CustomButton(
           text: LocaleKeys.address_save_address.tr(),

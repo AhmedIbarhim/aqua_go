@@ -12,6 +12,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
 
+import '../../../../core/components/bottom_action_sheet_container.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../widgets/complain_images_section.dart';
 
@@ -58,6 +59,7 @@ class _ComplainViewState extends State<ComplainView> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
     return Scaffold(
       backgroundColor: context.colors.screenBG,
       appBar: GenericAppBar(
@@ -68,7 +70,7 @@ class _ComplainViewState extends State<ComplainView> {
         children: [
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
+              padding: EdgeInsets.all(width * 0.06),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -237,18 +239,7 @@ class _ComplainViewState extends State<ComplainView> {
   }
 
   Widget _buildActionButtons() {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(24, 24, 24, 48),
-      decoration: BoxDecoration(
-        color: context.colors.screenBG,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 12,
-            offset: const Offset(0, -12),
-          ),
-        ],
-      ),
+    return BottomActionSheetContainer(
       child: Row(
         children: [
           Expanded(

@@ -23,12 +23,18 @@ class RatingSuccessAlertBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         // Success Icon
-        SvgPicture.asset(AppAssets.successIcon, width: 112, height: 112),
-        const SizedBox(height: 16),
+        SvgPicture.asset(
+          AppAssets.successIcon,
+          width: width * 0.28,
+          height: width * 0.28,
+        ),
+        SizedBox(height: height * 0.02),
 
         // Title
         Text(
@@ -46,7 +52,7 @@ class RatingSuccessAlertBox extends StatelessWidget {
             height: 1.5,
           ),
         ),
-        const SizedBox(height: 24),
+        SizedBox(height: height * 0.03),
 
         // OK Button
         CustomButton(

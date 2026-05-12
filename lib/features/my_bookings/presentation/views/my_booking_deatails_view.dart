@@ -8,6 +8,7 @@ import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
+import '../../../../core/components/bottom_action_sheet_container.dart';
 import '../../../../core/components/rating_widget.dart';
 import '../widgets/my_booking_procedures_bottom_sheet.dart';
 import '../widgets/my_booking_photos_section.dart';
@@ -42,7 +43,7 @@ class MyBookingDetailsView extends StatelessWidget {
         children: [
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
+              padding: EdgeInsets.all(24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -388,9 +389,7 @@ class MyBookingDetailsView extends StatelessWidget {
   }
 
   Widget _buildActionSheet(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(24, 24, 24, 48),
-      decoration: BoxDecoration(color: context.colors.screenBG),
+    return BottomActionSheetContainer(
       child: CustomButton(
         text: LocaleKeys.bookings_edit_booking.tr(),
 

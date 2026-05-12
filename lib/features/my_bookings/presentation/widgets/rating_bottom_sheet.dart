@@ -39,11 +39,13 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: EdgeInsets.symmetric(horizontal: width * 0.06),
           child: Text(
             LocaleKeys.bookings_share_opinion.tr(),
             style: AppTextStyles.regular20.copyWith(
@@ -52,9 +54,9 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
             textAlign: TextAlign.center,
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: height * 0.02),
         _buildRatingStars(),
-        const SizedBox(height: 8),
+        SizedBox(height: height * 0.01),
         Center(
           child: Text(
             _getRatingText(),
@@ -63,11 +65,14 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
             ),
           ),
         ),
-        const SizedBox(height: 24),
+        SizedBox(height: height * 0.03),
         _buildBikerInfo(),
 
-        if (_rating < 5) ...[const SizedBox(height: 24), _buildRatingReasons()],
-        const SizedBox(height: 32),
+        if (_rating < 5) ...[
+          SizedBox(height: height * 0.03),
+          _buildRatingReasons(),
+        ],
+        SizedBox(height: height * 0.04),
         Row(
           children: [
             Expanded(
@@ -81,7 +86,7 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
                 text: LocaleKeys.submit.tr(),
               ),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: width * 0.02),
 
             Expanded(
               flex: 1,
@@ -95,12 +100,13 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: height * 0.02),
       ],
     );
   }
 
   Widget _buildRatingStars() {
+    final width = MediaQuery.of(context).size.width;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(5, (index) {
@@ -111,13 +117,13 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
             });
           },
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
+            padding: EdgeInsets.symmetric(horizontal: width * 0.01),
             child: Icon(
               index < _rating ? Icons.star_rounded : Icons.star_outline_rounded,
               color: index < _rating
                   ? context.colors.warning
                   : context.colors.contentDisabled,
-              size: 40,
+              size: width * 0.1,
             ),
           ),
         );
@@ -135,6 +141,7 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
   }
 
   Widget _buildBikerInfo() {
+    final width = MediaQuery.of(context).size.width;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -146,7 +153,7 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
         ),
         const SizedBox(height: 8),
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(width * 0.04),
           decoration: BoxDecoration(
             color: context.colors.cardBackGround,
             borderRadius: BorderRadius.circular(12),
@@ -154,13 +161,13 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
           child: Row(
             children: [
               CircleAvatar(
-                radius: 20,
+                radius: width * 0.05,
                 backgroundImage: const AssetImage(
                   AppAssets.wavingHand,
                 ), // Placeholder
                 backgroundColor: context.colors.borderSecondary,
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: width * 0.03),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -194,6 +201,7 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
   }
 
   Widget _buildRatingReasons() {
+    final width = MediaQuery.of(context).size.width;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -205,8 +213,8 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
         ),
         const SizedBox(height: 10),
         Wrap(
-          spacing: 8,
-          runSpacing: 8,
+          spacing: width * 0.02,
+          runSpacing: width * 0.02,
           children: _reasons.map((reason) {
             final isSelected = _selectedReasons.contains(reason);
             return GestureDetector(
@@ -220,9 +228,9 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
                 });
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
+                padding: EdgeInsets.symmetric(
+                  horizontal: width * 0.04,
+                  vertical: width * 0.03,
                 ),
                 decoration: BoxDecoration(
                   color: context.colors.themeColor,

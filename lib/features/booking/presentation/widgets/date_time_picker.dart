@@ -56,13 +56,14 @@ class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
 
   @override
   Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildDateHeader(),
-        const SizedBox(height: 12),
+        SizedBox(height: height * 0.015),
         _buildDateSlider(),
-        const SizedBox(height: 12),
+        SizedBox(height: height * 0.015),
         _buildAvailableAppointments(),
       ],
     );
@@ -109,13 +110,15 @@ class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
   }
 
   Widget _buildDateSlider() {
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.09,
+      height: height * 0.1,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: dates.length,
         padding: const EdgeInsets.symmetric(horizontal: 0),
-        separatorBuilder: (context, index) => const SizedBox(width: 8),
+        separatorBuilder: (context, index) => SizedBox(width: width * 0.02),
         itemBuilder: (context, index) {
           final date = dates[index];
           final isSelected = DateUtils.isSameDay(date, selectedDate);
@@ -132,8 +135,8 @@ class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
               widget.onDateChanged(date);
             },
             child: Container(
-              width: MediaQuery.of(context).size.width * 0.15,
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
+              width: width * 0.16,
+              padding: EdgeInsets.symmetric(vertical: height * 0.01, horizontal: 2),
               decoration: BoxDecoration(
                 color: isSelected
                     ? context.colors.brandHover
@@ -156,7 +159,7 @@ class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: height * 0.005),
                   Text(
                     dayNumber,
                     style: isSelected
@@ -177,6 +180,8 @@ class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
   }
 
   Widget _buildAvailableAppointments() {
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -189,10 +194,10 @@ class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
             ),
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: height * 0.02),
         Wrap(
-          spacing: 8,
-          runSpacing: 8,
+          spacing: width * 0.02,
+          runSpacing: width * 0.02,
           children: availableTimes.map((time) {
             final isSelected = selectedTime == time;
             // Mocking some disabled times for design consistency
@@ -208,8 +213,8 @@ class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
                       widget.onTimeChanged(time);
                     },
               child: Container(
-                width: (MediaQuery.of(context).size.width - 64) / 3,
-                padding: const EdgeInsets.symmetric(vertical: 12),
+                width: (width - (width * 0.12 + width * 0.04)) / 3,
+                padding: EdgeInsets.symmetric(vertical: height * 0.015),
                 decoration: BoxDecoration(
                   color: isSelected
                       ? context.colors.brandHover

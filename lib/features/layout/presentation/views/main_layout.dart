@@ -37,9 +37,9 @@ class _MainLayoutState extends State<MainLayout> {
                     AppAssets.homeLightHeader,
                     fit: BoxFit.cover,
                     width: double.infinity,
-                    height: height * 0.36,
+                    height: height * 0.45,
                   )
-                : SizedBox(height: height * 0.36),
+                : SizedBox(height: height * 0.45),
           Scaffold(
             backgroundColor: Colors.transparent,
             appBar: _currentIndex == 3 ? null : const MainAppBar(),

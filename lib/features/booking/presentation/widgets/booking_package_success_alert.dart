@@ -22,12 +22,18 @@ class BookingPackageSuccessAlert extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         // Success Icon
-        SvgPicture.asset(AppAssets.successIcon, width: 112, height: 112),
-        const SizedBox(height: 16),
+        SvgPicture.asset(
+          AppAssets.successIcon,
+          width: width * 0.28,
+          height: width * 0.28,
+        ),
+        SizedBox(height: height * 0.02),
 
         // Title
         Text(LocaleKeys.success.tr(), style: AppTextStyles.medium16),
@@ -42,7 +48,7 @@ class BookingPackageSuccessAlert extends StatelessWidget {
             height: 1.5,
           ),
         ),
-        const SizedBox(height: 24),
+        SizedBox(height: height * 0.03),
 
         // Primary Button
         CustomButton(
@@ -52,7 +58,6 @@ class BookingPackageSuccessAlert extends StatelessWidget {
             // TODO: Implement navigation to request wash
           },
         ),
-        const SizedBox(height: 16),
 
         // Secondary Button
         CustomButton(

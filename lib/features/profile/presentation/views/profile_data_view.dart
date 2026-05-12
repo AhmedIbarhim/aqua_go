@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
 
 import '../../../../core/enums/gender_enum.dart';
-import '../../../../core/extentions/context_extentions.dart';
+import '../widgets/gender_selection_widget.dart';
 
 class ProfileDataView extends StatefulWidget {
   const ProfileDataView({super.key});
@@ -108,7 +108,11 @@ class _ProfileDataViewState extends State<ProfileDataView> {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    _buildGenderSelection(),
+                    GenderSelectionWidget(
+                      selectedGender: _gender,
+                      isEditing: isEditing,
+                      onChanged: (value) => setState(() => _gender = value),
+                    ),
                   ],
                 ),
               ),
@@ -132,52 +136,6 @@ class _ProfileDataViewState extends State<ProfileDataView> {
         _dobController.text = "${picked.day}/${picked.month}/${picked.year}";
       });
     }
-  }
-
-  Widget _buildGenderSelection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          LocaleKeys.profile_gender.tr(),
-          style: AppTextStyles.medium14.copyWith(
-            color: context.colors.textPrimary,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            Expanded(
-              child: _GenderCard(
-                label: context.isEn
-                    ? GenderEnum.male.nameEn()
-                    : GenderEnum.male.nameAr(),
-                icon: AppAssets.male,
-                isSelected: _gender == GenderEnum.male,
-                isEditing: isEditing,
-                onTap: isEditing
-                    ? () => setState(() => _gender = GenderEnum.male)
-                    : null,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _GenderCard(
-                label: context.isEn
-                    ? GenderEnum.female.nameEn()
-                    : GenderEnum.female.nameAr(),
-                icon: AppAssets.female,
-                isSelected: _gender == GenderEnum.female,
-                isEditing: isEditing,
-                onTap: isEditing
-                    ? () => setState(() => _gender = GenderEnum.female)
-                    : null,
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
   }
 
   Widget _buildBottomAction() {
@@ -209,7 +167,6 @@ class _ProfileDataViewState extends State<ProfileDataView> {
                   ),
                 ),
                 const SizedBox(width: 8),
-
                 Expanded(
                   flex: 1,
                   child: CustomButton(
@@ -232,85 +189,6 @@ class _ProfileDataViewState extends State<ProfileDataView> {
               ),
               onPressed: () => setState(() => isEditing = true),
             ),
-    );
-  }
-}
-
-class _GenderCard extends StatelessWidget {
-  final String label;
-  final String icon;
-  final bool isSelected;
-  final bool isEditing;
-  final VoidCallback? onTap;
-
-  const _GenderCard({
-    required this.label,
-    required this.icon,
-    required this.isSelected,
-    required this.isEditing,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    Color bgColor;
-    Color borderColor;
-    Color textColor;
-    double iconOpacity;
-
-    if (isEditing) {
-      if (isSelected) {
-        bgColor = context.colors.brandHover;
-        borderColor = context.colors.primary;
-        textColor = context.colors.textPrimary;
-        iconOpacity = 1.0;
-      } else {
-        bgColor = context.colors.background;
-        borderColor = context.colors.borderSecondary;
-        textColor = context.colors.contentSecondaryLight;
-        iconOpacity = 1.0;
-      }
-    } else {
-      if (isSelected) {
-        bgColor = context.colors.cardBackGround;
-        borderColor = context.colors.borderSecondary;
-        textColor = context.colors.textSecondary;
-        iconOpacity = 1.0;
-      } else {
-        bgColor = context.colors.background;
-        borderColor = context.colors.defaultSubtle;
-        textColor = context.colors.contentDisabled;
-        iconOpacity = 0.5;
-      }
-    }
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: 80,
-        decoration: BoxDecoration(
-          color: bgColor,
-          border: Border.all(color: borderColor),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Opacity(
-              opacity: iconOpacity,
-              child: SvgPicture.asset(icon, width: 48, height: 48),
-            ),
-            const SizedBox(width: 8),
-
-            Text(
-              label,
-              style: (isSelected && isEditing) || (isSelected && !isEditing)
-                  ? AppTextStyles.medium18.copyWith(color: textColor)
-                  : AppTextStyles.regular18.copyWith(color: textColor),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

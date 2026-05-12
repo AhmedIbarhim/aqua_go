@@ -8,6 +8,7 @@ import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../../core/components/custom_button.dart';
 import '../../../../core/components/generic_app_bar.dart';
+import '../../../../core/components/bottom_action_sheet_container.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../widgets/car_selection_list.dart';
 import '../widgets/additional_services_grid.dart';
@@ -28,6 +29,8 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    final height = MediaQuery.sizeOf(context).height;
     return Scaffold(
       backgroundColor: context.colors.screenBG,
       appBar: GenericAppBar(
@@ -36,23 +39,22 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
         backgroundImage: AppAssets.bookingHeaderImage,
         centerTitle: true,
       ),
-      body: Stack(
+      body: Column(
         children: [
-          CustomScrollView(
-            slivers: [
-              SliverToBoxAdapter(child: _buildContent(context)),
-              const SliverPadding(padding: EdgeInsets.only(bottom: 120)),
-            ],
+          Expanded(
+            child: SingleChildScrollView(
+              child: _buildContent(context, width, height),
+            ),
           ),
-          _buildBottomActionSheet(context),
+          _buildBottomActionSheet(context, width, height),
         ],
       ),
     );
   }
 
-  Widget _buildContent(BuildContext context) {
+  Widget _buildContent(BuildContext context, double width, double height) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(width * 0.06),
       decoration: BoxDecoration(color: context.colors.themeColor),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -61,7 +63,7 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
             LocaleKeys.bookings_choose_car.tr(),
             isRequired: true,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: height * 0.02),
           CarSelectionList(
             selectedCarIndex: selectedCarIndex,
             onCarSelected: (index) {
@@ -73,9 +75,9 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
               // TODO: Navigate to Add Car view
             },
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: height * 0.03),
           _buildSectionTitle(LocaleKeys.bookings_additional_services.tr()),
-          const SizedBox(height: 16),
+          SizedBox(height: height * 0.02),
           AdditionalServicesGrid(
             selectedIndices: selectedServiceIndices,
             onServiceToggled: (index) {
@@ -88,7 +90,7 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
               });
             },
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: height * 0.02),
           BookingDateTimePicker(
             initialDate: selectedDate ?? DateTime.now(),
             initialTime: selectedTime,
@@ -103,7 +105,7 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
               });
             },
           ),
-          const SizedBox(height: 30),
+          SizedBox(height: height * 0.04),
         ],
       ),
     );
@@ -120,47 +122,43 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
     );
   }
 
-  Widget _buildBottomActionSheet(BuildContext context) {
-    return Positioned(
-      bottom: 0,
-      left: 0,
-      right: 0,
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(24, 24, 24, 48),
-        decoration: BoxDecoration(color: context.colors.screenBG),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                Text(
-                  LocaleKeys.bookings_total.tr(),
-                  style: AppTextStyles.regular14.copyWith(
-                    color: context.colors.textSecondary,
-                  ),
+  Widget _buildBottomActionSheet(
+    BuildContext context,
+    double width,
+    double height,
+  ) {
+    return BottomActionSheetContainer(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Text(
+                LocaleKeys.bookings_total.tr(),
+                style: AppTextStyles.regular14.copyWith(
+                  color: context.colors.textSecondary,
                 ),
-                const Spacer(),
-                Text('94.99', style: AppTextStyles.medium24),
-
-                SvgPicture.asset(
-                  AppAssets.currency,
-                  width: 24,
-                  colorFilter: ColorFilter.mode(
-                    context.colors.textPrimary,
-                    BlendMode.srcIn,
-                  ),
+              ),
+              const Spacer(),
+              Text('94.99', style: AppTextStyles.medium24),
+              const SizedBox(width: 4),
+              SvgPicture.asset(
+                AppAssets.currency,
+                width: width * 0.06,
+                colorFilter: ColorFilter.mode(
+                  context.colors.textPrimary,
+                  BlendMode.srcIn,
                 ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            CustomButton(
-              text: LocaleKeys.bookings_book_now.tr(),
-              onPressed: () {
-                context.pushNamed(Routes.bookingSummary);
-              },
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+          CustomButton(
+            text: LocaleKeys.bookings_book_now.tr(),
+            onPressed: () {
+              context.pushNamed(Routes.bookingSummary);
+            },
+          ),
+        ],
       ),
     );
   }

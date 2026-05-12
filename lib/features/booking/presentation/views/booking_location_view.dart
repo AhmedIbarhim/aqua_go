@@ -8,6 +8,7 @@ import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../../core/components/custom_button.dart';
 import '../../../../core/components/generic_app_bar.dart';
+import '../../../../core/components/bottom_action_sheet_container.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../../../adress/data/models/address_model.dart';
 import '../widgets/location_selection_card.dart';
@@ -40,6 +41,8 @@ class _BookingLocationViewState extends State<BookingLocationView> {
 
   @override
   Widget build(BuildContext context) {
+    final height = MediaQuery.sizeOf(context).height;
+    final width = MediaQuery.sizeOf(context).width;
     return Scaffold(
       backgroundColor: context.colors.screenBG,
       appBar: GenericAppBar(
@@ -48,95 +51,89 @@ class _BookingLocationViewState extends State<BookingLocationView> {
         backgroundImage: AppAssets.bookingHeaderImage,
         centerTitle: true,
       ),
-      body: Stack(
+      body: Column(
         children: [
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(color: context.colors.background),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  LocaleKeys.address_map.tr(),
-                  style: AppTextStyles.regular16.copyWith(
-                    color: context.colors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                LocationSelectionCard(
-                  icon: AppAssets.gps,
-                  title: LocaleKeys.address_current_location.tr(),
-                  subtitle: 'شارع احمد عبد الخالق, نجران السعودية',
-                  isSelected: selectedLocationIndex == 0,
-                  onTap: () {
-                    setState(() {
-                      selectedLocationIndex = 0;
-                    });
-                  },
-                ),
-                const SizedBox(height: 8),
-                _buildAddressSelectOnMapCard(context),
-                const SizedBox(height: 24),
-                Text(
-                  LocaleKeys.address_my_addresses.tr(),
-                  style: AppTextStyles.regular16.copyWith(
-                    color: context.colors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.5,
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        ListView.builder(
-                          physics: const NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: myAddresses.length,
-                          padding: EdgeInsets.zero,
-                          itemBuilder: (context, index) {
-                            final address = myAddresses[index];
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 8),
-                              child: LocationSelectionCard(
-                                icon: AppAssets.location,
-                                title: address.name.tr(),
-                                subtitle: address.formattedAddress,
-                                isSelected: selectedLocationIndex == index + 1,
-                                onTap: () {
-                                  setState(() {
-                                    selectedLocationIndex = index + 1;
-                                  });
-                                },
-                                onEdit: () {},
-                              ),
-                            );
-                          },
-                        ),
-                        AddNewAddressButton(
-                          text: LocaleKeys.address_add_new_location.tr(),
-                          onTap: () {
-                            context.pushNamed(
-                              Routes.newAddressMap,
-                              arguments:
-                                  NewAddressMapArgs(forAddingAddress: true),
-                            );
-                          },
-                        ),
-                      ],
+          Expanded(
+            child: SingleChildScrollView(
+              child: Container(
+                padding: EdgeInsets.all(width * 0.06),
+                decoration: BoxDecoration(color: context.colors.background),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      LocaleKeys.address_map.tr(),
+                      style: AppTextStyles.regular16.copyWith(
+                        color: context.colors.textPrimary,
+                      ),
                     ),
-                  ),
+                    SizedBox(height: height * 0.01),
+                    LocationSelectionCard(
+                      icon: AppAssets.gps,
+                      title: LocaleKeys.address_current_location.tr(),
+                      subtitle: 'شارع احمد عبد الخالق, نجران السعودية',
+                      isSelected: selectedLocationIndex == 0,
+                      onTap: () {
+                        setState(() {
+                          selectedLocationIndex = 0;
+                        });
+                      },
+                    ),
+                    SizedBox(height: height * 0.01),
+                    _buildAddressSelectOnMapCard(context, width),
+                    SizedBox(height: height * 0.03),
+                    Text(
+                      LocaleKeys.address_my_addresses.tr(),
+                      style: AppTextStyles.regular16.copyWith(
+                        color: context.colors.textPrimary,
+                      ),
+                    ),
+                    SizedBox(height: height * 0.01),
+                    ListView.builder(
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: myAddresses.length,
+                      padding: EdgeInsets.zero,
+                      itemBuilder: (context, index) {
+                        final address = myAddresses[index];
+                        return Padding(
+                          padding: EdgeInsets.only(bottom: height * 0.01),
+                          child: LocationSelectionCard(
+                            icon: AppAssets.location,
+                            title: address.name.tr(),
+                            subtitle: address.formattedAddress,
+                            isSelected: selectedLocationIndex == index + 1,
+                            onTap: () {
+                              setState(() {
+                                selectedLocationIndex = index + 1;
+                              });
+                            },
+                            onEdit: () {},
+                          ),
+                        );
+                      },
+                    ),
+                    AddNewAddressButton(
+                      text: LocaleKeys.address_add_new_location.tr(),
+                      onTap: () {
+                        context.pushNamed(
+                          Routes.newAddressMap,
+                          arguments: NewAddressMapArgs(forAddingAddress: true),
+                        );
+                      },
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
-          _buildBottomActionSheet(context),
+          _buildBottomActionSheet(),
         ],
       ),
     );
   }
 
-  Widget _buildAddressSelectOnMapCard(BuildContext context) {
+  Widget _buildAddressSelectOnMapCard(BuildContext context, double width) {
     return InkWell(
       onTap: () {
         context.pushNamed(
@@ -146,7 +143,7 @@ class _BookingLocationViewState extends State<BookingLocationView> {
       },
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(width * 0.04),
         decoration: BoxDecoration(
           color: context.colors.themeColor,
           borderRadius: BorderRadius.circular(12),
@@ -155,7 +152,8 @@ class _BookingLocationViewState extends State<BookingLocationView> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            SvgPicture.asset(AppAssets.mapOutlined, width: 24),
+            SvgPicture.asset(AppAssets.mapOutlined, width: width * 0.06),
+            const SizedBox(width: 8),
             Container(
               width: 8,
               height: 8,
@@ -164,9 +162,7 @@ class _BookingLocationViewState extends State<BookingLocationView> {
                 shape: BoxShape.circle,
               ),
             ),
-
             const SizedBox(width: 8),
-
             Text(
               LocaleKeys.address_select_on_map.tr(),
               style: AppTextStyles.regular16.copyWith(
@@ -179,20 +175,13 @@ class _BookingLocationViewState extends State<BookingLocationView> {
     );
   }
 
-  Widget _buildBottomActionSheet(BuildContext context) {
-    return Positioned(
-      bottom: 0,
-      left: 0,
-      right: 0,
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(24, 24, 24, 48),
-        decoration: BoxDecoration(color: context.colors.screenBG),
-        child: CustomButton(
-          text: LocaleKeys.bookings_save_car_location.tr(),
-          onPressed: () {
-            context.pushNamed(Routes.bookingDetails);
-          },
-        ),
+  Widget _buildBottomActionSheet() {
+    return BottomActionSheetContainer(
+      child: CustomButton(
+        text: LocaleKeys.bookings_save_car_location.tr(),
+        onPressed: () {
+          context.pushNamed(Routes.bookingDetails);
+        },
       ),
     );
   }
@@ -210,12 +199,13 @@ class AddNewAddressButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(width * 0.04),
         decoration: BoxDecoration(
           color: context.colors.themeColor,
           borderRadius: BorderRadius.circular(12),
@@ -224,9 +214,8 @@ class AddNewAddressButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.add, color: context.colors.primary, size: 24),
+            Icon(Icons.add, color: context.colors.primary, size: width * 0.06),
             const SizedBox(width: 8),
-
             Text(
               text,
               style: AppTextStyles.medium14.copyWith(

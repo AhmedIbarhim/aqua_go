@@ -8,11 +8,9 @@ class HomeBannersCarosal extends StatefulWidget {
   const HomeBannersCarosal({
     super.key,
     required this.banners,
-    // required this.width,
     required this.carouselController,
   });
   final List<BannerModel> banners;
-  // final double width;
   final CarouselSliderController carouselController;
 
   @override

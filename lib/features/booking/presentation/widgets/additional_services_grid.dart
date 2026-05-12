@@ -23,14 +23,15 @@ class AdditionalServicesGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
     return GridView.builder(
       shrinkWrap: true,
       padding: EdgeInsets.zero,
       physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        mainAxisSpacing: 8,
-        crossAxisSpacing: 8,
+        mainAxisSpacing: width * 0.02,
+        crossAxisSpacing: width * 0.02,
         childAspectRatio: 2.1,
       ),
       itemCount: additionalServices.length,
@@ -44,6 +45,7 @@ class AdditionalServicesGrid extends StatelessWidget {
             service['title']!,
             service['price']!,
             service['icon']!,
+            width,
             isSelected: isSelected,
           ),
         );
@@ -55,11 +57,12 @@ class AdditionalServicesGrid extends StatelessWidget {
     BuildContext context,
     String title,
     String price,
-    String icon, {
+    String icon,
+    double width, {
     bool isSelected = false,
   }) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(width * 0.025),
       decoration: BoxDecoration(
         color:
             isSelected ? context.colors.brandHover : context.colors.themeColor,
@@ -75,9 +78,9 @@ class AdditionalServicesGrid extends StatelessWidget {
         children: [
           SvgPicture.asset(
             icon,
-            width: 40,
+            width: width * 0.09,
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: width * 0.015),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -101,7 +104,7 @@ class AdditionalServicesGrid extends StatelessWidget {
                     const SizedBox(width: 4),
                     SvgPicture.asset(
                       AppAssets.currency,
-                      width: 14,
+                      width: width * 0.035,
                       colorFilter: ColorFilter.mode(
                         context.colors.textSecondary,
                         BlendMode.srcIn,
