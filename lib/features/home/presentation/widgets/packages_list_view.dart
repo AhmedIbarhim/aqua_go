@@ -34,7 +34,8 @@ class _PackagesListViewState extends State<PackagesListView> {
     ),
     PackageModel(
       title: 'باقة اكوا بريميوم',
-      description: '5 غسلات . 5 مجاناً',
+      description:
+          '5 غسلات . 5 مجاناًjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj',
       price: '30.00',
       duration: '30 يوم',
       image: 'assets/images/royal_demo.png',
@@ -43,7 +44,7 @@ class _PackagesListViewState extends State<PackagesListView> {
 
   @override
   Widget build(BuildContext context) {
-    var height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
     return Column(
       children: [
         Padding(
@@ -102,7 +103,7 @@ class _PackagesListViewState extends State<PackagesListView> {
         ),
         const SizedBox(height: 16),
         SizedBox(
-          height: height * 0.2,
+          height: width * 0.37,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 24),

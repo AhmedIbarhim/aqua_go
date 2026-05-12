@@ -1,8 +1,7 @@
 import 'package:aqua_go/core/components/custom_button.dart';
 import 'package:aqua_go/core/components/generic_app_bar.dart';
 import 'package:aqua_go/core/themes/app_colors_extension.dart';
-import 'package:aqua_go/core/themes/app_text_styles.dart';
-import 'package:easy_localization/easy_localization.dart' hide TextDirection;
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../widgets/vehicle_color_picker.dart';
@@ -163,23 +162,12 @@ class _AddCarViewState extends State<AddCarView> {
           const SizedBox(width: 8),
           Expanded(
             flex: 1,
-            child: GestureDetector(
-              onTap: () => Navigator.pop(context),
-              child: Container(
-                height: 48,
-                decoration: BoxDecoration(
-                  border: Border.all(color: context.colors.borderSecondary),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Center(
-                  child: Text(
-                    LocaleKeys.cancel.tr(),
-                    style: AppTextStyles.medium16.copyWith(
-                      color: context.colors.primary,
-                    ),
-                  ),
-                ),
-              ),
+            child: CustomButton(
+              onPressed: () {},
+              text: LocaleKeys.cancel.tr(),
+              color: context.colors.background,
+              textColor: context.colors.primary,
+              borderColor: context.colors.contentDisabled,
             ),
           ),
         ],

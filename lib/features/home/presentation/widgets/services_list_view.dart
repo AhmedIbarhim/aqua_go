@@ -30,7 +30,8 @@ class _ServicesListViewState extends State<ServicesListView> {
     ),
     ServiceModel(
       title: 'غسلة (داخلي و خارجي)',
-      description: 'تنظيف داخلي و غسيل خارجي مع كنش المراتب. مسح الديكور.',
+      description:
+          'تنظيف داخلي و غسيل خارجي مع كنش المراتب. مسح الديكوssssssssssssssssssssssssssssssssssssssر.',
       price: '90.00',
       oldPrice: '100.00',
       image: 'assets/images/car_demo.png',
@@ -39,7 +40,7 @@ class _ServicesListViewState extends State<ServicesListView> {
 
   @override
   Widget build(BuildContext context) {
-    var height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
     return Column(
       children: [
         Padding(
@@ -53,7 +54,7 @@ class _ServicesListViewState extends State<ServicesListView> {
         ),
         const SizedBox(height: 16),
         SizedBox(
-          height: height * 0.18,
+          height: width * 0.3,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 24),

@@ -3,7 +3,6 @@ import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:aqua_go/features/my_cars/data/models/my_car_model.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:svg_flutter/svg_flutter.dart';
 
 import '../../../../core/themes/app_colors_extension.dart'
@@ -20,15 +19,15 @@ class MyCarCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var height = MediaQuery.of(context).size.height;
-    var width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.sizeOf(context).height;
+    final width = MediaQuery.sizeOf(context).width;
     return Container(
       width: double.infinity,
       height: height * 0.23,
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(width * 0.03),
       decoration: BoxDecoration(
         color: context.colors.cardBackGround,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,7 +35,7 @@ class MyCarCard extends StatelessWidget {
         children: [
           // Image Container
           Container(
-            height: height * 0.13,
+            height: height * 0.12,
             width: double.infinity,
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.2),
@@ -47,12 +46,12 @@ class MyCarCard extends StatelessWidget {
                 Positioned(
                   left: 0,
                   top: 0,
-                  child: Image.asset(AppAssets.shadows_1, width: width * 0.75),
+                  child: Image.asset(AppAssets.shadows_1, width: width * 0.7),
                 ),
                 // Car Image
                 Center(
                   child: SizedBox(
-                    height: height * 0.08,
+                    height: height * 0.07,
                     child: Image.asset(
                       AppAssets.myCar,
                       color: Color(car.colorCode),
@@ -62,32 +61,32 @@ class MyCarCard extends StatelessWidget {
                 ),
                 // Toyota Logo
                 Positioned(
-                  right: 4,
-                  top: 4,
+                  right: width * 0.01,
+                  top: height * 0.005,
                   child: Image.asset(
                     car.typeImage,
-                    // width: 42,
-                    // height: 24,
+                    height: height * 0.03,
                     fit: BoxFit.contain,
                   ),
                 ),
                 // Edit and Delete Icons
                 Positioned(
-                  left: 12,
-                  top: 12,
+                  left: width * 0.03,
+                  top: height * 0.015,
                   child: Row(
                     children: [
                       GestureDetector(
                         onTap: onEdit,
                         child: SvgPicture.asset(
                           AppAssets.edit,
+                          width: width * 0.05,
                           colorFilter: ColorFilter.mode(
                             context.colors.themeOpositeColor,
                             BlendMode.srcIn,
                           ),
                         ),
                       ),
-                      const SizedBox(width: 16),
+                      SizedBox(width: width * 0.04),
                       GestureDetector(
                         onTap: () {
                           WarningBox.show(
@@ -100,6 +99,7 @@ class MyCarCard extends StatelessWidget {
                         },
                         child: SvgPicture.asset(
                           AppAssets.remove,
+                          width: width * 0.05,
                           colorFilter: ColorFilter.mode(
                             lightAppColors.error,
                             BlendMode.srcIn,
@@ -112,22 +112,19 @@ class MyCarCard extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: height * 0.008),
           // Title
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
+            padding: EdgeInsets.symmetric(horizontal: width * 0.01),
             child: Text(
               "${car.name} ${car.model}",
-              style: GoogleFonts.ibmPlexSansArabic(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-              textAlign: TextAlign.right,
+              style: AppTextStyles.medium14,
+              textAlign: TextAlign.start,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: height * 0.005),
           // Specs Row
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -158,19 +155,20 @@ class MyCarCard extends StatelessWidget {
     required String text,
     required String icon,
   }) {
+    final width = MediaQuery.sizeOf(context).width;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         SvgPicture.asset(
           icon,
-          width: 20,
-          height: 20,
+          width: width * 0.045,
+          height: width * 0.045,
           colorFilter: ColorFilter.mode(
             context.colors.contentSecondaryLight,
             BlendMode.srcIn,
           ),
         ),
-        const SizedBox(width: 4),
+        SizedBox(width: width * 0.01),
 
         Text(
           text,
@@ -183,10 +181,12 @@ class MyCarCard extends StatelessWidget {
   }
 
   Widget _buildDivider(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    final height = MediaQuery.sizeOf(context).height;
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8),
+      margin: EdgeInsets.symmetric(horizontal: width * 0.02),
       width: 1,
-      height: 16,
+      height: height * 0.015,
       color: context.colors.borderSecondary,
     );
   }

@@ -20,7 +20,7 @@ class ServiceCard extends StatelessWidget {
         context.pushNamed(Routes.bookingLocation);
       },
       child: Container(
-        width: width * 0.85,
+        width: width * 0.91,
         decoration: BoxDecoration(
           color: context.colors.screenBG,
           borderRadius: BorderRadius.circular(20),
@@ -38,8 +38,8 @@ class ServiceCard extends StatelessWidget {
                   AppAssets.shadows_3,
                   fit: BoxFit.cover,
                   color: context.colors.primary,
-                  width: 200,
-                  height: 200,
+                  width: 190,
+                  height: 190,
                 ),
               ),
 

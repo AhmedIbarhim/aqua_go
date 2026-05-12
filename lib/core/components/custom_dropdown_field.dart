@@ -71,7 +71,7 @@ class CustomDropdownField extends StatelessWidget {
                             border: Border(
                               bottom: BorderSide(
                                 color: context.colors.borderSecondary
-                                    .withOpacity(0.5),
+                                    .withValues(alpha: 0.5),
                               ),
                             ),
                           ),
@@ -103,7 +103,7 @@ class CustomDropdownField extends StatelessWidget {
             );
           },
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
             decoration: BoxDecoration(
               color: context.colors.background,
               border: Border.all(color: context.colors.borderSecondary),

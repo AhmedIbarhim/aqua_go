@@ -24,7 +24,7 @@ class PackageCard extends StatelessWidget {
         BookingPackageBottomSheet.show(context, packageModel: packageModel);
       },
       child: Container(
-        width: atHome == true ? width * 0.75 : width,
+        width: atHome == true ? width * 0.78 : width,
 
         decoration: BoxDecoration(
           color: context.colors.screenBG,
@@ -62,16 +62,15 @@ class PackageCard extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.all(width * 0.035),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Gift Icon Box
                         Container(
-                          width: 44,
-                          height: 44,
+                          width: width * 0.1,
+                          height: width * 0.1,
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             color: context.colors.primary,
@@ -82,7 +81,7 @@ class PackageCard extends StatelessWidget {
                             color: context.colors.textTheme,
                           ),
                         ),
-                        // Duration Tag
+
                         Flexible(
                           child: Container(
                             padding: const EdgeInsets.symmetric(
@@ -105,13 +104,14 @@ class PackageCard extends StatelessWidget {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 16),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Title and Subtitle
                         Expanded(
                           child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -127,27 +127,33 @@ class PackageCard extends StatelessWidget {
                                 style: AppTextStyles.regular12.copyWith(
                                   color: context.colors.textSecondary,
                                 ),
-                                maxLines: 1,
+
+                                maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ],
                           ),
                         ),
                         const SizedBox(width: 8),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                        Column(
                           children: [
-                            Text(
-                              packageModel.price,
-                              style: AppTextStyles.bold18,
-                            ),
-                            const SizedBox(width: 4),
-                            SvgPicture.asset(
-                              AppAssets.currency,
-                              width: 20,
-                              height: 20,
-                              // ignore: deprecated_member_use
-                              color: context.colors.textPrimary,
+                            Text("\n", style: AppTextStyles.regular12),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  packageModel.price,
+                                  style: AppTextStyles.bold18,
+                                ),
+                                const SizedBox(width: 4),
+                                SvgPicture.asset(
+                                  AppAssets.currency,
+                                  width: 20,
+                                  height: 20,
+                                  // ignore: deprecated_member_use
+                                  color: context.colors.textPrimary,
+                                ),
+                              ],
                             ),
                           ],
                         ),
