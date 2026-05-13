@@ -1,6 +1,7 @@
 import 'package:carousel_slider/carousel_controller.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/themes/app_colors_extension.dart';
+import '../../../../core/extentions/context_extentions.dart';
 import '../data/models/banner_model.dart';
 import '../widgets/home_banners_carosal.dart';
 import '../widgets/packages_list_view.dart';
@@ -35,26 +36,25 @@ class _HomeViewState extends State<HomeView> {
             HomeBannersCarosal(
               carouselController: _carouselController,
               banners: banners,
-              // width: MediaQuery.of(context).size.width,
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: context.screenHeight * 0.01),
             Container(
               decoration: BoxDecoration(
                 color: context.colors.background,
-                borderRadius: BorderRadius.only(
+                borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(20),
                   topRight: Radius.circular(20),
                 ),
               ),
               child: Column(
                 children: [
-                  const SizedBox(height: 20),
+                  SizedBox(height: context.screenHeight * 0.02),
                   const PackagesListView(),
-                  const SizedBox(height: 24),
+                  SizedBox(height: context.screenHeight * 0.02),
                   const ServicesListView(),
-                  const SizedBox(height: 24),
+                  SizedBox(height: context.screenHeight * 0.02),
                   const OffersListView(),
-                  const SizedBox(height: 150),
+                  SizedBox(height: context.screenHeight * 0.15),
                 ],
               ),
             ),

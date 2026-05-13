@@ -12,8 +12,7 @@ class OfferCard extends StatelessWidget {
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
     return Container(
-      width: atHome == true ? width - 82 : width,
-      height: height * 0.2,
+      width: atHome == true ? height * 0.4 : width,
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),

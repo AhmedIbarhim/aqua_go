@@ -64,3 +64,10 @@ extension NavigatorExtension on BuildContext {
     return Navigator.of(this).canPop();
   }
 }
+
+extension ResponsiveExtension on BuildContext {
+  double get screenWidth => MediaQuery.sizeOf(this).width;
+  double get screenHeight => MediaQuery.sizeOf(this).height;
+  bool get isTablet => screenWidth >= 600;
+  bool get isMobile => screenWidth < 600;
+}

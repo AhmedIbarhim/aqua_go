@@ -1,6 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
+import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/themes/app_colors_extension.dart';
 import '../data/models/banner_model.dart';
 
@@ -22,7 +23,6 @@ class _HomeBannersCarosalState extends State<HomeBannersCarosal> {
 
   @override
   Widget build(BuildContext context) {
-    var height = MediaQuery.sizeOf(context).height;
     return Column(
       children: [
         CarouselSlider.builder(
@@ -30,15 +30,17 @@ class _HomeBannersCarosalState extends State<HomeBannersCarosal> {
           itemCount: widget.banners.length,
           itemBuilder: (context, index, realIndex) {
             return Container(
-              // width: widget.width,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(12),
               ),
-              child: Image.asset(
-                widget.banners[index].image,
-                fit: BoxFit.fill,
-                width: double.infinity,
-                height: double.infinity,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.asset(
+                  widget.banners[index].image,
+                  fit: BoxFit.fill,
+                  width: double.infinity,
+                  height: double.infinity,
+                ),
               ),
             );
           },
@@ -48,11 +50,12 @@ class _HomeBannersCarosalState extends State<HomeBannersCarosal> {
                 _currentIndex = index;
               });
             },
-            aspectRatio: 100 / 37,
-            viewportFraction: 0.75,
+            height: context.isTablet
+                ? context.screenHeight * 0.22
+                : context.screenHeight * 0.18,
+            viewportFraction: context.isTablet ? 0.6 : 0.75,
             initialPage: 0,
             enableInfiniteScroll: true,
-            //reverse: true,
             autoPlay: true,
             autoPlayInterval: const Duration(seconds: 5),
             autoPlayAnimationDuration: const Duration(milliseconds: 800),
@@ -64,21 +67,31 @@ class _HomeBannersCarosalState extends State<HomeBannersCarosal> {
           ),
         ),
         if (widget.banners.isNotEmpty) ...[
-          SizedBox(height: height * 0.01),
+          SizedBox(height: context.screenHeight * 0.012),
           DotsIndicator(
             dotsCount: widget.banners.length,
             position: _currentIndex.toDouble(),
             decorator: DotsDecorator(
               activeColor: context.colors.contentSecondaryLight,
               color: context.colors.contentSecondary,
-              size: const Size(6, 6),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(6),
+              size: Size(
+                context.screenWidth * 0.015,
+                context.screenWidth * 0.015,
               ),
-              spacing: const EdgeInsets.all(4),
-              activeSize: const Size(6, 6),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(
+                  context.screenWidth * 0.015,
+                ),
+              ),
+              spacing: EdgeInsets.all(context.screenWidth * 0.01),
+              activeSize: Size(
+                context.screenWidth * 0.015,
+                context.screenWidth * 0.015,
+              ),
               activeShape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: BorderRadius.circular(
+                  context.screenWidth * 0.015,
+                ),
               ),
             ),
           ),

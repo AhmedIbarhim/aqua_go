@@ -19,12 +19,13 @@ class PackageCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
     return GestureDetector(
       onTap: () {
         BookingPackageBottomSheet.show(context, packageModel: packageModel);
       },
       child: Container(
-        width: atHome == true ? width * 0.78 : width,
+        width: atHome == true ? height * 0.35 : width,
 
         decoration: BoxDecoration(
           color: context.colors.screenBG,
@@ -43,8 +44,8 @@ class PackageCard extends StatelessWidget {
                   AppAssets.shadows_1,
                   fit: BoxFit.cover,
                   color: context.colors.primary,
-                  width: 200,
-                  height: 200,
+                  width: height * 0.2,
+                  height: height * 0.23,
                 ),
               ),
 
@@ -55,8 +56,8 @@ class PackageCard extends StatelessWidget {
                 child: Image.asset(
                   AppAssets.shadows_2,
                   color: context.colors.primary,
-                  width: 150,
-                  height: 150,
+                  width: height * 0.18,
+                  height: height * 0.2,
                 ),
               ),
               Padding(
@@ -96,9 +97,7 @@ class PackageCard extends StatelessWidget {
                             ),
                             child: Text(
                               'لمدة : ${packageModel.duration}',
-                              style: AppTextStyles.medium12.copyWith(
-                                fontSize: 10,
-                              ),
+                              style: AppTextStyles.medium10,
                             ),
                           ),
                         ),

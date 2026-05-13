@@ -32,14 +32,14 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
             Row(
               children: [
                 Container(
-                  width: sw(40),
-                  height: sw(40),
+                  width: sw(30),
+                  height: sw(30),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(color: context.colors.primary, width: 1),
                   ),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(sw(20)),
+                    borderRadius: BorderRadius.circular(sw(40)),
                     child: CustomNetworkImage(
                       'https://ui-avatars.com/api/?name=Mohamed+Faisal&background=00D5DD&color=fff',
                     ),

@@ -113,8 +113,8 @@ class MainNavigationBar extends StatelessWidget {
           color: !isActive
               ? Colors.transparent
               : context.isDarkTheme
-                  ? Colors.transparent
-                  : context.colors.primary,
+              ? Colors.transparent
+              : context.colors.primary,
           borderRadius: BorderRadius.circular(sw(100)),
         ),
         child: Row(
@@ -127,8 +127,8 @@ class MainNavigationBar extends StatelessWidget {
               colorFilter: ColorFilter.mode(
                 isActive
                     ? context.isDarkTheme
-                        ? context.colors.primary
-                        : context.colors.themeColor
+                          ? context.colors.primary
+                          : context.colors.themeColor
                     : context.colors.contentDisabled,
                 BlendMode.srcIn,
               ),
@@ -150,4 +150,3 @@ class MainNavigationBar extends StatelessWidget {
     );
   }
 }
-

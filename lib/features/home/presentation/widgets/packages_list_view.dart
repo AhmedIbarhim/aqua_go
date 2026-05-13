@@ -45,6 +45,7 @@ class _PackagesListViewState extends State<PackagesListView> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
     return Column(
       children: [
         Padding(
@@ -55,7 +56,9 @@ class _PackagesListViewState extends State<PackagesListView> {
             children: [
               Text(
                 LocaleKeys.home_available_packages.tr(),
-                style: AppTextStyles.bold16,
+                style: !context.isTablet
+                    ? AppTextStyles.bold16
+                    : AppTextStyles.bold18,
               ),
               GestureDetector(
                 onTap: () {
@@ -101,13 +104,13 @@ class _PackagesListViewState extends State<PackagesListView> {
             ],
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: height * 0.012),
         SizedBox(
-          height: width * 0.37,
+          height: context.isMobile ? width * 0.37 : height * 0.175,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 24),
-            itemCount: 3,
+            itemCount: packages.length,
             separatorBuilder: (context, index) => const SizedBox(width: 16),
             itemBuilder: (context, index) =>
                 PackageCard(packageModel: packages[index]),

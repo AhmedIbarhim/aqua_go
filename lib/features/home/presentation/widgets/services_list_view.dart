@@ -1,3 +1,4 @@
+import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/themes/app_text_styles.dart';
@@ -13,6 +14,20 @@ class ServicesListView extends StatefulWidget {
 }
 
 class _ServicesListViewState extends State<ServicesListView> {
+  late PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(viewportFraction: 1.0);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
   final List<ServiceModel> services = [
     ServiceModel(
       title: 'غسلة (داخلي و خارجي)',
@@ -41,6 +56,7 @@ class _ServicesListViewState extends State<ServicesListView> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
     return Column(
       children: [
         Padding(
@@ -48,20 +64,25 @@ class _ServicesListViewState extends State<ServicesListView> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Text(LocaleKeys.home_services.tr(), style: AppTextStyles.bold16),
+              Text(
+                LocaleKeys.home_services.tr(),
+                style: !context.isTablet
+                    ? AppTextStyles.bold16
+                    : AppTextStyles.bold18,
+              ),
             ],
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: height * 0.012),
         SizedBox(
-          height: width * 0.3,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+          height: context.isMobile ? width * 0.3 : height * 0.13,
+          child: PageView.builder(
+            controller: _pageController,
             itemCount: services.length,
-            separatorBuilder: (context, index) => const SizedBox(width: 16),
-            itemBuilder: (context, index) =>
-                ServiceCard(serviceModel: services[index]),
+            itemBuilder: (context, index) => Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: ServiceCard(serviceModel: services[index]),
+            ),
           ),
         ),
       ],

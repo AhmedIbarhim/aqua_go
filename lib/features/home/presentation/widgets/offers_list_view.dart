@@ -35,7 +35,9 @@ class _OffersListViewState extends State<OffersListView> {
             children: [
               Text(
                 LocaleKeys.home_best_offers.tr(),
-                style: AppTextStyles.bold16,
+                style: !context.isTablet
+                    ? AppTextStyles.bold16
+                    : AppTextStyles.bold18,
               ),
               GestureDetector(
                 onTap: () {
@@ -79,7 +81,7 @@ class _OffersListViewState extends State<OffersListView> {
           ),
         ),
 
-        const SizedBox(height: 16),
+        SizedBox(height: height * 0.012),
         SizedBox(
           height: height * 0.21,
           child: ListView.separated(
