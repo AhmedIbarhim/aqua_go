@@ -5,6 +5,8 @@ import '../../../../generated/locale_keys.g.dart';
 import '../../../../core/route/routes.dart';
 import '../../data/models/my_car_model.dart';
 import 'my_car_card.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../controllers/my_cars_cubit.dart';
 
 class MyCarsListView extends StatelessWidget {
   const MyCarsListView({super.key, required this.cars});
@@ -16,7 +18,7 @@ class MyCarsListView extends StatelessWidget {
         const SizedBox(height: 8),
         CustomButton(
           text: LocaleKeys.my_cars_add_car.tr(),
-          preWidget: Icon(Icons.add),
+          preWidget: const Icon(Icons.add),
           onPressed: () {
             Navigator.pushNamed(context, Routes.addVehicle);
           },
@@ -24,7 +26,19 @@ class MyCarsListView extends StatelessWidget {
         const SizedBox(height: 24),
         Expanded(
           child: ListView.separated(
-            itemBuilder: (context, index) => MyCarCard(car: cars[index]),
+            itemBuilder: (context, index) {
+              final car = cars[index];
+              return MyCarCard(
+                car: car,
+                onEdit: () {
+                  Navigator.pushNamed(context, Routes.addVehicle,
+                      arguments: car);
+                },
+                onDelete: () {
+                  context.read<MyCarsCubit>().deleteCar(car.id);
+                },
+              );
+            },
             separatorBuilder: (context, index) => const SizedBox(height: 16),
             itemCount: cars.length,
           ),

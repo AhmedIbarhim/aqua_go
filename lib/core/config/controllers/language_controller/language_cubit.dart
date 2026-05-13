@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:aqua_go/core/config/local_storage/shared_prefs.dart';
 import 'package:aqua_go/core/constants.dart';
 import 'package:bloc/bloc.dart';

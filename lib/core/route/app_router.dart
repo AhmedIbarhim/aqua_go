@@ -14,6 +14,7 @@ import '../../features/layout/presentation/views/main_layout.dart';
 import '../../features/my_bookings/presentation/views/complain_view.dart';
 import '../../features/my_bookings/presentation/views/gallery_view.dart';
 import '../../features/my_bookings/presentation/views/my_booking_deatails_view.dart';
+import '../../features/my_cars/data/models/my_car_model.dart';
 import '../../features/profile/presentation/views/language_select_view.dart';
 import '../../features/profile/presentation/views/profile_data_view.dart';
 import '../../features/startup/views/onboarding_view.dart';
@@ -25,6 +26,8 @@ import '../../features/profile/presentation/views/privacy_policy_view.dart';
 import '../../features/profile/presentation/views/about_us_view.dart';
 import '../../features/profile/presentation/views/terms_view.dart';
 import '../../features/profile/presentation/views/support_view.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../features/my_cars/controllers/my_cars_cubit.dart';
 import 'routes.dart';
 
 abstract class AppRouter {
@@ -79,7 +82,13 @@ abstract class AppRouter {
         return MaterialPageRoute(builder: (_) => const NotificationView());
 
       case Routes.addVehicle:
-        return MaterialPageRoute(builder: (_) => const AddCarView());
+        final car = settings.arguments as MyCarModel?;
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider.value(
+            value: MyCarsCubit(),
+            child: AddCarView(car: car),
+          ),
+        );
 
       case Routes.bookingDetails:
         return MaterialPageRoute(builder: (_) => const BookingDetailsView());

@@ -1,6 +1,7 @@
 import '../../../../core/helpers/car_color_helper.dart';
 
 class MyCarModel {
+  final String id;
   final String name;
   final String model;
   final String year;
@@ -10,6 +11,7 @@ class MyCarModel {
   final int colorCode;
 
   MyCarModel({
+    required this.id,
     required this.name,
     required this.model,
     required this.year,

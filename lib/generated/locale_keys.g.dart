@@ -74,6 +74,7 @@ abstract class  LocaleKeys {
   static const my_cars_empty_state = 'my_cars.empty_state';
   static const my_cars_empty_desc = 'my_cars.empty_desc';
   static const my_cars_add_car = 'my_cars.add_car';
+  static const my_cars_edit_car = 'my_cars.edit_car';
   static const my_cars_add_car_title = 'my_cars.add_car_title';
   static const my_cars_car_brand = 'my_cars.car_brand';
   static const my_cars_model = 'my_cars.model';

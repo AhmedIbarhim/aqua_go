@@ -21,6 +21,7 @@ class CarSelectionList extends StatelessWidget {
 
   static final List<MyCarModel> myCars = [
     MyCarModel(
+      id: '',
       name: 'تويوتا',
       model: 'لاند كروزر',
       year: '2022',
@@ -29,6 +30,7 @@ class CarSelectionList extends StatelessWidget {
       typeImage: AppAssets.demoToyota,
     ),
     MyCarModel(
+      id: '',
       name: 'مرسيدس',
       model: 'جي كلاس',
       year: '2023',
@@ -37,6 +39,7 @@ class CarSelectionList extends StatelessWidget {
       typeImage: AppAssets.demoToyota,
     ),
     MyCarModel(
+      id: '',
       name: 'بي ام دبليو',
       model: 'الفئة الخامسة',
       year: '2024',
@@ -67,7 +70,13 @@ class CarSelectionList extends StatelessWidget {
           final isSelected = selectedCarIndex == index - 1;
           return GestureDetector(
             onTap: () => onCarSelected(index - 1),
-            child: _buildCarCard(context, car, width, height, isSelected: isSelected),
+            child: _buildCarCard(
+              context,
+              car,
+              width,
+              height,
+              isSelected: isSelected,
+            ),
           );
         },
       ),

@@ -76,6 +76,7 @@
         "empty_state": "No cars added yet",
         "empty_desc": "Your vehicles will appear here once you add them",
         "add_car": "Add New Car",
+        "edit_car": "Edit Car",
         "add_car_title": "Add New Car",
         "car_brand": "Car Brand",
         "model": "Model",

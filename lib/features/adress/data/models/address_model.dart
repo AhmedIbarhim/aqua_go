@@ -13,8 +13,28 @@ class AddressModel {
     required this.lng,
   });
 
-  factory AddressModel.fromLocation(LocationModel location,
-      {required String name}) {
+  factory AddressModel.fromJson(Map<String, dynamic> json) {
+    return AddressModel(
+      name: json['name'] ?? '',
+      formattedAddress: json['formatted_address'] ?? '',
+      lat: (json['lat'] as num).toDouble(),
+      lng: (json['lng'] as num).toDouble(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'formatted_address': formattedAddress,
+      'lat': lat,
+      'lng': lng,
+    };
+  }
+
+  factory AddressModel.fromLocation(
+    LocationModel location, {
+    required String name,
+  }) {
     return AddressModel(
       name: name,
       formattedAddress: location.formattedAddress,

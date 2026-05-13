@@ -8,9 +8,14 @@ import '../widgets/vehicle_color_picker.dart';
 import '../../../../core/components/bottom_action_sheet_container.dart';
 import '../../../../core/components/custom_dropdown_field.dart';
 import '../../../../core/components/custom_text_field.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../data/models/my_car_model.dart';
+import '../../controllers/my_cars_cubit.dart';
+import '../../../../core/utils/app_assets.dart';
 
 class AddCarView extends StatefulWidget {
-  const AddCarView({super.key});
+  final MyCarModel? car;
+  const AddCarView({super.key, this.car});
 
   @override
   State<AddCarView> createState() => _AddCarViewState();
@@ -27,6 +32,13 @@ class _AddCarViewState extends State<AddCarView> {
   @override
   void initState() {
     super.initState();
+    if (widget.car != null) {
+      _selectedBrand = widget.car!.name;
+      _selectedModel = widget.car!.model;
+      _selectedYear = widget.car!.year;
+      _selectedColor = Color(widget.car!.colorCode);
+      _plateNumberController.text = widget.car!.boardNumber;
+    }
     _plateNumberController.addListener(() {
       setState(() {});
     });
@@ -52,7 +64,9 @@ class _AddCarViewState extends State<AddCarView> {
     return Scaffold(
       backgroundColor: context.colors.screenBG,
       appBar: GenericAppBar(
-        title: LocaleKeys.my_cars_add_car_title.tr(),
+        title: widget.car == null
+            ? LocaleKeys.my_cars_add_car_title.tr()
+            : LocaleKeys.my_cars_edit_car.tr(),
         centerTitle: true,
       ),
       body: Column(
@@ -156,6 +170,23 @@ class _AddCarViewState extends State<AddCarView> {
                 if (!formKey.currentState!.validate()) {
                   return;
                 }
+                final car = MyCarModel(
+                  id: widget.car?.id ??
+                      DateTime.now().millisecondsSinceEpoch.toString(),
+                  name: _selectedBrand!,
+                  model: _selectedModel!,
+                  year: _selectedYear!,
+                  image: AppAssets.myCar,
+                  typeImage: AppAssets.demoToyota,
+                  boardNumber: _plateNumberController.text.trim(),
+                  colorCode: _selectedColor!.toARGB32(),
+                );
+                if (widget.car == null) {
+                  context.read<MyCarsCubit>().addCar(car);
+                } else {
+                  context.read<MyCarsCubit>().updateCar(car);
+                }
+                Navigator.pop(context);
               },
             ),
           ),
@@ -163,7 +194,7 @@ class _AddCarViewState extends State<AddCarView> {
           Expanded(
             flex: 1,
             child: CustomButton(
-              onPressed: () {},
+              onPressed: () => Navigator.pop(context),
               text: LocaleKeys.cancel.tr(),
               color: context.colors.background,
               textColor: context.colors.primary,

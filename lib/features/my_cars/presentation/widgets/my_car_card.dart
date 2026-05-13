@@ -5,8 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg_flutter.dart';
 
-import '../../../../core/themes/app_colors_extension.dart'
-    show AppThemeExtension, lightAppColors;
+import '../../../../core/themes/app_colors_extension.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../generated/locale_keys.g.dart';
 
@@ -92,9 +91,12 @@ class MyCarCard extends StatelessWidget {
                           WarningBox.show(
                             context: context,
                             primaryButtonText: LocaleKeys.delete_confirm.tr(),
-
                             title: LocaleKeys.delete_confirm.tr(),
                             message: LocaleKeys.my_cars_delete_message.tr(),
+                            onPrimaryPressed: () {
+                              Navigator.pop(context);
+                              onDelete?.call();
+                            },
                           );
                         },
                         child: SvgPicture.asset(
