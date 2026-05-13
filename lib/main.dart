@@ -10,12 +10,17 @@ import 'core/config/controllers/theme_controller/theme_cubit.dart';
 import 'core/config/local_storage/shared_prefs.dart';
 import 'core/constants.dart';
 import 'generated/codegen_loader.g.dart';
+import 'package:flutter/services.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initServiceLocator();
   await EasyLocalization.ensureInitialized();
   await SharedPrefs.init();
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   final String savedLang = SharedPrefs.getString(kLanguage);
   final Locale startLocale = savedLang.isEmpty
       ? const Locale('ar')

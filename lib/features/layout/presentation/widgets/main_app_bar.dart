@@ -32,8 +32,8 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
             Row(
               children: [
                 Container(
-                  width: sw(30),
-                  height: sw(30),
+                  width: sw(40),
+                  height: sw(40),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(color: context.colors.primary, width: 1),
