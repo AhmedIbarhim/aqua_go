@@ -18,6 +18,8 @@ class CustomTextField extends StatelessWidget {
   final Widget? prefixIcon;
   final Widget? suffixIcon;
   final TextStyle? style;
+  final int? maxLines;
+  final int? minLines;
 
   const CustomTextField({
     super.key,
@@ -34,6 +36,8 @@ class CustomTextField extends StatelessWidget {
     this.prefixIcon,
     this.suffixIcon,
     this.style,
+    this.maxLines,
+    this.minLines,
   });
 
   @override
@@ -97,7 +101,10 @@ class CustomTextField extends StatelessWidget {
               ),
               filled: true,
               fillColor: fillColor ?? context.colors.background,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 12,
+              ),
               prefixIcon: prefixIcon,
               suffixIcon: suffixIcon,
 

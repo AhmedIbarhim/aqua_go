@@ -4,6 +4,7 @@ import 'package:aqua_go/core/config/di/service_locator.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'core/config/bloc_observer.dart';
 import 'core/config/controllers/language_controller/language_cubit.dart';
 import 'core/config/controllers/theme_controller/theme_cubit.dart';
 
@@ -17,6 +18,7 @@ void main() async {
   await initServiceLocator();
   await EasyLocalization.ensureInitialized();
   await SharedPrefs.init();
+  Bloc.observer = AppBlocObserver();
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,

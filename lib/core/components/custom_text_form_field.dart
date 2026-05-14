@@ -34,7 +34,7 @@ class CustomTextFormField extends StatelessWidget {
   Widget build(BuildContext context) {
     final height = MediaQuery.sizeOf(context).height;
     return SizedBox(
-      height: height * 0.055,
+      height: (minLines != null) ? null : height * 0.055,
       child: TextFormField(
         controller: controller,
         onSaved: onSaved,
@@ -59,7 +59,10 @@ class CustomTextFormField extends StatelessWidget {
           labelStyle: AppTextStyles.regular12,
           suffixIcon: suffixIcon,
           prefixIcon: prefixIcon,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 12,
+          ),
         ),
         obscureText: obscureText,
         maxLines: maxLines,
