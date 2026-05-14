@@ -7,12 +7,11 @@ import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'my_address_card.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../controllers/addresses_controller/addresses_cubit.dart';
 
 class MyAddressesList extends StatelessWidget {
-  const MyAddressesList({
-    super.key,
-    required this.myAddresses,
-  });
+  const MyAddressesList({super.key, required this.myAddresses});
 
   final List<AddressModel> myAddresses;
 
@@ -22,13 +21,15 @@ class MyAddressesList extends StatelessWidget {
       itemCount: myAddresses.length,
       separatorBuilder: (context, index) => const SizedBox(height: 16),
       itemBuilder: (context, index) {
+        final address = myAddresses[index];
         return MyAddressCard(
-          address: myAddresses[index],
+          address: address,
           onEdit: () {
             context.pushNamed(
               Routes.newAddressMap,
               arguments: NewAddressMapArgs(
-                forAddingAddress: true,
+                forAddingAddress: false,
+                address: address,
               ),
             );
           },
@@ -37,7 +38,8 @@ class MyAddressesList extends StatelessWidget {
               context: context,
               message: LocaleKeys.address_confirm_delete.tr(),
               onPrimaryPressed: () {
-                // TODO: Implement delete logic
+                context.read<AddressesCubit>().deleteAddress(address.id);
+                Navigator.pop(context);
               },
             );
           },

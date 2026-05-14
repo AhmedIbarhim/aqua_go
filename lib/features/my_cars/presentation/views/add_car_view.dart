@@ -8,6 +8,7 @@ import '../widgets/vehicle_color_picker.dart';
 import '../../../../core/components/bottom_action_sheet_container.dart';
 import '../../../../core/components/custom_dropdown_field.dart';
 import '../../../../core/components/custom_text_field.dart';
+import '../../../../core/config/di/service_locator.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../data/models/my_car_model.dart';
 import '../../controllers/my_cars_cubit.dart';
@@ -61,103 +62,111 @@ class _AddCarViewState extends State<AddCarView> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    return Scaffold(
-      backgroundColor: context.colors.screenBG,
-      appBar: GenericAppBar(
-        title: widget.car == null
-            ? LocaleKeys.my_cars_add_car_title.tr()
-            : LocaleKeys.my_cars_edit_car.tr(),
-        centerTitle: true,
-      ),
-      body: Column(
-        children: [
-          const SizedBox(height: 16),
-          Expanded(
-            child: Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: context.colors.background,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(24),
-                  topRight: Radius.circular(24),
-                ),
-              ),
-              child: SingleChildScrollView(
-                padding: EdgeInsets.all(width * 0.06),
-                child: Form(
-                  key: formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CustomDropdownField(
-                        label: LocaleKeys.my_cars_car_brand.tr(),
-                        hint: LocaleKeys.select_here.tr(),
-                        value: _selectedBrand,
-                        onChanged: (val) =>
-                            setState(() => _selectedBrand = val),
-                        items: const [
-                          "تويوتا",
-                          "نيسان",
-                          "هيونداي",
-                          "كيا",
-                        ], // Mock data
-                        isRequired: true,
+    return BlocProvider.value(
+      value: locator<MyCarsCubit>(),
+      child: Builder(
+        builder: (context) {
+          return Scaffold(
+            backgroundColor: context.colors.screenBG,
+            appBar: GenericAppBar(
+              title: widget.car == null
+                  ? LocaleKeys.my_cars_add_car_title.tr()
+                  : LocaleKeys.my_cars_edit_car.tr(),
+              centerTitle: true,
+            ),
+            body: Column(
+              children: [
+                const SizedBox(height: 16),
+                Expanded(
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: context.colors.background,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(24),
+                        topRight: Radius.circular(24),
                       ),
-                      const SizedBox(height: 16),
-                      CustomDropdownField(
-                        label: LocaleKeys.my_cars_model.tr(),
-                        hint: LocaleKeys.select_here.tr(),
-                        value: _selectedModel,
-                        onChanged: (val) =>
-                            setState(() => _selectedModel = val),
-                        items: const [
-                          "لاند كروزر",
-                          "كامري",
-                          "إلنترا",
-                          "سبورتاج",
-                        ], // Mock data
-                        isRequired: true,
-                      ),
-                      const SizedBox(height: 16),
-                      VehicleColorPicker(
-                        selectedColor: _selectedColor,
-                        onColorChanged: (color) =>
-                            setState(() => _selectedColor = color),
-                      ),
-                      const SizedBox(height: 16),
-                      CustomDropdownField(
-                        label: LocaleKeys.my_cars_manufacturing_year.tr(),
-                        hint: LocaleKeys.select_here.tr(),
-                        value: _selectedYear,
-                        onChanged: (val) => setState(() => _selectedYear = val),
-                        items: List.generate(
-                          20,
-                          (index) => (2024 - index).toString(),
+                    ),
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.all(width * 0.06),
+                      child: Form(
+                        key: formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CustomDropdownField(
+                              label: LocaleKeys.my_cars_car_brand.tr(),
+                              hint: LocaleKeys.select_here.tr(),
+                              value: _selectedBrand,
+                              onChanged: (val) =>
+                                  setState(() => _selectedBrand = val),
+                              items: const [
+                                "تويوتا",
+                                "نيسان",
+                                "هيونداي",
+                                "كيا",
+                              ], // Mock data
+                              isRequired: true,
+                            ),
+                            const SizedBox(height: 16),
+                            CustomDropdownField(
+                              label: LocaleKeys.my_cars_model.tr(),
+                              hint: LocaleKeys.select_here.tr(),
+                              value: _selectedModel,
+                              onChanged: (val) =>
+                                  setState(() => _selectedModel = val),
+                              items: const [
+                                "لاند كروزر",
+                                "كامري",
+                                "إلنترا",
+                                "سبورتاج",
+                              ], // Mock data
+                              isRequired: true,
+                            ),
+                            const SizedBox(height: 16),
+                            VehicleColorPicker(
+                              selectedColor: _selectedColor,
+                              onColorChanged: (color) =>
+                                  setState(() => _selectedColor = color),
+                            ),
+                            const SizedBox(height: 16),
+                            CustomDropdownField(
+                              label: LocaleKeys.my_cars_manufacturing_year.tr(),
+                              hint: LocaleKeys.select_here.tr(),
+                              value: _selectedYear,
+                              onChanged: (val) =>
+                                  setState(() => _selectedYear = val),
+                              items: List.generate(
+                                20,
+                                (index) => (2024 - index).toString(),
+                              ),
+                              isRequired: false,
+                            ),
+                            const SizedBox(height: 16),
+                            CustomTextField(
+                              mustCapitalize: true,
+                              label: LocaleKeys.my_cars_plate_number.tr(),
+                              hint: LocaleKeys.write_here.tr(),
+                              controller: _plateNumberController,
+                              isRequired: true,
+                            ),
+                            const SizedBox(height: 24),
+                          ],
                         ),
-                        isRequired: false,
                       ),
-                      const SizedBox(height: 16),
-                      CustomTextField(
-                        mustCapitalize: true,
-                        label: LocaleKeys.my_cars_plate_number.tr(),
-                        hint: LocaleKeys.write_here.tr(),
-                        controller: _plateNumberController,
-                        isRequired: true,
-                      ),
-                      const SizedBox(height: 24),
-                    ],
+                    ),
                   ),
                 ),
-              ),
+                _buildBottomActions(context),
+              ],
             ),
-          ),
-          _buildBottomActions(),
-        ],
+          );
+        },
       ),
     );
   }
 
-  Widget _buildBottomActions() {
+  Widget _buildBottomActions(BuildContext context) {
     return BottomActionSheetContainer(
       child: Row(
         children: [
@@ -171,7 +180,8 @@ class _AddCarViewState extends State<AddCarView> {
                   return;
                 }
                 final car = MyCarModel(
-                  id: widget.car?.id ??
+                  id:
+                      widget.car?.id ??
                       DateTime.now().millisecondsSinceEpoch.toString(),
                   name: _selectedBrand!,
                   model: _selectedModel!,
@@ -182,9 +192,9 @@ class _AddCarViewState extends State<AddCarView> {
                   colorCode: _selectedColor!.toARGB32(),
                 );
                 if (widget.car == null) {
-                  context.read<MyCarsCubit>().addCar(car);
+                  locator<MyCarsCubit>().addCar(car);
                 } else {
-                  context.read<MyCarsCubit>().updateCar(car);
+                  locator<MyCarsCubit>().updateCar(car);
                 }
                 Navigator.pop(context);
               },

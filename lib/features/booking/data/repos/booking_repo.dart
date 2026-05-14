@@ -1,6 +1,5 @@
 import 'package:aqua_go/core/config/networking/api_client.dart';
 import 'package:dartz/dartz.dart';
-import 'package:dio/dio.dart';
 
 import '../../../../core/errors/failure.dart';
 

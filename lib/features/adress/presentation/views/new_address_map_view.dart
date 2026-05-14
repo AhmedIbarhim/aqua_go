@@ -10,18 +10,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:aqua_go/core/components/custom_button.dart';
+import '../../data/models/address_model.dart';
 import '../widgets/location_search_field.dart';
 import '../widgets/add_address_bottom_sheet.dart';
 
 class NewAddressMapArgs {
   final bool forAddingAddress;
-  NewAddressMapArgs({required this.forAddingAddress});
+  final AddressModel? address;
+  NewAddressMapArgs({required this.forAddingAddress, this.address});
 }
 
 class NewAddressMapView extends StatefulWidget {
-  const NewAddressMapView({super.key, this.forAddingAddess = false});
+  const NewAddressMapView({
+    super.key,
+    this.forAddingAddess = false,
+    this.address,
+  });
 
   final bool forAddingAddess;
+  final AddressModel? address;
 
   @override
   State<NewAddressMapView> createState() => _NewAddressMapViewState();
@@ -37,7 +44,12 @@ class _NewAddressMapViewState extends State<NewAddressMapView> {
   void initState() {
     super.initState();
     _mapsCubit = locator<MapsCubit>();
-    _mapsCubit.determinePosition();
+    if (widget.address != null) {
+      _mapsCubit.onMapTap(LatLng(widget.address!.lat, widget.address!.lng));
+      _searchController.text = widget.address!.formattedAddress;
+    } else {
+      _mapsCubit.determinePosition();
+    }
   }
 
   @override
@@ -69,7 +81,6 @@ class _NewAddressMapViewState extends State<NewAddressMapView> {
 
               return Stack(
                 children: [
-                  // Map Background
                   GoogleMap(
                     mapType: MapType.normal,
                     initialCameraPosition: CameraPosition(
@@ -92,7 +103,6 @@ class _NewAddressMapViewState extends State<NewAddressMapView> {
                     padding: const EdgeInsets.only(bottom: 150),
                   ),
 
-                  // Search Bar Overlay
                   Positioned(
                     top: MediaQuery.of(context).padding.top + 16,
                     left: 24,
@@ -122,7 +132,6 @@ class _NewAddressMapViewState extends State<NewAddressMapView> {
                     ),
                   ),
 
-                  // Return to current location button
                   Positioned(
                     bottom: MediaQuery.of(context).size.height * 0.2,
                     right: MediaQuery.of(context).size.width * 0.05,
@@ -173,11 +182,9 @@ class _NewAddressMapViewState extends State<NewAddressMapView> {
                       child: CustomButton(
                         text: LocaleKeys.proceed.tr(),
                         onPressed: () {
-                          if (widget.forAddingAddess) {
-                            AddAddressBottomSheet.show(
-                              context,
-                              state.selectedAddressName,
-                            );
+                          if (widget.forAddingAddess ||
+                              widget.address == null) {
+                            _addAddress(context, state);
                           } else {}
                         },
                       ),
@@ -212,5 +219,15 @@ class _NewAddressMapViewState extends State<NewAddressMapView> {
     } else {
       context.read<MapsCubit>().determinePosition();
     }
+  }
+
+  void _addAddress(BuildContext context, MapsState state) {
+    AddAddressBottomSheet.show(
+      context: context,
+      address: state.selectedAddressName,
+      lat: state.markers.first.position.latitude,
+      lng: state.markers.first.position.longitude,
+      existingAddress: widget.address,
+    );
   }
 }

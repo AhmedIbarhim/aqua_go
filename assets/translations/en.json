@@ -114,7 +114,8 @@
         "duration": "Duration: ",
         "total": "Total",
         "buy_package": "Subscribe to Package",
-        "buy": "Subscribe Now"
+        "buy": "Subscribe Now",
+        "price": "Price"
     },
     "bookings": {
         "previous_bookings": "Previous Bookings",
@@ -145,6 +146,8 @@
         "subtotal": "Subtotal",
         "vat": "VAT",
         "confirm_booking": "Confirm Booking",
+        "confirm_payment": "Confirm Payment",
+        "package_name": "Package Name",
         "dont_call": "Don't call",
         "outside_only": "Outside only",
         "special_note": "Special note",
@@ -201,6 +204,7 @@
         "select_on_map": "Select on Map",
         "my_addresses": "My Addresses",
         "add_new_location": "Add New Location",
+        "edit_location": "Edit Location",
         "search_hint": "Search location...",
         "search_results": "Search Results",
         "address_label": "Address",

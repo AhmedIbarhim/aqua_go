@@ -114,7 +114,8 @@
         "duration": "لمدة : ",
         "total": "الإجمالي",
         "buy_package": "اشتراك في الباقة",
-        "buy": "اشترك الآن"
+        "buy": "اشترك الآن",
+        "price": "السعر"
     },
     "bookings": {
         "previous_bookings": "حجوزات سابقة",
@@ -145,6 +146,8 @@
         "subtotal": "المبلغ قبل الضريبة",
         "vat": "ضريبة القيمة المضافة",
         "confirm_booking": "تأكيد الحجز",
+        "confirm_payment": "تأكيد الدفع",
+        "package_name": "اسم الباقة",
         "dont_call": "لا تتصل بالهاتف",
         "outside_only": "غسيل خارجي فقط",
         "special_note": "ملاحظة خاصة",
@@ -201,6 +204,7 @@
         "select_on_map": "اختر على الخريطة",
         "my_addresses": "عناويني",
         "add_new_location": "إضافة عنوان جديد",
+        "edit_location": "تعديل الموقع",
         "search_hint": "إبحث عن موقع ...",
         "search_results": "نتائج البحث",
         "address_label": "العنوان",

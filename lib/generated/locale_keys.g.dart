@@ -111,6 +111,7 @@ abstract class  LocaleKeys {
   static const booking_package_total = 'booking_package.total';
   static const booking_package_buy_package = 'booking_package.buy_package';
   static const booking_package_buy = 'booking_package.buy';
+  static const booking_package_price = 'booking_package.price';
   static const booking_package = 'booking_package';
   static const bookings_previous_bookings = 'bookings.previous_bookings';
   static const bookings_current_bookings = 'bookings.current_bookings';
@@ -140,6 +141,8 @@ abstract class  LocaleKeys {
   static const bookings_subtotal = 'bookings.subtotal';
   static const bookings_vat = 'bookings.vat';
   static const bookings_confirm_booking = 'bookings.confirm_booking';
+  static const bookings_confirm_payment = 'bookings.confirm_payment';
+  static const bookings_package_name = 'bookings.package_name';
   static const bookings_dont_call = 'bookings.dont_call';
   static const bookings_outside_only = 'bookings.outside_only';
   static const bookings_special_note = 'bookings.special_note';
@@ -193,6 +196,7 @@ abstract class  LocaleKeys {
   static const address_select_on_map = 'address.select_on_map';
   static const address_my_addresses = 'address.my_addresses';
   static const address_add_new_location = 'address.add_new_location';
+  static const address_edit_location = 'address.edit_location';
   static const address_search_hint = 'address.search_hint';
   static const address_search_results = 'address.search_results';
   static const address_address_label = 'address.address_label';

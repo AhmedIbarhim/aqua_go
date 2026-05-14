@@ -1,7 +1,9 @@
 import 'package:aqua_go/core/config/networking/api_client.dart';
 import 'package:dio/dio.dart';
 
+import '../../../../core/config/local_storage/shared_prefs.dart';
 import '../../../../core/config/networking/endpoints.dart';
+import '../../../../core/constants.dart';
 
 class LocationService {
   final APIClient apiClient;
@@ -15,7 +17,7 @@ class LocationService {
       queryParameters: {
         'input': query,
         'key': _apiKey,
-        'language': 'ar',
+        'language': SharedPrefs.getString(kLanguage) == 'en' ? 'en' : 'ar',
         'components': 'country:sa',
       },
     );

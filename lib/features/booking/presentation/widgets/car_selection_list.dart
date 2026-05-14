@@ -9,45 +9,17 @@ import '../../../../features/my_cars/data/models/my_car_model.dart';
 
 class CarSelectionList extends StatelessWidget {
   final int? selectedCarIndex;
+  final List<MyCarModel> cars;
   final Function(int index) onCarSelected;
   final VoidCallback onAddCar;
 
   const CarSelectionList({
     super.key,
     required this.selectedCarIndex,
+    required this.cars,
     required this.onCarSelected,
     required this.onAddCar,
   });
-
-  static final List<MyCarModel> myCars = [
-    MyCarModel(
-      id: '',
-      name: 'تويوتا',
-      model: 'لاند كروزر',
-      year: '2022',
-      image: AppAssets.demoLandcroser,
-      boardNumber: '1234',
-      typeImage: AppAssets.demoToyota,
-    ),
-    MyCarModel(
-      id: '',
-      name: 'مرسيدس',
-      model: 'جي كلاس',
-      year: '2023',
-      image: AppAssets.myCar,
-      boardNumber: '5678',
-      typeImage: AppAssets.demoToyota,
-    ),
-    MyCarModel(
-      id: '',
-      name: 'بي ام دبليو',
-      model: 'الفئة الخامسة',
-      year: '2024',
-      image: AppAssets.myCar,
-      boardNumber: '9012',
-      typeImage: AppAssets.demoToyota,
-    ),
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +29,7 @@ class CarSelectionList extends StatelessWidget {
       height: height * 0.14,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        itemCount: myCars.length + 1,
+        itemCount: cars.length + 1,
         separatorBuilder: (context, index) => SizedBox(width: width * 0.02),
         itemBuilder: (context, index) {
           if (index == 0) {
@@ -66,7 +38,7 @@ class CarSelectionList extends StatelessWidget {
               child: _buildAddCarCard(context, width, height),
             );
           }
-          final car = myCars[index - 1];
+          final car = cars[index - 1];
           final isSelected = selectedCarIndex == index - 1;
           return GestureDetector(
             onTap: () => onCarSelected(index - 1),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/config/di/service_locator.dart';
 import '../../../../core/themes/app_colors_extension.dart';
 import '../widgets/empty_cars_widget.dart';
 import '../widgets/my_cars_list_view.dart';
@@ -13,7 +14,7 @@ class MyCarsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
-      value: MyCarsCubit()..getCars(),
+      value: locator<MyCarsCubit>()..getCars(),
       child: Container(
         height: double.infinity,
         width: double.infinity,

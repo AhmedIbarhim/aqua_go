@@ -21,14 +21,14 @@ class _PackagesListViewState extends State<PackagesListView> {
     PackageModel(
       title: 'باقة اكوا كلاسيك',
       description: '5 غسلات . 5 مجاناً',
-      price: '30.00',
+      price: '200.00',
       duration: '30 يوم',
       image: 'assets/images/gift_demo.png',
     ),
     PackageModel(
       title: 'باقة اكوا سوبر',
-      description: '5 غسلات . 5 مجاناً',
-      price: '30.00',
+      description: '10 غسلات . 10 مجاناً',
+      price: '300.00',
       duration: '30 يوم',
       image: 'assets/images/rocket_demo.png',
     ),

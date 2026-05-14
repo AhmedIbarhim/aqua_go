@@ -12,6 +12,10 @@ class PackageModel {
     required this.duration,
     required this.image,
   });
+
+  String get total =>
+      (num.parse(price) + (num.parse(price) * .14)).toStringAsFixed(2);
+  String get vat => (num.parse(price) * .14).toStringAsFixed(2);
   factory PackageModel.fromJson(Map<String, dynamic> json) {
     return PackageModel(
       title: json['title'],

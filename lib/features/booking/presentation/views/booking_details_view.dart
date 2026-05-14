@@ -1,7 +1,10 @@
 import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/core/route/routes.dart';
+import 'package:aqua_go/features/my_cars/controllers/my_cars_cubit.dart';
+import 'package:aqua_go/features/my_cars/data/models/my_car_model.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:svg_flutter/svg.dart';
 import '../../../../core/themes/app_colors_extension.dart';
 import '../../../../core/themes/app_text_styles.dart';
@@ -9,6 +12,7 @@ import '../../../../core/utils/app_assets.dart';
 import '../../../../core/components/custom_button.dart';
 import '../../../../core/components/generic_app_bar.dart';
 import '../../../../core/components/bottom_action_sheet_container.dart';
+import '../../../../core/config/di/service_locator.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../widgets/car_selection_list.dart';
 import '../widgets/additional_services_grid.dart';
@@ -31,23 +35,30 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
     final height = MediaQuery.sizeOf(context).height;
-    return Scaffold(
-      backgroundColor: context.colors.screenBG,
-      appBar: GenericAppBar(
-        title: LocaleKeys.bookings_booking_details.tr(),
-        hasBackground: true,
-        backgroundImage: AppAssets.bookingHeaderImage,
-        centerTitle: true,
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              child: _buildContent(context, width, height),
+    return BlocProvider.value(
+      value: locator<MyCarsCubit>()..getCars(),
+      child: Builder(
+        builder: (context) {
+          return Scaffold(
+            backgroundColor: context.colors.screenBG,
+            appBar: GenericAppBar(
+              title: LocaleKeys.bookings_booking_details.tr(),
+              hasBackground: true,
+              backgroundImage: AppAssets.bookingHeaderImage,
+              centerTitle: true,
             ),
-          ),
-          _buildBottomActionSheet(context, width, height),
-        ],
+            body: Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: _buildContent(context, width, height),
+                  ),
+                ),
+                _buildBottomActionSheet(context, width, height),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
@@ -64,15 +75,21 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
             isRequired: true,
           ),
           SizedBox(height: height * 0.02),
-          CarSelectionList(
-            selectedCarIndex: selectedCarIndex,
-            onCarSelected: (index) {
-              setState(() {
-                selectedCarIndex = index;
-              });
-            },
-            onAddCar: () {
-              // TODO: Navigate to Add Car view
+          BlocBuilder<MyCarsCubit, MyCarsState>(
+            builder: (context, state) {
+              final cars = state is MyCarsLoaded ? state.cars : <MyCarModel>[];
+              return CarSelectionList(
+                cars: cars,
+                selectedCarIndex: selectedCarIndex,
+                onCarSelected: (index) {
+                  setState(() {
+                    selectedCarIndex = index;
+                  });
+                },
+                onAddCar: () {
+                  context.pushNamed(Routes.addVehicle);
+                },
+              );
             },
           ),
           SizedBox(height: height * 0.03),

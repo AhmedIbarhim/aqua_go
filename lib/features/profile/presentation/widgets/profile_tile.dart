@@ -9,6 +9,7 @@ import '../../../../generated/locale_keys.g.dart';
 class ProfileTile extends StatelessWidget {
   final String title;
   final String icon;
+  final Color? iconColor;
   final Color? textColor;
   final Color? borderColor;
   final bool isVerified;
@@ -21,6 +22,7 @@ class ProfileTile extends StatelessWidget {
     super.key,
     required this.title,
     required this.icon,
+    this.iconColor,
     this.textColor,
     this.borderColor,
     this.isVerified = false,
@@ -56,7 +58,15 @@ class ProfileTile extends StatelessWidget {
             Expanded(
               child: Row(
                 children: [
-                  SvgPicture.asset(icon, width: sw(24), height: sw(24)),
+                  SvgPicture.asset(
+                    icon,
+                    width: sw(24),
+                    height: sw(24),
+                    colorFilter: ColorFilter.mode(
+                      iconColor ?? context.colors.textPrimary,
+                      BlendMode.srcIn,
+                    ),
+                  ),
                   SizedBox(width: sw(8)),
                   Expanded(
                     child: Text(

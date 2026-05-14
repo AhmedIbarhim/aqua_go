@@ -9,15 +9,45 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
 
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../data/models/address_model.dart';
+import '../../controllers/addresses_controller/addresses_cubit.dart';
+
 class AddAddressBottomSheet extends StatefulWidget {
   final String address;
-  const AddAddressBottomSheet({super.key, required this.address});
+  final double lat;
+  final double lng;
+  final AddressModel? existingAddress;
 
-  static void show(BuildContext context, String address) {
+  const AddAddressBottomSheet({
+    super.key,
+    required this.address,
+    required this.lat,
+    required this.lng,
+    this.existingAddress,
+  });
+
+  static void show({
+    required BuildContext context,
+    required String address,
+    required double lat,
+    required double lng,
+    AddressModel? existingAddress,
+  }) {
     CustomBottomSheet.show(
       context: context,
-      title: LocaleKeys.address_add_new_location.tr(),
-      child: AddAddressBottomSheet(address: address),
+      title: existingAddress == null
+          ? LocaleKeys.address_add_new_location.tr()
+          : LocaleKeys.address_edit_location.tr(),
+      child: BlocProvider.value(
+        value: AddressesCubit(),
+        child: AddAddressBottomSheet(
+          address: address,
+          lat: lat,
+          lng: lng,
+          existingAddress: existingAddress,
+        ),
+      ),
     );
   }
 
@@ -28,6 +58,14 @@ class AddAddressBottomSheet extends StatefulWidget {
 class _AddAddressBottomSheetState extends State<AddAddressBottomSheet> {
   final TextEditingController _addressNameController = TextEditingController();
   final TextEditingController _accessNotesController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.existingAddress != null) {
+      _addressNameController.text = widget.existingAddress!.name;
+    }
+  }
 
   @override
   void dispose() {
@@ -123,8 +161,26 @@ class _AddAddressBottomSheetState extends State<AddAddressBottomSheet> {
         CustomButton(
           text: LocaleKeys.address_save_address.tr(),
           onPressed: () {
-            // TODO: Implement save logic
-            Navigator.pop(context);
+            if (_addressNameController.text.trim().isEmpty) return;
+
+            final newAddress = AddressModel(
+              id:
+                  widget.existingAddress?.id ??
+                  DateTime.now().millisecondsSinceEpoch.toString(),
+              name: _addressNameController.text.trim(),
+              formattedAddress: widget.address,
+              lat: widget.lat,
+              lng: widget.lng,
+            );
+
+            if (widget.existingAddress == null) {
+              context.read<AddressesCubit>().addAddress(newAddress);
+            } else {
+              context.read<AddressesCubit>().updateAddress(newAddress);
+            }
+
+            Navigator.pop(context); // Close bottom sheet
+            Navigator.pop(context); // Return from map view
           },
         ),
       ],

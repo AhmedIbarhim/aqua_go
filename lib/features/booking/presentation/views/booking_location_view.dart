@@ -10,7 +10,10 @@ import '../../../../core/components/custom_button.dart';
 import '../../../../core/components/generic_app_bar.dart';
 import '../../../../core/components/bottom_action_sheet_container.dart';
 import '../../../../generated/locale_keys.g.dart';
-import '../../../adress/data/models/address_model.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/config/di/service_locator.dart';
+import '../../../adress/controllers/addresses_controller/addresses_cubit.dart';
+import '../../../adress/controllers/maps_controller/maps_cubit.dart';
 import '../widgets/location_selection_card.dart';
 import '../../../adress/presentation/views/new_address_map_view.dart';
 
@@ -24,133 +27,151 @@ class BookingLocationView extends StatefulWidget {
 class _BookingLocationViewState extends State<BookingLocationView> {
   int selectedLocationIndex = 0;
 
-  final List<AddressModel> myAddresses = [
-    AddressModel(
-      name: 'المنزل',
-      formattedAddress: '12شارع الماسة, الرياض السعودية',
-      lat: 24.7136,
-      lng: 46.6753,
-    ),
-    AddressModel(
-      name: 'المكتب',
-      formattedAddress: '1شارع الدار البيضاء, الرياض السعودية',
-      lat: 24.7136,
-      lng: 46.6753,
-    ),
-  ];
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.sizeOf(context).height;
     final width = MediaQuery.sizeOf(context).width;
-    return Scaffold(
-      backgroundColor: context.colors.screenBG,
-      appBar: GenericAppBar(
-        title: LocaleKeys.bookings_choose_car_location.tr(),
-        hasBackground: true,
-        backgroundImage: AppAssets.bookingHeaderImage,
-        centerTitle: true,
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return SingleChildScrollView(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight: constraints.maxHeight,
-                    ),
-                    child: Container(
-                      padding: EdgeInsets.all(width * 0.06),
-                      decoration: BoxDecoration(
-                        color: context.colors.background,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => locator<MapsCubit>()..determinePosition(),
+        ),
+        BlocProvider.value(value: AddressesCubit()..getAddresses()),
+      ],
+      child: Scaffold(
+        backgroundColor: context.colors.screenBG,
+        appBar: GenericAppBar(
+          title: LocaleKeys.bookings_choose_car_location.tr(),
+          hasBackground: true,
+          backgroundImage: AppAssets.bookingHeaderImage,
+          centerTitle: true,
+        ),
+        body: Column(
+          children: [
+            Expanded(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: constraints.maxHeight,
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            LocaleKeys.address_map.tr(),
-                            style: AppTextStyles.regular16.copyWith(
-                              color: context.colors.textPrimary,
+                      child: Container(
+                        padding: EdgeInsets.all(width * 0.06),
+                        decoration: BoxDecoration(
+                          color: context.colors.background,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              LocaleKeys.address_map.tr(),
+                              style: AppTextStyles.regular16.copyWith(
+                                color: context.colors.textPrimary,
+                              ),
                             ),
-                          ),
-                          SizedBox(height: height * 0.01),
-                          LocationSelectionCard(
-                            icon: AppAssets.gps,
-                            title: LocaleKeys.address_current_location.tr(),
-                            subtitle: 'شارع احمد عبد الخالق, نجران السعودية',
-                            isSelected: selectedLocationIndex == 0,
-                            onTap: () {
-                              setState(() {
-                                selectedLocationIndex = 0;
-                              });
-                            },
-                          ),
-                          SizedBox(height: height * 0.01),
-                          _buildAddressSelectOnMapCard(context, width),
-                          SizedBox(height: height * 0.03),
-                          Text(
-                            LocaleKeys.address_my_addresses.tr(),
-                            style: AppTextStyles.regular16.copyWith(
-                              color: context.colors.textPrimary,
-                            ),
-                          ),
-                          SizedBox(height: height * 0.01),
-                          ListView.builder(
-                            physics: const NeverScrollableScrollPhysics(),
-                            shrinkWrap: true,
-                            itemCount: myAddresses.length,
-                            padding: EdgeInsets.zero,
-                            itemBuilder: (context, index) {
-                              final address = myAddresses[index];
-                              return Padding(
-                                padding: EdgeInsets.only(bottom: height * 0.01),
-                                child: LocationSelectionCard(
-                                  icon: AppAssets.location,
-                                  title: address.name.tr(),
-                                  subtitle: address.formattedAddress,
-                                  isSelected:
-                                      selectedLocationIndex == index + 1,
+                            SizedBox(height: height * 0.01),
+                            BlocBuilder<MapsCubit, MapsState>(
+                              builder: (context, state) {
+                                return LocationSelectionCard(
+                                  icon: AppAssets.gps,
+                                  title: LocaleKeys.address_current_location
+                                      .tr(),
+                                  subtitle: state.isLoading
+                                      ? '...'
+                                      : state.selectedAddressName.isEmpty
+                                      ? '__'
+                                      : state.selectedAddressName,
+                                  isSelected: selectedLocationIndex == 0,
                                   onTap: () {
                                     setState(() {
-                                      selectedLocationIndex = index + 1;
+                                      selectedLocationIndex = 0;
                                     });
                                   },
-                                  onEdit: () {},
-                                ),
-                              );
-                            },
-                          ),
-                          CustomButton(
-                            color: context.colors.background,
-                            borderColor: context.colors.borderSecondary,
-                            textColor: context.colors.primary,
-                            preWidget: Icon(
-                              Icons.add,
-                              color: context.colors.primary,
-                              size: width * 0.06,
+                                );
+                              },
                             ),
-                            text: LocaleKeys.address_add_new_location.tr(),
-                            onPressed: () {
-                              context.pushNamed(
-                                Routes.newAddressMap,
-                                arguments: NewAddressMapArgs(
-                                  forAddingAddress: true,
-                                ),
-                              );
-                            },
-                          ),
-                        ],
+                            SizedBox(height: height * 0.01),
+                            _buildAddressSelectOnMapCard(context, width),
+                            SizedBox(height: height * 0.03),
+                            Text(
+                              LocaleKeys.address_my_addresses.tr(),
+                              style: AppTextStyles.regular16.copyWith(
+                                color: context.colors.textPrimary,
+                              ),
+                            ),
+                            SizedBox(height: height * 0.01),
+                            BlocBuilder<AddressesCubit, AddressesState>(
+                              builder: (context, state) {
+                                if (state is AddressesLoaded) {
+                                  return ListView.builder(
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    shrinkWrap: true,
+                                    itemCount: state.addresses.length,
+                                    padding: EdgeInsets.zero,
+                                    itemBuilder: (context, index) {
+                                      final address = state.addresses[index];
+                                      return Padding(
+                                        padding: EdgeInsets.only(
+                                          bottom: height * 0.01,
+                                        ),
+                                        child: LocationSelectionCard(
+                                          icon: AppAssets.location,
+                                          title: address.name,
+                                          subtitle: address.formattedAddress,
+                                          isSelected:
+                                              selectedLocationIndex ==
+                                              index + 1,
+                                          onTap: () {
+                                            setState(() {
+                                              selectedLocationIndex = index + 1;
+                                            });
+                                          },
+                                          onEdit: () {},
+                                        ),
+                                      );
+                                    },
+                                  );
+                                }
+                                return const SizedBox.shrink();
+                              },
+                            ),
+                            CustomButton(
+                              color: context.colors.background,
+                              borderColor: context.colors.borderSecondary,
+                              textColor: context.colors.primary,
+                              preWidget: Icon(
+                                Icons.add,
+                                color: context.colors.primary,
+                                size: width * 0.06,
+                              ),
+                              text: LocaleKeys.address_add_new_location.tr(),
+                              onPressed: () {
+                                context.pushNamed(
+                                  Routes.newAddressMap,
+                                  arguments: NewAddressMapArgs(
+                                    forAddingAddress: true,
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
-          ),
-          _buildBottomActionSheet(),
-        ],
+            _buildBottomActionSheet(),
+          ],
+        ),
       ),
     );
   }

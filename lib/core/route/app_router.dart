@@ -26,8 +26,7 @@ import '../../features/profile/presentation/views/privacy_policy_view.dart';
 import '../../features/profile/presentation/views/about_us_view.dart';
 import '../../features/profile/presentation/views/terms_view.dart';
 import '../../features/profile/presentation/views/support_view.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../features/my_cars/controllers/my_cars_cubit.dart';
+
 import 'routes.dart';
 
 abstract class AppRouter {
@@ -83,12 +82,7 @@ abstract class AppRouter {
 
       case Routes.addVehicle:
         final car = settings.arguments as MyCarModel?;
-        return MaterialPageRoute(
-          builder: (_) => BlocProvider.value(
-            value: MyCarsCubit(),
-            child: AddCarView(car: car),
-          ),
-        );
+        return MaterialPageRoute(builder: (_) => AddCarView(car: car));
 
       case Routes.bookingDetails:
         return MaterialPageRoute(builder: (_) => const BookingDetailsView());
@@ -102,8 +96,10 @@ abstract class AppRouter {
       case Routes.newAddressMap:
         final args = settings.arguments as NewAddressMapArgs;
         return MaterialPageRoute(
-          builder: (_) =>
-              NewAddressMapView(forAddingAddess: args.forAddingAddress),
+          builder: (_) => NewAddressMapView(
+            forAddingAddess: args.forAddingAddress,
+            address: args.address,
+          ),
         );
       case Routes.complain:
         final args = settings.arguments as ComplainArgs;

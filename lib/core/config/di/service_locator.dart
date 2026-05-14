@@ -1,5 +1,6 @@
 import 'package:aqua_go/features/adress/controllers/maps_controller/maps_cubit.dart';
 import 'package:aqua_go/features/adress/data/repos/maps_repo.dart';
+import 'package:aqua_go/features/my_cars/controllers/my_cars_cubit.dart';
 import 'package:get_it/get_it.dart';
 
 import '../../../features/adress/data/services/location_service.dart';
@@ -18,7 +19,11 @@ Future<void> initServiceLocator() async {
     () => MapsRepository(locationService: locator()),
   );
 
+  // cubits
+
   locator.registerFactory<MapsCubit>(
     () => MapsCubit(mapsRepository: locator()),
   );
+
+  locator.registerFactory<MyCarsCubit>(() => MyCarsCubit());
 }

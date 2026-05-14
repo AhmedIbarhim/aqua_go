@@ -14,38 +14,36 @@ class EmptyCarsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SvgPicture.asset(AppAssets.emptyCars),
-            const SizedBox(height: 40),
-            Text(
-              LocaleKeys.my_cars_empty_state.tr(),
-              style: AppTextStyles.semiBold16,
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SvgPicture.asset(AppAssets.emptyCars),
+          const SizedBox(height: 40),
+          Text(
+            LocaleKeys.my_cars_empty_state.tr(),
+            style: AppTextStyles.semiBold16,
+          ),
+          const SizedBox(height: 20),
+          Text(
+            LocaleKeys.my_cars_empty_desc.tr(),
+            textAlign: TextAlign.center,
+            style: AppTextStyles.regular14.copyWith(
+              color: context.colors.textSecondary,
             ),
-            const SizedBox(height: 20),
-            Text(
-              LocaleKeys.my_cars_empty_desc.tr(),
-              textAlign: TextAlign.center,
-              style: AppTextStyles.regular14.copyWith(
-                color: context.colors.textSecondary,
-              ),
+          ),
+          SizedBox(height: 30),
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 0.6,
+            child: CustomButton(
+              onPressed: () {
+                Navigator.pushNamed(context, Routes.addVehicle);
+              },
+              text: LocaleKeys.my_cars_add_car.tr(),
+              preWidget: Icon(Icons.add),
             ),
-            SizedBox(height: 30),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.6,
-              child: CustomButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, Routes.addVehicle);
-                },
-                text: LocaleKeys.my_cars_add_car.tr(),
-                preWidget: Icon(Icons.add),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

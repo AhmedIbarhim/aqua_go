@@ -12,53 +12,54 @@ import '../widgets/my_addresses_list.dart';
 import '../../../../core/components/bottom_action_sheet_container.dart';
 import 'new_address_map_view.dart';
 
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../controllers/addresses_controller/addresses_cubit.dart';
+
 class MyAddressesView extends StatelessWidget {
   const MyAddressesView({super.key});
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    // Mock data based on design
-    final List<AddressModel> myAddresses = [
-      AddressModel(
-        name: 'المكتب',
-        formattedAddress: '12شارع الماسة, الرياض السعودية',
-        lat: 24.7136,
-        lng: 46.6753,
-      ),
-      AddressModel(
-        name: 'المنزل',
-        formattedAddress: '12شارع الماسة, الرياض السعودية',
-        lat: 24.7136,
-        lng: 46.6753,
-      ),
-    ];
 
-    return Scaffold(
-      backgroundColor: context.colors.screenBG,
-      appBar: GenericAppBar(
-        title: LocaleKeys.address_my_addresses.tr(),
-        centerTitle: true,
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Container(
-              padding: EdgeInsets.all(width * 0.06),
-              decoration: BoxDecoration(
-                color: context.colors.background,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(24),
-                  topRight: Radius.circular(24),
-                ),
-              ),
-              child: myAddresses.isEmpty
-                  ? const SingleChildScrollView(child: EmptyAddressesWidget())
-                  : MyAddressesList(myAddresses: myAddresses),
+    return BlocProvider.value(
+      value: AddressesCubit()..getAddresses(),
+      child: BlocBuilder<AddressesCubit, AddressesState>(
+        builder: (context, state) {
+          final List<AddressModel> myAddresses = state is AddressesLoaded
+              ? state.addresses
+              : <AddressModel>[];
+
+          return Scaffold(
+            backgroundColor: context.colors.screenBG,
+            appBar: GenericAppBar(
+              title: LocaleKeys.address_my_addresses.tr(),
+              centerTitle: true,
             ),
-          ),
-          _buildBottomActionSheet(context),
-        ],
+            body: Column(
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: EdgeInsets.all(width * 0.06),
+                    decoration: BoxDecoration(
+                      color: context.colors.background,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(24),
+                        topRight: Radius.circular(24),
+                      ),
+                    ),
+                    child: myAddresses.isEmpty
+                        ? const SingleChildScrollView(
+                            child: EmptyAddressesWidget(),
+                          )
+                        : MyAddressesList(myAddresses: myAddresses),
+                  ),
+                ),
+                _buildBottomActionSheet(context),
+              ],
+            ),
+          );
+        },
       ),
     );
   }

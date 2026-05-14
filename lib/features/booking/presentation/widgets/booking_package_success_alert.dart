@@ -58,7 +58,7 @@ class BookingPackageSuccessAlert extends StatelessWidget {
             // TODO: Implement navigation to request wash
           },
         ),
-
+        const SizedBox(height: 16),
         // Secondary Button
         CustomButton(
           text: LocaleKeys.go_to_home.tr(),

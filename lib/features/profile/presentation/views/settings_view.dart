@@ -65,6 +65,7 @@ class _SettingsViewState extends State<SettingsView> {
                     ProfileTile(
                       title: LocaleKeys.settings_language.tr(),
                       icon: AppAssets.language,
+
                       onTap: () {
                         context.pushNamed(Routes.languageSelect);
                       },

@@ -100,14 +100,16 @@ class MyAddressCard extends StatelessWidget {
 
               const SizedBox(width: 4),
 
-              Text(
-                address.formattedAddress,
-                textAlign: TextAlign.start,
-                style: AppTextStyles.regular14.copyWith(
-                  color: context.colors.textSecondary,
+              Expanded(
+                child: Text(
+                  address.formattedAddress,
+                  textAlign: TextAlign.start,
+                  style: AppTextStyles.regular14.copyWith(
+                    color: context.colors.textSecondary,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),

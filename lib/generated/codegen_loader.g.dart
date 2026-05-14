@@ -130,7 +130,8 @@ class CodegenLoader extends AssetLoader{
     "duration": "لمدة : ",
     "total": "الإجمالي",
     "buy_package": "اشتراك في الباقة",
-    "buy": "اشترك الآن"
+    "buy": "اشترك الآن",
+    "price": "السعر"
   },
   "bookings": {
     "previous_bookings": "حجوزات سابقة",
@@ -161,6 +162,8 @@ class CodegenLoader extends AssetLoader{
     "subtotal": "المبلغ قبل الضريبة",
     "vat": "ضريبة القيمة المضافة",
     "confirm_booking": "تأكيد الحجز",
+    "confirm_payment": "تأكيد الدفع",
+    "package_name": "اسم الباقة",
     "dont_call": "لا تتصل بالهاتف",
     "outside_only": "غسيل خارجي فقط",
     "special_note": "ملاحظة خاصة",
@@ -217,6 +220,7 @@ class CodegenLoader extends AssetLoader{
     "select_on_map": "اختر على الخريطة",
     "my_addresses": "عناويني",
     "add_new_location": "إضافة عنوان جديد",
+    "edit_location": "تعديل الموقع",
     "search_hint": "إبحث عن موقع ...",
     "search_results": "نتائج البحث",
     "address_label": "العنوان",
@@ -437,7 +441,8 @@ static const Map<String,dynamic> _en = {
     "duration": "Duration: ",
     "total": "Total",
     "buy_package": "Subscribe to Package",
-    "buy": "Subscribe Now"
+    "buy": "Subscribe Now",
+    "price": "Price"
   },
   "bookings": {
     "previous_bookings": "Previous Bookings",
@@ -468,6 +473,8 @@ static const Map<String,dynamic> _en = {
     "subtotal": "Subtotal",
     "vat": "VAT",
     "confirm_booking": "Confirm Booking",
+    "confirm_payment": "Confirm Payment",
+    "package_name": "Package Name",
     "dont_call": "Don't call",
     "outside_only": "Outside only",
     "special_note": "Special note",
@@ -524,6 +531,7 @@ static const Map<String,dynamic> _en = {
     "select_on_map": "Select on Map",
     "my_addresses": "My Addresses",
     "add_new_location": "Add New Location",
+    "edit_location": "Edit Location",
     "search_hint": "Search location...",
     "search_results": "Search Results",
     "address_label": "Address",

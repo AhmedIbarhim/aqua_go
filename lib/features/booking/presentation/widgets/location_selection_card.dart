@@ -103,6 +103,7 @@ class LocationSelectionCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     subtitle,
+                    maxLines: 1,
                     style: AppTextStyles.regular14.copyWith(
                       color: context.colors.textSecondary,
                     ),
