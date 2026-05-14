@@ -2,6 +2,7 @@ import 'package:carousel_slider/carousel_controller.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../data/models/banner_model.dart';
+import '../data/models/current_package_model.dart';
 import '../widgets/home_banners_carosal.dart';
 import '../widgets/packages_list_view.dart';
 import '../widgets/services_list_view.dart';
@@ -23,6 +24,17 @@ class _HomeViewState extends State<HomeView> {
     BannerModel(image: "assets/images/banner_demo.png"),
     BannerModel(image: "assets/images/banner_demo.png"),
   ];
+
+  CurrentPackageModel dummyPackage = CurrentPackageModel(
+    title: 'باقة اكوا كلاسيك',
+    description:
+        '5 غسلات . 5 مجاناً.....................................................................................',
+    image: 'assets/images/gift_demo.png',
+    remainingWashes: 8,
+    totalWashes: 10,
+    expiryDate: DateTime(2026, 9, 18),
+  );
+
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
@@ -47,6 +59,13 @@ class _HomeViewState extends State<HomeView> {
               ),
               child: Column(
                 children: [
+                  // SizedBox(height: context.screenHeight * 0.02),
+                  // CurrentPackageSection(
+                  //   currentPackage: dummyPackage,
+                  //   onUsePackage: () {
+                  //     // Handle use package
+                  //   },
+                  // ),
                   SizedBox(height: context.screenHeight * 0.02),
                   const PackagesListView(),
                   SizedBox(height: context.screenHeight * 0.02),

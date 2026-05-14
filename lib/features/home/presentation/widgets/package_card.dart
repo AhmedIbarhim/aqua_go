@@ -1,8 +1,10 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
+import '../../../../generated/locale_keys.g.dart';
 import '../../../booking/presentation/widgets/booking_package_bottom_sheet.dart';
 import '../data/models/package_model.dart';
 
@@ -67,7 +69,6 @@ class PackageCard extends StatelessWidget {
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
                           width: width * 0.1,
@@ -96,7 +97,7 @@ class PackageCard extends StatelessWidget {
                               borderRadius: BorderRadius.circular(100),
                             ),
                             child: Text(
-                              'لمدة : ${packageModel.duration}',
+                              '${LocaleKeys.duration.tr()}: ${packageModel.duration}',
                               style: AppTextStyles.medium10,
                             ),
                           ),
@@ -121,14 +122,19 @@ class PackageCard extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis,
                               ),
                               const SizedBox(height: 2),
-                              Text(
-                                packageModel.description,
-                                style: AppTextStyles.regular12.copyWith(
-                                  color: context.colors.textSecondary,
-                                ),
+                              SizedBox(
+                                width: context.isMobile
+                                    ? height * 0.21
+                                    : width * 0.3,
+                                child: Text(
+                                  packageModel.description,
+                                  style: AppTextStyles.regular12.copyWith(
+                                    color: context.colors.textSecondary,
+                                  ),
 
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
                             ],
                           ),

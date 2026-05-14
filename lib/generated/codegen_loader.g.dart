@@ -33,6 +33,7 @@ class CodegenLoader extends AssetLoader{
   "delete_confirm": "تأكيد الحذف",
   "take_photo": "التقاط صورة",
   "select_from_gallery": "اختر من المعرض",
+  "duration": "المدة",
   "onboarding": {
     "title1": "نظافة السيارة بسهولة",
     "title2": "تألق في أي وقت وأي مكان",
@@ -82,6 +83,9 @@ class CodegenLoader extends AssetLoader{
   },
   "home": {
     "available_packages": "الباقات المتاحة",
+    "current_package": "الباقة الحالية",
+    "remaining": "متبقي",
+    "use_package": "استخدم الباقة",
     "services": "الخدمات",
     "best_offers": "أفضل العروض",
     "available_offers": "العروض المتاحة",
@@ -344,6 +348,7 @@ static const Map<String,dynamic> _en = {
   "delete_confirm": "Confirm Delete",
   "take_photo": "Take Photo",
   "select_from_gallery": "Select From Gallery",
+  "duration": "Duration",
   "onboarding": {
     "title1": "Effortless Car Care",
     "title2": "Shine Anytime, Anywhere",
@@ -393,6 +398,9 @@ static const Map<String,dynamic> _en = {
   },
   "home": {
     "available_packages": "Available Packages",
+    "current_package": "Current Package",
+    "remaining": "Remaining",
+    "use_package": "Use Package",
     "services": "Services",
     "best_offers": "Best Offers",
     "available_offers": "Available Offers",

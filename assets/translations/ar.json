@@ -17,6 +17,7 @@
     "delete_confirm": "تأكيد الحذف",
     "take_photo": "التقاط صورة",
     "select_from_gallery": "اختر من المعرض",
+    "duration": "المدة",
     "onboarding": {
         "title1": "نظافة السيارة بسهولة",
         "title2": "تألق في أي وقت وأي مكان",
@@ -66,6 +67,9 @@
     },
     "home": {
         "available_packages": "الباقات المتاحة",
+        "current_package": "الباقة الحالية",
+        "remaining": "متبقي",
+        "use_package": "استخدم الباقة",
         "services": "الخدمات",
         "best_offers": "أفضل العروض",
         "available_offers": "العروض المتاحة",

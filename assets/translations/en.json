@@ -17,6 +17,7 @@
     "delete_confirm": "Confirm Delete",
     "take_photo": "Take Photo",
     "select_from_gallery": "Select From Gallery",
+    "duration": "Duration",
     "onboarding": {
         "title1": "Effortless Car Care",
         "title2": "Shine Anytime, Anywhere",
@@ -66,6 +67,9 @@
     },
     "home": {
         "available_packages": "Available Packages",
+        "current_package": "Current Package",
+        "remaining": "Remaining",
+        "use_package": "Use Package",
         "services": "Services",
         "best_offers": "Best Offers",
         "available_offers": "Available Offers",

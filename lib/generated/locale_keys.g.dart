@@ -21,6 +21,7 @@ abstract class  LocaleKeys {
   static const delete_confirm = 'delete_confirm';
   static const take_photo = 'take_photo';
   static const select_from_gallery = 'select_from_gallery';
+  static const duration = 'duration';
   static const onboarding_title1 = 'onboarding.title1';
   static const onboarding_title2 = 'onboarding.title2';
   static const onboarding_title3 = 'onboarding.title3';
@@ -65,6 +66,9 @@ abstract class  LocaleKeys {
   static const layout_ready_to_serve = 'layout.ready_to_serve';
   static const layout = 'layout';
   static const home_available_packages = 'home.available_packages';
+  static const home_current_package = 'home.current_package';
+  static const home_remaining = 'home.remaining';
+  static const home_use_package = 'home.use_package';
   static const home_services = 'home.services';
   static const home_best_offers = 'home.best_offers';
   static const home_available_offers = 'home.available_offers';
