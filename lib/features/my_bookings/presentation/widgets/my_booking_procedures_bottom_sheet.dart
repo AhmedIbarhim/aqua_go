@@ -1,7 +1,6 @@
 import 'package:aqua_go/core/components/custom_bottom_sheet.dart';
 import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/core/route/routes.dart';
-import 'package:aqua_go/core/themes/app_colors_extension.dart';
 import 'package:aqua_go/core/themes/app_text_styles.dart';
 import 'package:aqua_go/features/my_bookings/data/models/my_bookings_model.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';

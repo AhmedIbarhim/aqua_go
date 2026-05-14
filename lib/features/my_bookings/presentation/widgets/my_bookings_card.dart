@@ -7,7 +7,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
 
-import '../../../../core/themes/app_colors_extension.dart';
 import '../../data/models/my_bookings_model.dart';
 import '../views/my_booking_deatails_view.dart';
 

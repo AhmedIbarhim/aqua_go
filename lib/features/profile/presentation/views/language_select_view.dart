@@ -9,7 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:svg_flutter/svg.dart';
 
 import '../../../../core/config/controllers/language_controller/language_cubit.dart';
-import '../../../../core/themes/app_colors_extension.dart';
+import '../../../../core/extentions/context_extentions.dart';
 import '../../../../generated/locale_keys.g.dart';
 
 class LanguageSelectView extends StatelessWidget {

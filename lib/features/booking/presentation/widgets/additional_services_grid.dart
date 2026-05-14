@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
-import '../../../../core/themes/app_colors_extension.dart';
+import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 
@@ -64,8 +64,9 @@ class AdditionalServicesGrid extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(width * 0.025),
       decoration: BoxDecoration(
-        color:
-            isSelected ? context.colors.brandHover : context.colors.themeColor,
+        color: isSelected
+            ? context.colors.brandHover
+            : context.colors.themeColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isSelected
@@ -76,10 +77,7 @@ class AdditionalServicesGrid extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          SvgPicture.asset(
-            icon,
-            width: width * 0.09,
-          ),
+          SvgPicture.asset(icon, width: width * 0.09),
           SizedBox(width: width * 0.015),
           Expanded(
             child: Column(

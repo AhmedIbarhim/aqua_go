@@ -3,7 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/components/generic_app_bar.dart';
-import '../../../../core/themes/app_colors_extension.dart';
+import '../../../../core/extentions/context_extentions.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../widgets/offer_card.dart';
 

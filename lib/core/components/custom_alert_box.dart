@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
 
 import '../../generated/locale_keys.g.dart';
+import '../extentions/context_extentions.dart';
 import '../themes/app_text_styles.dart';
 import '../utils/app_assets.dart';
 import 'custom_button.dart';

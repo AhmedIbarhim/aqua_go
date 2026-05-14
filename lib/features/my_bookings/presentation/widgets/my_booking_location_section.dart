@@ -1,4 +1,4 @@
-import 'package:aqua_go/core/themes/app_colors_extension.dart';
+import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/core/themes/app_text_styles.dart';
 import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';

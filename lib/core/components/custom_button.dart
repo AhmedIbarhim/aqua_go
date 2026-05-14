@@ -1,7 +1,7 @@
 import 'package:aqua_go/core/themes/app_text_styles.dart';
 import 'package:flutter/material.dart';
 
-import '../themes/app_colors_extension.dart';
+import '../extentions/context_extentions.dart';
 
 class CustomButton extends StatelessWidget {
   const CustomButton({

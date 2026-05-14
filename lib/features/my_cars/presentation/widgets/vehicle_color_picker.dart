@@ -1,10 +1,10 @@
-import 'package:aqua_go/core/themes/app_colors_extension.dart';
 import 'package:aqua_go/core/themes/app_text_styles.dart';
 import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/components/custom_color_picker.dart';
+import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/helpers/car_color_helper.dart';
 
 class VehicleColorPicker extends StatelessWidget {

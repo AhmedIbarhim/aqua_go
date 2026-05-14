@@ -218,10 +218,3 @@ const lightAppColors = AppColors(
   error: Color(0xFFDC2626),
   warning: Color(0xFFD97706),
 );
-
-// -----------------------------------------------------------------------------
-// BuildContext Helper for easy access
-// -----------------------------------------------------------------------------
-extension AppThemeExtension on BuildContext {
-  AppColors get colors => Theme.of(this).extension<AppColors>()!;
-}

@@ -1,6 +1,5 @@
 import 'package:carousel_slider/carousel_controller.dart';
 import 'package:flutter/material.dart';
-import '../../../../core/themes/app_colors_extension.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../data/models/banner_model.dart';
 import '../widgets/home_banners_carosal.dart';

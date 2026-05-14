@@ -2,7 +2,7 @@ import 'package:aqua_go/core/themes/app_text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
 
-import '../../../../core/themes/app_colors_extension.dart';
+import '../../../../core/extentions/context_extentions.dart';
 
 class GenderCard extends StatelessWidget {
   final String label;

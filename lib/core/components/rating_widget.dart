@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../themes/app_colors_extension.dart';
+
+import '../extentions/context_extentions.dart';
 
 class RatingWidget extends StatelessWidget {
   final double rating;

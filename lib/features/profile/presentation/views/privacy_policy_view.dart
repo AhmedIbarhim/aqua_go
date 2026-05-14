@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/components/custom_button.dart';
 import '../../../../core/components/generic_app_bar.dart';
+import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/themes/app_text_styles.dart';
 
 class PrivacyPolicyView extends StatelessWidget {

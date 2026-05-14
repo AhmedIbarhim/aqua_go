@@ -3,7 +3,6 @@ import 'package:aqua_go/core/route/routes.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
-import '../../../../core/themes/app_colors_extension.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../../core/components/custom_button.dart';
@@ -196,15 +195,7 @@ class _BookingLocationViewState extends State<BookingLocationView> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             SvgPicture.asset(AppAssets.mapOutlined, width: width * 0.06),
-            const SizedBox(width: 8),
-            Container(
-              width: 8,
-              height: 8,
-              decoration: BoxDecoration(
-                color: context.colors.brandHover,
-                shape: BoxShape.circle,
-              ),
-            ),
+
             const SizedBox(width: 8),
             Text(
               LocaleKeys.address_select_on_map.tr(),

@@ -1,12 +1,12 @@
 import 'package:aqua_go/core/components/custom_bottom_sheet.dart';
 import 'package:aqua_go/core/components/custom_button.dart';
-import 'package:aqua_go/core/themes/app_colors_extension.dart';
 import 'package:aqua_go/core/themes/app_text_styles.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flex_color_picker/flex_color_picker.dart';
 
 import '../../generated/locale_keys.g.dart';
+import '../extentions/context_extentions.dart';
 
 class CustomColorPicker extends StatefulWidget {
   final Color initialColor;

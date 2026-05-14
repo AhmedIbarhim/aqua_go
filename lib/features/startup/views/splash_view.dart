@@ -3,7 +3,6 @@ import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/route/routes.dart';
-import '../../../core/themes/app_colors_extension.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({super.key});

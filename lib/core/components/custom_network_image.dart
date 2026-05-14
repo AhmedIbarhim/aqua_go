@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
 
-import '../themes/app_colors_extension.dart';
+import '../extentions/context_extentions.dart';
 import '../utils/app_assets.dart';
 
 class CustomNetworkImage extends StatelessWidget {

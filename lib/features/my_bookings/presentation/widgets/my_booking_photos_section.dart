@@ -4,7 +4,6 @@ import '../views/gallery_view.dart';
 import '../../../../core/components/custom_network_image.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/route/routes.dart';
-import '../../../../core/themes/app_colors_extension.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../generated/locale_keys.g.dart';
 
@@ -53,8 +52,10 @@ class MyBookingPhotosSection extends StatelessWidget {
                   onTap: () {
                     context.pushNamed(
                       Routes.gallery,
-                      arguments:
-                          GalleryArgs(images: dummyImages, initialIndex: 0),
+                      arguments: GalleryArgs(
+                        images: dummyImages,
+                        initialIndex: 0,
+                      ),
                     );
                   },
                   child: ClipRRect(
@@ -69,8 +70,10 @@ class MyBookingPhotosSection extends StatelessWidget {
                   onTap: () {
                     context.pushNamed(
                       Routes.gallery,
-                      arguments:
-                          GalleryArgs(images: dummyImages, initialIndex: 1),
+                      arguments: GalleryArgs(
+                        images: dummyImages,
+                        initialIndex: 1,
+                      ),
                     );
                   },
                   child: ClipRRect(

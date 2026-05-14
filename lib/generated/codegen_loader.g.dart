@@ -217,7 +217,7 @@ class CodegenLoader extends AssetLoader{
   "address": {
     "map": "الخريطة",
     "current_location": "الموقع الحالي",
-    "select_on_map": "اختر على الخريطة",
+    "select_on_map": "حدد على الخريطة",
     "my_addresses": "عناويني",
     "add_new_location": "إضافة عنوان جديد",
     "edit_location": "تعديل الموقع",

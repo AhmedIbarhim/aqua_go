@@ -1,7 +1,8 @@
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../themes/app_colors_extension.dart';
+
+import '../extentions/context_extentions.dart';
 import '../themes/app_text_styles.dart';
 
 class CustomOtpFields extends StatelessWidget {

@@ -1,11 +1,11 @@
 import 'package:aqua_go/core/components/custom_button.dart';
 import 'package:aqua_go/core/components/generic_app_bar.dart';
-import 'package:aqua_go/core/themes/app_colors_extension.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../widgets/vehicle_color_picker.dart';
 import '../../../../core/components/bottom_action_sheet_container.dart';
+import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/components/custom_dropdown_field.dart';
 import '../../../../core/components/custom_text_field.dart';
 import '../../../../core/config/di/service_locator.dart';

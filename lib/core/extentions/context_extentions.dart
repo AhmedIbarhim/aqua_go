@@ -3,16 +3,34 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../config/controllers/language_controller/language_cubit.dart';
 import '../config/controllers/theme_controller/theme_cubit.dart';
+import '../themes/app_colors_extension.dart';
+
+// Locale Extension
 
 extension LocaleExtentions on BuildContext {
   bool get isEn => read<LanguageCubit>().state.locale.languageCode == 'en';
   bool get isAr => read<LanguageCubit>().state.locale.languageCode == 'ar';
 }
 
+// -----------------------------------------------------------------------------
+// App Colors Extension
+// -----------------------------------------------------------------------------
+extension AppThemeExtension on BuildContext {
+  AppColors get colors => Theme.of(this).extension<AppColors>()!;
+}
+
+// -----------------------------------------------------------------------------
+// Theme Extension
+// -----------------------------------------------------------------------------
+
 extension ThemeExtentions on BuildContext {
   bool get isDarkTheme => read<ThemeCubit>().state.themeMode == ThemeMode.dark;
   bool get isLightTheme => !isDarkTheme;
 }
+
+// -----------------------------------------------------------------------------
+// Bottom Sheet Extension
+// -----------------------------------------------------------------------------
 
 extension BottomSheetExtension on BuildContext {
   void showCustomBottomSheet({required Widget child}) {
@@ -24,6 +42,10 @@ extension BottomSheetExtension on BuildContext {
     );
   }
 }
+
+// -----------------------------------------------------------------------------
+// Navigation Extension
+// -----------------------------------------------------------------------------
 
 extension NavigatorExtension on BuildContext {
   Future<T?> pushNamed<T extends Object?>(
@@ -64,6 +86,10 @@ extension NavigatorExtension on BuildContext {
     return Navigator.of(this).canPop();
   }
 }
+
+// -----------------------------------------------------------------------------
+// Responsive Extension
+// -----------------------------------------------------------------------------
 
 extension ResponsiveExtension on BuildContext {
   double get screenWidth => MediaQuery.sizeOf(this).width;

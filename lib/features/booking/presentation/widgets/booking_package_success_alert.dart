@@ -5,7 +5,6 @@ import 'package:svg_flutter/svg.dart';
 import '../../../../core/components/custom_alert_box.dart';
 import '../../../../core/components/custom_button.dart';
 import '../../../../core/extentions/context_extentions.dart';
-import '../../../../core/themes/app_colors_extension.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../../generated/locale_keys.g.dart';
