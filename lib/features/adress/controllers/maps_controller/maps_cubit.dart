@@ -12,9 +12,24 @@ part 'maps_state.dart';
 class MapsCubit extends Cubit<MapsState> {
   final MapsRepository mapsRepository;
 
-  MapsCubit({required this.mapsRepository}) : super(const MapsState());
+  MapsCubit({required this.mapsRepository}) : super(const MapsState()) {
+    _monitorLocationService();
+  }
 
   Timer? _debounce;
+  StreamSubscription<ServiceStatus>? _serviceStatusSubscription;
+
+  void _monitorLocationService() {
+    _serviceStatusSubscription =
+        Geolocator.getServiceStatusStream().listen((status) {
+      if (status == ServiceStatus.enabled) {
+        emit(state.copyWith(isLocationServiceEnabled: true));
+        determinePosition();
+      } else {
+        emit(state.copyWith(isLocationServiceEnabled: false));
+      }
+    });
+  }
 
   Future<void> determinePosition() async {
     emit(state.copyWith(isLoading: true));
@@ -25,13 +40,11 @@ class MapsCubit extends Cubit<MapsState> {
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       emit(
-        state.copyWith(
-          isLoading: false,
-          errorMessage: 'Location services are disabled.',
-        ),
+        state.copyWith(isLoading: false, isLocationServiceEnabled: false),
       );
       return;
     }
+    emit(state.copyWith(isLocationServiceEnabled: true));
 
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
@@ -159,9 +172,14 @@ class MapsCubit extends Cubit<MapsState> {
     emit(state.copyWith(placePredictions: [], showSearchResults: false));
   }
 
+  Future<void> openLocationSettings() async {
+    await Geolocator.openLocationSettings();
+  }
+
   @override
   Future<void> close() {
     _debounce?.cancel();
+    _serviceStatusSubscription?.cancel();
     return super.close();
   }
 }

@@ -1,5 +1,5 @@
 import 'package:aqua_go/core/components/custom_button.dart';
-import 'package:aqua_go/core/themes/app_colors_extension.dart';
+import 'package:aqua_go/core/themes/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 

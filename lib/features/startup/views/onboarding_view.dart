@@ -1,6 +1,6 @@
 import 'package:aqua_go/core/components/custom_button.dart';
 import 'package:aqua_go/core/route/routes.dart';
-import 'package:aqua_go/core/themes/app_colors_extension.dart';
+import 'package:aqua_go/core/themes/app_colors.dart';
 import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:dots_indicator/dots_indicator.dart';

@@ -11,7 +11,8 @@ class LocationSelectionCard extends StatelessWidget {
   final String subtitle;
   final String icon;
   final bool isSelected;
-  final VoidCallback onTap;
+  final bool isEnabled;
+  final VoidCallback? onTap;
   final VoidCallback? onEdit;
 
   const LocationSelectionCard({
@@ -20,14 +21,15 @@ class LocationSelectionCard extends StatelessWidget {
     required this.subtitle,
     required this.icon,
     this.isSelected = false,
-    required this.onTap,
+    this.isEnabled = true,
+    this.onTap,
     this.onEdit,
   });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onTap,
+      onTap: isEnabled ? onTap : null,
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.all(16),

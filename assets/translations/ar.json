@@ -217,7 +217,9 @@
         "save_address": "حفظ العنوان",
         "confirm_delete": "هل انت متأكد من حذف العنوان؟",
         "no_addresses": "لا توجد عناوين حالية",
-        "no_addresses_desc": "سيتم عرض العناوين الخاصة بك في هذه الصفحة"
+        "no_addresses_desc": "سيتم عرض العناوين الخاصة بك في هذه الصفحة",
+        "location_disabled_message": "يرجى تفعيل خدمات الموقع لتحديد موقعك.",
+        "go_to_settings": "الذهاب إلى الإعدادات"
     },
     "profile": {
         "male": "ذكر",

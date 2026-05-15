@@ -8,6 +8,7 @@ class MapsState extends Equatable {
   final String selectedAddressName;
   final List<PlacePredictionModel> placePredictions;
   final String? errorMessage;
+  final bool isLocationServiceEnabled;
 
   const MapsState({
     this.currentPosition,
@@ -17,6 +18,7 @@ class MapsState extends Equatable {
     this.selectedAddressName = '',
     this.placePredictions = const [],
     this.errorMessage,
+    this.isLocationServiceEnabled = true,
   });
 
   MapsState copyWith({
@@ -27,6 +29,7 @@ class MapsState extends Equatable {
     String? selectedAddressName,
     List<PlacePredictionModel>? placePredictions,
     String? errorMessage,
+    bool? isLocationServiceEnabled,
   }) {
     return MapsState(
       currentPosition: currentPosition ?? this.currentPosition,
@@ -36,6 +39,8 @@ class MapsState extends Equatable {
       selectedAddressName: selectedAddressName ?? this.selectedAddressName,
       placePredictions: placePredictions ?? this.placePredictions,
       errorMessage: errorMessage,
+      isLocationServiceEnabled:
+          isLocationServiceEnabled ?? this.isLocationServiceEnabled,
     );
   }
 
@@ -48,5 +53,6 @@ class MapsState extends Equatable {
     selectedAddressName,
     placePredictions,
     errorMessage,
+    isLocationServiceEnabled,
   ];
 }

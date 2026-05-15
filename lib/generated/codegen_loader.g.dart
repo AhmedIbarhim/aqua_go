@@ -233,7 +233,9 @@ class CodegenLoader extends AssetLoader{
     "save_address": "حفظ العنوان",
     "confirm_delete": "هل انت متأكد من حذف العنوان؟",
     "no_addresses": "لا توجد عناوين حالية",
-    "no_addresses_desc": "سيتم عرض العناوين الخاصة بك في هذه الصفحة"
+    "no_addresses_desc": "سيتم عرض العناوين الخاصة بك في هذه الصفحة",
+    "location_disabled_message": "يرجى تفعيل خدمات الموقع لتحديد موقعك.",
+    "go_to_settings": "الذهاب إلى الإعدادات"
   },
   "profile": {
     "male": "ذكر",
@@ -548,7 +550,9 @@ static const Map<String,dynamic> _en = {
     "save_address": "Save Address",
     "confirm_delete": "Are you sure you want to delete the address?",
     "no_addresses": "No Current Addresses",
-    "no_addresses_desc": "Your addresses will be displayed here"
+    "no_addresses_desc": "Your addresses will be displayed here",
+    "location_disabled_message": "Please enable location services to find your position.",
+    "go_to_settings": "Go To Settings"
   },
   "profile": {
     "male": "Male",

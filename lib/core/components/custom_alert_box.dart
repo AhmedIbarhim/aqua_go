@@ -1,5 +1,5 @@
 import 'dart:ui' as ui;
-import 'package:aqua_go/core/themes/app_colors_extension.dart';
+import 'package:aqua_go/core/themes/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
@@ -53,7 +53,7 @@ class CustomAlertBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
+    final width = context.screenWidth;
     return GestureDetector(
       onTap: () => Navigator.pop(context),
       child: Material(
@@ -186,11 +186,10 @@ class WarningBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
+    final width = context.screenWidth;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Warning Icon
         SvgPicture.asset(
           AppAssets.warningIcon,
           width: width * 0.28,
@@ -235,6 +234,83 @@ class WarningBox extends StatelessWidget {
                 borderColor: context.colors.borderSecondary,
                 textColor: context.colors.textPrimary,
                 onPressed: onSecondaryPressed ?? () => Navigator.pop(context),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class DialogBox extends StatelessWidget {
+  const DialogBox({
+    super.key,
+    required this.message,
+    required this.mainButtonText,
+    required this.onMainButtonPressed,
+    this.secondaryButtonText,
+    this.onSecondaryButtonPressed,
+  });
+
+  final String message;
+  final String mainButtonText;
+  final VoidCallback onMainButtonPressed;
+  final String? secondaryButtonText;
+  final VoidCallback? onSecondaryButtonPressed;
+
+  static Future<T?> show<T>({
+    required BuildContext context,
+    required String message,
+    required String mainButtonText,
+    required VoidCallback onMainButtonPressed,
+    String? secondaryButtonText,
+    VoidCallback? onSecondaryButtonPressed,
+  }) {
+    return CustomAlertBox.show<T>(
+      context: context,
+      child: DialogBox(
+        message: message,
+        mainButtonText: mainButtonText,
+        onMainButtonPressed: onMainButtonPressed,
+        secondaryButtonText: secondaryButtonText,
+        onSecondaryButtonPressed: onSecondaryButtonPressed,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final width = context.screenWidth;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          message,
+          textAlign: TextAlign.center,
+          style: AppTextStyles.regular16.copyWith(
+            color: context.colors.textSecondary,
+            height: 1.5,
+          ),
+        ),
+        SizedBox(height: width * 0.06),
+        Row(
+          children: [
+            Expanded(
+              child: CustomButton(
+                text: mainButtonText,
+                onPressed: onMainButtonPressed,
+              ),
+            ),
+            SizedBox(width: width * 0.02),
+            Expanded(
+              child: CustomButton(
+                text: secondaryButtonText ?? LocaleKeys.back.tr(),
+                color: context.colors.cardBackGround,
+                borderColor: context.colors.borderSecondary,
+                textColor: context.colors.textPrimary,
+                onPressed:
+                    onSecondaryButtonPressed ?? () => Navigator.pop(context),
               ),
             ),
           ],

@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:aqua_go/core/components/custom_loading_indicator.dart';
 import 'package:aqua_go/core/config/di/service_locator.dart';
-import 'package:aqua_go/core/themes/app_colors_extension.dart';
+import 'package:aqua_go/core/themes/app_colors.dart';
 import 'package:aqua_go/features/adress/controllers/maps_controller/maps_cubit.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';

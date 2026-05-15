@@ -10,6 +10,8 @@ import '../../../../core/components/generic_app_bar.dart';
 import '../../../../core/components/bottom_action_sheet_container.dart';
 import '../../../../generated/locale_keys.g.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/components/custom_alert_box.dart';
+import '../../../../core/components/custom_snack_bar.dart';
 import '../../../../core/config/di/service_locator.dart';
 import '../../../adress/controllers/addresses_controller/addresses_cubit.dart';
 import '../../../adress/controllers/maps_controller/maps_cubit.dart';
@@ -63,11 +65,29 @@ class _BookingLocationViewState extends State<BookingLocationView> {
           centerTitle: true,
         ),
         body: BlocListener<MapsCubit, MapsState>(
+          listenWhen: (prev, curr) =>
+              prev.isLocationServiceEnabled != curr.isLocationServiceEnabled ||
+              prev.errorMessage != curr.errorMessage ||
+              prev.isLoading != curr.isLoading,
           listener: (context, state) {
             if (state.isLoading) {
               context.showLoadingOverlay();
             } else {
               context.hideLoadingOverlay();
+            }
+
+            if (!state.isLocationServiceEnabled) {
+              DialogBox.show(
+                context: context,
+                message: LocaleKeys.address_location_disabled_message.tr(),
+                mainButtonText: LocaleKeys.address_go_to_settings.tr(),
+                onMainButtonPressed: () {
+                  Navigator.pop(context);
+                  _mapsCubit.openLocationSettings();
+                },
+              );
+            } else if (state.errorMessage != null) {
+              CustomSnackBar.showError(context, state.errorMessage!);
             }
           },
           child: Column(
@@ -97,7 +117,10 @@ class _BookingLocationViewState extends State<BookingLocationView> {
                               SizedBox(height: height * 0.01),
                               BlocBuilder<MapsCubit, MapsState>(
                                 builder: (context, state) {
+                                  final hasData =
+                                      state.selectedAddressName.isNotEmpty;
                                   return LocationSelectionCard(
+                                    isEnabled: hasData && !state.isLoading,
                                     icon: AppAssets.gps,
                                     title: LocaleKeys.address_current_location
                                         .tr(),
@@ -115,7 +138,7 @@ class _BookingLocationViewState extends State<BookingLocationView> {
                                   );
                                 },
                               ),
-                              SizedBox(height: height * 0.01),
+                              SizedBox(height: height * 0.02),
                               _buildAddressSelectOnMapCard(context, width),
                               SizedBox(height: height * 0.03),
                               Text(
@@ -162,6 +185,7 @@ class _BookingLocationViewState extends State<BookingLocationView> {
                                   return const SizedBox.shrink();
                                 },
                               ),
+                              SizedBox(height: height * 0.01),
                               CustomButton(
                                 color: context.colors.background,
                                 borderColor: context.colors.borderSecondary,
@@ -181,6 +205,7 @@ class _BookingLocationViewState extends State<BookingLocationView> {
                                   );
                                 },
                               ),
+                              const SizedBox(height: 30),
                             ],
                           ),
                         ),
@@ -231,14 +256,35 @@ class _BookingLocationViewState extends State<BookingLocationView> {
     );
   }
 
+  bool _isLocationValid(MapsState mapsState, AddressesState addressesState) {
+    if (selectedLocationIndex == 0) {
+      return mapsState.selectedAddressName.isNotEmpty;
+    } else {
+      if (addressesState is AddressesLoaded) {
+        return selectedLocationIndex <= addressesState.addresses.length;
+      }
+    }
+    return false;
+  }
+
   Widget _buildBottomActionSheet() {
-    return BottomActionSheetContainer(
-      child: CustomButton(
-        text: LocaleKeys.bookings_save_car_location.tr(),
-        onPressed: () {
-          context.pushNamed(Routes.bookingDetails);
-        },
-      ),
+    return BlocBuilder<MapsCubit, MapsState>(
+      builder: (context, mapsState) {
+        return BlocBuilder<AddressesCubit, AddressesState>(
+          builder: (context, addressesState) {
+            final isValid = _isLocationValid(mapsState, addressesState);
+            return BottomActionSheetContainer(
+              child: CustomButton(
+                enabled: isValid,
+                text: LocaleKeys.bookings_save_car_location.tr(),
+                onPressed: () {
+                  context.pushNamed(Routes.bookingDetails);
+                },
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

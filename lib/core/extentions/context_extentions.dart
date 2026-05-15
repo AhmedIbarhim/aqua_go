@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../components/custom_loading_indicator.dart';
 import '../config/controllers/language_controller/language_cubit.dart';
 import '../config/controllers/theme_controller/theme_cubit.dart';
-import '../themes/app_colors_extension.dart';
+import '../themes/app_colors.dart';
 
 // -----------------------------------------------------------------------------
 // Locale Extension
@@ -115,7 +115,7 @@ extension LoadingExtension on BuildContext {
       builder: (context) => BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
         child: Material(
-          color: context.colors.textPrimary.withAlpha(5),
+          color: context.colors.contentDisabled.withAlpha(10),
           child: const Center(child: CustomLoadingIndicator(size: 100)),
         ),
       ),
