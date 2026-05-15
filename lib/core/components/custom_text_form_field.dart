@@ -33,6 +33,7 @@ class CustomTextFormField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.sizeOf(context).height;
+    return SizedBox(
       height: minLines != null ? null : height * 0.055,
       child: TextFormField(
         controller: controller,
