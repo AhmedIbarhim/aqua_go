@@ -25,17 +25,23 @@ class BookingLocationView extends StatefulWidget {
 
 class _BookingLocationViewState extends State<BookingLocationView> {
   late final AddressesCubit _addressCubit;
+  late final MapsCubit _mapsCubit;
   int selectedLocationIndex = 0;
 
   @override
   void initState() {
     _addressCubit = locator<AddressesCubit>()..getAddresses();
+    _mapsCubit = locator<MapsCubit>();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _mapsCubit.determinePosition();
+    });
     super.initState();
   }
 
   @override
   void dispose() {
     _addressCubit.close();
+    _mapsCubit.close();
     super.dispose();
   }
 
@@ -45,9 +51,7 @@ class _BookingLocationViewState extends State<BookingLocationView> {
     final width = MediaQuery.sizeOf(context).width;
     return MultiBlocProvider(
       providers: [
-        BlocProvider(
-          create: (context) => locator<MapsCubit>()..determinePosition(),
-        ),
+        BlocProvider.value(value: _mapsCubit),
         BlocProvider.value(value: _addressCubit),
       ],
       child: Scaffold(
@@ -58,126 +62,136 @@ class _BookingLocationViewState extends State<BookingLocationView> {
           backgroundImage: AppAssets.bookingHeaderImage,
           centerTitle: true,
         ),
-        body: Column(
-          children: [
-            Expanded(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  return SingleChildScrollView(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minHeight: constraints.maxHeight,
-                      ),
-                      child: Container(
-                        padding: EdgeInsets.all(width * 0.06),
-                        decoration: BoxDecoration(
-                          color: context.colors.background,
+        body: BlocListener<MapsCubit, MapsState>(
+          listener: (context, state) {
+            if (state.isLoading) {
+              context.showLoadingOverlay();
+            } else {
+              context.hideLoadingOverlay();
+            }
+          },
+          child: Column(
+            children: [
+              Expanded(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: constraints.maxHeight,
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              LocaleKeys.address_map.tr(),
-                              style: AppTextStyles.regular16.copyWith(
-                                color: context.colors.textPrimary,
+                        child: Container(
+                          padding: EdgeInsets.all(width * 0.06),
+                          decoration: BoxDecoration(
+                            color: context.colors.background,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                LocaleKeys.address_map.tr(),
+                                style: AppTextStyles.regular16.copyWith(
+                                  color: context.colors.textPrimary,
+                                ),
                               ),
-                            ),
-                            SizedBox(height: height * 0.01),
-                            BlocBuilder<MapsCubit, MapsState>(
-                              builder: (context, state) {
-                                return LocationSelectionCard(
-                                  icon: AppAssets.gps,
-                                  title: LocaleKeys.address_current_location
-                                      .tr(),
-                                  subtitle: state.isLoading
-                                      ? '...'
-                                      : state.selectedAddressName.isEmpty
-                                      ? '__'
-                                      : state.selectedAddressName,
-                                  isSelected: selectedLocationIndex == 0,
-                                  onTap: () {
-                                    setState(() {
-                                      selectedLocationIndex = 0;
-                                    });
-                                  },
-                                );
-                              },
-                            ),
-                            SizedBox(height: height * 0.01),
-                            _buildAddressSelectOnMapCard(context, width),
-                            SizedBox(height: height * 0.03),
-                            Text(
-                              LocaleKeys.address_my_addresses.tr(),
-                              style: AppTextStyles.regular16.copyWith(
-                                color: context.colors.textPrimary,
-                              ),
-                            ),
-                            SizedBox(height: height * 0.01),
-                            BlocBuilder<AddressesCubit, AddressesState>(
-                              builder: (context, state) {
-                                if (state is AddressesLoaded) {
-                                  return ListView.builder(
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    shrinkWrap: true,
-                                    itemCount: state.addresses.length,
-                                    padding: EdgeInsets.zero,
-                                    itemBuilder: (context, index) {
-                                      final address = state.addresses[index];
-                                      return Padding(
-                                        padding: EdgeInsets.only(
-                                          bottom: height * 0.01,
-                                        ),
-                                        child: LocationSelectionCard(
-                                          icon: AppAssets.location,
-                                          title: address.name,
-                                          subtitle: address.formattedAddress,
-                                          isSelected:
-                                              selectedLocationIndex ==
-                                              index + 1,
-                                          onTap: () {
-                                            setState(() {
-                                              selectedLocationIndex = index + 1;
-                                            });
-                                          },
-                                          onEdit: () {},
-                                        ),
-                                      );
+                              SizedBox(height: height * 0.01),
+                              BlocBuilder<MapsCubit, MapsState>(
+                                builder: (context, state) {
+                                  return LocationSelectionCard(
+                                    icon: AppAssets.gps,
+                                    title: LocaleKeys.address_current_location
+                                        .tr(),
+                                    subtitle: state.isLoading
+                                        ? '...'
+                                        : state.selectedAddressName.isEmpty
+                                        ? '__'
+                                        : state.selectedAddressName,
+                                    isSelected: selectedLocationIndex == 0,
+                                    onTap: () {
+                                      setState(() {
+                                        selectedLocationIndex = 0;
+                                      });
                                     },
                                   );
-                                }
-                                return const SizedBox.shrink();
-                              },
-                            ),
-                            CustomButton(
-                              color: context.colors.background,
-                              borderColor: context.colors.borderSecondary,
-                              textColor: context.colors.primary,
-                              preWidget: Icon(
-                                Icons.add,
-                                color: context.colors.primary,
-                                size: width * 0.06,
+                                },
                               ),
-                              text: LocaleKeys.address_add_new_location.tr(),
-                              onPressed: () {
-                                context.pushNamed(
-                                  Routes.newAddressMap,
-                                  arguments: NewAddressMapArgs(
-                                    forAddingAddress: true,
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
+                              SizedBox(height: height * 0.01),
+                              _buildAddressSelectOnMapCard(context, width),
+                              SizedBox(height: height * 0.03),
+                              Text(
+                                LocaleKeys.address_my_addresses.tr(),
+                                style: AppTextStyles.regular16.copyWith(
+                                  color: context.colors.textPrimary,
+                                ),
+                              ),
+                              SizedBox(height: height * 0.01),
+                              BlocBuilder<AddressesCubit, AddressesState>(
+                                builder: (context, state) {
+                                  if (state is AddressesLoaded) {
+                                    return ListView.builder(
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      shrinkWrap: true,
+                                      itemCount: state.addresses.length,
+                                      padding: EdgeInsets.zero,
+                                      itemBuilder: (context, index) {
+                                        final address = state.addresses[index];
+                                        return Padding(
+                                          padding: EdgeInsets.only(
+                                            bottom: height * 0.01,
+                                          ),
+                                          child: LocationSelectionCard(
+                                            icon: AppAssets.location,
+                                            title: address.name,
+                                            subtitle: address.formattedAddress,
+                                            isSelected:
+                                                selectedLocationIndex ==
+                                                index + 1,
+                                            onTap: () {
+                                              setState(() {
+                                                selectedLocationIndex =
+                                                    index + 1;
+                                              });
+                                            },
+                                            onEdit: () {},
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  }
+                                  return const SizedBox.shrink();
+                                },
+                              ),
+                              CustomButton(
+                                color: context.colors.background,
+                                borderColor: context.colors.borderSecondary,
+                                textColor: context.colors.primary,
+                                preWidget: Icon(
+                                  Icons.add,
+                                  color: context.colors.primary,
+                                  size: width * 0.06,
+                                ),
+                                text: LocaleKeys.address_add_new_location.tr(),
+                                onPressed: () {
+                                  context.pushNamed(
+                                    Routes.newAddressMap,
+                                    arguments: NewAddressMapArgs(
+                                      forAddingAddress: true,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
-            ),
-            _buildBottomActionSheet(),
-          ],
+              _buildBottomActionSheet(),
+            ],
+          ),
         ),
       ),
     );

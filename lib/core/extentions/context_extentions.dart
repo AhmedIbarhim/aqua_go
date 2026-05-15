@@ -1,11 +1,15 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../components/custom_loading_indicator.dart';
 import '../config/controllers/language_controller/language_cubit.dart';
 import '../config/controllers/theme_controller/theme_cubit.dart';
 import '../themes/app_colors_extension.dart';
 
+// -----------------------------------------------------------------------------
 // Locale Extension
+// -----------------------------------------------------------------------------
 
 extension LocaleExtentions on BuildContext {
   bool get isEn => read<LanguageCubit>().state.locale.languageCode == 'en';
@@ -96,4 +100,31 @@ extension ResponsiveExtension on BuildContext {
   double get screenHeight => MediaQuery.sizeOf(this).height;
   bool get isTablet => screenWidth >= 600;
   bool get isMobile => screenWidth < 600;
+}
+
+// -----------------------------------------------------------------------------
+// Loading Extension
+// -----------------------------------------------------------------------------
+
+OverlayEntry? _loadingOverlayEntry;
+
+extension LoadingExtension on BuildContext {
+  void showLoadingOverlay() {
+    if (_loadingOverlayEntry != null) return;
+    _loadingOverlayEntry = OverlayEntry(
+      builder: (context) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+        child: Material(
+          color: context.colors.textPrimary.withAlpha(5),
+          child: const Center(child: CustomLoadingIndicator(size: 100)),
+        ),
+      ),
+    );
+    Overlay.of(this).insert(_loadingOverlayEntry!);
+  }
+
+  void hideLoadingOverlay() {
+    _loadingOverlayEntry?.remove();
+    _loadingOverlayEntry = null;
+  }
 }

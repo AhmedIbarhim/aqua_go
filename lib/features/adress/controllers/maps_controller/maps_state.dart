@@ -11,7 +11,7 @@ class MapsState extends Equatable {
 
   const MapsState({
     this.currentPosition,
-    this.isLoading = true,
+    this.isLoading = false,
     this.markers = const {},
     this.showSearchResults = false,
     this.selectedAddressName = '',
