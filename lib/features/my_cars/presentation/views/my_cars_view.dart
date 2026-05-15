@@ -8,13 +8,32 @@ import '../widgets/my_cars_list_view.dart';
 import '../../data/models/my_car_model.dart';
 import '../../controllers/my_cars_cubit.dart';
 
-class MyCarsView extends StatelessWidget {
+class MyCarsView extends StatefulWidget {
   const MyCarsView({super.key});
+
+  @override
+  State<MyCarsView> createState() => _MyCarsViewState();
+}
+
+class _MyCarsViewState extends State<MyCarsView> {
+  final MyCarsCubit _myCarsCubit = locator<MyCarsCubit>();
+
+  @override
+  void initState() {
+    _myCarsCubit.getCars();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _myCarsCubit.close();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
-      value: locator<MyCarsCubit>()..getCars(),
+      value: _myCarsCubit,
       child: Container(
         height: double.infinity,
         width: double.infinity,

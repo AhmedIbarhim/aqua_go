@@ -66,7 +66,7 @@ class CustomTextField extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         SizedBox(
-          height: height * 0.055,
+          height: minLines != null ? null : height * 0.055,
           child: TextField(
             onTap: onTap,
             onTapOutside: (_) => FocusScope.of(context).unfocus(),
@@ -86,7 +86,6 @@ class CustomTextField extends StatelessWidget {
                   ]
                 : null,
             controller: controller,
-            textAlign: TextAlign.right,
             textAlignVertical: TextAlignVertical.center,
             keyboardType: keyboardType,
             style:
@@ -102,8 +101,8 @@ class CustomTextField extends StatelessWidget {
               filled: true,
               fillColor: fillColor ?? context.colors.background,
               contentPadding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 12,
+                horizontal: 8,
+                vertical: 8,
               ),
               prefixIcon: prefixIcon,
               suffixIcon: suffixIcon,

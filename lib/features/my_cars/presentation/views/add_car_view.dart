@@ -62,8 +62,8 @@ class _AddCarViewState extends State<AddCarView> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    return BlocProvider.value(
-      value: locator<MyCarsCubit>(),
+    return BlocProvider(
+      create: (context) => locator<MyCarsCubit>(),
       child: Builder(
         builder: (context) {
           return Scaffold(
@@ -192,9 +192,9 @@ class _AddCarViewState extends State<AddCarView> {
                   colorCode: _selectedColor!.toARGB32(),
                 );
                 if (widget.car == null) {
-                  locator<MyCarsCubit>().addCar(car);
+                  context.read<MyCarsCubit>().addCar(car);
                 } else {
-                  locator<MyCarsCubit>().updateCar(car);
+                  context.read<MyCarsCubit>().updateCar(car);
                 }
                 Navigator.pop(context);
               },

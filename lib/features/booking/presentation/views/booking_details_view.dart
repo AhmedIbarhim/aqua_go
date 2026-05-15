@@ -34,8 +34,8 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
     final height = MediaQuery.sizeOf(context).height;
-    return BlocProvider.value(
-      value: locator<MyCarsCubit>()..getCars(),
+    return BlocProvider(
+      create: (context) => locator<MyCarsCubit>()..getCars(),
       child: Builder(
         builder: (context) {
           return Scaffold(

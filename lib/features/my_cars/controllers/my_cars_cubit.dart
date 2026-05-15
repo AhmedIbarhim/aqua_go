@@ -1,36 +1,45 @@
+import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../data/models/my_car_model.dart';
+import '../data/repos/cars_repository.dart';
 
 part 'my_cars_state.dart';
 
 class MyCarsCubit extends Cubit<MyCarsState> {
-  // Singleton pattern
-  static final MyCarsCubit _instance = MyCarsCubit._internal();
-  factory MyCarsCubit() => _instance;
-  MyCarsCubit._internal() : super(MyCarsInitial());
+  final CarsRepository _carsRepository;
+  StreamSubscription? _subscription;
 
-  final List<MyCarModel> _cars = [];
+  MyCarsCubit({required CarsRepository carsRepository})
+    : _carsRepository = carsRepository,
+      super(MyCarsInitial()) {
+    // Listen to repository changes to keep state in sync
+    _subscription = _carsRepository.carsStream.listen((cars) {
+      if (!isClosed) {
+        emit(MyCarsLoaded(List.from(cars)));
+      }
+    });
+  }
 
   void getCars() {
-    emit(MyCarsLoaded(List.from(_cars)));
+    emit(MyCarsLoaded(List.from(_carsRepository.cars)));
   }
 
   void addCar(MyCarModel car) {
-    _cars.add(car);
-    emit(MyCarsLoaded(List.from(_cars)));
+    _carsRepository.addCar(car);
   }
 
   void deleteCar(String id) {
-    _cars.removeWhere((element) => element.id == id);
-    emit(MyCarsLoaded(List.from(_cars)));
+    _carsRepository.deleteCar(id);
   }
 
   void updateCar(MyCarModel updatedCar) {
-    final index = _cars.indexWhere((element) => element.id == updatedCar.id);
-    if (index != -1) {
-      _cars[index] = updatedCar;
-      emit(MyCarsLoaded(List.from(_cars)));
-    }
+    _carsRepository.updateCar(updatedCar);
+  }
+
+  @override
+  Future<void> close() {
+    _subscription?.cancel();
+    return super.close();
   }
 }

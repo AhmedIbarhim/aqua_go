@@ -18,8 +18,8 @@ class _SplashViewState extends State<SplashView> {
     Future.delayed(const Duration(seconds: 2), () {
       if (!mounted) return;
 
-      context.pushReplacementNamed(Routes.onboarding);
-      // context.pushReplacementNamed(Routes.layout);
+      // context.pushReplacementNamed(Routes.onboarding);
+      context.pushReplacementNamed(Routes.layout);
     });
   }
 

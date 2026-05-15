@@ -7,7 +7,7 @@ import '../services/location_service.dart';
 class MapsRepository {
   final LocationService locationService;
 
-  MapsRepository({required this.locationService});
+  const MapsRepository({required this.locationService});
 
   Future<Either<Failure, List<PlacePredictionModel>>> getAutocomplete(
     String query,

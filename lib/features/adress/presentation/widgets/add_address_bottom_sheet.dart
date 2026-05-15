@@ -11,6 +11,7 @@ import 'package:svg_flutter/svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../data/models/address_model.dart';
+import '../../../../core/config/di/service_locator.dart';
 import '../../controllers/addresses_controller/addresses_cubit.dart';
 
 class AddAddressBottomSheet extends StatefulWidget {
@@ -39,8 +40,8 @@ class AddAddressBottomSheet extends StatefulWidget {
       title: existingAddress == null
           ? LocaleKeys.address_add_new_location.tr()
           : LocaleKeys.address_edit_location.tr(),
-      child: BlocProvider.value(
-        value: AddressesCubit(),
+      child: BlocProvider(
+        create: (context) => locator<AddressesCubit>(),
         child: AddAddressBottomSheet(
           address: address,
           lat: lat,
