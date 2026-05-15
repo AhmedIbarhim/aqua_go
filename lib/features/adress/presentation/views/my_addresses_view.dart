@@ -12,6 +12,7 @@ import '../../../../core/components/bottom_action_sheet_container.dart';
 import 'new_address_map_view.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/config/di/service_locator.dart';
 import '../../controllers/addresses_controller/addresses_cubit.dart';
 
 class MyAddressesView extends StatelessWidget {
@@ -21,8 +22,8 @@ class MyAddressesView extends StatelessWidget {
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
 
-    return BlocProvider.value(
-      value: AddressesCubit()..getAddresses(),
+    return BlocProvider(
+      create: (context) => locator<AddressesCubit>()..getAddresses(),
       child: BlocBuilder<AddressesCubit, AddressesState>(
         builder: (context, state) {
           final List<AddressModel> myAddresses = state is AddressesLoaded

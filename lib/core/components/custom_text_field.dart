@@ -18,6 +18,8 @@ class CustomTextField extends StatelessWidget {
   final Widget? prefixIcon;
   final Widget? suffixIcon;
   final TextStyle? style;
+  final int? maxLines;
+  final int? minLines;
 
   const CustomTextField({
     super.key,
@@ -34,6 +36,8 @@ class CustomTextField extends StatelessWidget {
     this.prefixIcon,
     this.suffixIcon,
     this.style,
+    this.maxLines,
+    this.minLines,
   });
 
   @override
@@ -62,7 +66,7 @@ class CustomTextField extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         SizedBox(
-          height: height * 0.055,
+          height: minLines != null ? null : height * 0.055,
           child: TextField(
             onTap: onTap,
             onTapOutside: (_) => FocusScope.of(context).unfocus(),
@@ -82,7 +86,6 @@ class CustomTextField extends StatelessWidget {
                   ]
                 : null,
             controller: controller,
-            textAlign: TextAlign.right,
             textAlignVertical: TextAlignVertical.center,
             keyboardType: keyboardType,
             style:
@@ -97,7 +100,10 @@ class CustomTextField extends StatelessWidget {
               ),
               filled: true,
               fillColor: fillColor ?? context.colors.background,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 8,
+                vertical: 8,
+              ),
               prefixIcon: prefixIcon,
               suffixIcon: suffixIcon,
 

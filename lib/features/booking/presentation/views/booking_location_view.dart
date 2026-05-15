@@ -24,11 +24,19 @@ class BookingLocationView extends StatefulWidget {
 }
 
 class _BookingLocationViewState extends State<BookingLocationView> {
+  late final AddressesCubit _addressCubit;
   int selectedLocationIndex = 0;
 
   @override
   void initState() {
+    _addressCubit = locator<AddressesCubit>()..getAddresses();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _addressCubit.close();
+    super.dispose();
   }
 
   @override
@@ -40,7 +48,7 @@ class _BookingLocationViewState extends State<BookingLocationView> {
         BlocProvider(
           create: (context) => locator<MapsCubit>()..determinePosition(),
         ),
-        BlocProvider.value(value: AddressesCubit()..getAddresses()),
+        BlocProvider.value(value: _addressCubit),
       ],
       child: Scaffold(
         backgroundColor: context.colors.screenBG,
