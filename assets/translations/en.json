@@ -1,5 +1,6 @@
 {
     "skip": "skip",
+    "guest": "Guest",
     "next": "next",
     "cancel": "Cancel",
     "ok": "OK",

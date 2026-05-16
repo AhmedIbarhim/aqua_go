@@ -135,7 +135,11 @@ abstract class AppRouter {
         return MaterialPageRoute(builder: (_) => const SupportView());
 
       case Routes.profileData:
-        return MaterialPageRoute(builder: (_) => const ProfileDataView());
+        final isFirstTime = settings.arguments as bool? ?? false;
+        return MaterialPageRoute(
+          builder: (_) => ProfileDataView(isFirstTime: isFirstTime),
+        );
+
 
       case Routes.myAddresses:
         return MaterialPageRoute(builder: (_) => const MyAddressesView());

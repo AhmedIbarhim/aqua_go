@@ -4,6 +4,7 @@
 
 abstract class  LocaleKeys {
   static const skip = 'skip';
+  static const guest = 'guest';
   static const next = 'next';
   static const cancel = 'cancel';
   static const ok = 'ok';

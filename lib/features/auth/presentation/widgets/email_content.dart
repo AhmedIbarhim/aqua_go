@@ -104,7 +104,7 @@ class _EmailContentState extends State<EmailContent> {
                 },
                 text: LocaleKeys.auth_back_to_profile.tr(),
                 textColor: context.colors.primary,
-                color: Colors.transparent,
+                color: darkAppColors.themeColor,
                 enabled: true,
               ),
               SizedBox(height: height * 0.02),

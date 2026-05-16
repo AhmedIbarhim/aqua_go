@@ -16,6 +16,7 @@ class CodegenLoader extends AssetLoader{
 
   static const Map<String,dynamic> _ar = {
   "skip": "تخطي",
+  "guest": "زائر",
   "next": "التالي",
   "cancel": "الغاء",
   "ok": "حسنا",
@@ -333,6 +334,7 @@ class CodegenLoader extends AssetLoader{
 };
 static const Map<String,dynamic> _en = {
   "skip": "skip",
+  "guest": "Guest",
   "next": "next",
   "cancel": "Cancel",
   "ok": "OK",

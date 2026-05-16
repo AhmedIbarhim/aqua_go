@@ -5,6 +5,7 @@ import 'package:svg_flutter/svg.dart';
 
 import '../../../../core/components/rating_widget.dart';
 import '../../../../core/extentions/context_extentions.dart';
+import '../../../../core/helpers/fetch_user_data_helper.dart';
 import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
@@ -45,7 +46,7 @@ class ProfileView extends StatelessWidget {
           SizedBox(height: sh(16)),
           // Name
           Text(
-            'فيصل محمد',
+            FetchUserData.getUserName(),
             style: AppTextStyles.bold23.copyWith(
               color: context.colors.textPrimary,
             ),
@@ -53,7 +54,7 @@ class ProfileView extends StatelessWidget {
           SizedBox(height: sh(8)),
           // Phone
           Text(
-            '+966 123333478',
+            FetchUserData.getPhone(),
             style: AppTextStyles.regular14.copyWith(
               color: context.colors.textSecondary,
             ),
@@ -81,15 +82,19 @@ class ProfileView extends StatelessWidget {
                 ),
                 SizedBox(height: sh(8)),
                 ProfileTile(
-                  title: LocaleKeys.profile_add_email.tr(),
+                  title: FetchUserData.getEmail() ?? LocaleKeys.profile_add_email.tr(),
                   icon: AppAssets.mail,
-                  onTap: () {
-                    context.pushNamed(Routes.addEmail);
-                  },
+                  isVerified: FetchUserData.getEmail() != null,
+                  onTap: FetchUserData.getEmail() == null
+                      ? () {
+                          context.pushNamed(Routes.addEmail);
+                        }
+                      : null,
                 ),
+
                 SizedBox(height: sh(8)),
                 ProfileTile(
-                  title: '+966 123445598',
+                  title: FetchUserData.getPhone(),
                   icon: AppAssets.phone,
                   isVerified: true,
                 ),
@@ -198,7 +203,7 @@ class ProfileView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'فيصل محمد',
+                    FetchUserData.getUserName(),
                     style: AppTextStyles.regular14.copyWith(
                       color: context.colors.textPrimary,
                     ),

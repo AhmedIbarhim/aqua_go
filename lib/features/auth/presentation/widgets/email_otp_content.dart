@@ -2,12 +2,13 @@ import 'dart:async';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/components/custom_button.dart';
 import '../../../../core/components/custom_otp_field.dart';
 import '../../../../core/extentions/context_extentions.dart';
-import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_colors.dart';
 import '../../../../core/themes/app_text_styles.dart';
+import '../../controllers/auth_cubit/auth_cubit.dart';
 
 class EmailOtpContent extends StatefulWidget {
   const EmailOtpContent({super.key, required this.email});
@@ -123,15 +124,16 @@ class _EmailOtpContentState extends State<EmailOtpContent> {
               text: LocaleKeys.auth_verify.tr(),
               onPressed: _isOtpComplete
                   ? () {
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        Routes.layout,
-                        (route) => false,
+                      final otp = _controllers.map((c) => c.text).join();
+                      context.read<AuthCubit>().verifyEmailOtp(
+                        widget.email,
+                        otp,
                       );
                     }
                   : null,
               enabled: _isOtpComplete,
             ),
+
             SizedBox(height: height * 0.025),
             Center(
               child: _start == 0

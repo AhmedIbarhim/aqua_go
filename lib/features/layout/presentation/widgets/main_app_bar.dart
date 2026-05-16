@@ -1,3 +1,5 @@
+import 'package:aqua_go/core/config/networking/endpoints.dart';
+import 'package:aqua_go/core/helpers/fetch_user_data_helper.dart';
 import 'package:aqua_go/core/components/custom_network_image.dart';
 import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
@@ -16,6 +18,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
     final size = MediaQuery.sizeOf(context);
     final double screenWidth = size.width;
     final double screenHeight = size.height;
+    final userName = FetchUserData.getUserName();
 
     // Scaling helpers
     double sw(double width) => (width / 414) * screenWidth;
@@ -31,17 +34,15 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
             Row(
               children: [
                 Container(
-                  width: sw(40),
-                  height: sw(40),
+                  width: context.isMobile ? sw(40) : sw(30),
+                  height: context.isMobile ? sw(40) : sw(30),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(color: context.colors.primary, width: 1),
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(sw(40)),
-                    child: CustomNetworkImage(
-                      'https://ui-avatars.com/api/?name=Mohamed+Faisal&background=00D5DD&color=fff',
-                    ),
+                    child: CustomNetworkImage(Endpoints.nameAvatar(userName)),
                   ),
                 ),
                 SizedBox(width: sw(8)),
@@ -50,7 +51,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      '${LocaleKeys.layout_welcome.tr()} محمد فيصل,',
+                      '${LocaleKeys.layout_welcome.tr()} $userName,',
                       style: AppTextStyles.regular12.copyWith(
                         color: context.colors.textSecondary,
                       ),

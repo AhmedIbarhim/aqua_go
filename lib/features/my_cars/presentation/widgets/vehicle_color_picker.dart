@@ -38,115 +38,120 @@ class VehicleColorPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text(
-              LocaleKeys.my_cars_color.tr(),
-              style: AppTextStyles.medium14.copyWith(
-                color: context.colors.textPrimary,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Column(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double itemSize = (constraints.maxWidth - (7 * 8)) / 8;
+        return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 8,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
-              ),
-              itemCount: carColors.length,
-              itemBuilder: (context, index) {
-                final color = carColors[index];
-                final isSelected = selectedColor == color;
-                return GestureDetector(
-                  onTap: () => onColorChanged(color),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: color,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: isSelected
-                            ? context.colors.primary
-                            : (color == Colors.white
-                                  ? Colors.grey.shade300
-                                  : Colors.transparent),
-                        width: isSelected ? 2 : 0.5,
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 8),
             Row(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                GestureDetector(
-                  onTap: () {
-                    CustomColorPicker.show(
-                      context,
-                      initialColor: selectedColor ?? Colors.red,
-                      onColorChanged: onColorChanged,
-                      onSave: () => Navigator.pop(context),
-                      onCancel: () => Navigator.pop(context),
-                    );
-                  },
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: SweepGradient(
-                        colors: [
-                          Colors.orange,
-                          Colors.yellow,
-                          Colors.green,
-                          Colors.blue,
-                          Colors.indigo,
-                          Colors.purple,
-                          Colors.red,
-                        ],
-                      ),
-                    ),
-                    child: Center(
-                      child: Image.asset(
-                        AppAssets.colorDropper,
-                        height: 25,
-                        width: 25,
-                      ),
-                    ),
+                Text(
+                  LocaleKeys.my_cars_color.tr(),
+                  style: AppTextStyles.medium14.copyWith(
+                    color: context.colors.textPrimary,
                   ),
                 ),
-                if (selectedColor != null &&
-                    !carColors.contains(selectedColor)) ...[
-                  const SizedBox(width: 8),
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: selectedColor,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: context.colors.primary,
-                        width: 2,
+              ],
+            ),
+            const SizedBox(height: 8),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 8,
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
+                  ),
+                  itemCount: carColors.length,
+                  itemBuilder: (context, index) {
+                    final color = carColors[index];
+                    final isSelected = selectedColor == color;
+                    return GestureDetector(
+                      onTap: () => onColorChanged(color),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: color,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: isSelected
+                                ? context.colors.primary
+                                : (color == Colors.white
+                                      ? Colors.grey.shade300
+                                      : Colors.transparent),
+                            width: isSelected ? 2 : 0.5,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        CustomColorPicker.show(
+                          context,
+                          initialColor: selectedColor ?? Colors.red,
+                          onColorChanged: onColorChanged,
+                          onSave: () => Navigator.pop(context),
+                          onCancel: () => Navigator.pop(context),
+                        );
+                      },
+                      child: Container(
+                        width: itemSize,
+                        height: itemSize,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(30),
+                          gradient: const SweepGradient(
+                            colors: [
+                              Colors.orange,
+                              Colors.yellow,
+                              Colors.green,
+                              Colors.blue,
+                              Colors.indigo,
+                              Colors.purple,
+                              Colors.red,
+                            ],
+                          ),
+                        ),
+                        child: Center(
+                          child: Image.asset(
+                            AppAssets.colorDropper,
+                            height: itemSize * 0.6,
+                            width: itemSize * 0.6,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                    if (selectedColor != null &&
+                        !carColors.contains(selectedColor)) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        width: itemSize,
+                        height: itemSize,
+                        decoration: BoxDecoration(
+                          color: selectedColor,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: context.colors.primary,
+                            width: 2,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
               ],
             ),
           ],
-        ),
-      ],
+        );
+      },
     );
   }
 }

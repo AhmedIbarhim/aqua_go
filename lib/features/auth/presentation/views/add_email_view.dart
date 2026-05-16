@@ -21,7 +21,7 @@ class AddEmailView extends StatelessWidget {
                 top: 0,
                 left: 0,
                 right: 0,
-                height: height * 0.63,
+                height: height * 0.65,
                 child: Image.asset(AppAssets.authBackImage, fit: BoxFit.fill),
               ),
               Column(

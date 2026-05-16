@@ -10,24 +10,47 @@ import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
 
 import '../../../../core/enums/gender_enum.dart';
+import '../../../../core/route/routes.dart';
 import '../widgets/gender_selection_widget.dart';
 
+import 'package:aqua_go/features/auth/data/repos/auth_repo.dart';
+import 'package:aqua_go/core/config/di/service_locator.dart';
+
 class ProfileDataView extends StatefulWidget {
-  const ProfileDataView({super.key});
+  final bool isFirstTime;
+  const ProfileDataView({super.key, this.isFirstTime = false});
 
   @override
   State<ProfileDataView> createState() => _ProfileDataViewState();
 }
 
 class _ProfileDataViewState extends State<ProfileDataView> {
-  bool isEditing = false;
-  final TextEditingController _nameController = TextEditingController(
-    text: 'فيصل محمد',
-  );
-  final TextEditingController _dobController = TextEditingController(
-    text: '1/1/1990',
-  );
-  GenderEnum _gender = GenderEnum.male;
+  late bool isEditing;
+  late final TextEditingController _nameController;
+  late final TextEditingController _dobController;
+  Gender _gender = Gender.male;
+  DateTime? _birthDate;
+
+  @override
+  void initState() {
+    super.initState();
+    isEditing = widget.isFirstTime;
+    final user = locator<AuthRepo>().getUser();
+    _nameController = TextEditingController(
+      text: widget.isFirstTime ? '' : user?.name ?? '',
+    );
+    _birthDate = user?.birthdate;
+    _dobController = TextEditingController(
+      text: widget.isFirstTime
+          ? ''
+          : (user?.birthdate != null
+                ? '${user!.birthdate!.day}/${user.birthdate!.month}/${user.birthdate!.year}'
+                : ''),
+    );
+    if (!widget.isFirstTime && user?.gender != null) {
+      _gender = GenderEnumExtension.fromString(user?.gender);
+    }
+  }
 
   @override
   void dispose() {
@@ -133,6 +156,7 @@ class _ProfileDataViewState extends State<ProfileDataView> {
     );
     if (picked != null) {
       setState(() {
+        _birthDate = picked;
         _dobController.text = "${picked.day}/${picked.month}/${picked.year}";
       });
     }
@@ -156,14 +180,47 @@ class _ProfileDataViewState extends State<ProfileDataView> {
           ),
         ],
       ),
-      child: isEditing
+      child: widget.isFirstTime
+          ? CustomButton(
+              text: LocaleKeys.proceed.tr(),
+              onPressed: () async {
+                final user = locator<AuthRepo>().getUser();
+                if (user != null) {
+                  final updatedUser = user.copyWith(
+                    name: _nameController.text,
+                    gender: _gender.name,
+                    birthdate: _birthDate,
+                  );
+                  await locator<AuthRepo>().saveUser(updatedUser);
+                }
+                if (mounted) {
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    Routes.layout,
+                    (route) => false,
+                  );
+                }
+              },
+            )
+          : isEditing
           ? Row(
               children: [
                 Expanded(
                   flex: 2,
                   child: CustomButton(
                     text: LocaleKeys.profile_save_changes.tr(),
-                    onPressed: () => setState(() => isEditing = false),
+                    onPressed: () async {
+                      final user = locator<AuthRepo>().getUser();
+                      if (user != null) {
+                        final updatedUser = user.copyWith(
+                          name: _nameController.text,
+                          gender: _gender.name,
+                          birthdate: _birthDate,
+                        );
+                        await locator<AuthRepo>().saveUser(updatedUser);
+                      }
+                      setState(() => isEditing = false);
+                    },
                   ),
                 ),
                 const SizedBox(width: 8),

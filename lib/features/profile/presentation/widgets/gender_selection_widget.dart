@@ -8,9 +8,9 @@ import '../../../../generated/locale_keys.g.dart';
 import 'gender_card.dart';
 
 class GenderSelectionWidget extends StatelessWidget {
-  final GenderEnum selectedGender;
+  final Gender selectedGender;
   final bool isEditing;
-  final ValueChanged<GenderEnum> onChanged;
+  final ValueChanged<Gender> onChanged;
 
   const GenderSelectionWidget({
     super.key,
@@ -44,28 +44,28 @@ class GenderSelectionWidget extends StatelessWidget {
             Expanded(
               child: GenderCard(
                 label: context.isEn
-                    ? GenderEnum.male.nameEn()
-                    : GenderEnum.male.nameAr(),
+                    ? Gender.male.nameEn()
+                    : Gender.male.nameAr(),
                 icon: AppAssets.male,
-                isSelected: selectedGender == GenderEnum.male,
+                isSelected: selectedGender == Gender.male,
                 isEditing: isEditing,
                 height: cardHeight,
                 iconSize: iconSize,
-                onTap: isEditing ? () => onChanged(GenderEnum.male) : null,
+                onTap: isEditing ? () => onChanged(Gender.male) : null,
               ),
             ),
             SizedBox(width: spacing),
             Expanded(
               child: GenderCard(
                 label: context.isEn
-                    ? GenderEnum.female.nameEn()
-                    : GenderEnum.female.nameAr(),
+                    ? Gender.female.nameEn()
+                    : Gender.female.nameAr(),
                 icon: AppAssets.female,
-                isSelected: selectedGender == GenderEnum.female,
+                isSelected: selectedGender == Gender.female,
                 isEditing: isEditing,
                 height: cardHeight,
                 iconSize: iconSize,
-                onTap: isEditing ? () => onChanged(GenderEnum.female) : null,
+                onTap: isEditing ? () => onChanged(Gender.female) : null,
               ),
             ),
           ],
