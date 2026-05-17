@@ -93,13 +93,17 @@ class BookingSummaryCard extends StatelessWidget {
           ],
         ),
         const Spacer(),
-        Text(
-          value,
-          style: AppTextStyles.regular12.copyWith(
-            color: context.colors.contentSecondaryLight,
+        SizedBox(
+          width: context.screenWidth * 0.45,
+          child: Text(
+            value,
+            style: AppTextStyles.regular12.copyWith(
+              color: context.colors.contentSecondaryLight,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.end,
           ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
         ),
       ],
     );

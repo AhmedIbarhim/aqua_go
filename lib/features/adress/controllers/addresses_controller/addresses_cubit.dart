@@ -11,9 +11,8 @@ class AddressesCubit extends Cubit<AddressesState> {
   StreamSubscription? _subscription;
 
   AddressesCubit({required AddressesRepository repository})
-      : _repository = repository,
-        super(AddressesInitial()) {
-    // Listen to repository changes to keep state in sync
+    : _repository = repository,
+      super(AddressesInitial()) {
     _subscription = _repository.addressesStream.listen((addresses) {
       if (!isClosed) {
         emit(AddressesLoaded(addresses));

@@ -13,7 +13,6 @@ class MyCarsCubit extends Cubit<MyCarsState> {
   MyCarsCubit({required CarsRepository carsRepository})
     : _carsRepository = carsRepository,
       super(MyCarsInitial()) {
-    // Listen to repository changes to keep state in sync
     _subscription = _carsRepository.carsStream.listen((cars) {
       if (!isClosed) {
         emit(MyCarsLoaded(List.from(cars)));

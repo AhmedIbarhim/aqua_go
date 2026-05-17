@@ -7,6 +7,8 @@ import 'package:aqua_go/features/auth/data/repos/auth_repo.dart';
 import 'package:aqua_go/features/auth/data/services/auth_service.dart';
 import 'package:aqua_go/features/my_cars/data/repos/cars_repository.dart';
 import 'package:aqua_go/features/my_cars/controllers/my_cars_cubit.dart';
+import 'package:aqua_go/features/booking/data/repos/booking_repo.dart';
+import 'package:aqua_go/features/booking/presentation/controllers/booking_cubit.dart';
 import 'package:get_it/get_it.dart';
 
 import '../../../features/adress/data/services/location_service.dart';
@@ -37,6 +39,10 @@ Future<void> initServiceLocator() async {
 
   locator.registerLazySingleton<AuthRepo>(() => AuthRepo(locator()));
 
+  locator.registerLazySingleton<BookingRepo>(
+    () => BookingRepo(apiClient: locator()),
+  );
+
   // Cubits
 
   locator.registerFactory<MapsCubit>(
@@ -52,4 +58,8 @@ Future<void> initServiceLocator() async {
   );
 
   locator.registerFactory<AuthCubit>(() => AuthCubit(locator()));
+
+  locator.registerFactory<BookingCubit>(
+    () => BookingCubit(bookingRepo: locator()),
+  );
 }

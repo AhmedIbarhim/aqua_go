@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../features/booking/presentation/controllers/booking_cubit.dart';
+import '../../../../core/config/di/service_locator.dart';
 import '../../features/adress/presentation/views/my_addresses_view.dart';
 import '../../features/adress/presentation/views/new_address_map_view.dart';
 import '../../features/auth/presentation/views/add_email_view.dart';
@@ -85,13 +88,30 @@ abstract class AppRouter {
         return MaterialPageRoute(builder: (_) => AddCarView(car: car));
 
       case Routes.bookingDetails:
-        return MaterialPageRoute(builder: (_) => const BookingDetailsView());
+        final args = settings.arguments as BookingFlowArgs;
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider.value(
+            value: args.bookingCubit,
+            child: const BookingDetailsView(),
+          ),
+        );
 
       case Routes.bookingLocation:
-        return MaterialPageRoute(builder: (_) => const BookingLocationView());
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => locator<BookingCubit>(),
+            child: const BookingLocationView(),
+          ),
+        );
 
       case Routes.bookingSummary:
-        return MaterialPageRoute(builder: (_) => const BookingSummaryView());
+        final args = settings.arguments as BookingFlowArgs;
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider.value(
+            value: args.bookingCubit,
+            child: const BookingSummaryView(),
+          ),
+        );
 
       case Routes.newAddressMap:
         final args = settings.arguments as NewAddressMapArgs;
@@ -119,8 +139,6 @@ abstract class AppRouter {
           builder: (_) =>
               GalleryView(images: args.images, initialIndex: args.initialIndex),
         );
-      // case Routes.language:
-      //   return MaterialPageRoute(builder: (_) => const LanguageView());
 
       case Routes.privacyPolicy:
         return MaterialPageRoute(builder: (_) => const PrivacyPolicyView());
@@ -140,7 +158,6 @@ abstract class AppRouter {
           builder: (_) => ProfileDataView(isFirstTime: isFirstTime),
         );
 
-
       case Routes.myAddresses:
         return MaterialPageRoute(builder: (_) => const MyAddressesView());
 
@@ -148,4 +165,9 @@ abstract class AppRouter {
         return MaterialPageRoute(builder: (_) => const Placeholder());
     }
   }
+}
+
+class BookingFlowArgs {
+  final BookingCubit bookingCubit;
+  BookingFlowArgs({required this.bookingCubit});
 }

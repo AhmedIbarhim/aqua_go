@@ -9,15 +9,11 @@ class BookingRepo {
   BookingRepo({required this.apiClient});
 
   Future<Either<Failure, void>> createBooking() async {
-    // try {
-
-    // } catch (error) {
-    //   if (error is DioException) {
-    //     return left(ServerFailure.fromDioExeption(error));
-    //   }
-    //   return left(ServerFailure(error.toString()));
-    // }
-
-    throw UnimplementedError();
+    try {
+      await Future.delayed(const Duration(seconds: 2));
+      return right(null);
+    } catch (error) {
+      return left(ServerFailure(error.toString()));
+    }
   }
 }

@@ -17,6 +17,9 @@ import '../../../adress/controllers/addresses_controller/addresses_cubit.dart';
 import '../../../adress/controllers/maps_controller/maps_cubit.dart';
 import '../widgets/location_selection_card.dart';
 import '../../../adress/presentation/views/new_address_map_view.dart';
+import '../../../adress/data/models/address_model.dart';
+import '../../presentation/controllers/booking_cubit.dart';
+import '../../../../core/route/app_router.dart';
 
 class BookingLocationView extends StatefulWidget {
   const BookingLocationView({super.key});
@@ -278,7 +281,29 @@ class _BookingLocationViewState extends State<BookingLocationView> {
                 enabled: isValid,
                 text: LocaleKeys.bookings_save_car_location.tr(),
                 onPressed: () {
-                  context.pushNamed(Routes.bookingDetails);
+                  AddressModel? address;
+                  if (selectedLocationIndex == 0) {
+                    address = AddressModel(
+                      id: 'current_gps',
+                      name: LocaleKeys.address_current_location.tr(),
+                      formattedAddress: mapsState.selectedAddressName,
+                      lat: mapsState.currentPosition?.latitude ?? 0.0,
+                      lng: mapsState.currentPosition?.longitude ?? 0.0,
+                    );
+                  } else if (addressesState is AddressesLoaded) {
+                    address = addressesState.addresses[selectedLocationIndex - 1];
+                  }
+
+                  if (address != null) {
+                    context.read<BookingCubit>().selectAddress(address);
+                  }
+
+                  context.pushNamed(
+                    Routes.bookingDetails,
+                    arguments: BookingFlowArgs(
+                      bookingCubit: context.read<BookingCubit>(),
+                    ),
+                  );
                 },
               ),
             );

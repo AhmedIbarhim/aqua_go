@@ -16,28 +16,25 @@ import '../../../../generated/locale_keys.g.dart';
 import '../widgets/car_selection_list.dart';
 import '../widgets/additional_services_grid.dart';
 import '../widgets/date_time_picker.dart';
+import '../controllers/booking_cubit.dart';
+import '../controllers/booking_state.dart';
+import '../../../../core/route/app_router.dart';
 
-class BookingDetailsView extends StatefulWidget {
+class BookingDetailsView extends StatelessWidget {
   const BookingDetailsView({super.key});
-
-  @override
-  State<BookingDetailsView> createState() => _BookingDetailsViewState();
-}
-
-class _BookingDetailsViewState extends State<BookingDetailsView> {
-  int? selectedCarIndex;
-  final Set<int> selectedServiceIndices = {};
-  DateTime? selectedDate;
-  String? selectedTime;
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
     final height = MediaQuery.sizeOf(context).height;
-    return BlocProvider(
-      create: (context) => locator<MyCarsCubit>()..getCars(),
-      child: Builder(
-        builder: (context) {
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => locator<MyCarsCubit>()..getCars(),
+        ),
+      ],
+      child: BlocBuilder<BookingCubit, BookingState>(
+        builder: (context, bookingState) {
           return Scaffold(
             backgroundColor: context.colors.screenBG,
             appBar: GenericAppBar(
@@ -50,10 +47,10 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
               children: [
                 Expanded(
                   child: SingleChildScrollView(
-                    child: _buildContent(context, width, height),
+                    child: _buildContent(context, bookingState, width, height),
                   ),
                 ),
-                _buildBottomActionSheet(context, width, height),
+                _buildBottomActionSheet(context, bookingState, width, height),
               ],
             ),
           );
@@ -62,7 +59,12 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
     );
   }
 
-  Widget _buildContent(BuildContext context, double width, double height) {
+  Widget _buildContent(
+    BuildContext context,
+    BookingState bookingState,
+    double width,
+    double height,
+  ) {
     return Container(
       padding: EdgeInsets.all(width * 0.06),
       decoration: BoxDecoration(color: context.colors.themeColor),
@@ -75,15 +77,19 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
           ),
           SizedBox(height: height * 0.02),
           BlocBuilder<MyCarsCubit, MyCarsState>(
-            builder: (context, state) {
-              final cars = state is MyCarsLoaded ? state.cars : <MyCarModel>[];
+            builder: (context, myCarsState) {
+              final cars = myCarsState is MyCarsLoaded ? myCarsState.cars : <MyCarModel>[];
+              int? selectedCarIndex;
+              if (bookingState.selectedCar != null) {
+                selectedCarIndex = cars.indexWhere((c) => c.id == bookingState.selectedCar!.id);
+                if (selectedCarIndex == -1) selectedCarIndex = null;
+              }
+
               return CarSelectionList(
                 cars: cars,
                 selectedCarIndex: selectedCarIndex,
                 onCarSelected: (index) {
-                  setState(() {
-                    selectedCarIndex = index;
-                  });
+                  context.read<BookingCubit>().selectCar(cars[index]);
                 },
                 onAddCar: () {
                   context.pushNamed(Routes.addVehicle);
@@ -95,30 +101,20 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
           _buildSectionTitle(LocaleKeys.bookings_additional_services.tr()),
           SizedBox(height: height * 0.02),
           AdditionalServicesGrid(
-            selectedIndices: selectedServiceIndices,
+            selectedIndices: bookingState.selectedServiceIndices,
             onServiceToggled: (index) {
-              setState(() {
-                if (selectedServiceIndices.contains(index)) {
-                  selectedServiceIndices.remove(index);
-                } else {
-                  selectedServiceIndices.add(index);
-                }
-              });
+              context.read<BookingCubit>().toggleService(index);
             },
           ),
           SizedBox(height: height * 0.02),
           BookingDateTimePicker(
-            initialDate: selectedDate ?? DateTime.now(),
-            initialTime: selectedTime,
+            initialDate: bookingState.selectedDate ?? DateTime.now(),
+            initialTime: bookingState.selectedTime,
             onDateChanged: (date) {
-              setState(() {
-                selectedDate = date;
-              });
+              context.read<BookingCubit>().updateDateTime(date, bookingState.selectedTime);
             },
             onTimeChanged: (time) {
-              setState(() {
-                selectedTime = time;
-              });
+              context.read<BookingCubit>().updateDateTime(bookingState.selectedDate, time);
             },
           ),
           SizedBox(height: height * 0.04),
@@ -140,9 +136,14 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
 
   Widget _buildBottomActionSheet(
     BuildContext context,
+    BookingState bookingState,
     double width,
     double height,
   ) {
+    final isComplete = bookingState.selectedCar != null &&
+        bookingState.selectedDate != null &&
+        bookingState.selectedTime != null;
+
     return BottomActionSheetContainer(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -170,9 +171,17 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
           ),
           CustomButton(
             text: LocaleKeys.bookings_book_now.tr(),
-            onPressed: () {
-              context.pushNamed(Routes.bookingSummary);
-            },
+            enabled: isComplete,
+            onPressed: isComplete
+                ? () {
+                    context.pushNamed(
+                      Routes.bookingSummary,
+                      arguments: BookingFlowArgs(
+                        bookingCubit: context.read<BookingCubit>(),
+                      ),
+                    );
+                  }
+                : null,
           ),
         ],
       ),

@@ -9,6 +9,8 @@ import 'package:dio/dio.dart';
 class AuthRepo {
   final AuthService _authService;
 
+  UserModel? _cachedUser;
+
   AuthRepo(this._authService);
 
   Future<Either<Failure, void>> login(String phone) async {
@@ -67,7 +69,6 @@ class AuthRepo {
     }
   }
 
-  UserModel? _cachedUser;
   Future<void> saveUser(UserModel user) async {
     _cachedUser = user;
     await SharedPrefs.setString(kUserData, user.toJson());
