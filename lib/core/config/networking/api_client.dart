@@ -28,7 +28,7 @@ class APIClient {
         responseType: ResponseType.json,
       ),
     );
-    
+
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
@@ -38,22 +38,22 @@ class APIClient {
           }
           return handler.next(options);
         },
-        onError: (err, handler) async {
-          if (err.response?.statusCode == 401) {
-            // Delete security credentials locally
-            await SecureStorage.delete(kAccessToken);
-            await SecureStorage.delete(kRefreshToken);
-            await SharedPrefs.removeString(kUserData);
+        // onError: (err, handler) async {
+        //   if (err.response?.statusCode == 401) {
+        //     // Delete security credentials locally
+        //     await SecureStorage.delete(kAccessToken);
+        //     await SecureStorage.delete(kRefreshToken);
+        //     await SharedPrefs.removeString(kUserData);
 
-            // Redirect context-free to login screen
-            AppRouter.navigatorKey.currentState?.pushNamedAndRemoveUntil(
-              Routes.login,
-              (route) => false,
-            );
-            return handler.reject(err);
-          }
-          return handler.next(err);
-        },
+        //     // Redirect context-free to login screen
+        //     AppRouter.navigatorKey.currentState?.pushNamedAndRemoveUntil(
+        //       Routes.login,
+        //       (route) => false,
+        //     );
+        //     return handler.reject(err);
+        //   }
+        //   return handler.next(err);
+        // },
       ),
     );
 
@@ -79,53 +79,63 @@ class APIClient {
     String path, {
     Map<String, dynamic>? queryParameters,
     Options? options,
-  }) => _request(() => _dio.get<T>(path, queryParameters: queryParameters, options: options));
+  }) => _request(
+    () => _dio.get<T>(path, queryParameters: queryParameters, options: options),
+  );
 
   Future<Either<Failure, Response<T>>> post<T>(
     String path, {
     dynamic data,
     Map<String, dynamic>? queryParameters,
     Options? options,
-  }) => _request(() => _dio.post<T>(
-    path,
-    data: data,
-    queryParameters: queryParameters,
-    options: options,
-  ));
+  }) => _request(
+    () => _dio.post<T>(
+      path,
+      data: data,
+      queryParameters: queryParameters,
+      options: options,
+    ),
+  );
 
   Future<Either<Failure, Response<T>>> put<T>(
     String path, {
     dynamic data,
     Map<String, dynamic>? queryParameters,
     Options? options,
-  }) => _request(() => _dio.put<T>(
-    path,
-    data: data,
-    queryParameters: queryParameters,
-    options: options,
-  ));
+  }) => _request(
+    () => _dio.put<T>(
+      path,
+      data: data,
+      queryParameters: queryParameters,
+      options: options,
+    ),
+  );
 
   Future<Either<Failure, Response<T>>> patch<T>(
     String path, {
     dynamic data,
     Map<String, dynamic>? queryParameters,
     Options? options,
-  }) => _request(() => _dio.patch<T>(
-    path,
-    data: data,
-    queryParameters: queryParameters,
-    options: options,
-  ));
+  }) => _request(
+    () => _dio.patch<T>(
+      path,
+      data: data,
+      queryParameters: queryParameters,
+      options: options,
+    ),
+  );
 
   Future<Either<Failure, Response<T>>> delete<T>(
     String path, {
     dynamic data,
     Map<String, dynamic>? queryParameters,
     Options? options,
-  }) => _request(() => _dio.delete<T>(
-    path,
-    data: data,
-    queryParameters: queryParameters,
-    options: options,
-  ));
+  }) => _request(
+    () => _dio.delete<T>(
+      path,
+      data: data,
+      queryParameters: queryParameters,
+      options: options,
+    ),
+  );
 }

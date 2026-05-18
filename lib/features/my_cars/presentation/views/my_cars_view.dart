@@ -1,3 +1,4 @@
+import 'package:aqua_go/core/components/custom_loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -45,8 +46,54 @@ class _MyCarsViewState extends State<MyCarsView> {
             topRight: Radius.circular(20),
           ),
         ),
-        child: BlocBuilder<MyCarsCubit, MyCarsState>(
+        child: BlocConsumer<MyCarsCubit, MyCarsState>(
+          listener: (context, state) {
+            if (state is MyCarsActionLoading) {
+              context.showLoadingOverlay();
+            } else {
+              context.hideLoadingOverlay();
+            }
+
+            if (state is MyCarsActionError) {
+              context.showWarningAlert(
+                title: 'Error',
+                message: state.message,
+                primaryButtonText: 'OK',
+              );
+            }
+          },
+          buildWhen: (previous, current) =>
+              current is MyCarsLoading ||
+              current is MyCarsLoaded ||
+              current is MyCarsError ||
+              current is MyCarsInitial,
           builder: (context, state) {
+            if (state is MyCarsLoading) {
+              return const Center(child: CustomLoadingIndicator(size: 100));
+            }
+            if (state is MyCarsError) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      state.message,
+                      style: TextStyle(
+                        color: context.colors.error,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 12),
+                    ElevatedButton(
+                      onPressed: () => _myCarsCubit.getCars(),
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              );
+            }
             final List<MyCarModel> cars = state is MyCarsLoaded
                 ? state.cars
                 : <MyCarModel>[];

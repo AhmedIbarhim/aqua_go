@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui' as ui;
 import 'package:aqua_go/features/auth/controllers/auth_cubit/auth_cubit.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -113,10 +114,8 @@ class _PhoneOtpContentState extends State<PhoneOtpContent> {
         } else if (state is LoginSuccess) {
           // Check if user has name (complete data)
           if (state.user.name == null || state.user.name!.isEmpty) {
-            Navigator.pushNamedAndRemoveUntil(
-              context,
+            context.pushNamedAndRemoveUntil(
               Routes.profileData,
-              (route) => false,
               arguments: true, // isFirstTime = true
             );
           } else {
@@ -173,14 +172,13 @@ class _PhoneOtpContentState extends State<PhoneOtpContent> {
                       ),
                     ),
                     const SizedBox(width: 4),
-                    Expanded(
-                      child: Text(
-                        widget.phoneNumber,
-                        style: AppTextStyles.regular16.copyWith(
-                          color: darkAppColors.textSecondary,
-                        ),
-                        overflow: TextOverflow.ellipsis,
+                    Text(
+                      widget.phoneNumber,
+                      textDirection: ui.TextDirection.ltr,
+                      style: AppTextStyles.regular16.copyWith(
+                        color: darkAppColors.textSecondary,
                       ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),

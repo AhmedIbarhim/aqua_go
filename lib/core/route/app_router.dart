@@ -24,6 +24,7 @@ import '../../features/startup/views/onboarding_view.dart';
 import '../../features/startup/views/splash_view.dart';
 import '../../features/notifications/presentation/views/notification_view.dart';
 import '../../features/profile/presentation/views/settings_view.dart';
+import '../../features/my_cars/controllers/my_cars_cubit.dart';
 import '../../features/my_cars/presentation/views/add_car_view.dart';
 import '../../features/profile/presentation/views/privacy_policy_view.dart';
 import '../../features/profile/presentation/views/about_us_view.dart';
@@ -90,7 +91,12 @@ abstract class AppRouter {
 
       case Routes.addVehicle:
         final car = settings.arguments as MyCarModel?;
-        return MaterialPageRoute(builder: (_) => AddCarView(car: car));
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => locator<MyCarsCubit>(),
+            child: AddCarView(car: car),
+          ),
+        );
 
       case Routes.bookingDetails:
         final args = settings.arguments as BookingFlowArgs;

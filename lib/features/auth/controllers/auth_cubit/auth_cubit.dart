@@ -11,7 +11,7 @@ class AuthCubit extends Cubit<AuthState> {
 
   Future<void> login(String phone) async {
     emit(LoginLoading());
-    final result = await _authRepo.login(phone);
+    final result = await _authRepo.login(phone.trim());
     result.fold(
       (failure) => emit(LoginError(failure.message)),
       (otpSessionId) => emit(OtpSent(otpSessionId)),
@@ -25,7 +25,7 @@ class AuthCubit extends Cubit<AuthState> {
   }) async {
     emit(LoginLoading());
     final result = await _authRepo.verifyOtp(
-      phone: phone,
+      phone: phone.trim(),
       otpSessionId: otpSessionId,
       otp: otp,
     );
@@ -76,5 +76,3 @@ class AuthCubit extends Cubit<AuthState> {
     emit(LogoutSuccess());
   }
 }
-
-
