@@ -1,4 +1,3 @@
-import 'package:aqua_go/core/components/custom_alert_box.dart';
 import 'package:aqua_go/core/components/custom_bottom_sheet.dart';
 import 'package:aqua_go/core/components/custom_button.dart';
 import 'package:aqua_go/core/components/custom_text_field.dart';
@@ -249,8 +248,7 @@ class _ComplainViewState extends State<ComplainView> {
               enabled: _typeController.text.isNotEmpty,
               onPressed: () {
                 // Handle submission
-                SuccessAlertBox.show(
-                  context: context,
+                context.showSuccessAlert(
                   title: LocaleKeys.bookings_complaint_submitted.tr(),
                 );
               },

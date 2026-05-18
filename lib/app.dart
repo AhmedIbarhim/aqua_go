@@ -58,6 +58,7 @@ class MyApp extends StatelessWidget {
                   ),
                 ),
               ),
+              navigatorKey: AppRouter.navigatorKey,
               onGenerateRoute: AppRouter.generateRoute,
               builder: (context, child) {
                 return MediaQuery(

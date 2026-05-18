@@ -14,32 +14,67 @@ class AuthCubit extends Cubit<AuthState> {
     final result = await _authRepo.login(phone);
     result.fold(
       (failure) => emit(LoginError(failure.message)),
-      (_) => emit(OtpSent()),
+      (otpSessionId) => emit(OtpSent(otpSessionId)),
     );
   }
 
-  Future<void> verifyOtp(UserModel user, String otp) async {
+  Future<void> verifyOtp({
+    required String phone,
+    required String otpSessionId,
+    required String otp,
+  }) async {
     emit(LoginLoading());
-    final result = await _authRepo.verifyOtp(user: user, otp: otp);
+    final result = await _authRepo.verifyOtp(
+      phone: phone,
+      otpSessionId: otpSessionId,
+      otp: otp,
+    );
     result.fold(
       (failure) => emit(LoginError(failure.message)),
       (user) => emit(LoginSuccess(user)),
     );
   }
 
-  Future<void> verifyEmailOtp(String email, String otp) async {
+  Future<void> requestEmailVerify(String email) async {
     emit(LoginLoading());
-    final currentUser = _authRepo.getUser();
-    if (currentUser != null) {
-      final updatedUser = currentUser.copyWith(email: email);
-      final result = await _authRepo.verifyOtp(user: updatedUser, otp: otp);
-      result.fold(
-        (failure) => emit(LoginError(failure.message)),
-        (user) => emit(LoginSuccess(user)),
-      );
-    } else {
-      emit(const LoginError('User not found'));
-    }
+    final result = await _authRepo.requestEmailVerify(email);
+    result.fold(
+      (failure) => emit(LoginError(failure.message)),
+      (otpSessionId) => emit(EmailOtpSent(otpSessionId)),
+    );
+  }
+
+  Future<void> confirmEmailVerify({
+    required String email,
+    required String otpSessionId,
+    required String otp,
+  }) async {
+    emit(LoginLoading());
+    final result = await _authRepo.confirmEmailVerify(
+      email: email,
+      otpSessionId: otpSessionId,
+      otp: otp,
+    );
+    result.fold(
+      (failure) => emit(LoginError(failure.message)),
+      (user) => emit(LoginSuccess(user)),
+    );
+  }
+
+  Future<void> updateProfile(UserModel user) async {
+    emit(ProfileUpdateLoading());
+    final result = await _authRepo.updateProfile(user);
+    result.fold(
+      (failure) => emit(ProfileUpdateError(failure.message)),
+      (updatedUser) => emit(ProfileUpdateSuccess(updatedUser)),
+    );
+  }
+
+  Future<void> logout() async {
+    emit(LogoutLoading());
+    await _authRepo.logout();
+    emit(LogoutSuccess());
   }
 }
+
 

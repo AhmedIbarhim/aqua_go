@@ -1,4 +1,6 @@
 import 'package:aqua_go/core/config/networking/api_client.dart';
+import 'package:aqua_go/core/errors/failure.dart';
+import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 
 import '../../../../core/config/local_storage/shared_prefs.dart';
@@ -11,8 +13,8 @@ class LocationService {
 
   LocationService({required this.apiClient});
 
-  Future<Response> getAutocomplete(String query) async {
-    return await apiClient.get(
+  Future<Either<Failure, Response>> getAutocomplete(String query) {
+    return apiClient.get(
       Endpoints.googleMapsAutocompleteUrl,
       queryParameters: {
         'input': query,
@@ -23,15 +25,15 @@ class LocationService {
     );
   }
 
-  Future<Response> getPlaceDetails(String placeId) async {
-    return await apiClient.get(
+  Future<Either<Failure, Response>> getPlaceDetails(String placeId) {
+    return apiClient.get(
       Endpoints.googleMapsPlaceDetailsUrl,
       queryParameters: {'place_id': placeId, 'key': _apiKey, 'language': 'ar'},
     );
   }
 
-  Future<Response> getAddressFromLatLng(double lat, double lng) async {
-    return await apiClient.get(
+  Future<Either<Failure, Response>> getAddressFromLatLng(double lat, double lng) {
+    return apiClient.get(
       Endpoints.googleMapsGeocodeUrl,
       queryParameters: {
         'latlng': '$lat,$lng',

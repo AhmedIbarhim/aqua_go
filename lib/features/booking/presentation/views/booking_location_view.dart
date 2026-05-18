@@ -10,8 +10,6 @@ import '../../../../core/components/generic_app_bar.dart';
 import '../../../../core/components/bottom_action_sheet_container.dart';
 import '../../../../generated/locale_keys.g.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../core/components/custom_alert_box.dart';
-import '../../../../core/components/custom_snack_bar.dart';
 import '../../../../core/config/di/service_locator.dart';
 import '../../../adress/controllers/addresses_controller/addresses_cubit.dart';
 import '../../../adress/controllers/maps_controller/maps_cubit.dart';
@@ -80,8 +78,7 @@ class _BookingLocationViewState extends State<BookingLocationView> {
             }
 
             if (!state.isLocationServiceEnabled) {
-              DialogBox.show(
-                context: context,
+              context.showDialogBox(
                 message: LocaleKeys.address_location_disabled_message.tr(),
                 mainButtonText: LocaleKeys.address_go_to_settings.tr(),
                 onMainButtonPressed: () {
@@ -90,7 +87,7 @@ class _BookingLocationViewState extends State<BookingLocationView> {
                 },
               );
             } else if (state.errorMessage != null) {
-              CustomSnackBar.showError(context, state.errorMessage!);
+              context.showErrorSnackBar(state.errorMessage!);
             }
           },
           child: Column(
@@ -291,7 +288,8 @@ class _BookingLocationViewState extends State<BookingLocationView> {
                       lng: mapsState.currentPosition?.longitude ?? 0.0,
                     );
                   } else if (addressesState is AddressesLoaded) {
-                    address = addressesState.addresses[selectedLocationIndex - 1];
+                    address =
+                        addressesState.addresses[selectedLocationIndex - 1];
                   }
 
                   if (address != null) {

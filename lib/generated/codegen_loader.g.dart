@@ -72,7 +72,10 @@ class CodegenLoader extends AssetLoader{
     "logout": "تسجيل الخروج",
     "logout_confirmation": "هل أنت متأكد من تسجيل الخروج؟",
     "delete_account": "حذف الحساب",
-    "delete_account_confirmation": "هل أنت متأكد من حذف الحساب؟"
+    "delete_account_confirmation": "هل أنت متأكد من حذف الحساب؟",
+    "otp_expired_message": "انتهت صلاحية رمز التحقق، يرجى طلب رمز جديد",
+    "otp_invalid_message": "رمز التحقق غير صحيح، حاول مرة أخرى",
+    "otp_code_sent": "تم ارسال رمز التحقق"
   },
   "layout": {
     "home": "الرئيسية",
@@ -258,7 +261,8 @@ class CodegenLoader extends AssetLoader{
     "dob": "تاريخ الميلاد",
     "gender": "النوع",
     "edit_data": "تعديل البيانات",
-    "save_changes": "حفظ التعديلات"
+    "save_changes": "حفظ التعديلات",
+    "confirm_logout": "هل انت متأكد من تسجيل الخروج؟"
   },
   "settings": {
     "more_settings": "المزيد من الإعدادات",
@@ -390,7 +394,10 @@ static const Map<String,dynamic> _en = {
     "logout": "Logout",
     "logout_confirmation": "Are you sure you want to logout?",
     "delete_account": "Delete Account",
-    "delete_account_confirmation": "Are you sure you want to delete your account?"
+    "delete_account_confirmation": "Are you sure you want to delete your account?",
+    "otp_expired_message": "Your verification code has expired, please request a new one",
+    "otp_invalid_message": "Invalid verification code, please try again",
+    "otp_code_sent": "Verification code has been sent"
   },
   "layout": {
     "home": "Home",
@@ -576,7 +583,8 @@ static const Map<String,dynamic> _en = {
     "dob": "Date of Birth",
     "gender": "Gender",
     "edit_data": "Edit Data",
-    "save_changes": "Save Changes"
+    "save_changes": "Save Changes",
+    "confirm_logout": "Are you sure you want to logout?"
   },
   "settings": {
     "more_settings": "More Settings",

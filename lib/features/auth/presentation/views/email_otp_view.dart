@@ -2,24 +2,24 @@ import 'package:aqua_go/core/config/di/service_locator.dart';
 import 'package:aqua_go/core/route/routes.dart';
 import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/features/auth/controllers/auth_cubit/auth_cubit.dart';
-import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../widgets/auth_scaffold.dart';
 import '../widgets/email_otp_content.dart';
 
 class EmailOtpArgs {
   final String email;
-  EmailOtpArgs({required this.email});
+  final String otpSessionId;
+  EmailOtpArgs({required this.email, required this.otpSessionId});
 }
 
 class EmailOtpView extends StatelessWidget {
-  const EmailOtpView({super.key, required this.email});
+  const EmailOtpView({super.key, required this.email, required this.otpSessionId});
   final String email;
+  final String otpSessionId;
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.sizeOf(context).height;
-    final width = MediaQuery.sizeOf(context).width;
     return BlocProvider(
       create: (context) => locator<AuthCubit>(),
       child: BlocListener<AuthCubit, AuthState>(
@@ -36,50 +36,13 @@ class EmailOtpView extends StatelessWidget {
               (route) => false,
             );
           } else if (state is LoginError) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(state.message)));
+            context.showErrorSnackBar(state.message);
           }
         },
-        child: Scaffold(
-          extendBodyBehindAppBar: true,
-          body: SingleChildScrollView(
-            child: SizedBox(
-              height: height,
-              child: Stack(
-                children: [
-                  Positioned(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: height * 0.65,
-                    child: Image.asset(
-                      AppAssets.authBackImage,
-                      fit: BoxFit.fill,
-                    ),
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: SizedBox(
-                          child: Center(
-                            child: Image.asset(
-                              AppAssets.logoTransparent,
-                              width: width * 0.8,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Align(
-                        alignment: Alignment.bottomCenter,
-                        child: EmailOtpContent(email: email),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+        child: AuthScaffold(
+          content: EmailOtpContent(
+            email: email,
+            otpSessionId: otpSessionId,
           ),
         ),
       ),

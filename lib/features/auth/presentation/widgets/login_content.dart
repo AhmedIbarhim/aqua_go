@@ -79,11 +79,10 @@ class _LoginContentState extends State<LoginContent> {
               CustomButton(
                 onPressed: _isPhoneValid
                     ? () {
-                        Navigator.pushNamed(
-                          context,
+                        context.pushNamed(
                           Routes.phoneOtp,
                           arguments: PhoneOtpArgs(
-                            phoneNumber: _phoneController.text,
+                            phoneNumber: '+966${_phoneController.text}',
                           ),
                         );
                       }

@@ -1,6 +1,7 @@
 import 'dart:convert';
+import 'package:equatable/equatable.dart';
 
-class UserModel {
+class UserModel extends Equatable {
   final String? name;
   final String? email;
   final String? phone;
@@ -8,7 +9,7 @@ class UserModel {
   final String? gender;
   final DateTime? birthdate;
 
-  UserModel({
+  const UserModel({
     this.name,
     this.email,
     this.phone,
@@ -17,20 +18,20 @@ class UserModel {
     this.birthdate,
   });
 
-  factory UserModel.fromMap(Map<String, dynamic> map) {
+  factory UserModel.fromJson(Map<String, dynamic> map) {
     return UserModel(
-      name: map['name'],
+      name: map['name'] ?? map['nameEn'] ?? map['nameAr'],
       email: map['email'],
       phone: map['phone'],
       avatar: map['avatar'],
       gender: map['gender'],
       birthdate: map['birthdate'] != null
-          ? DateTime.parse(map['birthdate'])
+          ? DateTime.tryParse(map['birthdate'].toString())
           : null,
     );
   }
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     return {
       'name': name,
       'email': email,
@@ -41,15 +42,16 @@ class UserModel {
     };
   }
 
-  String toJson() => json.encode(toMap());
+  String toEncodedJson() => json.encode(toJson());
 
-  factory UserModel.fromJson(String source) =>
-      UserModel.fromMap(json.decode(source));
+  factory UserModel.fromEncodedJson(String source) =>
+      UserModel.fromJson(json.decode(source));
 
   UserModel copyWith({
     String? name,
     String? phone,
     String? email,
+    String? avatar,
     String? gender,
     DateTime? birthdate,
   }) {
@@ -57,9 +59,12 @@ class UserModel {
       name: name ?? this.name,
       phone: phone ?? this.phone,
       email: email ?? this.email,
+      avatar: avatar ?? this.avatar,
       gender: gender ?? this.gender,
       birthdate: birthdate ?? this.birthdate,
     );
   }
-}
 
+  @override
+  List<Object?> get props => [name, email, phone, avatar, gender, birthdate];
+}

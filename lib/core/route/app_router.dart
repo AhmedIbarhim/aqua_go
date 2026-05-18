@@ -33,6 +33,8 @@ import '../../features/profile/presentation/views/support_view.dart';
 import 'routes.dart';
 
 abstract class AppRouter {
+  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
   static Route generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case Routes.splash:
@@ -53,7 +55,10 @@ abstract class AppRouter {
       case Routes.emailOtp:
         final args = settings.arguments as EmailOtpArgs;
         return MaterialPageRoute(
-          builder: (_) => EmailOtpView(email: args.email),
+          builder: (_) => EmailOtpView(
+            email: args.email,
+            otpSessionId: args.otpSessionId,
+          ),
         );
 
       case Routes.addEmail:

@@ -1,10 +1,10 @@
 import 'package:aqua_go/core/config/local_storage/shared_prefs.dart';
+import 'package:aqua_go/core/config/local_storage/secure_storage.dart';
 import 'package:aqua_go/core/constants.dart';
 import 'package:aqua_go/core/errors/failure.dart';
 import 'package:aqua_go/features/auth/data/models/user_model.dart';
 import 'package:aqua_go/features/auth/data/services/auth_service.dart';
 import 'package:dartz/dartz.dart';
-import 'package:dio/dio.dart';
 
 class AuthRepo {
   final AuthService _authService;
@@ -13,65 +13,137 @@ class AuthRepo {
 
   AuthRepo(this._authService);
 
-  Future<Either<Failure, void>> login(String phone) async {
-    try {
-      await Future.delayed(const Duration(seconds: 2));
-      return const Right(null);
-      // final response = await _authService.login(phone);
-      // if (response.statusCode == 200) {
-      //   return const Right(null);
-      // }
-      // return Left(ServerFailure('Login failed'));
-    } catch (e) {
-      if (e is DioException) {
-        return Left(ServerFailure.fromDioExeption(e));
-      }
-      return Left(ServerFailure(e.toString()));
-    }
+  Future<Either<Failure, String>> login(String phone) async {
+    await SecureStorage.delete(kAccessToken);
+    await SecureStorage.delete(kRefreshToken);
+
+    final result = await _authService.login(phone);
+    return result.fold(
+      (failure) => Left(failure),
+      (response) {
+        if (response.statusCode == 200 && response.data != null) {
+          final otpSessionId = response.data['otpSessionId'] as String;
+          return Right(otpSessionId);
+        }
+        return const Left(ServerFailure('Login OTP request failed'));
+      },
+    );
   }
 
   Future<Either<Failure, UserModel>> verifyOtp({
-    required UserModel user,
+    required String phone,
+    required String otpSessionId,
     required String otp,
   }) async {
-    try {
-      await Future.delayed(const Duration(seconds: 2));
+    final result = await _authService.verifyOtp(otpSessionId, otp);
+    return result.fold(
+      (failure) => Left(failure),
+      (response) async {
+        if (response.statusCode == 200 && response.data != null) {
+          final accessToken = response.data['accessToken'] as String;
+          final refreshToken = response.data['refreshToken'] as String;
 
-      // If we have an existing user, we should merge the data or trust the passed user
-      // if it contains updates.
-      final existingUser = getUser();
-      UserModel finalUser = user;
+          // Persist JWT tokens locally
+          await SecureStorage.write(kAccessToken, accessToken);
+          await SecureStorage.write(kRefreshToken, refreshToken);
 
-      if (existingUser != null && existingUser.phone == user.phone) {
-        // If the passed user has no name but the existing one does, we should keep the existing name
-        // (This happens during initial login)
-        if (user.name == null && existingUser.name != null) {
-          finalUser = existingUser;
+          // Fetch user profile from `/api/customer/me` using the new tokens
+          final profileResult = await _authService.getProfile();
+          return profileResult.fold(
+            (failure) => Left(failure),
+            (profileResponse) async {
+              if (profileResponse.statusCode == 200 && profileResponse.data != null) {
+                final profileUser = UserModel.fromJson(
+                  profileResponse.data,
+                ).copyWith(phone: phone);
+                await saveUser(profileUser);
+                return Right(profileUser);
+              }
+              return const Left(ServerFailure('Failed to fetch user profile details'));
+            },
+          );
         }
-      }
+        return const Left(ServerFailure('Verification failed'));
+      },
+    );
+  }
 
-      await saveUser(finalUser);
-      return Right(finalUser);
-      /*
-      final response = await _authService.verifyOtp(user.phone ?? '', otp);
-      if (response.statusCode == 200) {
-        final user = UserModel.fromMap(response.data['data']['user']);
-        await saveUser(user);
-        return Right(user);
-      }
-      return Left(ServerFailure('Verification failed'));
-      */
-    } catch (e) {
-      if (e is DioException) {
-        return Left(ServerFailure.fromDioExeption(e));
-      }
-      return Left(ServerFailure(e.toString()));
-    }
+  Future<Either<Failure, UserModel>> updateProfile(UserModel user) async {
+    final name = user.name ?? '';
+    final isArabic = RegExp(r'[\u0600-\u06FF]').hasMatch(name);
+
+    final Map<String, dynamic> updateData = {
+      if (isArabic) 'nameAr': name else 'nameEn': name,
+      if (user.gender != null) 'gender': user.gender,
+      if (user.birthdate != null)
+        'birthdate': user.birthdate!.toIso8601String().split('T')[0], // yyyy-MM-dd
+    };
+
+    final result = await _authService.updateProfile(updateData);
+    return result.fold(
+      (failure) => Left(failure),
+      (response) async {
+        if (response.statusCode == 200 || response.statusCode == 204) {
+          final profileResult = await _authService.getProfile();
+          return profileResult.fold(
+            (failure) => Left(failure),
+            (profileResponse) async {
+              if (profileResponse.statusCode == 200 && profileResponse.data != null) {
+                final updatedUser = UserModel.fromJson(
+                  profileResponse.data,
+                ).copyWith(phone: user.phone);
+                await saveUser(updatedUser);
+                return Right(updatedUser);
+              }
+              return const Left(ServerFailure('Failed to sync updated profile with server'));
+            },
+          );
+        }
+        return const Left(ServerFailure('Failed to sync updated profile with server'));
+      },
+    );
+  }
+
+  Future<Either<Failure, String>> requestEmailVerify(String email) async {
+    final result = await _authService.requestEmailVerify(email);
+    return result.fold(
+      (failure) => Left(failure),
+      (response) {
+        if (response.statusCode == 200 && response.data != null) {
+          final otpSessionId = response.data['otpSessionId'] as String;
+          return Right(otpSessionId);
+        }
+        return const Left(ServerFailure('Failed to send email verification'));
+      },
+    );
+  }
+
+  Future<Either<Failure, UserModel>> confirmEmailVerify({
+    required String email,
+    required String otpSessionId,
+    required String otp,
+  }) async {
+    final result = await _authService.confirmEmailVerify(otpSessionId, otp);
+    return result.fold(
+      (failure) => Left(failure),
+      (response) async {
+        if (response.statusCode == 200 || response.statusCode == 204) {
+          final currentUser = getUser();
+          if (currentUser != null) {
+            final updatedUser = currentUser.copyWith(email: email);
+            await saveUser(updatedUser);
+            return Right(updatedUser);
+          }
+          return const Left(ServerFailure('User not found'));
+        }
+        return const Left(ServerFailure('Email verification failed'));
+      },
+    );
   }
 
   Future<void> saveUser(UserModel user) async {
     _cachedUser = user;
-    await SharedPrefs.setString(kUserData, user.toJson());
+    await SharedPrefs.setString(kUserData, user.toEncodedJson());
   }
 
   UserModel? getUser() {
@@ -79,7 +151,7 @@ class AuthRepo {
     final userJson = SharedPrefs.getString(kUserData);
     if (userJson.isNotEmpty) {
       try {
-        _cachedUser = UserModel.fromJson(userJson);
+        _cachedUser = UserModel.fromEncodedJson(userJson);
         return _cachedUser;
       } catch (_) {
         return null;
@@ -89,7 +161,18 @@ class AuthRepo {
   }
 
   Future<void> logout() async {
-    _cachedUser = null;
-    await SharedPrefs.removeString(kUserData);
+    try {
+      final refreshToken = await SecureStorage.read(kRefreshToken);
+      if (refreshToken != null && refreshToken.isNotEmpty) {
+        await _authService.logout(refreshToken);
+      }
+    } catch (_) {
+      // Silently ignore logout network failures to guarantee clean local state
+    } finally {
+      _cachedUser = null;
+      await SecureStorage.delete(kAccessToken);
+      await SecureStorage.delete(kRefreshToken);
+      await SharedPrefs.removeString(kUserData);
+    }
   }
 }

@@ -9,12 +9,14 @@ class CustomOtpFields extends StatelessWidget {
   final List<TextEditingController> controllers;
   final List<FocusNode> focusNodes;
   final Function(String)? onChanged;
+  final bool hasError;
 
   const CustomOtpFields({
     super.key,
     required this.controllers,
     required this.focusNodes,
     this.onChanged,
+    this.hasError = false,
   });
 
   @override
@@ -29,6 +31,7 @@ class CustomOtpFields extends StatelessWidget {
             index: index,
             controllers: controllers,
             focusNodes: focusNodes,
+            hasError: hasError,
             onChanged: (value) {
               if (value.isNotEmpty) {
                 if (index < controllers.length - 1) {
@@ -53,12 +56,14 @@ class _SingleOtpField extends StatefulWidget {
   final List<TextEditingController> controllers;
   final List<FocusNode> focusNodes;
   final Function(String) onChanged;
+  final bool hasError;
 
   const _SingleOtpField({
     required this.index,
     required this.controllers,
     required this.focusNodes,
     required this.onChanged,
+    required this.hasError,
   });
 
   @override
@@ -91,6 +96,19 @@ class _SingleOtpFieldState extends State<_SingleOtpField> {
     final bool isFocusedOrNotEmpty =
         controller.text.isNotEmpty || focusNode.hasFocus;
 
+    Color borderColor;
+    double borderWidth;
+    if (widget.hasError) {
+      borderColor = context.colors.error.withValues(alpha: 0.2);
+      borderWidth = 1.5;
+    } else if (isFocusedOrNotEmpty) {
+      borderColor = colors.primary;
+      borderWidth = 1.5;
+    } else {
+      borderColor = colors.borderSecondary;
+      borderWidth = 1;
+    }
+
     return Container(
       width: screenHeight * 0.07,
       height: screenHeight * 0.07,
@@ -98,10 +116,7 @@ class _SingleOtpFieldState extends State<_SingleOtpField> {
       decoration: BoxDecoration(
         color: isFocusedOrNotEmpty ? colors.brandHover : Colors.transparent,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isFocusedOrNotEmpty ? colors.primary : colors.borderSecondary,
-          width: isFocusedOrNotEmpty ? 1.5 : 1,
-        ),
+        border: Border.all(color: borderColor, width: borderWidth),
       ),
       alignment: Alignment.center,
       child: TextField(

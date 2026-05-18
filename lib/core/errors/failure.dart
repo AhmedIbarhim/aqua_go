@@ -1,62 +1,86 @@
 import 'package:dio/dio.dart';
+import 'package:equatable/equatable.dart';
 
-abstract class Failure {
+abstract class Failure extends Equatable {
   final String message;
-  Failure(this.message);
+  const Failure(this.message);
+
+  @override
+  List<Object?> get props => [message];
+
+  @override
+  String toString() => '$runtimeType: $message';
 }
 
 class ServerFailure extends Failure {
-  ServerFailure(super.errMessage);
+  const ServerFailure(super.errMessage);
 
-  factory ServerFailure.fromDioExeption(DioException dioExeption) {
-    switch (dioExeption.type) {
+  factory ServerFailure.fromDioException(DioException dioException) {
+    switch (dioException.type) {
       case DioExceptionType.connectionTimeout:
-        return ServerFailure('Connection timeout with ApiServer');
+        return const ServerFailure('Connection timeout with ApiServer');
 
       case DioExceptionType.sendTimeout:
-        return ServerFailure('Send timeout with ApiServer');
+        return const ServerFailure('Send timeout with ApiServer');
 
       case DioExceptionType.receiveTimeout:
-        return ServerFailure('Receive timeout with ApiServer');
+        return const ServerFailure('Receive timeout with ApiServer');
+
+      case DioExceptionType.connectionError:
+        return const ServerFailure('No Internet Connection');
 
       case DioExceptionType.badResponse:
         return ServerFailure.fromBadResponse(
-          dioExeption.response!.statusCode!,
-          dioExeption.response!.data,
+          dioException.response?.statusCode ?? 0,
+          dioException.response?.data,
         );
       case DioExceptionType.cancel:
-        return ServerFailure('Request to ApiServer was canceled');
+        return const ServerFailure('Request to ApiServer was canceled');
 
       case DioExceptionType.unknown:
-        if (dioExeption.message!.contains('SocketException')) {
-          return ServerFailure('No Enternet Connection');
+        if (dioException.message != null && dioException.message!.contains('SocketException')) {
+          return const ServerFailure('No Internet Connection');
         }
-        return ServerFailure('Unexpected Error, Please try again later');
-
-      // case DioExceptionType.badCertificate:
-
-      // case DioExceptionType.connectionError:
+        return const ServerFailure('Unexpected Error, Please try again later');
 
       default:
-        return ServerFailure(
+        return const ServerFailure(
           'Opps, there was an Error, please try again later',
         );
     }
   }
 
   factory ServerFailure.fromBadResponse(int statusCode, dynamic response) {
-    if (statusCode == 400 || statusCode == 401 || statusCode == 403) {
-      return ServerFailure(response['error']['message']);
+    if (statusCode == 400 || statusCode == 401 || statusCode == 403 || statusCode == 422) {
+      if (response is Map) {
+        if (response['error'] is Map && response['error']['message'] != null) {
+          return ServerFailure(response['error']['message'].toString());
+        } else if (response['message'] != null) {
+          return ServerFailure(response['message'].toString());
+        } else if (response['error'] != null) {
+          return ServerFailure(response['error'].toString());
+        } else if (response['errors'] != null) {
+          if (response['errors'] is Map) {
+            final firstError = (response['errors'] as Map).values.first;
+            if (firstError is List && firstError.isNotEmpty) {
+              return ServerFailure(firstError.first.toString());
+            }
+            return ServerFailure(firstError.toString());
+          }
+          return ServerFailure(response['errors'].toString());
+        }
+      }
+      return const ServerFailure('Oops, there was an Error, please try again later');
     } else if (statusCode == 404) {
-      return ServerFailure('Your request not fornd, please try again later');
+      return const ServerFailure('Your request not found, please try again later');
     } else if (statusCode == 500) {
-      return ServerFailure('Internal Server error, please try again later');
+      return const ServerFailure('Internal Server error, please try again later');
     } else {
-      return ServerFailure('Oops, there was an Error, please try again later');
+      return const ServerFailure('Oops, there was an Error, please try again later');
     }
   }
 }
 
 class LocationFailure extends Failure {
-  LocationFailure(super.message);
+  const LocationFailure(super.message);
 }

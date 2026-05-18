@@ -56,7 +56,10 @@
         "logout": "Logout",
         "logout_confirmation": "Are you sure you want to logout?",
         "delete_account": "Delete Account",
-        "delete_account_confirmation": "Are you sure you want to delete your account?"
+        "delete_account_confirmation": "Are you sure you want to delete your account?",
+        "otp_expired_message": "Your verification code has expired, please request a new one",
+        "otp_invalid_message": "Invalid verification code, please try again",
+        "otp_code_sent": "Verification code has been sent"
     },
     "layout": {
         "home": "Home",
@@ -242,7 +245,8 @@
         "dob": "Date of Birth",
         "gender": "Gender",
         "edit_data": "Edit Data",
-        "save_changes": "Save Changes"
+        "save_changes": "Save Changes",
+        "confirm_logout": "Are you sure you want to logout?"
     },
     "settings": {
         "more_settings": "More Settings",

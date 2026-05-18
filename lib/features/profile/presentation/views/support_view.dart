@@ -62,6 +62,7 @@ class SupportView extends StatelessWidget {
                   ProfileTile(
                     title: LocaleKeys.support_whatsapp_contact.tr(),
                     icon: AppAssets.whatsapp,
+                    alreadyColoredIcon: true,
                     onTap: () {
                       // TODO: Open WhatsApp link
                     },

@@ -4,7 +4,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
 
-import '../../../../core/components/custom_alert_box.dart';
 import '../../../../core/components/custom_button.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
@@ -14,8 +13,7 @@ class RatingSuccessAlertBox extends StatelessWidget {
   const RatingSuccessAlertBox({super.key});
 
   static Future<T?> show<T>(BuildContext context) {
-    return CustomAlertBox.show<T>(
-      context: context,
+    return context.showCustomAlert<T>(
       child: const RatingSuccessAlertBox(),
     );
   }

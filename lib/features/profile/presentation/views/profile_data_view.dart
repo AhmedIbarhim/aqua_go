@@ -7,6 +7,7 @@ import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:svg_flutter/svg.dart';
 
 import '../../../../core/enums/gender_enum.dart';
@@ -14,6 +15,7 @@ import '../../../../core/route/routes.dart';
 import '../widgets/gender_selection_widget.dart';
 
 import 'package:aqua_go/features/auth/data/repos/auth_repo.dart';
+import 'package:aqua_go/features/auth/controllers/auth_cubit/auth_cubit.dart';
 import 'package:aqua_go/core/config/di/service_locator.dart';
 
 class ProfileDataView extends StatefulWidget {
@@ -61,88 +63,117 @@ class _ProfileDataViewState extends State<ProfileDataView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: context.colors.screenBG,
-      appBar: GenericAppBar(
-        title: isEditing
-            ? LocaleKeys.profile_edit_profile_data.tr()
-            : LocaleKeys.profile_view_profile.tr(),
-      ),
-      body: Column(
-        children: [
-          const SizedBox(height: 8),
-          Expanded(
-            child: Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: context.colors.background,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(24),
-                  topRight: Radius.circular(24),
-                ),
+    return BlocProvider(
+      create: (context) => locator<AuthCubit>(),
+      child: BlocListener<AuthCubit, AuthState>(
+        listener: (context, state) {
+          if (state is ProfileUpdateLoading) {
+            context.showLoadingOverlay();
+          } else {
+            context.hideLoadingOverlay();
+          }
+
+          if (state is ProfileUpdateSuccess) {
+            if (widget.isFirstTime) {
+              context.pushNamedAndRemoveUntil(Routes.layout);
+            } else {
+              setState(() => isEditing = false);
+            }
+          } else if (state is ProfileUpdateError) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.message)));
+          }
+        },
+        child: Builder(
+          builder: (context) {
+            return Scaffold(
+              backgroundColor: context.colors.screenBG,
+              appBar: GenericAppBar(
+                title: isEditing
+                    ? LocaleKeys.profile_edit_profile_data.tr()
+                    : LocaleKeys.profile_view_profile.tr(),
               ),
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  children: [
-                    CustomTextField(
-                      label: LocaleKeys.profile_full_name.tr(),
-                      hint: '',
-                      controller: _nameController,
-                      isRequired: isEditing,
-                      enabled: isEditing,
-                      fillColor: isEditing
-                          ? context.colors.background
-                          : context.colors.cardBackGround,
-                      style: AppTextStyles.medium16.copyWith(
-                        color: isEditing
-                            ? context.colors.contentSecondaryLight
-                            : context.colors.textSecondary,
+              body: Column(
+                children: [
+                  const SizedBox(height: 8),
+                  Expanded(
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: context.colors.background,
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(24),
+                          topRight: Radius.circular(24),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 24),
-                    CustomTextField(
-                      label: LocaleKeys.profile_dob.tr(),
-                      hint: '',
-                      controller: _dobController,
-                      isRequired: false,
-                      enabled: isEditing,
-                      readOnly: true,
-                      onTap: isEditing ? _selectDate : null,
-                      prefixIcon: isEditing
-                          ? Padding(
-                              padding: const EdgeInsets.all(12.0),
-                              child: SvgPicture.asset(
-                                AppAssets.date,
-                                colorFilter: ColorFilter.mode(
-                                  context.colors.textPrimary,
-                                  BlendMode.srcIn,
-                                ),
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          children: [
+                            CustomTextField(
+                              label: LocaleKeys.profile_full_name.tr(),
+                              hint: '',
+                              controller: _nameController,
+                              isRequired: isEditing,
+                              enabled: isEditing,
+                              fillColor: isEditing
+                                  ? context.colors.background
+                                  : context.colors.cardBackGround,
+                              style: AppTextStyles.medium16.copyWith(
+                                color: isEditing
+                                    ? context.colors.contentSecondaryLight
+                                    : context.colors.textSecondary,
                               ),
-                            )
-                          : null,
-                      fillColor: isEditing
-                          ? context.colors.background
-                          : context.colors.cardBackGround,
-                      style: AppTextStyles.medium16.copyWith(
-                        color: isEditing
-                            ? context.colors.contentSecondaryLight
-                            : context.colors.textSecondary,
+                            ),
+                            const SizedBox(height: 24),
+                            CustomTextField(
+                              label: LocaleKeys.profile_dob.tr(),
+                              hint: '',
+                              controller: _dobController,
+                              isRequired: false,
+                              enabled: isEditing,
+                              readOnly: true,
+                              onTap: isEditing ? _selectDate : null,
+                              prefixIcon: isEditing
+                                  ? Padding(
+                                      padding: const EdgeInsets.all(12.0),
+                                      child: SvgPicture.asset(
+                                        AppAssets.date,
+                                        colorFilter: ColorFilter.mode(
+                                          context.colors.textPrimary,
+                                          BlendMode.srcIn,
+                                        ),
+                                      ),
+                                    )
+                                  : null,
+                              fillColor: isEditing
+                                  ? context.colors.background
+                                  : context.colors.cardBackGround,
+                              style: AppTextStyles.medium16.copyWith(
+                                color: isEditing
+                                    ? context.colors.contentSecondaryLight
+                                    : context.colors.textSecondary,
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            GenderSelectionWidget(
+                              selectedGender: _gender,
+                              isEditing: isEditing,
+                              onChanged: (value) =>
+                                  setState(() => _gender = value),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 24),
-                    GenderSelectionWidget(
-                      selectedGender: _gender,
-                      isEditing: isEditing,
-                      onChanged: (value) => setState(() => _gender = value),
-                    ),
-                  ],
-                ),
+                  ),
+                  _buildBottomAction(context),
+                ],
               ),
-            ),
-          ),
-          _buildBottomAction(),
-        ],
+            );
+          },
+        ),
       ),
     );
   }
@@ -162,7 +193,7 @@ class _ProfileDataViewState extends State<ProfileDataView> {
     }
   }
 
-  Widget _buildBottomAction() {
+  Widget _buildBottomAction(BuildContext context) {
     return Container(
       padding: EdgeInsets.only(
         left: 24,
@@ -183,7 +214,7 @@ class _ProfileDataViewState extends State<ProfileDataView> {
       child: widget.isFirstTime
           ? CustomButton(
               text: LocaleKeys.proceed.tr(),
-              onPressed: () async {
+              onPressed: () {
                 final user = locator<AuthRepo>().getUser();
                 if (user != null) {
                   final updatedUser = user.copyWith(
@@ -191,9 +222,8 @@ class _ProfileDataViewState extends State<ProfileDataView> {
                     gender: _gender.name,
                     birthdate: _birthDate,
                   );
-                  await locator<AuthRepo>().saveUser(updatedUser);
-                }
-                if (mounted) {
+                  context.read<AuthCubit>().updateProfile(updatedUser);
+                } else {
                   Navigator.pushNamedAndRemoveUntil(
                     context,
                     Routes.layout,
@@ -209,7 +239,7 @@ class _ProfileDataViewState extends State<ProfileDataView> {
                   flex: 2,
                   child: CustomButton(
                     text: LocaleKeys.profile_save_changes.tr(),
-                    onPressed: () async {
+                    onPressed: () {
                       final user = locator<AuthRepo>().getUser();
                       if (user != null) {
                         final updatedUser = user.copyWith(
@@ -217,9 +247,10 @@ class _ProfileDataViewState extends State<ProfileDataView> {
                           gender: _gender.name,
                           birthdate: _birthDate,
                         );
-                        await locator<AuthRepo>().saveUser(updatedUser);
+                        context.read<AuthCubit>().updateProfile(updatedUser);
+                      } else {
+                        setState(() => isEditing = false);
                       }
-                      setState(() => isEditing = false);
                     },
                   ),
                 ),

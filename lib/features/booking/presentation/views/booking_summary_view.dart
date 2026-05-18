@@ -1,7 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../core/components/custom_alert_box.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
@@ -15,7 +14,6 @@ import '../widgets/payment_summary_card.dart';
 import '../widgets/payment_method_selection.dart';
 import '../controllers/booking_cubit.dart';
 import '../controllers/booking_state.dart';
-import '../../../../core/components/custom_snack_bar.dart';
 import '../widgets/additional_services_grid.dart';
 
 class BookingSummaryView extends StatefulWidget {
@@ -40,12 +38,12 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
         }
 
         if (state.status == BookingStatus.success) {
-          SuccessAlertBox.show(context: context).then((_) {
+          context.showSuccessAlert().then((_) {
             if (!context.mounted) return;
             Navigator.popUntil(context, (route) => route.isFirst);
           });
         } else if (state.status == BookingStatus.failure) {
-          CustomSnackBar.showError(context, state.errorMessage ?? '');
+          context.showErrorSnackBar(state.errorMessage ?? '');
         }
       },
       builder: (context, bookingState) {

@@ -2,7 +2,9 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../components/custom_alert_box.dart';
 import '../components/custom_loading_indicator.dart';
+import '../components/custom_snackbar.dart';
 import '../config/controllers/language_controller/language_cubit.dart';
 import '../config/controllers/theme_controller/theme_cubit.dart';
 import '../themes/app_colors.dart';
@@ -43,6 +45,74 @@ extension BottomSheetExtension on BuildContext {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => child,
+    );
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Alert Dialog Extension
+// -----------------------------------------------------------------------------
+
+extension AlertDialogExtension on BuildContext {
+  Future<T?> showCustomAlert<T>({
+    required Widget child,
+    EdgeInsets? padding,
+    EdgeInsets? margin,
+  }) {
+    return CustomAlertBox.show<T>(
+      context: this,
+      child: child,
+      padding: padding,
+      margin: margin,
+    );
+  }
+
+  Future<T?> showSuccessAlert<T>({
+    String? title,
+    String? message,
+    String? buttonText,
+  }) {
+    return SuccessAlertBox.show<T>(
+      context: this,
+      title: title,
+      message: message,
+      buttonText: buttonText,
+    );
+  }
+
+  Future<T?> showWarningAlert<T>({
+    String? title,
+    required String message,
+    String? primaryButtonText,
+    VoidCallback? onPrimaryPressed,
+    String? secondaryButtonText,
+    VoidCallback? onSecondaryPressed,
+  }) {
+    return WarningBox.show<T>(
+      context: this,
+      title: title,
+      message: message,
+      primaryButtonText: primaryButtonText,
+      onPrimaryPressed: onPrimaryPressed,
+      secondaryButtonText: secondaryButtonText,
+      onSecondaryPressed: onSecondaryPressed,
+    );
+  }
+
+  Future<T?> showDialogBox<T>({
+    required String message,
+    required String mainButtonText,
+    required VoidCallback onMainButtonPressed,
+    String? secondaryButtonText,
+    VoidCallback? onSecondaryButtonPressed,
+  }) {
+    return DialogBox.show<T>(
+      context: this,
+      message: message,
+      mainButtonText: mainButtonText,
+      onMainButtonPressed: onMainButtonPressed,
+      secondaryButtonText: secondaryButtonText,
+      onSecondaryButtonPressed: onSecondaryButtonPressed,
     );
   }
 }
@@ -126,5 +196,35 @@ extension LoadingExtension on BuildContext {
   void hideLoadingOverlay() {
     _loadingOverlayEntry?.remove();
     _loadingOverlayEntry = null;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// SnackBar Extension
+// -----------------------------------------------------------------------------
+
+extension SnackBarExtension on BuildContext {
+  void showSuccessSnackBar(
+    String message, {
+    String? title,
+    Duration duration = const Duration(seconds: 4),
+  }) {
+    CustomSnackbar.showSuccess(this, message, duration: duration);
+  }
+
+  void showErrorSnackBar(
+    String message, {
+    String? title,
+    Duration duration = const Duration(seconds: 4),
+  }) {
+    CustomSnackbar.showError(this, message, duration: duration);
+  }
+
+  void showWarningSnackBar(
+    String message, {
+    String? title,
+    Duration duration = const Duration(seconds: 4),
+  }) {
+    CustomSnackbar.showWarning(this, message, duration: duration);
   }
 }

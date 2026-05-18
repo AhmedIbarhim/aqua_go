@@ -56,7 +56,10 @@
         "logout": "تسجيل الخروج",
         "logout_confirmation": "هل أنت متأكد من تسجيل الخروج؟",
         "delete_account": "حذف الحساب",
-        "delete_account_confirmation": "هل أنت متأكد من حذف الحساب؟"
+        "delete_account_confirmation": "هل أنت متأكد من حذف الحساب؟",
+        "otp_expired_message": "انتهت صلاحية رمز التحقق، يرجى طلب رمز جديد",
+        "otp_invalid_message": "رمز التحقق غير صحيح، حاول مرة أخرى",
+        "otp_code_sent": "تم ارسال رمز التحقق"
     },
     "layout": {
         "home": "الرئيسية",
@@ -242,7 +245,8 @@
         "dob": "تاريخ الميلاد",
         "gender": "النوع",
         "edit_data": "تعديل البيانات",
-        "save_changes": "حفظ التعديلات"
+        "save_changes": "حفظ التعديلات",
+        "confirm_logout": "هل انت متأكد من تسجيل الخروج؟"
     },
     "settings": {
         "more_settings": "المزيد من الإعدادات",

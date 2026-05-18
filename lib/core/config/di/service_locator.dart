@@ -12,12 +12,13 @@ import 'package:aqua_go/features/booking/presentation/controllers/booking_cubit.
 import 'package:get_it/get_it.dart';
 
 import '../../../features/adress/data/services/location_service.dart';
+import 'package:aqua_go/core/config/networking/endpoints.dart';
 import '../networking/api_client.dart';
 
 final GetIt locator = GetIt.instance;
 
 Future<void> initServiceLocator() async {
-  locator.registerLazySingleton<APIClient>(() => APIClient(baseUrl: ""));
+  locator.registerLazySingleton<APIClient>(() => APIClient(baseUrl: Endpoints.baseUrl));
 
   locator.registerLazySingleton<LocationService>(
     () => LocationService(apiClient: locator()),

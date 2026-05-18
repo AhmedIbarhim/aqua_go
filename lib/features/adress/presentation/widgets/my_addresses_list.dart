@@ -1,4 +1,3 @@
-import 'package:aqua_go/core/components/custom_alert_box.dart';
 import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/core/route/routes.dart';
 import 'package:aqua_go/features/adress/data/models/address_model.dart';
@@ -34,8 +33,7 @@ class MyAddressesList extends StatelessWidget {
             );
           },
           onDelete: () {
-            WarningBox.show(
-              context: context,
+            context.showWarningAlert(
               message: LocaleKeys.address_confirm_delete.tr(),
               onPrimaryPressed: () {
                 context.read<AddressesCubit>().deleteAddress(address.id);

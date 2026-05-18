@@ -1,4 +1,3 @@
-import 'package:aqua_go/core/components/custom_alert_box.dart';
 import 'package:aqua_go/core/themes/app_colors.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -87,8 +86,7 @@ class PrivacyPolicyView extends StatelessWidget {
                       textColor: lightAppColors.themeColor,
                       borderColor: context.colors.error,
                       onPressed: () {
-                        WarningBox.show(
-                          context: context,
+                        context.showWarningAlert(
                           title: LocaleKeys.auth_delete_account.tr(),
                           message: LocaleKeys.auth_delete_account_confirmation
                               .tr(),

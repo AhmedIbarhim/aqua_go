@@ -23,14 +23,13 @@ class FetchUserData {
     return getUser()?.gender ?? '';
   }
 
-  static DateTime getBirthdate() {
-    return getUser()?.birthdate ?? DateTime.now();
+  static DateTime? getBirthdate() {
+    return getUser()?.birthdate;
   }
 
   static String? getAvatarUrl() {
-    return getUser()?.name != null
-        ? Endpoints.nameAvatar(getUser()!.name)
-        : null;
+    final name = getUser()?.name;
+    return name != null ? Endpoints.nameAvatar(name) : null;
   }
 
   static String? getEmail() {

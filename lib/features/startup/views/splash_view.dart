@@ -2,6 +2,9 @@ import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:flutter/material.dart';
 
+import '../../../core/config/local_storage/secure_storage.dart';
+import '../../../core/config/local_storage/shared_prefs.dart';
+import '../../../core/constants.dart';
 import '../../../core/route/routes.dart';
 
 class SplashView extends StatefulWidget {
@@ -15,12 +18,26 @@ class _SplashViewState extends State<SplashView> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 2), () {
-      if (!mounted) return;
+    _checkNavigation();
+  }
 
-      context.pushReplacementNamed(Routes.onboarding);
-      // context.pushReplacementNamed(Routes.layout);
-    });
+  Future<void> _checkNavigation() async {
+    await Future.delayed(const Duration(seconds: 2));
+    if (!mounted) return;
+
+    final token = await SecureStorage.read(kAccessToken);
+    if (!mounted) return;
+
+    if (token != null && token.isNotEmpty) {
+      context.pushReplacementNamed(Routes.layout);
+    } else {
+      final isNotFirstUse = SharedPrefs.getBool(kNotFirstUse);
+      if (isNotFirstUse) {
+        context.pushReplacementNamed(Routes.login);
+      } else {
+        context.pushReplacementNamed(Routes.onboarding);
+      }
+    }
   }
 
   @override

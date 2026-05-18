@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:aqua_go/core/themes/app_text_styles.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +19,8 @@ class ProfileTile extends StatelessWidget {
   final bool toggleValue;
   final ValueChanged<bool>? onToggleChanged;
   final VoidCallback? onTap;
+  final bool alreadyColoredIcon;
+  final bool isPhoneNumber;
 
   const ProfileTile({
     super.key,
@@ -30,6 +34,8 @@ class ProfileTile extends StatelessWidget {
     this.toggleValue = false,
     this.onToggleChanged,
     this.onTap,
+    this.alreadyColoredIcon = false,
+    this.isPhoneNumber = false,
   });
 
   @override
@@ -62,18 +68,19 @@ class ProfileTile extends StatelessWidget {
                     icon,
                     width: sw(24),
                     height: sw(24),
-                    colorFilter: ColorFilter.mode(
-                      iconColor ?? context.colors.textPrimary,
-                      BlendMode.srcIn,
-                    ),
+                    colorFilter: alreadyColoredIcon
+                        ? null
+                        : ColorFilter.mode(
+                            iconColor ?? context.colors.textPrimary,
+                            BlendMode.srcIn,
+                          ),
                   ),
                   SizedBox(width: sw(8)),
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: AppTextStyles.regular14.copyWith(
-                        color: textColor ?? context.colors.textPrimary,
-                      ),
+                  Text(
+                    title,
+                    textDirection: isPhoneNumber ? ui.TextDirection.ltr : null,
+                    style: AppTextStyles.regular14.copyWith(
+                      color: textColor ?? context.colors.textPrimary,
                     ),
                   ),
                 ],

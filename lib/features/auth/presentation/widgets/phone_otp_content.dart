@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:aqua_go/features/auth/controllers/auth_cubit/auth_cubit.dart';
-import 'package:aqua_go/features/auth/data/models/user_model.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +24,37 @@ class _PhoneOtpContentState extends State<PhoneOtpContent> {
   late List<FocusNode> _focusNodes;
   Timer? _timer;
   int _start = 60;
+  String? _otpSessionId;
+  String? _errorMessage;
+
+  bool _isOtpValidationError(String message) {
+    final msg = message.toLowerCase();
+    if (msg.contains('timeout') ||
+        msg.contains('internet') ||
+        msg.contains('connection') ||
+        msg.contains('server error') ||
+        msg.contains('try again later') ||
+        msg.contains('canceled') ||
+        msg.contains('unexpected') ||
+        msg.contains('oops')) {
+      return false;
+    }
+    return true;
+  }
+
+  bool get _isExpiredError =>
+      _errorMessage != null &&
+      (_errorMessage!.toLowerCase().contains('expire') ||
+          _errorMessage!.contains('انتهت') ||
+          _errorMessage!.contains('منتهي'));
+
+  String get _displayError {
+    if (_errorMessage == null) return '';
+    if (_isExpiredError) {
+      return LocaleKeys.auth_otp_expired_message.tr();
+    }
+    return LocaleKeys.auth_otp_invalid_message.tr();
+  }
 
   @override
   void initState() {
@@ -32,6 +62,9 @@ class _PhoneOtpContentState extends State<PhoneOtpContent> {
     _controllers = List.generate(4, (index) => TextEditingController());
     _focusNodes = List.generate(4, (index) => FocusNode());
     startTimer();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<AuthCubit>().login(widget.phoneNumber);
+    });
   }
 
   void startTimer() {
@@ -74,7 +107,10 @@ class _PhoneOtpContentState extends State<PhoneOtpContent> {
     final height = MediaQuery.sizeOf(context).height;
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
-        if (state is LoginSuccess) {
+        if (state is OtpSent) {
+          _otpSessionId = state.otpSessionId;
+          context.showSuccessSnackBar(LocaleKeys.auth_otp_code_sent.tr());
+        } else if (state is LoginSuccess) {
           // Check if user has name (complete data)
           if (state.user.name == null || state.user.name!.isEmpty) {
             Navigator.pushNamedAndRemoveUntil(
@@ -91,9 +127,14 @@ class _PhoneOtpContentState extends State<PhoneOtpContent> {
             );
           }
         } else if (state is LoginError) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(state.message)));
+          context.showErrorSnackBar(state.message);
+          setState(() {
+            if (_isOtpValidationError(state.message)) {
+              _errorMessage = state.message;
+            } else {
+              _errorMessage = null;
+            }
+          });
         }
       },
       builder: (context, state) {
@@ -147,23 +188,46 @@ class _PhoneOtpContentState extends State<PhoneOtpContent> {
                 CustomOtpFields(
                   controllers: _controllers,
                   focusNodes: _focusNodes,
-                  onChanged: (value) => setState(() {}),
+                  hasError: _errorMessage != null,
+                  onChanged: (value) {
+                    setState(() {
+                      _errorMessage = null;
+                    });
+                  },
                 ),
+                if (_errorMessage != null) ...[
+                  SizedBox(height: height * 0.015),
+                  Center(
+                    child: Text(
+                      _displayError,
+                      style: AppTextStyles.regular16.copyWith(
+                        color: context.colors.error,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
                 SizedBox(height: height * 0.03),
                 CustomButton(
                   text: LocaleKeys.auth_verify.tr(),
                   // isLoading: state is LoginLoading,
-                  onPressed: _isOtpComplete
+                  onPressed:
+                      _isOtpComplete &&
+                          _otpSessionId != null &&
+                          _errorMessage == null
                       ? () {
                           final otp = _controllers.map((c) => c.text).join();
-                          // For mock flow, we just need phone to create initial user if not exists
                           context.read<AuthCubit>().verifyOtp(
-                            UserModel(phone: widget.phoneNumber),
-                            otp,
+                            phone: widget.phoneNumber,
+                            otpSessionId: _otpSessionId!,
+                            otp: otp,
                           );
                         }
                       : null,
-                  enabled: _isOtpComplete,
+                  enabled:
+                      _isOtpComplete &&
+                      _otpSessionId != null &&
+                      _errorMessage == null,
                 ),
                 SizedBox(height: height * 0.025),
                 Center(
@@ -174,6 +238,7 @@ class _PhoneOtpContentState extends State<PhoneOtpContent> {
                               _start = 60;
                             });
                             startTimer();
+                            context.read<AuthCubit>().login(widget.phoneNumber);
                           },
                           child: Text(
                             LocaleKeys.auth_resend_code_button.tr(),

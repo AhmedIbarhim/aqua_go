@@ -1,4 +1,3 @@
-import 'package:aqua_go/core/components/custom_alert_box.dart';
 import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:aqua_go/features/my_cars/data/models/my_car_model.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -89,8 +88,7 @@ class MyCarCard extends StatelessWidget {
                       SizedBox(width: width * 0.04),
                       GestureDetector(
                         onTap: () {
-                          WarningBox.show(
-                            context: context,
+                          context.showWarningAlert(
                             primaryButtonText: LocaleKeys.delete_confirm.tr(),
                             title: LocaleKeys.delete_confirm.tr(),
                             message: LocaleKeys.my_cars_delete_message.tr(),

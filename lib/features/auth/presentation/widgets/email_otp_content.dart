@@ -11,8 +11,9 @@ import '../../../../core/themes/app_text_styles.dart';
 import '../../controllers/auth_cubit/auth_cubit.dart';
 
 class EmailOtpContent extends StatefulWidget {
-  const EmailOtpContent({super.key, required this.email});
+  const EmailOtpContent({super.key, required this.email, required this.otpSessionId});
   final String email;
+  final String otpSessionId;
 
   @override
   State<EmailOtpContent> createState() => _EmailOtpContentState();
@@ -23,10 +24,12 @@ class _EmailOtpContentState extends State<EmailOtpContent> {
   late List<FocusNode> _focusNodes;
   Timer? _timer;
   int _start = 120;
+  String? _currentOtpSessionId;
 
   @override
   void initState() {
     super.initState();
+    _currentOtpSessionId = widget.otpSessionId;
     _controllers = List.generate(4, (index) => TextEditingController());
     _focusNodes = List.generate(4, (index) => FocusNode());
     startTimer();
@@ -70,108 +73,120 @@ class _EmailOtpContentState extends State<EmailOtpContent> {
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.sizeOf(context).height;
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 24, vertical: height * 0.02),
-      decoration: BoxDecoration(
-        color: darkAppColors.themeColor,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(32),
-          topRight: Radius.circular(32),
+    return BlocListener<AuthCubit, AuthState>(
+      listener: (context, state) {
+        if (state is EmailOtpSent) {
+          setState(() {
+            _currentOtpSessionId = state.otpSessionId;
+          });
+          context.showSuccessSnackBar(LocaleKeys.auth_otp_code_sent.tr());
+        }
+      },
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(horizontal: 24, vertical: height * 0.02),
+        decoration: BoxDecoration(
+          color: darkAppColors.themeColor,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(32),
+            topRight: Radius.circular(32),
+          ),
         ),
-      ),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              LocaleKeys.auth_verify_email.tr(),
-              style: AppTextStyles.semiBold24.copyWith(
-                color: darkAppColors.textPrimary,
-              ),
-            ),
-            SizedBox(height: height * 0.02),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text(
-                  LocaleKeys.auth_enter_verification_code.tr(),
-                  style: AppTextStyles.regular16.copyWith(
-                    color: darkAppColors.textSecondary,
-                  ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                LocaleKeys.auth_verify_email.tr(),
+                style: AppTextStyles.semiBold24.copyWith(
+                  color: darkAppColors.textPrimary,
                 ),
-                const SizedBox(width: 4),
-                Expanded(
-                  child: Text(
-                    widget.email,
+              ),
+              SizedBox(height: height * 0.02),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(
+                    LocaleKeys.auth_enter_verification_code.tr(),
                     style: AppTextStyles.regular16.copyWith(
                       color: darkAppColors.textSecondary,
                     ),
-                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-              ],
-            ),
-            SizedBox(height: height * 0.03),
-            CustomOtpFields(
-              controllers: _controllers,
-              focusNodes: _focusNodes,
-              onChanged: (value) => setState(() {}),
-            ),
-            SizedBox(height: height * 0.03),
-            CustomButton(
-              text: LocaleKeys.auth_verify.tr(),
-              onPressed: _isOtpComplete
-                  ? () {
-                      final otp = _controllers.map((c) => c.text).join();
-                      context.read<AuthCubit>().verifyEmailOtp(
-                        widget.email,
-                        otp,
-                      );
-                    }
-                  : null,
-              enabled: _isOtpComplete,
-            ),
-
-            SizedBox(height: height * 0.025),
-            Center(
-              child: _start == 0
-                  ? GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _start = 120;
-                        });
-                        startTimer();
-                      },
-                      child: Text(
-                        LocaleKeys.auth_resend_code_button.tr(),
-                        style: AppTextStyles.regular16.copyWith(
-                          color: context.colors.primary,
-                        ),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Text(
+                      widget.email,
+                      style: AppTextStyles.regular16.copyWith(
+                        color: darkAppColors.textSecondary,
                       ),
-                    )
-                  : Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          LocaleKeys.auth_resend_code.tr(),
-                          style: AppTextStyles.regular16.copyWith(
-                            color: darkAppColors.contentSecondaryLight,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          _timerText,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: height * 0.03),
+              CustomOtpFields(
+                controllers: _controllers,
+                focusNodes: _focusNodes,
+                onChanged: (value) => setState(() {}),
+              ),
+              SizedBox(height: height * 0.03),
+              CustomButton(
+                text: LocaleKeys.auth_verify.tr(),
+                onPressed: _isOtpComplete && _currentOtpSessionId != null
+                    ? () {
+                        final otp = _controllers.map((c) => c.text).join();
+                        context.read<AuthCubit>().confirmEmailVerify(
+                          email: widget.email,
+                          otpSessionId: _currentOtpSessionId!,
+                          otp: otp,
+                        );
+                      }
+                    : null,
+                enabled: _isOtpComplete && _currentOtpSessionId != null,
+              ),
+
+              SizedBox(height: height * 0.025),
+              Center(
+                child: _start == 0
+                    ? GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _start = 120;
+                          });
+                          startTimer();
+                          context.read<AuthCubit>().requestEmailVerify(widget.email);
+                        },
+                        child: Text(
+                          LocaleKeys.auth_resend_code_button.tr(),
                           style: AppTextStyles.regular16.copyWith(
                             color: context.colors.primary,
                           ),
                         ),
-                      ],
-                    ),
-            ),
-            SizedBox(height: height * 0.02),
-          ],
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            LocaleKeys.auth_resend_code.tr(),
+                            style: AppTextStyles.regular16.copyWith(
+                              color: darkAppColors.contentSecondaryLight,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            _timerText,
+                            style: AppTextStyles.regular16.copyWith(
+                              color: context.colors.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+              ),
+              SizedBox(height: height * 0.02),
+            ],
+          ),
         ),
       ),
     );

@@ -4,3 +4,5 @@ const String kArabicLang = "ar";
 const String kEnglishLang = "en";
 const String kThemeMode = "kThemeMode";
 const String kUserData = "kUserData";
+const String kAccessToken = "kAccessToken";
+const String kRefreshToken = "kRefreshToken";

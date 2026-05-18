@@ -58,6 +58,9 @@ abstract class  LocaleKeys {
   static const auth_logout_confirmation = 'auth.logout_confirmation';
   static const auth_delete_account = 'auth.delete_account';
   static const auth_delete_account_confirmation = 'auth.delete_account_confirmation';
+  static const auth_otp_expired_message = 'auth.otp_expired_message';
+  static const auth_otp_invalid_message = 'auth.otp_invalid_message';
+  static const auth_otp_code_sent = 'auth.otp_code_sent';
   static const auth = 'auth';
   static const layout_home = 'layout.home';
   static const layout_my_cars = 'layout.my_cars';
@@ -232,6 +235,7 @@ abstract class  LocaleKeys {
   static const profile_gender = 'profile.gender';
   static const profile_edit_data = 'profile.edit_data';
   static const profile_save_changes = 'profile.save_changes';
+  static const profile_confirm_logout = 'profile.confirm_logout';
   static const profile = 'profile';
   static const settings_more_settings = 'settings.more_settings';
   static const settings_privacy_policy = 'settings.privacy_policy';
