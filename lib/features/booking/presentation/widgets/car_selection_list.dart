@@ -85,16 +85,21 @@ class CarSelectionList extends StatelessWidget {
             ),
           ),
           SizedBox(height: height * 0.01),
-          Text(
-            '${car.name} ${car.model}',
-            style: AppTextStyles.regular12.copyWith(
-              color: isSelected
-                  ? context.colors.textPrimary
-                  : context.colors.contentDisabled,
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              context.isEn
+                  ? '${car.carBrand?.vehicleBrandName.nameEn} ${car.carModel?.vehicleModelName.nameEn}'
+                  : '${car.carBrand?.vehicleBrandName.nameAr} ${car.carModel?.vehicleModelName.nameAr}',
+              style: AppTextStyles.regular12.copyWith(
+                color: isSelected
+                    ? context.colors.textPrimary
+                    : context.colors.contentDisabled,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),

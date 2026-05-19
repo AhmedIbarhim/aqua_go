@@ -119,8 +119,8 @@ class MyCarCard extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: width * 0.01),
             child: Text(
               context.isAr
-                  ? "${car.carBrand?.brandName.nameAr} ${car.carModel?.name.nameAr}"
-                  : "${car.carBrand?.brandName.nameEn} ${car.carModel?.name.nameEn}",
+                  ? "${car.carBrand?.vehicleBrandName.nameAr} ${car.carModel?.vehicleModelName.nameAr}"
+                  : "${car.carBrand?.vehicleBrandName.nameEn} ${car.carModel?.vehicleModelName.nameEn}",
               style: AppTextStyles.medium14,
               textAlign: TextAlign.start,
               maxLines: 1,

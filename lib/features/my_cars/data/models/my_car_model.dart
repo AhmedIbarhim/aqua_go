@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import '../../../../core/helpers/car_color_helper.dart';
 import '../../../../core/utils/app_assets.dart';
 import 'vehicle_brand_model.dart';
@@ -25,19 +24,19 @@ class MyCarModel {
     this.carModel,
   });
 
-  // Getter for brand / make name
-  String get name {
-    if (carBrand == null) return '';
-    final isArabic = Intl.defaultLocale?.startsWith('ar') ?? false;
-    return isArabic ? carBrand!.brandName.nameAr : carBrand!.brandName.nameEn;
-  }
+  // // Getter for brand / make name
+  // String get name {
+  //   if (carBrand == null) return '';
+  //   final isArabic = Intl.defaultLocale?.startsWith('ar') ?? false;
+  //   return isArabic ? carBrand!.brandName.nameAr : carBrand!.brandName.nameEn;
+  // }
 
-  // Getter for model name
-  String get model {
-    if (carModel == null) return '';
-    final isArabic = Intl.defaultLocale?.startsWith('ar') ?? false;
-    return isArabic ? carModel!.name.nameAr : carModel!.name.nameEn;
-  }
+  // // Getter for model name
+  // String get model {
+  //   if (carModel == null) return '';
+  //   final isArabic = Intl.defaultLocale?.startsWith('ar') ?? false;
+  //   return isArabic ? carModel!.name.nameAr : carModel!.name.nameEn;
+  // }
 
   // Getter for year (API does not have year; return default placeholder or fallback)
   String get year => '2024';

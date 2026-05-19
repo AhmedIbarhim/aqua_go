@@ -62,8 +62,8 @@ class _CarBrandDropdownState extends State<CarBrandDropdown> {
         final isArabic = context.locale.languageCode == 'ar';
         final currentDisplayValue = _selectedValue != null
             ? (isArabic
-                  ? _selectedValue!.brandName.nameAr
-                  : _selectedValue!.brandName.nameEn)
+                  ? _selectedValue!.vehicleBrandName.nameAr
+                  : _selectedValue!.vehicleBrandName.nameEn)
             : null;
 
         return Column(
@@ -120,8 +120,8 @@ class _CarBrandDropdownState extends State<CarBrandDropdown> {
                               mainAxisSize: MainAxisSize.min,
                               children: currentBrands.map((item) {
                                 final displayName = isArabic
-                                    ? item.brandName.nameAr
-                                    : item.brandName.nameEn;
+                                    ? item.vehicleBrandName.nameAr
+                                    : item.vehicleBrandName.nameEn;
                                 final isSelected =
                                     item.id == _selectedValue?.id;
                                 return InkWell(

@@ -14,7 +14,7 @@ import '../../../../core/enums/gender_enum.dart';
 import '../../../../core/route/routes.dart';
 import '../widgets/gender_selection_widget.dart';
 
-import 'package:aqua_go/features/auth/data/repos/auth_repo.dart';
+import 'package:aqua_go/features/auth/data/repos/auth_repository.dart';
 import 'package:aqua_go/features/auth/controllers/auth_cubit/auth_cubit.dart';
 import 'package:aqua_go/core/config/di/service_locator.dart';
 
@@ -37,7 +37,7 @@ class _ProfileDataViewState extends State<ProfileDataView> {
   void initState() {
     super.initState();
     isEditing = widget.isFirstTime;
-    final user = locator<AuthRepo>().getUser();
+    final user = locator<AuthRepository>().getUser();
     _nameController = TextEditingController(
       text: widget.isFirstTime ? '' : user?.name ?? '',
     );
@@ -215,7 +215,7 @@ class _ProfileDataViewState extends State<ProfileDataView> {
           ? CustomButton(
               text: LocaleKeys.proceed.tr(),
               onPressed: () {
-                final user = locator<AuthRepo>().getUser();
+                final user = locator<AuthRepository>().getUser();
                 if (user != null) {
                   final updatedUser = user.copyWith(
                     name: _nameController.text,
@@ -240,7 +240,7 @@ class _ProfileDataViewState extends State<ProfileDataView> {
                   child: CustomButton(
                     text: LocaleKeys.profile_save_changes.tr(),
                     onPressed: () {
-                      final user = locator<AuthRepo>().getUser();
+                      final user = locator<AuthRepository>().getUser();
                       if (user != null) {
                         final updatedUser = user.copyWith(
                           name: _nameController.text,

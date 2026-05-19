@@ -3,14 +3,14 @@ import 'package:equatable/equatable.dart';
 class VehicleModelModel extends Equatable {
   final String id;
   final String makeId;
-  final ModelName name;
+  final ModelName vehicleModelName;
   final bool active;
   final int version;
 
   const VehicleModelModel({
     required this.id,
     required this.makeId,
-    required this.name,
+    required this.vehicleModelName,
     required this.active,
     required this.version,
   });
@@ -19,7 +19,7 @@ class VehicleModelModel extends Equatable {
     return VehicleModelModel(
       id: json['id'] as String,
       makeId: json['makeId'] as String,
-      name: ModelName.fromJson(json['name']),
+      vehicleModelName: ModelName.fromJson(json['name']),
       active: json['active'] as bool? ?? true,
       version: json['version'] as int? ?? 1,
     );
@@ -29,14 +29,14 @@ class VehicleModelModel extends Equatable {
     return {
       'id': id,
       'makeId': makeId,
-      'name': name.toJson(),
+      'name': vehicleModelName.toJson(),
       'active': active,
       'version': version,
     };
   }
 
   @override
-  List<Object?> get props => [id, makeId, name, active, version];
+  List<Object?> get props => [id, makeId, vehicleModelName, active, version];
 }
 
 class ModelName extends Equatable {

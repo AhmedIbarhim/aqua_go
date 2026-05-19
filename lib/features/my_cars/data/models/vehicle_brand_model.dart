@@ -2,13 +2,13 @@ import 'package:equatable/equatable.dart';
 
 class VehicleBrandModel extends Equatable {
   final String id;
-  final BrandName brandName;
+  final BrandName vehicleBrandName;
   final bool active;
   final int version;
 
   const VehicleBrandModel({
     required this.id,
-    required this.brandName,
+    required this.vehicleBrandName,
     required this.active,
     required this.version,
   });
@@ -16,7 +16,7 @@ class VehicleBrandModel extends Equatable {
   factory VehicleBrandModel.fromJson(Map<String, dynamic> json) {
     return VehicleBrandModel(
       id: json['id'] as String,
-      brandName: BrandName.fromJson(json['name']),
+      vehicleBrandName: BrandName.fromJson(json['name']),
       active: json['active'] as bool? ?? true,
       version: json['version'] as int? ?? 1,
     );
@@ -25,14 +25,14 @@ class VehicleBrandModel extends Equatable {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'name': brandName.toJson(),
+      'name': vehicleBrandName.toJson(),
       'active': active,
       'version': version,
     };
   }
 
   @override
-  List<Object?> get props => [id, brandName, active, version];
+  List<Object?> get props => [id, vehicleBrandName, active, version];
 }
 
 class BrandName extends Equatable {

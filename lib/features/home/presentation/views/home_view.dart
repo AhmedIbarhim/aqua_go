@@ -1,11 +1,14 @@
 import 'package:carousel_slider/carousel_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/extentions/context_extentions.dart';
+import '../../../../core/config/di/service_locator.dart';
 import '../../data/models/banner_model.dart';
 import '../../data/models/current_package_model.dart';
+import '../../controllers/services_controller/services_cubit.dart';
 import '../widgets/home_banners_carosal.dart';
 import '../widgets/packages_list_view.dart';
-import '../widgets/services_list_view.dart';
+import '../widgets/services_page_view.dart';
 import '../widgets/offers_list_view.dart';
 
 class HomeView extends StatefulWidget {
@@ -18,6 +21,7 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   final CarouselSliderController _carouselController =
       CarouselSliderController();
+  final ServicesCubit _servicesCubit = locator<ServicesCubit>();
 
   List<BannerModel> banners = [
     BannerModel(image: "assets/images/banner_demo.png"),
@@ -36,47 +40,62 @@ class _HomeViewState extends State<HomeView> {
   );
 
   @override
+  void initState() {
+    super.initState();
+    _servicesCubit.getServices();
+  }
+
+  @override
+  void dispose() {
+    _servicesCubit.close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
-      onRefresh: () async {
-        // Reload data here
-      },
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            HomeBannersCarosal(
-              carouselController: _carouselController,
-              banners: banners,
-            ),
-            SizedBox(height: context.screenHeight * 0.01),
-            Container(
-              decoration: BoxDecoration(
-                color: context.colors.background,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
+    return BlocProvider.value(
+      value: _servicesCubit,
+      child: RefreshIndicator(
+        onRefresh: () async {
+          await _servicesCubit.getServices();
+        },
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              HomeBannersCarosal(
+                carouselController: _carouselController,
+                banners: banners,
+              ),
+              SizedBox(height: context.screenHeight * 0.01),
+              Container(
+                decoration: BoxDecoration(
+                  color: context.colors.background,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    // SizedBox(height: context.screenHeight * 0.02),
+                    // CurrentPackageSection(
+                    //   currentPackage: dummyPackage,
+                    //   onUsePackage: () {
+                    //     // Handle use package
+                    //   },
+                    // ),
+                    SizedBox(height: context.screenHeight * 0.02),
+                    const PackagesListView(),
+                    SizedBox(height: context.screenHeight * 0.02),
+                    const ServicesPageView(),
+                    SizedBox(height: context.screenHeight * 0.02),
+                    const OffersListView(),
+                    SizedBox(height: context.screenHeight * 0.15),
+                  ],
                 ),
               ),
-              child: Column(
-                children: [
-                  // SizedBox(height: context.screenHeight * 0.02),
-                  // CurrentPackageSection(
-                  //   currentPackage: dummyPackage,
-                  //   onUsePackage: () {
-                  //     // Handle use package
-                  //   },
-                  // ),
-                  SizedBox(height: context.screenHeight * 0.02),
-                  const PackagesListView(),
-                  SizedBox(height: context.screenHeight * 0.02),
-                  const ServicesListView(),
-                  SizedBox(height: context.screenHeight * 0.02),
-                  const OffersListView(),
-                  SizedBox(height: context.screenHeight * 0.15),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

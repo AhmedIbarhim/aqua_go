@@ -57,14 +57,18 @@ class ServiceCard extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                serviceModel.title,
+                                context.isEn
+                                    ? serviceModel.rawName.nameEn
+                                    : serviceModel.rawName.nameAr,
                                 style: AppTextStyles.bold16,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                serviceModel.description,
+                                context.isEn
+                                    ? serviceModel.rawDescription.descEn
+                                    : serviceModel.rawDescription.descAr,
                                 style: AppTextStyles.regular12.copyWith(
                                   color: context.colors.textSecondary,
                                 ),

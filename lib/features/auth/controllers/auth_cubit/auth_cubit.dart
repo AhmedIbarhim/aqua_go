@@ -1,12 +1,12 @@
 import 'package:aqua_go/features/auth/data/models/user_model.dart';
-import 'package:aqua_go/features/auth/data/repos/auth_repo.dart';
+import 'package:aqua_go/features/auth/data/repos/auth_repository.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
 part 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
-  final AuthRepo _authRepo;
+  final AuthRepository _authRepo;
   AuthCubit(this._authRepo) : super(LoginInitial());
 
   Future<void> login(String phone) async {

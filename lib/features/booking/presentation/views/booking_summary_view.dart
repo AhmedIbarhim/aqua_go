@@ -101,8 +101,9 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
           const SizedBox(height: 16),
           BookingSummaryCard(
             serviceName: 'غسلة (داخلي و خارجي)',
-            carName:
-                '${bookingState.selectedCar?.name ?? ''} ${bookingState.selectedCar?.model ?? ''}',
+            carName: context.isAr
+                ? bookingState.selectedCar!.carBrand!.vehicleBrandName.nameAr
+                : bookingState.selectedCar!.carModel!.vehicleModelName.nameEn,
             location: bookingState.selectedAddress?.details ?? '',
             dateTime: bookingState.selectedDate != null
                 ? '${bookingState.selectedDate!.month}/${bookingState.selectedDate!.day}/${bookingState.selectedDate!.year} - ${bookingState.selectedTime ?? ""}'
