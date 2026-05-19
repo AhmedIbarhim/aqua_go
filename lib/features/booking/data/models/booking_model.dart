@@ -1,4 +1,4 @@
-class ReservationModel {
+class BookingModel {
   final String id;
   final String carId;
   final String carName;
@@ -12,7 +12,7 @@ class ReservationModel {
   final String reservationDateTime;
   final String reservationStatus;
 
-  ReservationModel({
+  BookingModel({
     required this.id,
     required this.carId,
     required this.carName,

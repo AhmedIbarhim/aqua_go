@@ -11,11 +11,11 @@ import '../../../../core/components/bottom_action_sheet_container.dart';
 import '../../../../generated/locale_keys.g.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/config/di/service_locator.dart';
-import '../../../adress/controllers/addresses_controller/addresses_cubit.dart';
-import '../../../adress/controllers/maps_controller/maps_cubit.dart';
+import '../../../address/controllers/addresses_controller/addresses_cubit.dart';
+import '../../../address/controllers/maps_controller/maps_cubit.dart';
 import '../widgets/location_selection_card.dart';
-import '../../../adress/presentation/views/new_address_map_view.dart';
-import '../../../adress/data/models/address_model.dart';
+import '../../../address/presentation/views/new_address_map_view.dart';
+import '../../../address/data/models/address_model.dart';
 import '../../presentation/controllers/booking_cubit.dart';
 import '../../../../core/route/app_router.dart';
 

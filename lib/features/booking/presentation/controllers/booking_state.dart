@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import '../../../adress/data/models/address_model.dart';
+import '../../../address/data/models/address_model.dart';
 import '../../../my_cars/data/models/my_car_model.dart';
 import '../widgets/payment_method_selection.dart';
 
@@ -43,7 +43,8 @@ class BookingState extends Equatable {
       status: status ?? this.status,
       selectedAddress: selectedAddress ?? this.selectedAddress,
       selectedCar: selectedCar ?? this.selectedCar,
-      selectedServiceIndices: selectedServiceIndices ?? this.selectedServiceIndices,
+      selectedServiceIndices:
+          selectedServiceIndices ?? this.selectedServiceIndices,
       selectedDate: selectedDate ?? this.selectedDate,
       selectedTime: selectedTime ?? this.selectedTime,
       bikerNotes: bikerNotes ?? this.bikerNotes,
@@ -54,14 +55,14 @@ class BookingState extends Equatable {
 
   @override
   List<Object?> get props => [
-        status,
-        selectedAddress,
-        selectedCar,
-        selectedServiceIndices,
-        selectedDate,
-        selectedTime,
-        bikerNotes,
-        paymentMethod,
-        errorMessage,
-      ];
+    status,
+    selectedAddress,
+    selectedCar,
+    selectedServiceIndices,
+    selectedDate,
+    selectedTime,
+    bikerNotes,
+    paymentMethod,
+    errorMessage,
+  ];
 }

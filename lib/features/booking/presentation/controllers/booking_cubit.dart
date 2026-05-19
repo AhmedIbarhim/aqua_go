@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../adress/data/models/address_model.dart';
+import '../../../address/data/models/address_model.dart';
 import '../../../my_cars/data/models/my_car_model.dart';
 import '../../data/repos/booking_repo.dart';
 import '../widgets/payment_method_selection.dart';
@@ -9,8 +9,8 @@ class BookingCubit extends Cubit<BookingState> {
   final BookingRepo _bookingRepo;
 
   BookingCubit({required BookingRepo bookingRepo})
-      : _bookingRepo = bookingRepo,
-        super(const BookingState());
+    : _bookingRepo = bookingRepo,
+      super(const BookingState());
 
   void selectAddress(AddressModel address) {
     emit(state.copyWith(selectedAddress: address));
@@ -47,10 +47,12 @@ class BookingCubit extends Cubit<BookingState> {
         state.selectedCar == null ||
         state.selectedDate == null ||
         state.selectedTime == null) {
-      emit(state.copyWith(
-        status: BookingStatus.failure,
-        errorMessage: 'يرجى إكمال جميع بيانات الحجز المطلوبة',
-      ));
+      emit(
+        state.copyWith(
+          status: BookingStatus.failure,
+          errorMessage: 'يرجى إكمال جميع بيانات الحجز المطلوبة',
+        ),
+      );
       return;
     }
 
@@ -58,10 +60,12 @@ class BookingCubit extends Cubit<BookingState> {
 
     final result = await _bookingRepo.createBooking();
     result.fold(
-      (failure) => emit(state.copyWith(
-        status: BookingStatus.failure,
-        errorMessage: failure.message,
-      )),
+      (failure) => emit(
+        state.copyWith(
+          status: BookingStatus.failure,
+          errorMessage: failure.message,
+        ),
+      ),
       (_) => emit(state.copyWith(status: BookingStatus.success)),
     );
   }

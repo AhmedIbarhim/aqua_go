@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../features/booking/presentation/controllers/booking_cubit.dart';
 import '../../../../core/config/di/service_locator.dart';
-import '../../features/adress/presentation/views/my_addresses_view.dart';
-import '../../features/adress/presentation/views/new_address_map_view.dart';
+import '../../features/address/presentation/views/my_addresses_view.dart';
+import '../../features/address/presentation/views/new_address_map_view.dart';
 import '../../features/auth/presentation/views/add_email_view.dart';
 import '../../features/auth/presentation/views/email_otp_view.dart';
 import '../../features/auth/presentation/views/login_view.dart';
@@ -34,7 +34,8 @@ import '../../features/profile/presentation/views/support_view.dart';
 import 'routes.dart';
 
 abstract class AppRouter {
-  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
 
   static Route generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -56,10 +57,8 @@ abstract class AppRouter {
       case Routes.emailOtp:
         final args = settings.arguments as EmailOtpArgs;
         return MaterialPageRoute(
-          builder: (_) => EmailOtpView(
-            email: args.email,
-            otpSessionId: args.otpSessionId,
-          ),
+          builder: (_) =>
+              EmailOtpView(email: args.email, otpSessionId: args.otpSessionId),
         );
 
       case Routes.addEmail:

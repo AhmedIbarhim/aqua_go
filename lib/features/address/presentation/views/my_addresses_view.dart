@@ -1,7 +1,7 @@
 import 'package:aqua_go/core/components/custom_button.dart';
 import 'package:aqua_go/core/components/generic_app_bar.dart';
 import 'package:aqua_go/core/components/custom_loading_indicator.dart';
-import 'package:aqua_go/features/adress/data/models/address_model.dart';
+import 'package:aqua_go/features/address/data/models/address_model.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';

@@ -10,11 +10,11 @@ class AddressesRemoteDataSource {
   AddressesRemoteDataSource(this._apiClient);
 
   Future<Either<Failure, Response>> getAddresses() {
-    return _apiClient.get(Endpoints.myAdresses);
+    return _apiClient.get(Endpoints.myAddresses);
   }
 
   Future<Either<Failure, Response>> addAddress(Map<String, dynamic> data) {
-    return _apiClient.post(Endpoints.myAdresses, data: data);
+    return _apiClient.post(Endpoints.myAddresses, data: data);
   }
 
   Future<Either<Failure, Response>> updateAddress(

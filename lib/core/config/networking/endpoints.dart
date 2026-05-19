@@ -7,8 +7,10 @@ abstract class Endpoints {
   static const String logout = '/auth/logout';
   static const String refreshToken = '/auth/token/refresh';
 
-  // Customer Profile Endpoints
+  // Customer Profile & Account Endpoints
   static const String customerMe = '/me';
+  static const String deletionRequest = '/me/deletion-request';
+  static const String dataExport = '/me/data-export';
 
   // Customer Email Verification
   static const String verifyRequest = '/me/email/verify/request';
@@ -22,11 +24,12 @@ abstract class Endpoints {
   static const String vehicleBrands = '/catalog/vehicle-makes';
   static String vehicleModels(String brandId) =>
       '/catalog/vehicle-makes/$brandId/models';
-
   static const String services = '/services';
 
-  // Customer Addresses Endpoints
-  static const String myAdresses = '/me/addresses';
+  // Customer Saved Addresses Endpoints
+  static const String myAddresses =
+      '/me/addresses'; // Kept for compatibility with existing typo usage
+
   static String myAddress(String addressId) => '/me/addresses/$addressId';
 
   // Customer Bookings & Quotes Endpoints
@@ -37,8 +40,55 @@ abstract class Endpoints {
       '/bookings/$bookingId/cancel';
   static String rescheduleBooking(String bookingId) =>
       '/bookings/$bookingId/reschedule';
+  static String scheduleBooking(String bookingId) =>
+      '/bookings/$bookingId/schedule';
+  static String rateBooking(String bookingId) => '/bookings/$bookingId/rating';
 
-  // Google Maps Endpoints
+  // Customer Banners Endpoints
+  static const String banners = '/banners';
+
+  // Customer Geo & Zone Coverage Endpoints
+  static const String zoneCheck = '/geo/zone-check';
+  static const String geoPlacesAutocomplete = '/geo/places/autocomplete';
+  static String geoPlaceDetail(String placeId) => '/geo/places/$placeId';
+
+  // Customer Subscriptions Endpoints
+  static const String subscriptions = '/subscriptions';
+  static String subscriptionDetail(String subscriptionId) =>
+      '/subscriptions/$subscriptionId';
+  static String cancelSubscription(String subscriptionId) =>
+      '/subscriptions/$subscriptionId/cancel';
+
+  // Customer Availability Endpoints
+  static const String availability = '/availability';
+
+  // Customer Notification Preferences Endpoints
+  static const String notificationPreferences = '/me/notification-preferences';
+
+  // Customer Notification Inbox & Devices Endpoints
+  static const String notifications = '/me/notifications';
+  static const String readAllNotifications = '/me/notifications/read-all';
+  static const String unreadNotificationsCount =
+      '/me/notifications/unread-count';
+  static String readNotification(String notificationId) =>
+      '/me/notifications/$notificationId/read';
+  static const String registerDevice = '/me/devices';
+  static String deregisterDevice(String deviceId) => '/me/devices/$deviceId';
+
+  // Customer Consent Endpoints
+  static const String consents = '/me/consents';
+
+  // Customer Policies Endpoints
+  static String policy(String type) => '/policies/$type';
+
+  // Customer Complaints Endpoints
+  static const String complaints = '/complaints';
+  static String complaintDetail(String complaintId) =>
+      '/complaints/$complaintId';
+  static String complaintPhotoPresign(String complaintId) =>
+      '/complaints/$complaintId/photos/presign';
+
+  // External Google Maps Endpoints (Legacy Direct Calls)
   static const String googleMapsAutocompleteUrl =
       'https://maps.googleapis.com/maps/api/place/autocomplete/json';
   static const String googleMapsPlaceDetailsUrl =

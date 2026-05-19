@@ -1,8 +1,8 @@
-import 'package:aqua_go/features/adress/controllers/addresses_controller/addresses_cubit.dart';
-import 'package:aqua_go/features/adress/data/repos/addresses_repository.dart';
-import 'package:aqua_go/features/adress/data/data_sources/addresses_remote_data_source.dart';
-import 'package:aqua_go/features/adress/controllers/maps_controller/maps_cubit.dart';
-import 'package:aqua_go/features/adress/data/repos/maps_repository.dart';
+import 'package:aqua_go/features/address/controllers/addresses_controller/addresses_cubit.dart';
+import 'package:aqua_go/features/address/data/repos/addresses_repository.dart';
+import 'package:aqua_go/features/address/data/data_sources/addresses_remote_data_source.dart';
+import 'package:aqua_go/features/address/controllers/maps_controller/maps_cubit.dart';
+import 'package:aqua_go/features/address/data/repos/maps_repository.dart';
 import 'package:aqua_go/features/auth/controllers/auth_cubit/auth_cubit.dart';
 import 'package:aqua_go/features/auth/data/repos/auth_repository.dart';
 import 'package:aqua_go/features/auth/data/services/auth_service.dart';
@@ -16,7 +16,7 @@ import 'package:aqua_go/features/home/data/repos/services_repository.dart';
 import 'package:aqua_go/features/home/controllers/services_controller/services_cubit.dart';
 import 'package:get_it/get_it.dart';
 
-import '../../../features/adress/data/services/location_service.dart';
+import '../../../features/address/data/services/location_service.dart';
 import 'package:aqua_go/core/config/networking/endpoints.dart';
 import '../networking/api_client.dart';
 

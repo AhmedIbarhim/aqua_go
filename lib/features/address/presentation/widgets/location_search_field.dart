@@ -8,7 +8,7 @@ import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../../generated/locale_keys.g.dart';
 
-import 'package:aqua_go/features/adress/data/models/place_prediction_model.dart';
+import 'package:aqua_go/features/address/data/models/place_prediction_model.dart';
 
 class LocationSearchField extends StatelessWidget {
   final TextEditingController controller;
