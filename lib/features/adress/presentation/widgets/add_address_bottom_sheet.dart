@@ -10,9 +10,11 @@ import 'package:svg_flutter/svg.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/extentions/context_extentions.dart';
+import '../../../../core/route/routes.dart';
 import '../../data/models/address_model.dart';
 import '../../../../core/config/di/service_locator.dart';
 import '../../controllers/addresses_controller/addresses_cubit.dart';
+import '../views/new_address_map_view.dart';
 
 class AddAddressBottomSheet extends StatefulWidget {
   final String address;
@@ -59,17 +61,24 @@ class AddAddressBottomSheet extends StatefulWidget {
 class _AddAddressBottomSheetState extends State<AddAddressBottomSheet> {
   final TextEditingController _addressNameController = TextEditingController();
   final TextEditingController _accessNotesController = TextEditingController();
+  late final TextEditingController _addressController;
+  late double _lat;
+  late double _lng;
 
   @override
   void initState() {
     super.initState();
+    _lat = widget.lat;
+    _lng = widget.lng;
+    _addressController = TextEditingController(text: widget.address);
     if (widget.existingAddress != null) {
-      _addressNameController.text = widget.existingAddress!.name;
+      _addressNameController.text = widget.existingAddress!.label;
     }
   }
 
   @override
   void dispose() {
+    _addressController.dispose();
     _addressNameController.dispose();
     _accessNotesController.dispose();
     super.dispose();
@@ -77,114 +86,162 @@ class _AddAddressBottomSheetState extends State<AddAddressBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionLabel(
-          LocaleKeys.address_address_label.tr(),
-          isRequired: true,
-        ),
-        SizedBox(height: height * 0.01),
-        Container(
-          width: double.infinity,
-          padding: EdgeInsets.all(width * 0.03),
-          decoration: BoxDecoration(
-            color: context.colors.background,
-            border: Border.all(color: context.colors.borderSecondary),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Row(
-            children: [
-              SvgPicture.asset(
-                AppAssets.location,
-                width: 24,
-                height: 24,
-                colorFilter: ColorFilter.mode(
-                  context.colors.textSecondary,
-                  BlendMode.srcIn,
-                ),
-              ),
-              const SizedBox(width: 8),
+    return BlocConsumer<AddressesCubit, AddressesState>(
+      listener: (context, state) {
+        if (state is AddressesActionLoading) {
+          context.showLoadingOverlay();
+        } else {
+          context.hideLoadingOverlay();
+        }
 
-              SizedBox(
-                width: width * 0.7,
-                child: Text(
-                  widget.address,
-                  style: AppTextStyles.medium16.copyWith(
-                    color: context.colors.contentSecondaryLight,
+        if (state is AddressesActionSuccess) {
+          Navigator.pop(context); // Close bottom sheet
+          if (widget.existingAddress == null) {
+            Navigator.pop(context); // Return from map view
+          }
+        }
+
+        if (state is AddressesActionError) {
+          context.showErrorSnackBar(state.message);
+        }
+      },
+      builder: (context, state) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSectionLabel(
+              LocaleKeys.address_address_label.tr(),
+              isRequired: true,
+            ),
+            SizedBox(height: height * 0.01),
+            CustomTextFormField(
+              controller: _addressController,
+              label: LocaleKeys.address_address_label.tr(),
+              readOnly: true,
+              maxLines: 1,
+              prefixIcon: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: SvgPicture.asset(
+                  AppAssets.location,
+                  width: 24,
+                  height: 24,
+                  colorFilter: ColorFilter.mode(
+                    context.colors.textSecondary,
+                    BlendMode.srcIn,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.end,
                 ),
               ),
-            ],
-          ),
-        ),
-        SizedBox(height: height * 0.03),
+              onTap: () async {
+                final result = await context.pushNamed(
+                  Routes.newAddressMap,
+                  arguments: NewAddressMapArgs(
+                    forAddingAddress: false,
+                    address:
+                        widget.existingAddress ??
+                        AddressModel(
+                          id: null,
+                          label: _addressNameController.text.trim(),
+                          details: _addressController.text.trim(),
+                          lat: _lat,
+                          lng: _lng,
+                        ),
+                  ),
+                );
 
-        _buildSectionLabel(
-          LocaleKeys.address_address_name_label.tr(),
-          isRequired: true,
-        ),
-        SizedBox(height: height * 0.01),
-        CustomTextFormField(
-          controller: _addressNameController,
-          label: LocaleKeys.address_address_name_label.tr(),
-          prefixIcon: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: SvgPicture.asset(
-              AppAssets.location,
-              width: 24,
-              height: 24,
-              colorFilter: ColorFilter.mode(
-                context.colors.textSecondary,
-                BlendMode.srcIn,
+                if (result != null && result is Map<String, dynamic>) {
+                  final newAddressName = result['address'] as String;
+                  final newLat = result['lat'] as double;
+                  final newLng = result['lng'] as double;
+                  setState(() {
+                    _addressController.text = newAddressName;
+                    _lat = newLat;
+                    _lng = newLng;
+                  });
+                }
+              },
+            ),
+            SizedBox(height: height * 0.03),
+
+            _buildSectionLabel(
+              LocaleKeys.address_address_name_label.tr(),
+              isRequired: true,
+            ),
+            SizedBox(height: height * 0.01),
+            CustomTextFormField(
+              controller: _addressNameController,
+              label: LocaleKeys.address_address_name_label.tr(),
+              prefixIcon: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: SvgPicture.asset(
+                  AppAssets.location,
+                  width: 24,
+                  height: 24,
+                  colorFilter: ColorFilter.mode(
+                    context.colors.textSecondary,
+                    BlendMode.srcIn,
+                  ),
+                ),
               ),
             ),
-          ),
-        ),
-        SizedBox(height: height * 0.03),
+            SizedBox(height: height * 0.03),
 
-        _buildSectionLabel(LocaleKeys.address_access_notes_label.tr()),
-        SizedBox(height: height * 0.01),
-        CustomTextFormField(
-          controller: _accessNotesController,
-          label: LocaleKeys.address_access_notes_label.tr(),
-          keyboardType: TextInputType.multiline,
-          minLines: 3,
-        ),
-        SizedBox(height: height * 0.04),
+            _buildSectionLabel(LocaleKeys.address_access_notes_label.tr()),
+            SizedBox(height: height * 0.01),
+            CustomTextFormField(
+              controller: _accessNotesController,
+              label: LocaleKeys.address_access_notes_label.tr(),
+              keyboardType: TextInputType.multiline,
+              minLines: 3,
+            ),
+            SizedBox(height: height * 0.04),
 
-        CustomButton(
-          text: LocaleKeys.address_save_address.tr(),
-          onPressed: () {
-            if (_addressNameController.text.trim().isEmpty) return;
+            Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: CustomButton(
+                    text: widget.existingAddress == null
+                        ? LocaleKeys.address_save_address.tr()
+                        : LocaleKeys.profile_save_changes.tr(),
+                    onPressed: () {
+                      if (_addressNameController.text.trim().isEmpty) return;
 
-            final newAddress = AddressModel(
-              id:
-                  widget.existingAddress?.id ??
-                  DateTime.now().millisecondsSinceEpoch.toString(),
-              name: _addressNameController.text.trim(),
-              formattedAddress: widget.address,
-              lat: widget.lat,
-              lng: widget.lng,
-            );
+                      final newAddress = AddressModel(
+                        id: widget.existingAddress?.id,
+                        label: _addressNameController.text.trim(),
+                        details: _addressController.text.trim(),
+                        lat: _lat,
+                        lng: _lng,
+                      );
 
-            if (widget.existingAddress == null) {
-              context.read<AddressesCubit>().addAddress(newAddress);
-            } else {
-              context.read<AddressesCubit>().updateAddress(newAddress);
-            }
-
-            Navigator.pop(context); // Close bottom sheet
-            Navigator.pop(context); // Return from map view
-          },
-        ),
-      ],
+                      if (widget.existingAddress == null) {
+                        context.read<AddressesCubit>().addAddress(newAddress);
+                      } else {
+                        context.read<AddressesCubit>().updateAddress(
+                          newAddress,
+                        );
+                      }
+                    },
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  flex: 1,
+                  child: CustomButton(
+                    onPressed: () => Navigator.pop(context),
+                    text: LocaleKeys.cancel.tr(),
+                    color: Colors.transparent,
+                    textColor: context.colors.textPrimary,
+                    borderColor: context.colors.borderSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
     );
   }
 

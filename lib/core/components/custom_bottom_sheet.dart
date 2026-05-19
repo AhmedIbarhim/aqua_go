@@ -84,7 +84,7 @@ class CustomBottomSheet extends StatelessWidget {
                         width: 32,
                         height: 32,
                         alignment: Alignment.center,
-                        child: const Icon(Icons.arrow_back, size: 24),
+                        child: const Icon(Icons.close, size: 24),
                       ),
                     ),
                     Text(title, style: AppTextStyles.regular20),

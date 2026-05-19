@@ -165,8 +165,8 @@ class _BookingLocationViewState extends State<BookingLocationView> {
                                           ),
                                           child: LocationSelectionCard(
                                             icon: AppAssets.location,
-                                            title: address.name,
-                                            subtitle: address.formattedAddress,
+                                            title: address.label,
+                                            subtitle: address.details,
                                             isSelected:
                                                 selectedLocationIndex ==
                                                 index + 1,
@@ -282,8 +282,8 @@ class _BookingLocationViewState extends State<BookingLocationView> {
                   if (selectedLocationIndex == 0) {
                     address = AddressModel(
                       id: 'current_gps',
-                      name: LocaleKeys.address_current_location.tr(),
-                      formattedAddress: mapsState.selectedAddressName,
+                      label: LocaleKeys.address_current_location.tr(),
+                      details: mapsState.selectedAddressName,
                       lat: mapsState.currentPosition?.latitude ?? 0.0,
                       lng: mapsState.currentPosition?.longitude ?? 0.0,
                     );

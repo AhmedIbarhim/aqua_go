@@ -184,6 +184,7 @@ class ProfileView extends StatelessWidget {
                         ProfileTile(
                           title: LocaleKeys.auth_logout.tr(),
                           icon: AppAssets.logout,
+                          alreadyColoredIcon: true,
                           textColor: context.colors.error,
                           onTap: () => _logout(context),
                         ),

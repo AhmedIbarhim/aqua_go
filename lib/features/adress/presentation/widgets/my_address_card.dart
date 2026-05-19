@@ -36,7 +36,7 @@ class MyAddressCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                address.name,
+                address.label,
                 style: AppTextStyles.regular16.copyWith(
                   color: context.colors.contentSecondaryLight,
                 ),
@@ -102,7 +102,7 @@ class MyAddressCard extends StatelessWidget {
 
               Expanded(
                 child: Text(
-                  address.formattedAddress,
+                  address.details,
                   textAlign: TextAlign.start,
                   style: AppTextStyles.regular14.copyWith(
                     color: context.colors.textSecondary,

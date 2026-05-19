@@ -15,25 +15,45 @@ class AddressesCubit extends Cubit<AddressesState> {
       super(AddressesInitial()) {
     _subscription = _repository.addressesStream.listen((addresses) {
       if (!isClosed) {
-        emit(AddressesLoaded(addresses));
+        emit(AddressesLoaded(List.from(addresses)));
       }
     });
   }
 
-  void getAddresses() {
-    emit(AddressesLoaded(_repository.addresses));
+  Future<void> getAddresses() async {
+    emit(AddressesLoading());
+    final result = await _repository.fetchAddresses();
+    result.fold(
+      (failure) => emit(AddressesError(failure.message)),
+      (addressesList) => emit(AddressesLoaded(List.from(addressesList))),
+    );
   }
 
-  void addAddress(AddressModel address) {
-    _repository.addAddress(address);
+  Future<void> addAddress(AddressModel address) async {
+    emit(AddressesActionLoading());
+    final result = await _repository.addAddress(address);
+    result.fold(
+      (failure) => emit(AddressesActionError(failure.message)),
+      (_) => emit(AddressesActionSuccess()),
+    );
   }
 
-  void deleteAddress(String id) {
-    _repository.deleteAddress(id);
+  Future<void> updateAddress(AddressModel updatedAddress) async {
+    emit(AddressesActionLoading());
+    final result = await _repository.updateAddress(updatedAddress);
+    result.fold(
+      (failure) => emit(AddressesActionError(failure.message)),
+      (_) => emit(AddressesActionSuccess()),
+    );
   }
 
-  void updateAddress(AddressModel updatedAddress) {
-    _repository.updateAddress(updatedAddress);
+  Future<void> deleteAddress(String id) async {
+    emit(AddressesActionLoading());
+    final result = await _repository.deleteAddress(id);
+    result.fold(
+      (failure) => emit(AddressesActionError(failure.message)),
+      (_) => emit(AddressesActionSuccess()),
+    );
   }
 
   @override

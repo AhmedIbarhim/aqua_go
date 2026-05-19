@@ -18,6 +18,8 @@ class CustomTextFormField extends StatelessWidget {
     this.minLines,
     this.obscureText = false,
     this.onSaved,
+    this.readOnly = false,
+    this.onTap,
   });
 
   final String label;
@@ -29,6 +31,8 @@ class CustomTextFormField extends StatelessWidget {
   final bool obscureText;
   final TextEditingController? controller;
   final void Function(String?)? onSaved;
+  final bool readOnly;
+  final void Function()? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +42,8 @@ class CustomTextFormField extends StatelessWidget {
       child: TextFormField(
         controller: controller,
         onSaved: onSaved,
+        readOnly: readOnly,
+        onTap: onTap,
         onTapOutside: (event) {
           FocusScope.of(context).unfocus();
         },

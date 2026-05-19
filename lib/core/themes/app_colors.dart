@@ -185,8 +185,10 @@ const darkAppColors = AppColors(
   contentSecondaryLight: Color(0xFFE5E5E5),
   contentTertiary: Color(0xFF5A687D),
   contentDisabled: Color(0xFF737373),
-  success: Color(0xFF22C55E),
-  error: Color(0xFFEF4444),
+  success: Color(0xFF0E612C),
+  error: Color(0xFFD90421),
+  // success: Color(0xFF22C55E),
+  // error: Color(0xFFEF4444),
   warning: Color(0xFFF59E0B),
 );
 
@@ -214,7 +216,9 @@ const lightAppColors = AppColors(
   contentSecondaryLight: Color(0xFF334155),
   contentTertiary: Color(0xFF94A3B8),
   contentDisabled: Color(0xFF94A3B8),
-  success: Color(0xFF16A34A),
-  error: Color(0xFFDC2626),
+  success: Color(0xFF0E612C),
+  error: Color(0xFFD90421),
+  // success: Color(0xFF22C55E),
+  // error: Color(0xFFEF4444),
   warning: Color(0xFFD97706),
 );

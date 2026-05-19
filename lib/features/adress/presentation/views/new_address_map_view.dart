@@ -47,7 +47,7 @@ class _NewAddressMapViewState extends State<NewAddressMapView> {
     _mapsCubit = locator<MapsCubit>();
     if (widget.address != null) {
       _mapsCubit.onMapTap(LatLng(widget.address!.lat, widget.address!.lng));
-      _searchController.text = widget.address!.formattedAddress;
+      _searchController.text = widget.address!.details;
     } else {
       _mapsCubit.determinePosition();
     }
@@ -183,10 +183,7 @@ class _NewAddressMapViewState extends State<NewAddressMapView> {
                       child: CustomButton(
                         text: LocaleKeys.proceed.tr(),
                         onPressed: () {
-                          if (widget.forAddingAddess ||
-                              widget.address == null) {
-                            _addAddress(context, state);
-                          } else {}
+                          _addAddress(context, state);
                         },
                       ),
                     ),
@@ -223,12 +220,20 @@ class _NewAddressMapViewState extends State<NewAddressMapView> {
   }
 
   void _addAddress(BuildContext context, MapsState state) {
-    AddAddressBottomSheet.show(
-      context: context,
-      address: state.selectedAddressName,
-      lat: state.markers.first.position.latitude,
-      lng: state.markers.first.position.longitude,
-      existingAddress: widget.address,
-    );
+    if (widget.forAddingAddess) {
+      AddAddressBottomSheet.show(
+        context: context,
+        address: state.selectedAddressName,
+        lat: state.markers.first.position.latitude,
+        lng: state.markers.first.position.longitude,
+        existingAddress: widget.address,
+      );
+    } else {
+      Navigator.pop(context, {
+        'address': state.selectedAddressName,
+        'lat': state.markers.first.position.latitude,
+        'lng': state.markers.first.position.longitude,
+      });
+    }
   }
 }

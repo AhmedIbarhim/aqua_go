@@ -1,5 +1,6 @@
 import 'package:aqua_go/core/components/custom_button.dart';
 import 'package:aqua_go/core/components/generic_app_bar.dart';
+import 'package:aqua_go/core/components/custom_loading_indicator.dart';
 import 'package:aqua_go/features/adress/data/models/address_model.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -15,28 +16,95 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/config/di/service_locator.dart';
 import '../../controllers/addresses_controller/addresses_cubit.dart';
 
-class MyAddressesView extends StatelessWidget {
+class MyAddressesView extends StatefulWidget {
   const MyAddressesView({super.key});
+
+  @override
+  State<MyAddressesView> createState() => _MyAddressesViewState();
+}
+
+class _MyAddressesViewState extends State<MyAddressesView> {
+  late final AddressesCubit _addressesCubit;
+
+  @override
+  void initState() {
+    _addressesCubit = locator<AddressesCubit>()..getAddresses();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _addressesCubit.close();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
 
-    return BlocProvider(
-      create: (context) => locator<AddressesCubit>()..getAddresses(),
-      child: BlocBuilder<AddressesCubit, AddressesState>(
-        builder: (context, state) {
-          final List<AddressModel> myAddresses = state is AddressesLoaded
-              ? state.addresses
-              : <AddressModel>[];
+    return BlocProvider.value(
+      value: _addressesCubit,
+      child: Scaffold(
+        backgroundColor: context.colors.screenBG,
+        appBar: GenericAppBar(
+          title: LocaleKeys.address_my_addresses.tr(),
+          centerTitle: true,
+        ),
+        body: BlocConsumer<AddressesCubit, AddressesState>(
+          listener: (context, state) {
+            if (state is AddressesActionLoading) {
+              context.showLoadingOverlay();
+            } else {
+              context.hideLoadingOverlay();
+            }
 
-          return Scaffold(
-            backgroundColor: context.colors.screenBG,
-            appBar: GenericAppBar(
-              title: LocaleKeys.address_my_addresses.tr(),
-              centerTitle: true,
-            ),
-            body: Column(
+            if (state is AddressesActionError) {
+              context.showWarningAlert(
+                title: 'Error',
+                message: state.message,
+                primaryButtonText: 'OK',
+              );
+            }
+          },
+          buildWhen: (previous, current) =>
+              current is AddressesLoading ||
+              current is AddressesLoaded ||
+              current is AddressesError ||
+              current is AddressesInitial,
+          builder: (context, state) {
+            if (state is AddressesLoading) {
+              return const Center(child: CustomLoadingIndicator(size: 100));
+            }
+
+            if (state is AddressesError) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      state.message,
+                      style: TextStyle(
+                        color: context.colors.error,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 12),
+                    ElevatedButton(
+                      onPressed: () => _addressesCubit.getAddresses(),
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            final List<AddressModel> myAddresses = state is AddressesLoaded
+                ? state.addresses
+                : <AddressModel>[];
+
+            return Column(
               children: [
                 Expanded(
                   child: Container(
@@ -57,9 +125,9 @@ class MyAddressesView extends StatelessWidget {
                 ),
                 _buildBottomActionSheet(context),
               ],
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

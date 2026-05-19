@@ -1,5 +1,6 @@
 import 'package:aqua_go/features/adress/controllers/addresses_controller/addresses_cubit.dart';
 import 'package:aqua_go/features/adress/data/repos/addresses_repository.dart';
+import 'package:aqua_go/features/adress/data/data_sources/addresses_remote_data_source.dart';
 import 'package:aqua_go/features/adress/controllers/maps_controller/maps_cubit.dart';
 import 'package:aqua_go/features/adress/data/repos/maps_repository.dart';
 import 'package:aqua_go/features/auth/controllers/auth_cubit/auth_cubit.dart';
@@ -31,6 +32,9 @@ Future<void> initServiceLocator() async {
   locator.registerLazySingleton<CarsRemoteDataSource>(
     () => CarsRemoteDataSource(locator()),
   );
+  locator.registerLazySingleton<AddressesRemoteDataSource>(
+    () => AddressesRemoteDataSource(locator()),
+  );
 
   // Repositories
 
@@ -39,7 +43,8 @@ Future<void> initServiceLocator() async {
   );
 
   locator.registerLazySingleton<AddressesRepository>(
-    () => AddressesRepository(),
+    () => AddressesRepository(locator()),
+    dispose: (repo) => repo.dispose(),
   );
 
   locator.registerLazySingleton<CarsRepository>(

@@ -1,11 +1,10 @@
 import 'package:aqua_go/core/extentions/context_extentions.dart';
-import 'package:aqua_go/core/route/routes.dart';
 import 'package:aqua_go/features/adress/data/models/address_model.dart';
-import 'package:aqua_go/features/adress/presentation/views/new_address_map_view.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'my_address_card.dart';
+import 'add_address_bottom_sheet.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../controllers/addresses_controller/addresses_cubit.dart';
 
@@ -24,19 +23,19 @@ class MyAddressesList extends StatelessWidget {
         return MyAddressCard(
           address: address,
           onEdit: () {
-            context.pushNamed(
-              Routes.newAddressMap,
-              arguments: NewAddressMapArgs(
-                forAddingAddress: false,
-                address: address,
-              ),
+            AddAddressBottomSheet.show(
+              context: context,
+              address: address.details,
+              lat: address.lat,
+              lng: address.lng,
+              existingAddress: address,
             );
           },
           onDelete: () {
             context.showWarningAlert(
               message: LocaleKeys.address_confirm_delete.tr(),
               onPrimaryPressed: () {
-                context.read<AddressesCubit>().deleteAddress(address.id);
+                context.read<AddressesCubit>().deleteAddress(address.id!);
                 Navigator.pop(context);
               },
             );
