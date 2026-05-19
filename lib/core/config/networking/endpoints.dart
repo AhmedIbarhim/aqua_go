@@ -22,6 +22,7 @@ abstract class Endpoints {
   static const String vehicleBrands = '/catalog/vehicle-makes';
   static String vehicleModels(String brandId) =>
       '/catalog/vehicle-makes/$brandId/models';
+
   static const String services = '/services';
 
   // Customer Addresses Endpoints

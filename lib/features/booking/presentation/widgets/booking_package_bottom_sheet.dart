@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/components/custom_bottom_sheet.dart';
 import '../../../../generated/locale_keys.g.dart';
-import '../../../home/presentation/data/models/package_model.dart';
+import '../../../home/data/models/package_model.dart';
 import 'booking_package_details_content.dart';
 import 'booking_package_success_alert.dart';
 import 'booking_package_payment_content.dart';

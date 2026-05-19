@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_text_styles.dart';
-import '../data/models/package_model.dart';
+import '../../data/models/package_model.dart';
 import 'package_card.dart';
 import '../views/packages_view.dart';
 

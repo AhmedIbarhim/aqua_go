@@ -4,7 +4,7 @@ import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
-import '../data/models/service_model.dart';
+import '../../data/models/service_model.dart';
 
 class ServiceCard extends StatelessWidget {
   const ServiceCard({super.key, required this.serviceModel});

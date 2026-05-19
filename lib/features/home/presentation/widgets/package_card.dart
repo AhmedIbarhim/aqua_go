@@ -6,7 +6,7 @@ import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../../../booking/presentation/widgets/booking_package_bottom_sheet.dart';
-import '../data/models/package_model.dart';
+import '../../data/models/package_model.dart';
 
 class PackageCard extends StatelessWidget {
   const PackageCard({

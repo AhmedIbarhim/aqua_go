@@ -32,9 +32,12 @@ class APIClient {
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
-          final token = await SecureStorage.read(kAccessToken);
-          if (token != null && token.isNotEmpty) {
-            options.headers['Authorization'] = 'Bearer $token';
+          final skipAuth = options.extra['skipAuth'] as bool? ?? false;
+          if (!skipAuth) {
+            final token = await SecureStorage.read(kAccessToken);
+            if (token != null && token.isNotEmpty) {
+              options.headers['Authorization'] = 'Bearer $token';
+            }
           }
           return handler.next(options);
         },
@@ -64,12 +67,16 @@ class APIClient {
           }
 
           try {
-            // Call refresh endpoint directly on raw Dio (bypasses this interceptor)
+            // Call refresh endpoint directly without attaching the expired access token
             final refreshResponse = await _dio.post(
               '/auth/token/refresh',
               data: {'refreshToken': storedRefreshToken},
-              // Mark as a refresh call so it is never intercepted for retry
-              options: Options(extra: const {'refreshAttempts': maxRefreshAttempts}),
+              options: Options(
+                extra: const {
+                  'skipAuth': true,
+                  'refreshAttempts': maxRefreshAttempts,
+                },
+              ),
             );
 
             final newAccessToken =

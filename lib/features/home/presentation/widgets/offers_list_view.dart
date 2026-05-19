@@ -4,7 +4,7 @@ import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../generated/locale_keys.g.dart';
-import '../data/models/offer_model.dart';
+import '../../data/models/offer_model.dart';
 import 'offer_card.dart';
 import '../views/offers_view.dart';
 

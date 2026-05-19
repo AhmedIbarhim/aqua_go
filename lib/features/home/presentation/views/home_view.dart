@@ -1,8 +1,8 @@
 import 'package:carousel_slider/carousel_controller.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/extentions/context_extentions.dart';
-import '../data/models/banner_model.dart';
-import '../data/models/current_package_model.dart';
+import '../../data/models/banner_model.dart';
+import '../../data/models/current_package_model.dart';
 import '../widgets/home_banners_carosal.dart';
 import '../widgets/packages_list_view.dart';
 import '../widgets/services_list_view.dart';

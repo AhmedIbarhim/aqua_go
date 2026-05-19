@@ -1,4 +1,4 @@
-import 'package:aqua_go/features/home/presentation/data/models/package_model.dart';
+import 'package:aqua_go/features/home/data/models/package_model.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 

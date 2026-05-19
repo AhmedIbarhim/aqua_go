@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../data/models/offer_model.dart';
+import '../../data/models/offer_model.dart';
 
 class OfferCard extends StatelessWidget {
   const OfferCard({super.key, required this.offerModel, this.atHome = true});

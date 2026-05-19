@@ -6,7 +6,7 @@ import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../../generated/locale_keys.g.dart';
-import '../../../home/presentation/data/models/package_model.dart';
+import '../../../home/data/models/package_model.dart';
 
 class BookingPackageDetailsContent extends StatelessWidget {
   final PackageModel packageModel;

@@ -3,7 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../generated/locale_keys.g.dart';
-import '../data/models/service_model.dart';
+import '../../data/models/service_model.dart';
 import 'service_card.dart';
 
 class ServicesListView extends StatefulWidget {

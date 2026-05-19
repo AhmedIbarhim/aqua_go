@@ -2,7 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/extentions/context_extentions.dart';
-import '../data/models/banner_model.dart';
+import '../../data/models/banner_model.dart';
 
 class HomeBannersCarosal extends StatefulWidget {
   const HomeBannersCarosal({
