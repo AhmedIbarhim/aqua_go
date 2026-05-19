@@ -202,4 +202,8 @@ class CarsRepository {
       return const Left(ServerFailure('Failed to remove vehicle'));
     });
   }
+
+  void dispose() {
+    _controller.close();
+  }
 }

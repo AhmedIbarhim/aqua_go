@@ -38,28 +38,98 @@ class APIClient {
           }
           return handler.next(options);
         },
-        // onError: (err, handler) async {
-        //   if (err.response?.statusCode == 401) {
-        //     // Delete security credentials locally
-        //     await SecureStorage.delete(kAccessToken);
-        //     await SecureStorage.delete(kRefreshToken);
-        //     await SharedPrefs.removeString(kUserData);
+        onError: (DioException err, handler) async {
+          // Only attempt token refresh on 401 Unauthorized
+          if (err.response?.statusCode != 401) {
+            return handler.next(err);
+          }
 
-        //     // Redirect context-free to login screen
-        //     AppRouter.navigatorKey.currentState?.pushNamedAndRemoveUntil(
-        //       Routes.login,
-        //       (route) => false,
-        //     );
-        //     return handler.reject(err);
-        //   }
-        //   return handler.next(err);
-        // },
+          const int maxRefreshAttempts = 3;
+
+          // Read how many refresh attempts have already been made for this request
+          final int attemptsSoFar =
+              (err.requestOptions.extra['refreshAttempts'] as int?) ?? 0;
+
+          // Exhausted all retries → force logout
+          if (attemptsSoFar >= maxRefreshAttempts) {
+            await _clearSessionAndRedirect();
+            return handler.next(err);
+          }
+
+          // Read the stored refresh token
+          final storedRefreshToken = await SecureStorage.read(kRefreshToken);
+          if (storedRefreshToken == null || storedRefreshToken.isEmpty) {
+            await _clearSessionAndRedirect();
+            return handler.next(err);
+          }
+
+          try {
+            // Call refresh endpoint directly on raw Dio (bypasses this interceptor)
+            final refreshResponse = await _dio.post(
+              '/auth/token/refresh',
+              data: {'refreshToken': storedRefreshToken},
+              // Mark as a refresh call so it is never intercepted for retry
+              options: Options(extra: const {'refreshAttempts': maxRefreshAttempts}),
+            );
+
+            final newAccessToken =
+                refreshResponse.data['accessToken'] as String?;
+            final newRefreshToken =
+                refreshResponse.data['refreshToken'] as String?;
+
+            if (newAccessToken == null || newAccessToken.isEmpty) {
+              await _clearSessionAndRedirect();
+              return handler.next(err);
+            }
+
+            // Persist the new tokens
+            await SecureStorage.write(kAccessToken, newAccessToken);
+            if (newRefreshToken != null && newRefreshToken.isNotEmpty) {
+              await SecureStorage.write(kRefreshToken, newRefreshToken);
+            }
+
+            // Retry the original request, bumping the attempt counter
+            final retryOptions = err.requestOptions.copyWith(
+              headers: {
+                ...err.requestOptions.headers,
+                'Authorization': 'Bearer $newAccessToken',
+              },
+              extra: {
+                ...err.requestOptions.extra,
+                'refreshAttempts': attemptsSoFar + 1,
+              },
+            );
+
+            final retryResponse = await _dio.fetch(retryOptions);
+            return handler.resolve(retryResponse);
+          } on DioException catch (_) {
+            // Refresh request itself failed → session is truly expired
+            await _clearSessionAndRedirect();
+            return handler.next(err);
+          } catch (_) {
+            await _clearSessionAndRedirect();
+            return handler.next(err);
+          }
+        },
       ),
     );
 
     if (kDebugMode) {
       _dio.interceptors.add(TalkerDioLogger());
     }
+  }
+
+  /// Wipes all local credentials and navigates to the login screen
+  /// without requiring a BuildContext.
+  Future<void> _clearSessionAndRedirect() async {
+    await SecureStorage.delete(kAccessToken);
+    await SecureStorage.delete(kRefreshToken);
+    await SharedPrefs.removeString(kUserData);
+
+    AppRouter.navigatorKey.currentState?.pushNamedAndRemoveUntil(
+      Routes.login,
+      (route) => false,
+    );
   }
 
   Future<Either<Failure, Response<T>>> _request<T>(

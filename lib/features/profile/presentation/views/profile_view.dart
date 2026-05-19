@@ -77,7 +77,7 @@ class ProfileView extends StatelessWidget {
                   SizedBox(height: sh(8)),
                   // Phone
                   Text(
-                    FetchUserData.getPhone(),
+                    FetchUserData.getPhone().replaceFirst("+966", "+966 "),
                     textDirection: ui.TextDirection.ltr,
                     style: AppTextStyles.regular14.copyWith(
                       color: context.colors.textSecondary,
@@ -123,7 +123,10 @@ class ProfileView extends StatelessWidget {
 
                         SizedBox(height: sh(8)),
                         ProfileTile(
-                          title: FetchUserData.getPhone(),
+                          title: FetchUserData.getPhone().replaceFirst(
+                            "+966",
+                            "+966 ",
+                          ),
                           isPhoneNumber: true,
                           icon: AppAssets.phone,
                           isVerified: true,

@@ -18,12 +18,17 @@ class MainLayout extends StatefulWidget {
 class _MainLayoutState extends State<MainLayout> {
   int _currentIndex = 0;
 
-  final List<Widget> _pages = [
-    const HomeView(),
-    const MyCarsView(),
-    const MyBookingsView(),
-    const ProfileView(),
+  /// Pages are built lazily: a tab's widget is only created the first time
+  /// it is selected, preventing background API calls on app start.
+  static const List<Widget> _pageBuilders = [
+    HomeView(),
+    MyCarsView(),
+    MyBookingsView(),
+    ProfileView(),
   ];
+
+  /// Tracks which tab indices have been visited at least once.
+  final Set<int> _visitedIndices = {0}; // Home is always shown first
 
   @override
   Widget build(BuildContext context) {
@@ -43,12 +48,20 @@ class _MainLayoutState extends State<MainLayout> {
           Scaffold(
             backgroundColor: Colors.transparent,
             appBar: _currentIndex == 3 ? null : const MainAppBar(),
-            // extendBodyBehindAppBar: _currentIndex == 0 ? true : false,
-            body: IndexedStack(index: _currentIndex, children: _pages),
+            body: IndexedStack(
+              index: _currentIndex,
+              children: List.generate(
+                _pageBuilders.length,
+                (i) => _visitedIndices.contains(i)
+                    ? _pageBuilders[i]
+                    : const SizedBox.shrink(),
+              ),
+            ),
             bottomNavigationBar: MainNavigationBar(
               currentIndex: _currentIndex,
               onTap: (index) {
                 setState(() {
+                  _visitedIndices.add(index);
                   _currentIndex = index;
                 });
               },

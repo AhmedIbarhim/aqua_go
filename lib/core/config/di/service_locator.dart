@@ -44,6 +44,7 @@ Future<void> initServiceLocator() async {
 
   locator.registerLazySingleton<CarsRepository>(
     () => CarsRepository(locator()),
+    dispose: (repo) => repo.dispose(),
   );
 
   locator.registerLazySingleton<AuthRepo>(() => AuthRepo(locator()));

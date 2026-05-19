@@ -10,15 +10,15 @@ class AuthService {
   AuthService(this._apiClient);
 
   Future<Either<Failure, Response>> login(String formattedPhone) {
-    return _apiClient.post(
-      Endpoints.customerSendOtp,
-      data: {'phone': formattedPhone},
-    );
+    return _apiClient.post(Endpoints.sendOtp, data: {'phone': formattedPhone});
   }
 
-  Future<Either<Failure, Response>> verifyOtp(String otpSessionId, String code) {
+  Future<Either<Failure, Response>> verifyOtp(
+    String otpSessionId,
+    String code,
+  ) {
     return _apiClient.post(
-      Endpoints.customerVerifyOtp,
+      Endpoints.verifyOtp,
       data: {'otpSessionId': otpSessionId, 'code': code},
     );
   }
@@ -32,22 +32,31 @@ class AuthService {
   }
 
   Future<Either<Failure, Response>> requestEmailVerify(String email) {
-    return _apiClient.post(
-      Endpoints.customerEmailVerifyRequest,
-      data: {'email': email},
-    );
+    return _apiClient.post(Endpoints.verifyRequest, data: {'email': email});
   }
 
-  Future<Either<Failure, Response>> confirmEmailVerify(String otpSessionId, String code) {
+  Future<Either<Failure, Response>> confirmEmailVerify(
+    String otpSessionId,
+    String code,
+  ) {
     return _apiClient.post(
-      Endpoints.customerEmailVerifyConfirm,
+      Endpoints.emailVerifyConfirm,
       data: {'otpSessionId': otpSessionId, 'code': code},
     );
   }
 
   Future<Either<Failure, Response>> logout(String refreshToken) {
     return _apiClient.post(
-      Endpoints.customerLogout,
+      Endpoints.logout,
+      data: {'refreshToken': refreshToken},
+    );
+  }
+
+  /// Calls the refresh-token endpoint directly on the raw Dio instance,
+  /// bypassing the auth interceptor to avoid circular retry loops.
+  Future<Response> refreshAccessToken(String refreshToken) {
+    return _apiClient.dio.post(
+      Endpoints.refreshToken,
       data: {'refreshToken': refreshToken},
     );
   }
