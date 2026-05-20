@@ -1,12 +1,14 @@
 import 'package:equatable/equatable.dart';
 import '../../../address/data/models/address_model.dart';
 import '../../../my_cars/data/models/my_car_model.dart';
+import '../../../home/data/models/service_model.dart';
 import '../widgets/payment_method_selection.dart';
 
 enum BookingStatus { initial, loading, success, failure }
 
 class BookingState extends Equatable {
   final BookingStatus status;
+  final ServiceModel? selectedService;
   final AddressModel? selectedAddress;
   final MyCarModel? selectedCar;
   final Set<int> selectedServiceIndices;
@@ -18,6 +20,7 @@ class BookingState extends Equatable {
 
   const BookingState({
     this.status = BookingStatus.initial,
+    this.selectedService,
     this.selectedAddress,
     this.selectedCar,
     this.selectedServiceIndices = const {},
@@ -30,6 +33,7 @@ class BookingState extends Equatable {
 
   BookingState copyWith({
     BookingStatus? status,
+    ServiceModel? selectedService,
     AddressModel? selectedAddress,
     MyCarModel? selectedCar,
     Set<int>? selectedServiceIndices,
@@ -41,6 +45,7 @@ class BookingState extends Equatable {
   }) {
     return BookingState(
       status: status ?? this.status,
+      selectedService: selectedService ?? this.selectedService,
       selectedAddress: selectedAddress ?? this.selectedAddress,
       selectedCar: selectedCar ?? this.selectedCar,
       selectedServiceIndices:
@@ -55,14 +60,15 @@ class BookingState extends Equatable {
 
   @override
   List<Object?> get props => [
-    status,
-    selectedAddress,
-    selectedCar,
-    selectedServiceIndices,
-    selectedDate,
-    selectedTime,
-    bikerNotes,
-    paymentMethod,
-    errorMessage,
-  ];
+        status,
+        selectedService,
+        selectedAddress,
+        selectedCar,
+        selectedServiceIndices,
+        selectedDate,
+        selectedTime,
+        bikerNotes,
+        paymentMethod,
+        errorMessage,
+      ];
 }

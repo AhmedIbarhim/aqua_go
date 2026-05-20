@@ -18,6 +18,7 @@ import '../../features/my_bookings/presentation/views/complain_view.dart';
 import '../../features/my_bookings/presentation/views/gallery_view.dart';
 import '../../features/my_bookings/presentation/views/my_booking_deatails_view.dart';
 import '../../features/my_cars/data/models/my_car_model.dart';
+import '../../features/home/data/models/service_model.dart';
 import '../../features/profile/presentation/views/language_select_view.dart';
 import '../../features/profile/presentation/views/profile_data_view.dart';
 import '../../features/startup/views/onboarding_view.dart';
@@ -107,9 +108,10 @@ abstract class AppRouter {
         );
 
       case Routes.bookingLocation:
+        final service = settings.arguments as ServiceModel?;
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
-            create: (_) => locator<BookingCubit>(),
+            create: (_) => locator<BookingCubit>()..initBooking(service),
             child: const BookingLocationView(),
           ),
         );

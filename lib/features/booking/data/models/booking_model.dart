@@ -1,29 +1,61 @@
+import '../../../address/data/models/address_model.dart';
+import '../../../my_cars/data/models/my_car_model.dart';
+import '../../../home/data/models/service_model.dart';
+import 'additional_service_model.dart';
+
 class BookingModel {
-  final String id;
-  final String carId;
-  final String carName;
-  final String carImage;
-  final String packageId;
-  final String packageName;
-  final String packageImage;
-  final String additionalServiceId;
-  final String additionalServiceName;
-  final String additionalServiceImage;
-  final String reservationDateTime;
-  final String reservationStatus;
+  final ServiceModel? service;
+  final MyCarModel? car;
+  final AddressModel? address;
+  final DateTime? date;
+  final String? time;
+  final List<AdditionalServiceModel> additionalServices;
+  final String? notes;
+  final String? paymentMethod;
 
   BookingModel({
-    required this.id,
-    required this.carId,
-    required this.carName,
-    required this.carImage,
-    required this.packageId,
-    required this.packageName,
-    required this.packageImage,
-    required this.additionalServiceId,
-    required this.additionalServiceName,
-    required this.additionalServiceImage,
-    required this.reservationDateTime,
-    required this.reservationStatus,
+    this.service,
+    this.car,
+    this.address,
+    this.date,
+    this.time,
+    this.additionalServices = const [],
+    this.notes,
+    this.paymentMethod,
   });
+
+  bool get isComplete =>
+      service != null &&
+      car != null &&
+      address != null &&
+      date != null &&
+      time != null;
+
+  Map<String, dynamic> toJson() {
+    String? scheduledAt;
+    if (date != null && time != null) {
+      final String formattedMonth = date!.month.toString().padLeft(2, '0');
+      final String formattedDay = date!.day.toString().padLeft(2, '0');
+      final String formattedTime = time!.contains(' ')
+          ? time!.split(' ').first
+          : time!;
+      scheduledAt =
+          '${date!.year}-$formattedMonth-${formattedDay}T$formattedTime:00Z';
+    }
+
+    return {
+      'savedAddressId': address?.id == 'current_gps' ? null : address?.id,
+      'addressLabel': address?.label,
+      'lat': address?.lat,
+      'lng': address?.lng,
+      'addressArrivalNotes': notes,
+      'savedVehicleId': car?.id,
+      'plateText': car?.plateNumber,
+      'vehicleMake': car?.carBrand?.vehicleBrandName.nameEn,
+      'vehicleModel': car?.carModel?.vehicleModelName.nameEn,
+      'vehicleColor': car?.color,
+      'type': 'SCHEDULED',
+      'scheduledAt': scheduledAt,
+    };
+  }
 }

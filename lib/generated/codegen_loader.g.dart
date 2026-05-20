@@ -239,7 +239,8 @@ class CodegenLoader extends AssetLoader{
     "no_addresses": "لا توجد عناوين حالية",
     "no_addresses_desc": "سيتم عرض العناوين الخاصة بك في هذه الصفحة",
     "location_disabled_message": "يرجى تفعيل خدمات الموقع لتحديد موقعك.",
-    "go_to_settings": "الذهاب إلى الإعدادات"
+    "go_to_settings": "الذهاب إلى الإعدادات",
+    "zone_not_available": "نأسف، هذا الموقع خارج منطقة التغطية حالياً"
   },
   "profile": {
     "male": "ذكر",
@@ -561,7 +562,8 @@ static const Map<String,dynamic> _en = {
     "no_addresses": "No Current Addresses",
     "no_addresses_desc": "Your addresses will be displayed here",
     "location_disabled_message": "Please enable location services to find your position.",
-    "go_to_settings": "Go To Settings"
+    "go_to_settings": "Go To Settings",
+    "zone_not_available": "Sorry, this location is currently outside our service area"
   },
   "profile": {
     "male": "Male",

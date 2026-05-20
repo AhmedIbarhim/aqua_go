@@ -211,6 +211,7 @@ class _AddAddressBottomSheetState extends State<AddAddressBottomSheet> {
                       final newAddress = AddressModel(
                         id: widget.existingAddress?.id,
                         label: _addressNameController.text.trim(),
+                        // arrivalNotes: _accessNotesController.text.trim(),
                         details: _addressController.text.trim(),
                         lat: _lat,
                         lng: _lng,

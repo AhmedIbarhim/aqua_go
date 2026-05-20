@@ -277,7 +277,7 @@ class _BookingLocationViewState extends State<BookingLocationView> {
               child: CustomButton(
                 enabled: isValid,
                 text: LocaleKeys.bookings_save_car_location.tr(),
-                onPressed: () {
+                onPressed: () async {
                   AddressModel? address;
                   if (selectedLocationIndex == 0) {
                     address = AddressModel(
@@ -293,9 +293,24 @@ class _BookingLocationViewState extends State<BookingLocationView> {
                   }
 
                   if (address != null) {
+                    context.showLoadingOverlay();
+                    final isAvailable = await context
+                        .read<BookingCubit>()
+                        .checkZone(address.lat, address.lng);
+                    if (!context.mounted) return;
+                    context.hideLoadingOverlay();
+
+                    if (!isAvailable) {
+                      context.showErrorSnackBar(
+                        LocaleKeys.address_zone_not_available.tr(),
+                      );
+                      return;
+                    }
+
                     context.read<BookingCubit>().selectAddress(address);
                   }
 
+                  if (!context.mounted) return;
                   context.pushNamed(
                     Routes.bookingDetails,
                     arguments: BookingFlowArgs(

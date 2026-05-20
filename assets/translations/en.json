@@ -223,7 +223,8 @@
         "no_addresses": "No Current Addresses",
         "no_addresses_desc": "Your addresses will be displayed here",
         "location_disabled_message": "Please enable location services to find your position.",
-        "go_to_settings": "Go To Settings"
+        "go_to_settings": "Go To Settings",
+        "zone_not_available": "Sorry, this location is currently outside our service area"
     },
     "profile": {
         "male": "Male",

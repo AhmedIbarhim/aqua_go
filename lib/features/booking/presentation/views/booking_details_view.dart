@@ -29,9 +29,7 @@ class BookingDetailsView extends StatelessWidget {
     final height = MediaQuery.sizeOf(context).height;
     return MultiBlocProvider(
       providers: [
-        BlocProvider(
-          create: (context) => locator<MyCarsCubit>()..getCars(),
-        ),
+        BlocProvider(create: (context) => locator<MyCarsCubit>()..getCars()),
       ],
       child: BlocBuilder<BookingCubit, BookingState>(
         builder: (context, bookingState) {
@@ -78,10 +76,14 @@ class BookingDetailsView extends StatelessWidget {
           SizedBox(height: height * 0.02),
           BlocBuilder<MyCarsCubit, MyCarsState>(
             builder: (context, myCarsState) {
-              final cars = myCarsState is MyCarsLoaded ? myCarsState.cars : <MyCarModel>[];
+              final cars = myCarsState is MyCarsLoaded
+                  ? myCarsState.cars
+                  : <MyCarModel>[];
               int? selectedCarIndex;
               if (bookingState.selectedCar != null) {
-                selectedCarIndex = cars.indexWhere((c) => c.id == bookingState.selectedCar!.id);
+                selectedCarIndex = cars.indexWhere(
+                  (c) => c.id == bookingState.selectedCar!.id,
+                );
                 if (selectedCarIndex == -1) selectedCarIndex = null;
               }
 
@@ -111,10 +113,16 @@ class BookingDetailsView extends StatelessWidget {
             initialDate: bookingState.selectedDate ?? DateTime.now(),
             initialTime: bookingState.selectedTime,
             onDateChanged: (date) {
-              context.read<BookingCubit>().updateDateTime(date, bookingState.selectedTime);
+              context.read<BookingCubit>().updateDateTime(
+                date,
+                bookingState.selectedTime,
+              );
             },
             onTimeChanged: (time) {
-              context.read<BookingCubit>().updateDateTime(bookingState.selectedDate, time);
+              context.read<BookingCubit>().updateDateTime(
+                bookingState.selectedDate,
+                time,
+              );
             },
           ),
           SizedBox(height: height * 0.04),
@@ -140,7 +148,8 @@ class BookingDetailsView extends StatelessWidget {
     double width,
     double height,
   ) {
-    final isComplete = bookingState.selectedCar != null &&
+    final isComplete =
+        bookingState.selectedCar != null &&
         bookingState.selectedDate != null &&
         bookingState.selectedTime != null;
 
@@ -157,7 +166,10 @@ class BookingDetailsView extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              Text('94.99', style: AppTextStyles.medium24),
+              Text(
+                bookingState.selectedService?.price ?? '0.00',
+                style: AppTextStyles.medium24,
+              ),
               const SizedBox(width: 4),
               SvgPicture.asset(
                 AppAssets.currency,

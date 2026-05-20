@@ -16,7 +16,10 @@ class ServiceCard extends StatelessWidget {
     final width = MediaQuery.of(context).size.width;
     return InkWell(
       onTap: () {
-        context.pushNamed(Routes.bookingLocation);
+        context.pushNamed(
+          Routes.bookingLocation,
+          arguments: serviceModel,
+        );
       },
       child: Container(
         width: width,

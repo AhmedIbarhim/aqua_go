@@ -86,7 +86,9 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
       }
     }
 
-    final basePrice = 94.99;
+    final basePrice =
+        double.tryParse(bookingState.selectedService?.price ?? '94.99') ??
+        94.99;
     final subtotal = basePrice + addonsTotal;
     final vat = subtotal * 0.15;
     final total = subtotal + vat;
@@ -100,7 +102,11 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
           _buildSectionTitle(LocaleKeys.bookings_booking_summary.tr()),
           const SizedBox(height: 16),
           BookingSummaryCard(
-            serviceName: 'غسلة (داخلي و خارجي)',
+            serviceName: context.isAr
+                ? (bookingState.selectedService?.rawName.nameAr ??
+                      'غسلة (داخلي و خارجي)')
+                : (bookingState.selectedService?.rawName.nameEn ??
+                      'Wash (Internal & External)'),
             carName: context.isAr
                 ? bookingState.selectedCar!.carBrand!.vehicleBrandName.nameAr
                 : bookingState.selectedCar!.carModel!.vehicleModelName.nameEn,
