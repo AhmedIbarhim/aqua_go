@@ -20,16 +20,10 @@ abstract class Failure extends Equatable {
   final String message;
   final FailureType type;
 
-  const Failure(
-    this.message,
-    this.type,
-  );
+  const Failure(this.message, this.type);
 
   @override
-  List<Object?> get props => [
-        message,
-        type,
-      ];
+  List<Object?> get props => [message, type];
 
   @override
   String toString() {
@@ -38,10 +32,5 @@ abstract class Failure extends Equatable {
 }
 
 class LocationFailure extends Failure {
-  const LocationFailure(
-    String message,
-  ) : super(
-          message,
-          FailureType.location,
-        );
+  const LocationFailure(String message) : super(message, FailureType.location);
 }

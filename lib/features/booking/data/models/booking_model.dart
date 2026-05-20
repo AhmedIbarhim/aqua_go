@@ -10,7 +10,7 @@ class BookingModel {
   final DateTime? date;
   final String? time;
   final List<AdditionalServiceModel> additionalServices;
-  final String? notes;
+  final List<String> bikerNotes;
   final String? paymentMethod;
 
   BookingModel({
@@ -20,7 +20,7 @@ class BookingModel {
     this.date,
     this.time,
     this.additionalServices = const [],
-    this.notes,
+    this.bikerNotes = const [],
     this.paymentMethod,
   });
 
@@ -48,14 +48,30 @@ class BookingModel {
       'addressLabel': address?.label,
       'lat': address?.lat,
       'lng': address?.lng,
-      'addressArrivalNotes': notes,
-      'savedVehicleId': car?.id,
+      'addressArrivalNotes': '',
       'plateText': car?.plateNumber,
       'vehicleMake': car?.carBrand?.vehicleBrandName.nameEn,
       'vehicleModel': car?.carModel?.vehicleModelName.nameEn,
       'vehicleColor': car?.color,
       'type': 'SCHEDULED',
       'scheduledAt': scheduledAt,
+      'savedVehicleId': car?.id,
+      'workerNotes': bikerNotes,
     };
+  }
+
+  factory BookingModel.fromJson(Map<String, dynamic> json) {
+    return BookingModel(
+      service: ServiceModel.fromJson(json['service']),
+      car: MyCarModel.fromJson(json['car']),
+      address: AddressModel.fromJson(json['address']),
+      date: DateTime.parse(json['date']),
+      time: json['time'],
+      additionalServices: (json['additionalServices'] as List)
+          .map((e) => AdditionalServiceModel.fromJson(e))
+          .toList(),
+      bikerNotes: json['bikerNotes'] as List<String>,
+      paymentMethod: json['paymentMethod'],
+    );
   }
 }

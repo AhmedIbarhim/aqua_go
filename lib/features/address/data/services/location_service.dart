@@ -1,5 +1,5 @@
 import 'package:aqua_go/core/config/networking/api_client.dart';
-import 'package:aqua_go/core/errors/failure.dart';
+import 'package:aqua_go/core/config/networking/exceptions/failure.dart';
 import 'package:dartz/dartz.dart';
 
 import '../../../../core/config/local_storage/shared_prefs.dart';
@@ -18,7 +18,7 @@ class LocationService {
       queryParameters: {
         'input': query,
         'key': _apiKey,
-        'language': SharedPrefs.getString(kLanguage) == 'en' ? 'en' : 'ar',
+        'language': CacheClient.getString(kLanguage) == 'en' ? 'en' : 'ar',
         'components': 'country:sa',
       },
     );
@@ -31,7 +31,10 @@ class LocationService {
     );
   }
 
-  Future<Either<Failure, dynamic>> getAddressFromLatLng(double lat, double lng) {
+  Future<Either<Failure, dynamic>> getAddressFromLatLng(
+    double lat,
+    double lng,
+  ) {
     return apiClient.get(
       Endpoints.googleMapsGeocodeUrl,
       queryParameters: {

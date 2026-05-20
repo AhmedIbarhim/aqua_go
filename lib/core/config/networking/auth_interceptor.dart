@@ -11,7 +11,7 @@ class AuthInterceptor extends Interceptor {
     final skipAuth = options.extra['skipAuth'] as bool? ?? false;
 
     if (!skipAuth) {
-      final token = await SecureStorage.read(kAccessToken);
+      final token = await SecureStorage.getSecuredString(kAccessToken);
 
       if (token != null && token.isNotEmpty) {
         options.headers['Authorization'] = 'Bearer $token';

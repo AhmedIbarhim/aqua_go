@@ -178,7 +178,7 @@ class _OnboardingViewState extends State<OnboardingView> {
         children: [
           GestureDetector(
             onTap: () {
-              SharedPrefs.setBool(kNotFirstUse, true);
+              CacheClient.setBool(kNotFirstUse, true);
               Navigator.pushReplacementNamed(context, Routes.login);
             },
             child: Text(
@@ -212,7 +212,7 @@ class _OnboardingViewState extends State<OnboardingView> {
       return CustomButton(
         text: LocaleKeys.get_started.tr(),
         onPressed: () {
-          SharedPrefs.setBool(kNotFirstUse, true);
+          CacheClient.setBool(kNotFirstUse, true);
           Navigator.pushReplacementNamed(context, Routes.login);
         },
       );

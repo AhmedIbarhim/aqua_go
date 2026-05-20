@@ -17,13 +17,13 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initServiceLocator();
   await EasyLocalization.ensureInitialized();
-  await SharedPrefs.init();
+  await CacheClient.init();
   Bloc.observer = AppBlocObserver();
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  final String savedLang = SharedPrefs.getString(kLanguage);
+  final String savedLang = CacheClient.getString(kLanguage);
   final Locale startLocale = savedLang.isEmpty
       ? const Locale('ar')
       : Locale(savedLang);

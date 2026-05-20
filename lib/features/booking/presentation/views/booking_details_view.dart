@@ -110,7 +110,7 @@ class BookingDetailsView extends StatelessWidget {
           ),
           SizedBox(height: height * 0.02),
           BookingDateTimePicker(
-            initialDate: bookingState.selectedDate ?? DateTime.now(),
+            initialDate: bookingState.selectedDate,
             initialTime: bookingState.selectedTime,
             onDateChanged: (date) {
               context.read<BookingCubit>().updateDateTime(

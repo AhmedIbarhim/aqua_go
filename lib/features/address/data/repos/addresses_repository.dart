@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:dartz/dartz.dart';
-import '../../../../core/errors/failure.dart';
+import '../../../../core/config/networking/exceptions/failure.dart';
 import '../models/address_model.dart';
 import '../data_sources/addresses_remote_data_source.dart';
 

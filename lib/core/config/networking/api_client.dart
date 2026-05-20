@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 
-import '../../errors/failure.dart';
+import 'exceptions/failure.dart';
 
 class APIClient {
   final Dio _dio;

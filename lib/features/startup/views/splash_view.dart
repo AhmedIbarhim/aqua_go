@@ -25,13 +25,13 @@ class _SplashViewState extends State<SplashView> {
     await Future.delayed(const Duration(seconds: 2));
     if (!mounted) return;
 
-    final token = await SecureStorage.read(kAccessToken);
+    final token = await SecureStorage.getSecuredString(kAccessToken);
     if (!mounted) return;
 
     if (token != null && token.isNotEmpty) {
       context.pushReplacementNamed(Routes.layout);
     } else {
-      final isNotFirstUse = SharedPrefs.getBool(kNotFirstUse);
+      final isNotFirstUse = CacheClient.getBool(kNotFirstUse);
       if (isNotFirstUse) {
         context.pushReplacementNamed(Routes.login);
       } else {

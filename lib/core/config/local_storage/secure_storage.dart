@@ -1,21 +1,21 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class SecureStorage {
-  static const FlutterSecureStorage _storage = FlutterSecureStorage();
+  static const FlutterSecureStorage _secureStorage = FlutterSecureStorage();
 
-  static Future<void> write(String key, String value) async {
-    await _storage.write(key: key, value: value);
+  static Future<void> saveSecuredString(String key, String value) async {
+    await _secureStorage.write(key: key, value: value);
   }
 
-  static Future<String?> read(String key) async {
-    return await _storage.read(key: key);
+  static Future<String?> getSecuredString(String key) async {
+    return await _secureStorage.read(key: key);
   }
 
-  static Future<void> delete(String key) async {
-    await _storage.delete(key: key);
+  static Future<void> deleteSecuredString(String key) async {
+    await _secureStorage.delete(key: key);
   }
 
-  static Future<void> clear() async {
-    await _storage.deleteAll();
+  static Future<void> clearSecuredData() async {
+    await _secureStorage.deleteAll();
   }
 }

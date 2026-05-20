@@ -1,6 +1,6 @@
 import 'package:aqua_go/core/config/networking/api_client.dart';
 import 'package:aqua_go/core/config/networking/endpoints.dart';
-import 'package:aqua_go/core/errors/failure.dart';
+import 'package:aqua_go/core/config/networking/exceptions/failure.dart';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 
@@ -13,10 +13,7 @@ class AuthService {
     return _apiClient.post(Endpoints.sendOtp, data: {'phone': formattedPhone});
   }
 
-  Future<Either<Failure, dynamic>> verifyOtp(
-    String otpSessionId,
-    String code,
-  ) {
+  Future<Either<Failure, dynamic>> verifyOtp(String otpSessionId, String code) {
     return _apiClient.post(
       Endpoints.verifyOtp,
       data: {'otpSessionId': otpSessionId, 'code': code},

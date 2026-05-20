@@ -103,13 +103,11 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
           const SizedBox(height: 16),
           BookingSummaryCard(
             serviceName: context.isAr
-                ? (bookingState.selectedService?.rawName.nameAr ??
-                      'غسلة (داخلي و خارجي)')
-                : (bookingState.selectedService?.rawName.nameEn ??
-                      'Wash (Internal & External)'),
+                ? (bookingState.selectedService?.rawName.nameAr ?? '')
+                : (bookingState.selectedService?.rawName.nameEn ?? ''),
             carName: context.isAr
-                ? bookingState.selectedCar!.carBrand!.vehicleBrandName.nameAr
-                : bookingState.selectedCar!.carModel!.vehicleModelName.nameEn,
+                ? '${bookingState.selectedCar!.carBrand!.vehicleBrandName.nameAr} ${bookingState.selectedCar!.carModel!.vehicleModelName.nameAr}'
+                : '${bookingState.selectedCar!.carBrand!.vehicleBrandName.nameEn} ${bookingState.selectedCar!.carModel!.vehicleModelName.nameEn}',
             location: bookingState.selectedAddress?.details ?? '',
             dateTime: bookingState.selectedDate != null
                 ? '${bookingState.selectedDate!.month}/${bookingState.selectedDate!.day}/${bookingState.selectedDate!.year} - ${bookingState.selectedTime ?? ""}'
@@ -125,6 +123,9 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
                 selectedNotes.addAll(notes);
               });
               context.read<BookingCubit>().updateNotes(selectedNotes);
+            },
+            onSpecialNoteTextChanged: (text) {
+              context.read<BookingCubit>().updateSpecialNoteText(text);
             },
           ),
           const SizedBox(height: 24),

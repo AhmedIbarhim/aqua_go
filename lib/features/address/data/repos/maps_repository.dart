@@ -1,4 +1,4 @@
-import 'package:aqua_go/core/errors/failure.dart';
+import 'package:aqua_go/core/config/networking/exceptions/failure.dart';
 import 'package:aqua_go/features/address/data/models/location_model.dart';
 import 'package:aqua_go/features/address/data/models/place_prediction_model.dart';
 import 'package:dartz/dartz.dart';
@@ -21,9 +21,7 @@ class MapsRepository {
         return Right(predictions);
       } else {
         return Left(
-          ServerFailure(
-            data?['error_message'] ?? 'Failed to get predictions',
-          ),
+          ServerFailure(data?['error_message'] ?? 'Failed to get predictions'),
         );
       }
     });
@@ -53,14 +51,10 @@ class MapsRepository {
       if (data != null &&
           data['status'] == 'OK' &&
           data['results'].isNotEmpty) {
-        return Right(
-          LocationModel.fromGeocodeJson(data['results'][0]),
-        );
+        return Right(LocationModel.fromGeocodeJson(data['results'][0]));
       } else {
         return Left(
-          ServerFailure(
-            data?['error_message'] ?? 'Failed to get address',
-          ),
+          ServerFailure(data?['error_message'] ?? 'Failed to get address'),
         );
       }
     });

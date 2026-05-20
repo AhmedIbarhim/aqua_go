@@ -15,6 +15,7 @@ class BookingState extends Equatable {
   final DateTime? selectedDate;
   final String? selectedTime;
   final Set<String> bikerNotes;
+  final String specialNoteText;
   final PaymentMethod? paymentMethod;
   final String? errorMessage;
 
@@ -27,6 +28,7 @@ class BookingState extends Equatable {
     this.selectedDate,
     this.selectedTime,
     this.bikerNotes = const {},
+    this.specialNoteText = '',
     this.paymentMethod,
     this.errorMessage,
   });
@@ -40,6 +42,7 @@ class BookingState extends Equatable {
     DateTime? selectedDate,
     String? selectedTime,
     Set<String>? bikerNotes,
+    String? specialNoteText,
     PaymentMethod? paymentMethod,
     String? errorMessage,
   }) {
@@ -53,6 +56,7 @@ class BookingState extends Equatable {
       selectedDate: selectedDate ?? this.selectedDate,
       selectedTime: selectedTime ?? this.selectedTime,
       bikerNotes: bikerNotes ?? this.bikerNotes,
+      specialNoteText: specialNoteText ?? this.specialNoteText,
       paymentMethod: paymentMethod ?? this.paymentMethod,
       errorMessage: errorMessage ?? this.errorMessage,
     );
@@ -68,6 +72,7 @@ class BookingState extends Equatable {
         selectedDate,
         selectedTime,
         bikerNotes,
+        specialNoteText,
         paymentMethod,
         errorMessage,
       ];

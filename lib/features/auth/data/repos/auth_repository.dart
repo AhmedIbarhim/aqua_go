@@ -1,7 +1,7 @@
 import 'package:aqua_go/core/config/local_storage/shared_prefs.dart';
 import 'package:aqua_go/core/config/local_storage/secure_storage.dart';
 import 'package:aqua_go/core/constants.dart';
-import 'package:aqua_go/core/errors/failure.dart';
+import 'package:aqua_go/core/config/networking/exceptions/failure.dart';
 import 'package:aqua_go/features/auth/data/models/user_model.dart';
 import 'package:aqua_go/features/auth/data/services/auth_service.dart';
 import 'package:dartz/dartz.dart';
@@ -14,8 +14,8 @@ class AuthRepository {
   AuthRepository(this._authService);
 
   Future<Either<Failure, String>> login(String phone) async {
-    await SecureStorage.delete(kAccessToken);
-    await SecureStorage.delete(kRefreshToken);
+    await SecureStorage.deleteSecuredString(kAccessToken);
+    await SecureStorage.deleteSecuredString(kRefreshToken);
 
     final result = await _authService.login(phone);
     return result.fold((failure) => Left(failure), (data) {
@@ -39,8 +39,8 @@ class AuthRepository {
         final refreshToken = data['refreshToken'] as String;
 
         // Persist JWT tokens locally
-        await SecureStorage.write(kAccessToken, accessToken);
-        await SecureStorage.write(kRefreshToken, refreshToken);
+        await SecureStorage.saveSecuredString(kAccessToken, accessToken);
+        await SecureStorage.saveSecuredString(kRefreshToken, refreshToken);
 
         // Fetch user profile from `/api/customer/me` using the new tokens
         final profileResult = await _authService.getProfile();
@@ -65,10 +65,9 @@ class AuthRepository {
 
   Future<Either<Failure, UserModel>> updateProfile(UserModel user) async {
     final name = user.name ?? '';
-    final isArabic = RegExp(r'[\u0600-\u06FF]').hasMatch(name);
 
     final Map<String, dynamic> updateData = {
-      if (isArabic) 'nameAr': name else 'nameEn': name,
+      'name': name,
       if (user.gender != null) 'gender': user.gender,
       if (user.birthdate != null)
         'birthdate': user.birthdate!.toIso8601String().split(
@@ -126,12 +125,12 @@ class AuthRepository {
 
   Future<void> saveUser(UserModel user) async {
     _cachedUser = user;
-    await SharedPrefs.setString(kUserData, user.toEncodedJson());
+    await CacheClient.setString(kUserData, user.toEncodedJson());
   }
 
   UserModel? getUser() {
     if (_cachedUser != null) return _cachedUser;
-    final userJson = SharedPrefs.getString(kUserData);
+    final userJson = CacheClient.getString(kUserData);
     if (userJson.isNotEmpty) {
       try {
         _cachedUser = UserModel.fromEncodedJson(userJson);
@@ -145,7 +144,7 @@ class AuthRepository {
 
   Future<void> logout() async {
     try {
-      final refreshToken = await SecureStorage.read(kRefreshToken);
+      final refreshToken = await SecureStorage.getSecuredString(kRefreshToken);
       if (refreshToken != null && refreshToken.isNotEmpty) {
         await _authService.logout(refreshToken);
       }
@@ -153,9 +152,9 @@ class AuthRepository {
       // Silently ignore logout network failures to guarantee clean local state
     } finally {
       _cachedUser = null;
-      await SecureStorage.delete(kAccessToken);
-      await SecureStorage.delete(kRefreshToken);
-      await SharedPrefs.removeString(kUserData);
+      await SecureStorage.deleteSecuredString(kAccessToken);
+      await SecureStorage.deleteSecuredString(kRefreshToken);
+      await CacheClient.removeString(kUserData);
     }
   }
 }

@@ -1,9 +1,13 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:aqua_go/core/config/local_storage/shared_prefs.dart';
+import 'package:aqua_go/core/constants.dart';
+import 'package:aqua_go/generated/locale_keys.g.dart';
 import '../../../address/data/models/address_model.dart';
 import '../../../my_cars/data/models/my_car_model.dart';
 import '../../../home/data/models/service_model.dart';
 import '../../data/models/booking_model.dart';
 import '../../data/models/additional_service_model.dart';
+import '../../data/models/biker_note.dart';
 import '../../data/repos/booking_repo.dart';
 import '../widgets/payment_method_selection.dart';
 import '../widgets/additional_services_grid.dart';
@@ -17,10 +21,7 @@ class BookingCubit extends Cubit<BookingState> {
       super(const BookingState());
 
   void initBooking(ServiceModel? service) {
-    emit(BookingState(
-      status: BookingStatus.initial,
-      selectedService: service,
-    ));
+    emit(BookingState(status: BookingStatus.initial, selectedService: service));
   }
 
   void selectAddress(AddressModel address) {
@@ -47,6 +48,10 @@ class BookingCubit extends Cubit<BookingState> {
 
   void updateNotes(Set<String> notes) {
     emit(state.copyWith(bikerNotes: notes));
+  }
+
+  void updateSpecialNoteText(String text) {
+    emit(state.copyWith(specialNoteText: text));
   }
 
   void updatePaymentMethod(PaymentMethod method) {
@@ -94,12 +99,31 @@ class BookingCubit extends Cubit<BookingState> {
     for (final idx in state.selectedServiceIndices) {
       if (idx < AdditionalServicesGrid.additionalServices.length) {
         final item = AdditionalServicesGrid.additionalServices[idx];
-        addonsList.add(AdditionalServiceModel(
-          id: item['id'] ?? idx.toString(),
-          name: item['title'] ?? '',
-          price: double.tryParse(item['price'] ?? '0.00') ?? 0.0,
-          image: item['icon'] ?? '',
-        ));
+        addonsList.add(
+          AdditionalServiceModel(
+            id: item['id'] ?? idx.toString(),
+            name: item['title'] ?? '',
+            price: double.tryParse(item['price'] ?? '0.00') ?? 0.0,
+            image: item['icon'] ?? '',
+          ),
+        );
+      }
+    }
+
+    final List<String> notesList = [];
+    final lang = CacheClient.getString(kLanguage);
+    final isArabic = lang.isEmpty || lang == 'ar';
+
+    for (final noteKey in state.bikerNotes) {
+      if (noteKey == LocaleKeys.bookings_special_note) {
+        if (state.specialNoteText.trim().isNotEmpty) {
+          notesList.add(state.specialNoteText.trim());
+        }
+      } else {
+        final enumVal = BikerNote.fromKey(noteKey);
+        if (enumVal != null) {
+          notesList.add(enumVal.getValue(isArabic));
+        }
       }
     }
 
@@ -110,7 +134,7 @@ class BookingCubit extends Cubit<BookingState> {
       date: state.selectedDate,
       time: state.selectedTime,
       additionalServices: addonsList,
-      notes: state.bikerNotes.join(', '),
+      bikerNotes: notesList,
       paymentMethod: state.paymentMethod?.name,
     );
 

@@ -7,14 +7,14 @@ import '../../../../core/utils/app_assets.dart';
 import '../../../../generated/locale_keys.g.dart';
 
 class BookingDateTimePicker extends StatefulWidget {
-  final DateTime initialDate;
+  final DateTime? initialDate;
   final String? initialTime;
   final Function(DateTime) onDateChanged;
   final Function(String) onTimeChanged;
 
   const BookingDateTimePicker({
     super.key,
-    required this.initialDate,
+    this.initialDate,
     required this.onDateChanged,
     required this.onTimeChanged,
     this.initialTime,
@@ -25,7 +25,7 @@ class BookingDateTimePicker extends StatefulWidget {
 }
 
 class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
-  late DateTime selectedDate;
+  DateTime? selectedDate;
   String? selectedTime;
 
   final List<String> availableTimes = [
@@ -86,9 +86,11 @@ class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
         Row(
           children: [
             Text(
-              context.isAr
-                  ? DateFormat('MMMM, yyyy', 'ar').format(selectedDate)
-                  : DateFormat('MMMM, yyyy').format(selectedDate),
+              selectedDate != null
+                  ? (context.isAr
+                        ? DateFormat('MMMM, yyyy', 'ar').format(selectedDate!)
+                        : DateFormat('MMMM, yyyy').format(selectedDate!))
+                  : LocaleKeys.bookings_choose_day.tr(),
               style: AppTextStyles.medium14.copyWith(
                 color: context.colors.textSecondary,
               ),
@@ -120,7 +122,8 @@ class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
         separatorBuilder: (context, index) => SizedBox(width: width * 0.02),
         itemBuilder: (context, index) {
           final date = dates[index];
-          final isSelected = DateUtils.isSameDay(date, selectedDate);
+          final isSelected =
+              selectedDate != null && DateUtils.isSameDay(date, selectedDate!);
           final dayName = context.isAr
               ? DateFormat('EEEE', 'ar').format(date)
               : DateFormat('EEEE').format(date);

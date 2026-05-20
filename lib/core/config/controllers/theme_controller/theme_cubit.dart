@@ -10,7 +10,7 @@ class ThemeCubit extends Cubit<ThemeState> {
   ThemeCubit() : super(ThemeInitial(_getInitialThemeMode()));
 
   static ThemeMode _getInitialThemeMode() {
-    final themeStr = SharedPrefs.getString(kThemeMode);
+    final themeStr = CacheClient.getString(kThemeMode);
     if (themeStr == 'dark') {
       return ThemeMode.dark;
     } else if (themeStr == 'light') {
@@ -22,7 +22,7 @@ class ThemeCubit extends Cubit<ThemeState> {
 
   Future<void> toggleTheme(bool isDark) async {
     final newThemeMode = isDark ? ThemeMode.dark : ThemeMode.light;
-    await SharedPrefs.setString(kThemeMode, isDark ? 'dark' : 'light');
+    await CacheClient.setString(kThemeMode, isDark ? 'dark' : 'light');
     emit(ThemeChanged(newThemeMode));
   }
 }

@@ -1,5 +1,5 @@
 import 'package:dartz/dartz.dart';
-import '../../../../core/errors/failure.dart';
+import '../../../../core/config/networking/exceptions/failure.dart';
 import '../models/service_model.dart';
 import '../data_source/services_remote_data_source.dart';
 
@@ -10,22 +10,21 @@ class ServicesRepository {
 
   Future<Either<Failure, List<ServiceModel>>> fetchServices() async {
     final result = await _servicesDataSource.getServices();
-    return result.fold(
-      (failure) => Left(failure),
-      (data) {
-        if (data != null) {
-          try {
-            final List<dynamic> list = data as List<dynamic>;
-            final parsedServices = list
-                .map((json) => ServiceModel.fromJson(json as Map<String, dynamic>))
-                .toList();
-            return Right(parsedServices);
-          } catch (e) {
-            return Left(ServerFailure('Parsing error: $e'));
-          }
+    return result.fold((failure) => Left(failure), (data) {
+      if (data != null) {
+        try {
+          final List<dynamic> list = data as List<dynamic>;
+          final parsedServices = list
+              .map(
+                (json) => ServiceModel.fromJson(json as Map<String, dynamic>),
+              )
+              .toList();
+          return Right(parsedServices);
+        } catch (e) {
+          return Left(ServerFailure('Parsing error: $e'));
         }
-        return const Left(ServerFailure('Failed to load services'));
-      },
-    );
+      }
+      return const Left(ServerFailure('Failed to load services'));
+    });
   }
 }

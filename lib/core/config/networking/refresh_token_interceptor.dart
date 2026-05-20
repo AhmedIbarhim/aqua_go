@@ -9,6 +9,10 @@ import 'package:aqua_go/core/config/networking/endpoints.dart';
 class RefreshTokenInterceptor extends Interceptor {
   final Dio dio;
 
+  // Cache the ongoing refresh request future to prevent concurrent refresh calls
+  Future<String?>? _refreshFuture;
+  bool _isRedirecting = false;
+
   RefreshTokenInterceptor(this.dio);
 
   @override
@@ -31,40 +35,22 @@ class RefreshTokenInterceptor extends Interceptor {
     }
 
     // Read the stored refresh token
-    final storedRefreshToken = await SecureStorage.read(kRefreshToken);
+    final storedRefreshToken = await SecureStorage.getSecuredString(
+      kRefreshToken,
+    );
     if (storedRefreshToken == null || storedRefreshToken.isEmpty) {
       await _clearSessionAndRedirect();
       return handler.next(err);
     }
 
     try {
-      // Use a separate Dio instance specifically for refresh
-      // to bypass interceptors and avoid circular loops
-      final refreshDio = Dio(
-        BaseOptions(
-          baseUrl: dio.options.baseUrl,
-          connectTimeout: const Duration(seconds: 15),
-          receiveTimeout: const Duration(seconds: 15),
-        ),
-      );
-
-      final refreshResponse = await refreshDio.post(
-        Endpoints.refreshToken,
-        data: {'refreshToken': storedRefreshToken},
-      );
-
-      final newAccessToken = refreshResponse.data['accessToken'] as String?;
-      final newRefreshToken = refreshResponse.data['refreshToken'] as String?;
+      // If a refresh is already in progress, wait for it instead of starting a new one
+      _refreshFuture ??= _refreshToken(storedRefreshToken);
+      final newAccessToken = await _refreshFuture;
 
       if (newAccessToken == null || newAccessToken.isEmpty) {
         await _clearSessionAndRedirect();
         return handler.next(err);
-      }
-
-      // Persist the new tokens
-      await SecureStorage.write(kAccessToken, newAccessToken);
-      if (newRefreshToken != null && newRefreshToken.isNotEmpty) {
-        await SecureStorage.write(kRefreshToken, newRefreshToken);
       }
 
       // Retry the original request, bumping the attempt counter
@@ -91,12 +77,50 @@ class RefreshTokenInterceptor extends Interceptor {
     }
   }
 
+  /// Performs the actual refresh request, saves the new tokens, and resets the future when finished.
+  Future<String?> _refreshToken(String storedRefreshToken) async {
+    try {
+      // Use a separate Dio instance specifically for refresh
+      // to bypass interceptors and avoid circular loops
+      final refreshDio = Dio(
+        BaseOptions(
+          baseUrl: dio.options.baseUrl,
+          connectTimeout: const Duration(seconds: 15),
+          receiveTimeout: const Duration(seconds: 15),
+        ),
+      );
+
+      final refreshResponse = await refreshDio.post(
+        Endpoints.refreshToken,
+        data: {'refreshToken': storedRefreshToken},
+      );
+
+      final newAccessToken = refreshResponse.data['accessToken'] as String?;
+      final newRefreshToken = refreshResponse.data['refreshToken'] as String?;
+
+      if (newAccessToken != null && newAccessToken.isNotEmpty) {
+        // Persist the new tokens
+        await SecureStorage.saveSecuredString(kAccessToken, newAccessToken);
+        if (newRefreshToken != null && newRefreshToken.isNotEmpty) {
+          await SecureStorage.saveSecuredString(kRefreshToken, newRefreshToken);
+        }
+      }
+      return newAccessToken;
+    } finally {
+      // Reset the future so subsequent failures in the future can trigger a new refresh flow
+      _refreshFuture = null;
+    }
+  }
+
   /// Wipes all local credentials and navigates to the login screen
   /// without requiring a BuildContext.
   Future<void> _clearSessionAndRedirect() async {
-    await SecureStorage.delete(kAccessToken);
-    await SecureStorage.delete(kRefreshToken);
-    await SharedPrefs.removeString(kUserData);
+    if (_isRedirecting) return;
+    _isRedirecting = true;
+
+    await SecureStorage.deleteSecuredString(kAccessToken);
+    await SecureStorage.deleteSecuredString(kRefreshToken);
+    await CacheClient.removeString(kUserData);
 
     AppRouter.navigatorKey.currentState?.pushNamedAndRemoveUntil(
       Routes.login,

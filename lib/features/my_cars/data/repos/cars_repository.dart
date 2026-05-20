@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:dartz/dartz.dart';
-import '../../../../core/errors/failure.dart';
+import '../../../../core/config/networking/exceptions/failure.dart';
 import '../models/my_car_model.dart';
 import '../models/vehicle_brand_model.dart';
 import '../models/vehicle_model_model.dart';

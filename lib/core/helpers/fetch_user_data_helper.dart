@@ -36,6 +36,10 @@ class FetchUserData {
     return getUser()?.email;
   }
 
+  static String? getUserId() {
+    return getUser()?.id;
+  }
+
   static bool getIsLoggedIn() {
     return getUser() != null;
   }

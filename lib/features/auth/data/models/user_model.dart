@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:equatable/equatable.dart';
 
 class UserModel extends Equatable {
+  final String? id;
   final String? name;
   final String? email;
   final String? phone;
@@ -10,6 +11,7 @@ class UserModel extends Equatable {
   final DateTime? birthdate;
 
   const UserModel({
+    this.id,
     this.name,
     this.email,
     this.phone,
@@ -20,7 +22,8 @@ class UserModel extends Equatable {
 
   factory UserModel.fromJson(Map<String, dynamic> map) {
     return UserModel(
-      name: map['name'] ?? map['nameEn'] ?? map['nameAr'],
+      id: map['id'],
+      name: map['name'],
       email: map['email'],
       phone: map['phone'],
       avatar: map['avatar'],
@@ -33,6 +36,7 @@ class UserModel extends Equatable {
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'name': name,
       'email': email,
       'phone': phone,
@@ -48,6 +52,7 @@ class UserModel extends Equatable {
       UserModel.fromJson(json.decode(source));
 
   UserModel copyWith({
+    String? id,
     String? name,
     String? phone,
     String? email,
@@ -56,6 +61,7 @@ class UserModel extends Equatable {
     DateTime? birthdate,
   }) {
     return UserModel(
+      id: id ?? this.id,
       name: name ?? this.name,
       phone: phone ?? this.phone,
       email: email ?? this.email,
@@ -66,5 +72,13 @@ class UserModel extends Equatable {
   }
 
   @override
-  List<Object?> get props => [name, email, phone, avatar, gender, birthdate];
+  List<Object?> get props => [
+    id,
+    name,
+    email,
+    phone,
+    avatar,
+    gender,
+    birthdate,
+  ];
 }

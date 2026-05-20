@@ -13,7 +13,7 @@ class LanguageCubit extends Cubit<LanguageState> {
   LanguageCubit() : super(LanguageInitial(_getInitialLocale()));
 
   static Locale _getInitialLocale() {
-    final lang = SharedPrefs.getString(kLanguage);
+    final lang = CacheClient.getString(kLanguage);
     if (lang.isEmpty) {
       return const Locale('ar');
     }
@@ -24,7 +24,7 @@ class LanguageCubit extends Cubit<LanguageState> {
     final isArabic = state.locale.languageCode == 'ar';
     final newLocale = isArabic ? const Locale('en') : const Locale('ar');
 
-    await SharedPrefs.setString(kLanguage, newLocale.languageCode);
+    await CacheClient.setString(kLanguage, newLocale.languageCode);
     await context.setLocale(newLocale);
     emit(LanguageChanged(newLocale));
   }
@@ -32,7 +32,7 @@ class LanguageCubit extends Cubit<LanguageState> {
   Future<void> changeLanguage(BuildContext context, String lang) async {
     final newLocale = Locale(lang);
 
-    await SharedPrefs.setString(kLanguage, newLocale.languageCode);
+    await CacheClient.setString(kLanguage, newLocale.languageCode);
     await context.setLocale(newLocale);
     emit(LanguageChanged(newLocale));
   }
