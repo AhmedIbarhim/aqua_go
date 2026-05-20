@@ -24,11 +24,11 @@ class CarsRepository {
 
   Future<Either<Failure, List<VehicleBrandModel>>> getBrands() async {
     final result = await _carsService.getVehicleMakes();
-    return result.fold((failure) => Left(failure), (response) {
-      if (response.statusCode == 200 && response.data != null) {
+    return result.fold((failure) => Left(failure), (data) {
+      if (data != null) {
         try {
-          final List<dynamic> data = response.data as List<dynamic>;
-          final brands = data
+          final List<dynamic> list = data as List<dynamic>;
+          final brands = list
               .map(
                 (json) =>
                     VehicleBrandModel.fromJson(json as Map<String, dynamic>),
@@ -47,10 +47,10 @@ class CarsRepository {
     String makeId,
   ) async {
     final result = await _carsService.getVehicleModels(makeId);
-    return result.fold((failure) => Left(failure), (response) {
-      if (response.statusCode == 200 && response.data != null) {
-        final List<dynamic> data = response.data as List<dynamic>;
-        final models = data
+    return result.fold((failure) => Left(failure), (data) {
+      if (data != null) {
+        final List<dynamic> list = data as List<dynamic>;
+        final models = list
             .map(
               (json) =>
                   VehicleModelModel.fromJson(json as Map<String, dynamic>),
@@ -77,9 +77,9 @@ class CarsRepository {
 
     // 2. Fetch customer vehicles
     final result = await _carsService.getVehicles();
-    return result.fold((failure) => Left(failure), (response) async {
-      if (response.statusCode == 200 && response.data != null) {
-        final List<dynamic> list = response.data as List<dynamic>;
+    return result.fold((failure) => Left(failure), (data) async {
+      if (data != null) {
+        final List<dynamic> list = data as List<dynamic>;
         final List<MyCarModel> parsedCars = [];
 
         for (final item in list) {
@@ -120,9 +120,9 @@ class CarsRepository {
     final Map<String, dynamic> data = car.toMap();
 
     final result = await _carsService.addVehicle(data);
-    return result.fold((failure) => Left(failure), (response) async {
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final carJson = response.data as Map<String, dynamic>;
+    return result.fold((failure) => Left(failure), (responseData) async {
+      if (responseData != null) {
+        final carJson = responseData as Map<String, dynamic>;
 
         // Resolve make and model details for the newly created car
         final makesResult = await getBrands();
@@ -155,51 +155,45 @@ class CarsRepository {
     final Map<String, dynamic> data = car.toMap();
 
     final result = await _carsService.updateVehicle(car.id, data);
-    return result.fold((failure) => Left(failure), (response) async {
-      if (response.statusCode == 200 || response.statusCode == 204) {
-        final Map<String, dynamic> carJson =
-            (response.data != null && response.data is Map)
-            ? response.data as Map<String, dynamic>
-            : car.toJson();
+    return result.fold((failure) => Left(failure), (responseData) async {
+      final Map<String, dynamic> carJson =
+          (responseData != null && responseData is Map)
+          ? responseData as Map<String, dynamic>
+          : car.toJson();
 
-        final makesResult = await getBrands();
-        final modelsResult = await getModels(car.makeId);
+      final makesResult = await getBrands();
+      final modelsResult = await getModels(car.makeId);
 
-        final makeModel = makesResult.fold(
-          (_) => null,
-          (list) => list.firstWhere((m) => m.id == car.makeId),
-        );
-        final modelModel = modelsResult.fold(
-          (_) => null,
-          (list) => list.firstWhere((m) => m.id == car.modelId),
-        );
+      final makeModel = makesResult.fold(
+        (_) => null,
+        (list) => list.firstWhere((m) => m.id == car.makeId),
+      );
+      final modelModel = modelsResult.fold(
+        (_) => null,
+        (list) => list.firstWhere((m) => m.id == car.modelId),
+      );
 
-        final updatedCar = MyCarModel.fromJson(
-          carJson,
-          make: makeModel,
-          modelRelation: modelModel,
-        );
+      final updatedCar = MyCarModel.fromJson(
+        carJson,
+        make: makeModel,
+        modelRelation: modelModel,
+      );
 
-        final index = _cars.indexWhere((element) => element.id == car.id);
-        if (index != -1) {
-          _cars[index] = updatedCar;
-          _update();
-        }
-        return Right(updatedCar);
+      final index = _cars.indexWhere((element) => element.id == car.id);
+      if (index != -1) {
+        _cars[index] = updatedCar;
+        _update();
       }
-      return const Left(ServerFailure('Failed to update vehicle details'));
+      return Right(updatedCar);
     });
   }
 
   Future<Either<Failure, void>> deleteCar(String id) async {
     final result = await _carsService.deleteVehicle(id);
-    return result.fold((failure) => Left(failure), (response) {
-      if (response.statusCode == 200 || response.statusCode == 204) {
-        _cars.removeWhere((element) => element.id == id);
-        _update();
-        return const Right(null);
-      }
-      return const Left(ServerFailure('Failed to remove vehicle'));
+    return result.fold((failure) => Left(failure), (_) {
+      _cars.removeWhere((element) => element.id == id);
+      _update();
+      return const Right(null);
     });
   }
 

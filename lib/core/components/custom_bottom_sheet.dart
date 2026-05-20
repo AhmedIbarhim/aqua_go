@@ -25,22 +25,25 @@ class CustomBottomSheet extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => BackdropFilter(
-        filter: ui.ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Expanded(
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () => Navigator.pop(context),
-                  child: const SizedBox.expand(),
+      builder: (context) => Scaffold(
+        backgroundColor: Colors.transparent,
+        body: BackdropFilter(
+          filter: ui.ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => Navigator.pop(context),
+                    child: const SizedBox.expand(),
+                  ),
                 ),
-              ),
-              CustomBottomSheet(title: title, padding: padding, child: child),
-            ],
+                CustomBottomSheet(title: title, padding: padding, child: child),
+              ],
+            ),
           ),
         ),
       ),

@@ -15,29 +15,28 @@ class BookingRepo {
     double lng,
   ) async {
     try {
-      final response = await apiClient.post(
+      final response = await apiClient.post<dynamic>(
         Endpoints.zoneCheck,
         data: {'lat': lat, 'lng': lng},
       );
-      return response.fold((failure) => left(failure), (res) {
-        final data = res.data;
+      return response.fold((failure) => left(failure), (data) {
         final inServiceArea = data?['inServiceArea'] as bool? ?? false;
         return right(inServiceArea);
       });
     } catch (error) {
-      return left(ServerFailure(error.toString()));
+      return left(ServerFailure(error.toString(), type: FailureType.unknown));
     }
   }
 
   Future<Either<Failure, void>> createBooking(BookingModel booking) async {
     try {
-      final response = await apiClient.post(
+      final response = await apiClient.post<dynamic>(
         Endpoints.bookings,
         data: booking.toJson(),
       );
       return response.fold((failure) => left(failure), (_) => right(null));
     } catch (error) {
-      return left(ServerFailure(error.toString()));
+      return left(ServerFailure(error.toString(), type: FailureType.unknown));
     }
   }
 }

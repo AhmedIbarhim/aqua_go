@@ -12,10 +12,10 @@ class ServicesRepository {
     final result = await _servicesDataSource.getServices();
     return result.fold(
       (failure) => Left(failure),
-      (response) {
-        if (response.statusCode == 200 && response.data != null) {
+      (data) {
+        if (data != null) {
           try {
-            final List<dynamic> list = response.data as List<dynamic>;
+            final List<dynamic> list = data as List<dynamic>;
             final parsedServices = list
                 .map((json) => ServiceModel.fromJson(json as Map<String, dynamic>))
                 .toList();

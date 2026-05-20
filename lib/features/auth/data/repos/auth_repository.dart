@@ -18,9 +18,9 @@ class AuthRepository {
     await SecureStorage.delete(kRefreshToken);
 
     final result = await _authService.login(phone);
-    return result.fold((failure) => Left(failure), (response) {
-      if (response.statusCode == 200 && response.data != null) {
-        final otpSessionId = response.data['otpSessionId'] as String;
+    return result.fold((failure) => Left(failure), (data) {
+      if (data != null) {
+        final otpSessionId = data['otpSessionId'] as String;
         return Right(otpSessionId);
       }
       return const Left(ServerFailure('Login OTP request failed'));
@@ -33,10 +33,10 @@ class AuthRepository {
     required String otp,
   }) async {
     final result = await _authService.verifyOtp(otpSessionId, otp);
-    return result.fold((failure) => Left(failure), (response) async {
-      if (response.statusCode == 200 && response.data != null) {
-        final accessToken = response.data['accessToken'] as String;
-        final refreshToken = response.data['refreshToken'] as String;
+    return result.fold((failure) => Left(failure), (data) async {
+      if (data != null) {
+        final accessToken = data['accessToken'] as String;
+        final refreshToken = data['refreshToken'] as String;
 
         // Persist JWT tokens locally
         await SecureStorage.write(kAccessToken, accessToken);
@@ -45,12 +45,11 @@ class AuthRepository {
         // Fetch user profile from `/api/customer/me` using the new tokens
         final profileResult = await _authService.getProfile();
         return profileResult.fold((failure) => Left(failure), (
-          profileResponse,
+          profileData,
         ) async {
-          if (profileResponse.statusCode == 200 &&
-              profileResponse.data != null) {
+          if (profileData != null) {
             final profileUser = UserModel.fromJson(
-              profileResponse.data,
+              profileData,
             ).copyWith(phone: phone);
             await saveUser(profileUser);
             return Right(profileUser);
@@ -78,36 +77,30 @@ class AuthRepository {
     };
 
     final result = await _authService.updateProfile(updateData);
-    return result.fold((failure) => Left(failure), (response) async {
-      if (response.statusCode == 200 || response.statusCode == 204) {
-        final profileResult = await _authService.getProfile();
-        return profileResult.fold((failure) => Left(failure), (
-          profileResponse,
-        ) async {
-          if (profileResponse.statusCode == 200 &&
-              profileResponse.data != null) {
-            final updatedUser = UserModel.fromJson(
-              profileResponse.data,
-            ).copyWith(phone: user.phone);
-            await saveUser(updatedUser);
-            return Right(updatedUser);
-          }
-          return const Left(
-            ServerFailure('Failed to sync updated profile with server'),
-          );
-        });
-      }
-      return const Left(
-        ServerFailure('Failed to sync updated profile with server'),
-      );
+    return result.fold((failure) => Left(failure), (data) async {
+      final profileResult = await _authService.getProfile();
+      return profileResult.fold((failure) => Left(failure), (
+        profileData,
+      ) async {
+        if (profileData != null) {
+          final updatedUser = UserModel.fromJson(
+            profileData,
+          ).copyWith(phone: user.phone);
+          await saveUser(updatedUser);
+          return Right(updatedUser);
+        }
+        return const Left(
+          ServerFailure('Failed to sync updated profile with server'),
+        );
+      });
     });
   }
 
   Future<Either<Failure, String>> requestEmailVerify(String email) async {
     final result = await _authService.requestEmailVerify(email);
-    return result.fold((failure) => Left(failure), (response) {
-      if (response.statusCode == 200 && response.data != null) {
-        final otpSessionId = response.data['otpSessionId'] as String;
+    return result.fold((failure) => Left(failure), (data) {
+      if (data != null) {
+        final otpSessionId = data['otpSessionId'] as String;
         return Right(otpSessionId);
       }
       return const Left(ServerFailure('Failed to send email verification'));
@@ -120,17 +113,14 @@ class AuthRepository {
     required String otp,
   }) async {
     final result = await _authService.confirmEmailVerify(otpSessionId, otp);
-    return result.fold((failure) => Left(failure), (response) async {
-      if (response.statusCode == 200 || response.statusCode == 204) {
-        final currentUser = getUser();
-        if (currentUser != null) {
-          final updatedUser = currentUser.copyWith(email: email);
-          await saveUser(updatedUser);
-          return Right(updatedUser);
-        }
-        return const Left(ServerFailure('User not found'));
+    return result.fold((failure) => Left(failure), (_) async {
+      final currentUser = getUser();
+      if (currentUser != null) {
+        final updatedUser = currentUser.copyWith(email: email);
+        await saveUser(updatedUser);
+        return Right(updatedUser);
       }
-      return const Left(ServerFailure('Email verification failed'));
+      return const Left(ServerFailure('User not found'));
     });
   }
 

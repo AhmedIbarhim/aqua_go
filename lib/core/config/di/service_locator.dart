@@ -19,12 +19,13 @@ import 'package:get_it/get_it.dart';
 import '../../../features/address/data/services/location_service.dart';
 import 'package:aqua_go/core/config/networking/endpoints.dart';
 import '../networking/api_client.dart';
+import '../networking/dio_factory.dart';
 
 final GetIt locator = GetIt.instance;
 
 Future<void> initServiceLocator() async {
   locator.registerLazySingleton<APIClient>(
-    () => APIClient(baseUrl: Endpoints.baseUrl),
+    () => APIClient(DioFactory.create(baseUrl: Endpoints.baseUrl)),
   );
 
   locator.registerLazySingleton<LocationService>(

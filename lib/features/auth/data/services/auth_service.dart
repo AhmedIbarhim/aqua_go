@@ -9,11 +9,11 @@ class AuthService {
 
   AuthService(this._apiClient);
 
-  Future<Either<Failure, Response>> login(String formattedPhone) {
+  Future<Either<Failure, dynamic>> login(String formattedPhone) {
     return _apiClient.post(Endpoints.sendOtp, data: {'phone': formattedPhone});
   }
 
-  Future<Either<Failure, Response>> verifyOtp(
+  Future<Either<Failure, dynamic>> verifyOtp(
     String otpSessionId,
     String code,
   ) {
@@ -23,19 +23,19 @@ class AuthService {
     );
   }
 
-  Future<Either<Failure, Response>> getProfile() {
+  Future<Either<Failure, dynamic>> getProfile() {
     return _apiClient.get(Endpoints.customerMe);
   }
 
-  Future<Either<Failure, Response>> updateProfile(Map<String, dynamic> data) {
+  Future<Either<Failure, dynamic>> updateProfile(Map<String, dynamic> data) {
     return _apiClient.patch(Endpoints.customerMe, data: data);
   }
 
-  Future<Either<Failure, Response>> requestEmailVerify(String email) {
+  Future<Either<Failure, dynamic>> requestEmailVerify(String email) {
     return _apiClient.post(Endpoints.verifyRequest, data: {'email': email});
   }
 
-  Future<Either<Failure, Response>> confirmEmailVerify(
+  Future<Either<Failure, dynamic>> confirmEmailVerify(
     String otpSessionId,
     String code,
   ) {
@@ -45,7 +45,7 @@ class AuthService {
     );
   }
 
-  Future<Either<Failure, Response>> logout(String refreshToken) {
+  Future<Either<Failure, dynamic>> logout(String refreshToken) {
     return _apiClient.post(
       Endpoints.logout,
       data: {'refreshToken': refreshToken},

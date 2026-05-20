@@ -103,7 +103,13 @@ class _AddAddressBottomSheetState extends State<AddAddressBottomSheet> {
         }
 
         if (state is AddressesActionError) {
-          context.showErrorSnackBar(state.message);
+          if (state.message == 'address-outside-service-area') {
+            context.showErrorSnackBar(
+              LocaleKeys.address_zone_not_available.tr(),
+            );
+          } else {
+            context.showErrorSnackBar(state.message);
+          }
         }
       },
       builder: (context, state) {

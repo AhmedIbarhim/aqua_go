@@ -13,16 +13,16 @@ class MapsRepository {
     String query,
   ) async {
     final result = await locationService.getAutocomplete(query);
-    return result.fold((failure) => Left(failure), (response) {
-      if (response.statusCode == 200 && response.data['status'] == 'OK') {
-        final predictions = (response.data['predictions'] as List)
+    return result.fold((failure) => Left(failure), (data) {
+      if (data != null && data['status'] == 'OK') {
+        final predictions = (data['predictions'] as List)
             .map((e) => PlacePredictionModel.fromJson(e))
             .toList();
         return Right(predictions);
       } else {
         return Left(
           ServerFailure(
-            response.data['error_message'] ?? 'Failed to get predictions',
+            data?['error_message'] ?? 'Failed to get predictions',
           ),
         );
       }
@@ -31,13 +31,13 @@ class MapsRepository {
 
   Future<Either<Failure, LocationModel>> getPlaceDetails(String placeId) async {
     final result = await locationService.getPlaceDetails(placeId);
-    return result.fold((failure) => Left(failure), (response) {
-      if (response.statusCode == 200 && response.data['status'] == 'OK') {
-        return Right(LocationModel.fromPlaceDetailsJson(response.data));
+    return result.fold((failure) => Left(failure), (data) {
+      if (data != null && data['status'] == 'OK') {
+        return Right(LocationModel.fromPlaceDetailsJson(data));
       } else {
         return Left(
           ServerFailure(
-            response.data['error_message'] ?? 'Failed to get place details',
+            data?['error_message'] ?? 'Failed to get place details',
           ),
         );
       }
@@ -49,17 +49,17 @@ class MapsRepository {
     double lng,
   ) async {
     final result = await locationService.getAddressFromLatLng(lat, lng);
-    return result.fold((failure) => Left(failure), (response) {
-      if (response.statusCode == 200 &&
-          response.data['status'] == 'OK' &&
-          response.data['results'].isNotEmpty) {
+    return result.fold((failure) => Left(failure), (data) {
+      if (data != null &&
+          data['status'] == 'OK' &&
+          data['results'].isNotEmpty) {
         return Right(
-          LocationModel.fromGeocodeJson(response.data['results'][0]),
+          LocationModel.fromGeocodeJson(data['results'][0]),
         );
       } else {
         return Left(
           ServerFailure(
-            response.data['error_message'] ?? 'Failed to get address',
+            data?['error_message'] ?? 'Failed to get address',
           ),
         );
       }
