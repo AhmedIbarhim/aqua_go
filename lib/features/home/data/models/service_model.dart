@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+import '../../../../core/utils/app_assets.dart';
+
 class ServiceModel extends Equatable {
   final String id;
   final String code;
@@ -7,6 +9,9 @@ class ServiceModel extends Equatable {
   final ServiceDescription rawDescription;
   final bool active;
   final List<dynamic> addons;
+  final int priceMinor;
+  final int vatMinor;
+  final String currency;
 
   // Optionals for override values
   final String? priceOverride;
@@ -20,15 +25,27 @@ class ServiceModel extends Equatable {
     required this.rawDescription,
     required this.active,
     required this.addons,
+    this.priceMinor = 0,
+    this.vatMinor = 0,
+    this.currency = 'SAR',
     this.priceOverride,
     this.oldPriceOverride,
     this.imageOverride,
   });
 
   // Fallback getters for UI compatibility
-  String get price => priceOverride ?? '90.00';
-  String get oldPrice => oldPriceOverride ?? '100.00';
-  String get image => imageOverride ?? 'assets/images/car_demo.png';
+  String get price => priceMinor > 0
+      ? (priceMinor / 100).toStringAsFixed(2)
+      : (priceOverride ?? '');
+  String get oldPrice => oldPriceOverride ?? '';
+  String get image => imageOverride ?? AppAssets.carDemo;
+
+  double get priceDouble => priceMinor > 0
+      ? priceMinor / 100
+      : (double.tryParse(priceOverride ?? '90.00') ?? 90.00);
+  double get vatDouble => priceMinor > 0 ? vatMinor / 100 : priceDouble * 0.15;
+  double get basePriceDouble =>
+      priceMinor > 0 ? priceDouble - vatDouble : priceDouble;
 
   factory ServiceModel.fromJson(Map<String, dynamic> json) {
     return ServiceModel(
@@ -38,6 +55,9 @@ class ServiceModel extends Equatable {
       rawDescription: ServiceDescription.fromJson(json['description']),
       active: json['active'] as bool? ?? true,
       addons: json['addons'] as List<dynamic>? ?? const [],
+      priceMinor: json['priceMinor'] as int? ?? 0,
+      vatMinor: json['vatMinor'] as int? ?? 0,
+      currency: json['currency'] as String? ?? 'SAR',
     );
   }
 
@@ -49,6 +69,9 @@ class ServiceModel extends Equatable {
       'description': rawDescription.toJson(),
       'active': active,
       'addons': addons,
+      'priceMinor': priceMinor,
+      'vatMinor': vatMinor,
+      'currency': currency,
     };
   }
 
@@ -60,6 +83,9 @@ class ServiceModel extends Equatable {
     rawDescription,
     active,
     addons,
+    priceMinor,
+    vatMinor,
+    currency,
   ];
 }
 

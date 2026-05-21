@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
@@ -28,18 +29,39 @@ class _HomeBannersCarosalState extends State<HomeBannersCarosal> {
           carouselController: widget.carouselController,
           itemCount: widget.banners.length,
           itemBuilder: (context, index, realIndex) {
+            final bannerImage = widget.banners[index].image;
+            final isNetworkImage =
+                bannerImage.startsWith('http') || bannerImage.startsWith('https');
+
             return Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Image.asset(
-                  widget.banners[index].image,
-                  fit: BoxFit.fill,
-                  width: double.infinity,
-                  height: double.infinity,
-                ),
+                child: isNetworkImage
+                    ? CachedNetworkImage(
+                        imageUrl: bannerImage,
+                        fit: BoxFit.fill,
+                        width: double.infinity,
+                        height: double.infinity,
+                        placeholder: (context, url) => Container(
+                          color: context.colors.defaultSubtle,
+                          child: const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        ),
+                        errorWidget: (context, url, error) => Image.asset(
+                          "assets/images/banner_demo.png",
+                          fit: BoxFit.fill,
+                        ),
+                      )
+                    : Image.asset(
+                        bannerImage,
+                        fit: BoxFit.fill,
+                        width: double.infinity,
+                        height: double.infinity,
+                      ),
               ),
             );
           },

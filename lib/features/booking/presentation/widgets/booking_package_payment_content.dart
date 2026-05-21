@@ -9,6 +9,7 @@ import '../../../../generated/locale_keys.g.dart';
 import '../../../home/data/models/package_model.dart';
 import 'payment_method_selection.dart';
 
+
 class BookingPackagePaymentContent extends StatelessWidget {
   final PackageModel packageModel;
   final void Function(BuildContext context) onConfirm;

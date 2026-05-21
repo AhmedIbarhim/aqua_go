@@ -9,7 +9,7 @@ import '../../data/models/booking_model.dart';
 import '../../data/models/additional_service_model.dart';
 import '../../data/models/biker_note.dart';
 import '../../data/repos/booking_repo.dart';
-import '../widgets/payment_method_selection.dart';
+import '../../../../core/enums/payment_method_enum.dart';
 import '../widgets/additional_services_grid.dart';
 import 'booking_state.dart';
 
@@ -135,7 +135,7 @@ class BookingCubit extends Cubit<BookingState> {
       time: state.selectedTime,
       additionalServices: addonsList,
       bikerNotes: notesList,
-      paymentMethod: state.paymentMethod?.name,
+      paymentMethod: state.paymentMethod,
     );
 
     final result = await _bookingRepo.createBooking(booking);

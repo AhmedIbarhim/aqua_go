@@ -2,6 +2,8 @@ import '../../../address/data/models/address_model.dart';
 import '../../../my_cars/data/models/my_car_model.dart';
 import '../../../home/data/models/service_model.dart';
 import 'additional_service_model.dart';
+import 'day_time_model.dart';
+import '../../../../core/enums/payment_method_enum.dart';
 
 class BookingModel {
   final ServiceModel? service;
@@ -11,7 +13,7 @@ class BookingModel {
   final String? time;
   final List<AdditionalServiceModel> additionalServices;
   final List<String> bikerNotes;
-  final String? paymentMethod;
+  final PaymentMethod? paymentMethod;
 
   BookingModel({
     this.service,
@@ -34,29 +36,30 @@ class BookingModel {
   Map<String, dynamic> toJson() {
     String? scheduledAt;
     if (date != null && time != null) {
-      final String formattedMonth = date!.month.toString().padLeft(2, '0');
-      final String formattedDay = date!.day.toString().padLeft(2, '0');
-      final String formattedTime = time!.contains(' ')
-          ? time!.split(' ').first
-          : time!;
-      scheduledAt =
-          '${date!.year}-$formattedMonth-${formattedDay}T$formattedTime:00Z';
+      scheduledAt = DayTimeModel(
+        date: date!,
+        rawTime: time!,
+      ).toScheduledAtString();
     }
 
     return {
-      'savedAddressId': address?.id == 'current_gps' ? null : address?.id,
+      if (address?.id != null && address?.id != 'current_gps')
+        'savedAddressId': address?.id,
       'addressLabel': address?.label,
       'lat': address?.lat,
       'lng': address?.lng,
-      'addressArrivalNotes': '',
+      if (address?.arrivalNotes != null)
+        'addressArrivalNotes': address?.arrivalNotes,
       'plateText': car?.plateNumber,
       'vehicleMake': car?.carBrand?.vehicleBrandName.nameEn,
       'vehicleModel': car?.carModel?.vehicleModelName.nameEn,
       'vehicleColor': car?.color,
+      'vehicleYear': int.parse(car?.year ?? '2020'),
       'type': 'SCHEDULED',
       'scheduledAt': scheduledAt,
-      'savedVehicleId': car?.id,
+      if (car?.id != null) 'savedVehicleId': car?.id,
       'workerNotes': bikerNotes,
+      if (paymentMethod != null) 'paymentMethod': paymentMethod!.name,
     };
   }
 
@@ -71,7 +74,9 @@ class BookingModel {
           .map((e) => AdditionalServiceModel.fromJson(e))
           .toList(),
       bikerNotes: json['bikerNotes'] as List<String>,
-      paymentMethod: json['paymentMethod'],
+      paymentMethod: PaymentMethodEnumExtension.fromString(
+        json['paymentMethod'],
+      ),
     );
   }
 }

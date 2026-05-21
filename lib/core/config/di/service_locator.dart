@@ -12,8 +12,11 @@ import 'package:aqua_go/features/my_cars/controllers/my_cars_cubit.dart';
 import 'package:aqua_go/features/booking/data/repos/booking_repo.dart';
 import 'package:aqua_go/features/booking/presentation/controllers/booking_cubit.dart';
 import 'package:aqua_go/features/home/data/data_source/services_remote_data_source.dart';
+import 'package:aqua_go/features/home/data/data_source/banners_remote_data_source.dart';
 import 'package:aqua_go/features/home/data/repos/services_repository.dart';
+import 'package:aqua_go/features/home/data/repos/banners_repository.dart';
 import 'package:aqua_go/features/home/controllers/services_controller/services_cubit.dart';
+import 'package:aqua_go/features/home/controllers/banners_controller/banners_cubit.dart';
 import 'package:get_it/get_it.dart';
 
 import '../../../features/address/data/services/location_service.dart';
@@ -42,6 +45,9 @@ Future<void> initServiceLocator() async {
   locator.registerLazySingleton<ServicesRemoteDataSource>(
     () => ServicesRemoteDataSource(locator()),
   );
+  locator.registerLazySingleton<BannersRemoteDataSource>(
+    () => BannersRemoteDataSource(locator()),
+  );
 
   // Repositories
 
@@ -61,6 +67,10 @@ Future<void> initServiceLocator() async {
 
   locator.registerLazySingleton<ServicesRepository>(
     () => ServicesRepository(locator()),
+  );
+
+  locator.registerLazySingleton<BannersRepository>(
+    () => BannersRepository(locator()),
   );
 
   locator.registerLazySingleton<AuthRepository>(
@@ -87,6 +97,10 @@ Future<void> initServiceLocator() async {
 
   locator.registerFactory<ServicesCubit>(
     () => ServicesCubit(servicesRepository: locator()),
+  );
+
+  locator.registerFactory<BannersCubit>(
+    () => BannersCubit(bannersRepository: locator()),
   );
 
   locator.registerFactory<AuthCubit>(() => AuthCubit(locator()));

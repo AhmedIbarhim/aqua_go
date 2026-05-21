@@ -16,10 +16,7 @@ class ServiceCard extends StatelessWidget {
     final width = MediaQuery.of(context).size.width;
     return InkWell(
       onTap: () {
-        context.pushNamed(
-          Routes.bookingLocation,
-          arguments: serviceModel,
-        );
+        context.pushNamed(Routes.bookingLocation, arguments: serviceModel);
       },
       child: Container(
         width: width,
@@ -85,7 +82,7 @@ class ServiceCard extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              if (serviceModel.oldPrice.isNotEmpty)
+                              if (serviceModel.oldPrice.isNotEmpty) ...[
                                 Text(
                                   serviceModel.oldPrice,
                                   style: AppTextStyles.regular12.copyWith(
@@ -96,7 +93,8 @@ class ServiceCard extends StatelessWidget {
                                     decorationThickness: 0.9,
                                   ),
                                 ),
-                              const SizedBox(width: 8),
+                                const SizedBox(width: 8),
+                              ],
                               Text(
                                 serviceModel.price,
                                 style: AppTextStyles.bold18,

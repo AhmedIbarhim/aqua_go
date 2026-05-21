@@ -87,6 +87,8 @@ class RefreshTokenInterceptor extends Interceptor {
           baseUrl: dio.options.baseUrl,
           connectTimeout: const Duration(seconds: 15),
           receiveTimeout: const Duration(seconds: 15),
+          contentType: 'application/json',
+          responseType: ResponseType.json,
         ),
       );
 
@@ -95,8 +97,15 @@ class RefreshTokenInterceptor extends Interceptor {
         data: {'refreshToken': storedRefreshToken},
       );
 
-      final newAccessToken = refreshResponse.data['accessToken'] as String?;
-      final newRefreshToken = refreshResponse.data['refreshToken'] as String?;
+      // Validate HTTP status code
+      if (refreshResponse.statusCode == null || refreshResponse.statusCode! < 200 || refreshResponse.statusCode! >= 300) {
+        return null;
+      }
+
+      // Accept both camelCase and snake_case keys to be defensive against server variations
+      final data = refreshResponse.data as Map<String, dynamic>?;
+      final newAccessToken = (data?['accessToken'] ?? data?['access_token']) as String?;
+      final newRefreshToken = (data?['refreshToken'] ?? data?['refresh_token']) as String?;
 
       if (newAccessToken != null && newAccessToken.isNotEmpty) {
         // Persist the new tokens
@@ -104,8 +113,10 @@ class RefreshTokenInterceptor extends Interceptor {
         if (newRefreshToken != null && newRefreshToken.isNotEmpty) {
           await SecureStorage.saveSecuredString(kRefreshToken, newRefreshToken);
         }
+        return newAccessToken;
       }
-      return newAccessToken;
+
+      return null;
     } finally {
       // Reset the future so subsequent failures in the future can trigger a new refresh flow
       _refreshFuture = null;

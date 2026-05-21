@@ -12,6 +12,7 @@ import '../widgets/booking_summary_card.dart';
 import '../widgets/biker_notes_selection.dart';
 import '../widgets/payment_summary_card.dart';
 import '../widgets/payment_method_selection.dart';
+
 import '../controllers/booking_cubit.dart';
 import '../controllers/booking_state.dart';
 import '../widgets/additional_services_grid.dart';
@@ -86,11 +87,9 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
       }
     }
 
-    final basePrice =
-        double.tryParse(bookingState.selectedService?.price ?? '94.99') ??
-        94.99;
+    final basePrice = bookingState.selectedService?.basePriceDouble ?? 94.99;
     final subtotal = basePrice + addonsTotal;
-    final vat = subtotal * 0.15;
+    final vat = (bookingState.selectedService?.vatDouble ?? (basePrice * 0.15)) + (addonsTotal * 0.15);
     final total = subtotal + vat;
 
     return Container(
