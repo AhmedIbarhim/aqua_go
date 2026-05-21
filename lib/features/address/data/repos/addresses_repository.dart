@@ -6,19 +6,8 @@ import '../data_sources/addresses_remote_data_source.dart';
 
 class AddressesRepository {
   final AddressesRemoteDataSource _addressesService;
-  final List<AddressModel> _addresses = [];
-  final StreamController<List<AddressModel>> _controller =
-      StreamController<List<AddressModel>>.broadcast();
 
   AddressesRepository(this._addressesService);
-
-  Stream<List<AddressModel>> get addressesStream => _controller.stream;
-
-  List<AddressModel> get addresses => List.unmodifiable(_addresses);
-
-  void _update() {
-    _controller.add(List.unmodifiable(_addresses));
-  }
 
   Future<Either<Failure, List<AddressModel>>> fetchAddresses() async {
     final result = await _addressesService.getAddresses();
@@ -32,10 +21,7 @@ class AddressesRepository {
               )
               .toList();
 
-          _addresses.clear();
-          _addresses.addAll(parsedAddresses);
-          _update();
-          return Right(_addresses);
+          return Right(parsedAddresses);
         } catch (e) {
           return Left(ServerFailure('Parsing error: $e'));
         }
@@ -53,8 +39,6 @@ class AddressesRepository {
         final addressJson = responseData as Map<String, dynamic>;
         final newAddress = AddressModel.fromJson(addressJson);
 
-        _addresses.add(newAddress);
-        _update();
         return Right(newAddress);
       }
       return const Left(ServerFailure('Failed to save address details'));
@@ -75,13 +59,6 @@ class AddressesRepository {
 
       final updatedAddress = AddressModel.fromJson(addressJson);
 
-      final index = _addresses.indexWhere(
-        (element) => element.id == address.id,
-      );
-      if (index != -1) {
-        _addresses[index] = updatedAddress;
-        _update();
-      }
       return Right(updatedAddress);
     });
   }
@@ -89,13 +66,7 @@ class AddressesRepository {
   Future<Either<Failure, void>> deleteAddress(String id) async {
     final result = await _addressesService.deleteAddress(id);
     return result.fold((failure) => Left(failure), (_) {
-      _addresses.removeWhere((element) => element.id == id);
-      _update();
       return const Right(null);
     });
-  }
-
-  void dispose() {
-    _controller.close();
   }
 }

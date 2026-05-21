@@ -215,7 +215,11 @@ class _BookingLocationViewState extends State<BookingLocationView> {
                                     arguments: NewAddressMapArgs(
                                       forAddingAddress: true,
                                     ),
-                                  );
+                                  ).then((_) {
+                                    if (context.mounted) {
+                                      _addressCubit.getAddresses();
+                                    }
+                                  });
                                 },
                               ),
                               const SizedBox(height: 30),

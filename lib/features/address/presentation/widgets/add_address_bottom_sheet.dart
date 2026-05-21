@@ -35,6 +35,7 @@ class AddAddressBottomSheet extends StatefulWidget {
     required String address,
     required double lat,
     required double lng,
+    AddressesCubit? addressesCubit,
     AddressModel? existingAddress,
   }) {
     CustomBottomSheet.show(
@@ -42,15 +43,25 @@ class AddAddressBottomSheet extends StatefulWidget {
       title: existingAddress == null
           ? LocaleKeys.address_add_new_location.tr()
           : LocaleKeys.address_edit_location.tr(),
-      child: BlocProvider(
-        create: (context) => locator<AddressesCubit>(),
-        child: AddAddressBottomSheet(
-          address: address,
-          lat: lat,
-          lng: lng,
-          existingAddress: existingAddress,
-        ),
-      ),
+      child: addressesCubit != null
+          ? BlocProvider.value(
+              value: addressesCubit,
+              child: AddAddressBottomSheet(
+                address: address,
+                lat: lat,
+                lng: lng,
+                existingAddress: existingAddress,
+              ),
+            )
+          : BlocProvider(
+              create: (context) => locator<AddressesCubit>(),
+              child: AddAddressBottomSheet(
+                address: address,
+                lat: lat,
+                lng: lng,
+                existingAddress: existingAddress,
+              ),
+            ),
     );
   }
 

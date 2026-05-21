@@ -20,7 +20,11 @@ class MyCarsListView extends StatelessWidget {
           text: LocaleKeys.my_cars_add_car.tr(),
           preWidget: const Icon(Icons.add),
           onPressed: () {
-            Navigator.pushNamed(context, Routes.addVehicle);
+            Navigator.pushNamed(context, Routes.addVehicle).then((_) {
+              if (context.mounted) {
+                context.read<MyCarsCubit>().getCars();
+              }
+            });
           },
         ),
         const SizedBox(height: 24),
@@ -32,7 +36,11 @@ class MyCarsListView extends StatelessWidget {
                 car: car,
                 onEdit: () {
                   Navigator.pushNamed(context, Routes.addVehicle,
-                      arguments: car);
+                      arguments: car).then((_) {
+                    if (context.mounted) {
+                      context.read<MyCarsCubit>().getCars();
+                    }
+                  });
                 },
                 onDelete: () {
                   context.read<MyCarsCubit>().deleteCar(car.id);

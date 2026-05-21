@@ -144,7 +144,11 @@ class _MyAddressesViewState extends State<MyAddressesView> {
           context.pushNamed(
             Routes.newAddressMap,
             arguments: NewAddressMapArgs(forAddingAddress: true),
-          );
+          ).then((_) {
+            if (context.mounted) {
+              _addressesCubit.getAddresses();
+            }
+          });
         },
       ),
     );

@@ -10,17 +10,10 @@ part 'my_cars_state.dart';
 
 class MyCarsCubit extends Cubit<MyCarsState> {
   final CarsRepository _carsRepository;
-  StreamSubscription? _subscription;
 
   MyCarsCubit({required CarsRepository carsRepository})
     : _carsRepository = carsRepository,
-      super(MyCarsInitial()) {
-    _subscription = _carsRepository.carsStream.listen((cars) {
-      if (!isClosed) {
-        emit(MyCarsLoaded(List.from(cars)));
-      }
-    });
-  }
+      super(MyCarsInitial());
 
   Future<void> getCars() async {
     emit(MyCarsLoading());
@@ -34,28 +27,34 @@ class MyCarsCubit extends Cubit<MyCarsState> {
   Future<void> addCar(MyCarModel car) async {
     emit(MyCarsActionLoading());
     final result = await _carsRepository.addCar(car);
-    result.fold(
-      (failure) => emit(MyCarsActionError(failure.message)),
-      (_) => emit(MyCarsActionSuccess()),
-    );
+    result.fold((failure) => emit(MyCarsActionError(failure.message)), (
+      _,
+    ) async {
+      await getCars();
+      emit(MyCarsActionSuccess());
+    });
   }
 
   Future<void> updateCar(MyCarModel car) async {
     emit(MyCarsActionLoading());
     final result = await _carsRepository.updateCar(car);
-    result.fold(
-      (failure) => emit(MyCarsActionError(failure.message)),
-      (_) => emit(MyCarsActionSuccess()),
-    );
+    result.fold((failure) => emit(MyCarsActionError(failure.message)), (
+      _,
+    ) async {
+      await getCars();
+      emit(MyCarsActionSuccess());
+    });
   }
 
   Future<void> deleteCar(String id) async {
     emit(MyCarsActionLoading());
     final result = await _carsRepository.deleteCar(id);
-    result.fold(
-      (failure) => emit(MyCarsActionError(failure.message)),
-      (_) => emit(MyCarsActionSuccess()),
-    );
+    result.fold((failure) => emit(MyCarsActionError(failure.message)), (
+      _,
+    ) async {
+      await getCars();
+      emit(MyCarsActionSuccess());
+    });
   }
 
   Future<void> getBrands() async {
@@ -74,11 +73,5 @@ class MyCarsCubit extends Cubit<MyCarsState> {
       (failure) => emit(ModelsError(failure.message)),
       (modelsList) => emit(ModelsLoaded(modelsList)),
     );
-  }
-
-  @override
-  Future<void> close() {
-    _subscription?.cancel();
-    return super.close();
   }
 }

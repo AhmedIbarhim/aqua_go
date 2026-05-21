@@ -57,12 +57,10 @@ Future<void> initServiceLocator() async {
 
   locator.registerLazySingleton<AddressesRepository>(
     () => AddressesRepository(locator()),
-    dispose: (repo) => repo.dispose(),
   );
 
   locator.registerLazySingleton<CarsRepository>(
     () => CarsRepository(locator()),
-    dispose: (repo) => repo.dispose(),
   );
 
   locator.registerLazySingleton<ServicesRepository>(

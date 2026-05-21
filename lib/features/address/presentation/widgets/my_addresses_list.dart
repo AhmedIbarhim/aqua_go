@@ -28,6 +28,7 @@ class MyAddressesList extends StatelessWidget {
               address: address.details,
               lat: address.lat,
               lng: address.lng,
+              addressesCubit: context.read<AddressesCubit>(),
               existingAddress: address,
             );
           },

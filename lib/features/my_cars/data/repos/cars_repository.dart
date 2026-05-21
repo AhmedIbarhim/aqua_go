@@ -8,19 +8,8 @@ import '../data_sources/cars_remote_data_source.dart';
 
 class CarsRepository {
   final CarsRemoteDataSource _carsService;
-  final List<MyCarModel> _cars = [];
-  final StreamController<List<MyCarModel>> _controller =
-      StreamController<List<MyCarModel>>.broadcast();
 
   CarsRepository(this._carsService);
-
-  Stream<List<MyCarModel>> get carsStream => _controller.stream;
-
-  List<MyCarModel> get cars => List.unmodifiable(_cars);
-
-  void _update() {
-    _controller.add(List.unmodifiable(_cars));
-  }
 
   Future<Either<Failure, List<VehicleBrandModel>>> getBrands() async {
     final result = await _carsService.getVehicleMakes();
@@ -107,10 +96,7 @@ class CarsRepository {
           );
         }
 
-        _cars.clear();
-        _cars.addAll(parsedCars);
-        _update();
-        return Right(_cars);
+        return Right(parsedCars);
       }
       return const Left(ServerFailure('Failed to parse vehicles response'));
     });
@@ -143,8 +129,6 @@ class CarsRepository {
           modelRelation: modelModel,
         );
 
-        _cars.add(newCar);
-        _update();
         return Right(newCar);
       }
       return const Left(ServerFailure('Failed to save vehicle details'));
@@ -179,11 +163,6 @@ class CarsRepository {
         modelRelation: modelModel,
       );
 
-      final index = _cars.indexWhere((element) => element.id == car.id);
-      if (index != -1) {
-        _cars[index] = updatedCar;
-        _update();
-      }
       return Right(updatedCar);
     });
   }
@@ -191,13 +170,7 @@ class CarsRepository {
   Future<Either<Failure, void>> deleteCar(String id) async {
     final result = await _carsService.deleteVehicle(id);
     return result.fold((failure) => Left(failure), (_) {
-      _cars.removeWhere((element) => element.id == id);
-      _update();
       return const Right(null);
     });
-  }
-
-  void dispose() {
-    _controller.close();
   }
 }

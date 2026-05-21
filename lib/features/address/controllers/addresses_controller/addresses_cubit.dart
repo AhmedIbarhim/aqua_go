@@ -8,17 +8,10 @@ part 'addresses_state.dart';
 
 class AddressesCubit extends Cubit<AddressesState> {
   final AddressesRepository _repository;
-  StreamSubscription? _subscription;
 
   AddressesCubit({required AddressesRepository repository})
     : _repository = repository,
-      super(AddressesInitial()) {
-    _subscription = _repository.addressesStream.listen((addresses) {
-      if (!isClosed) {
-        emit(AddressesLoaded(List.from(addresses)));
-      }
-    });
-  }
+      super(AddressesInitial());
 
   Future<void> getAddresses() async {
     emit(AddressesLoading());
@@ -34,7 +27,10 @@ class AddressesCubit extends Cubit<AddressesState> {
     final result = await _repository.addAddress(address);
     result.fold(
       (failure) => emit(AddressesActionError(failure.message)),
-      (_) => emit(AddressesActionSuccess()),
+      (_) async {
+        await getAddresses();
+        emit(AddressesActionSuccess());
+      },
     );
   }
 
@@ -43,7 +39,10 @@ class AddressesCubit extends Cubit<AddressesState> {
     final result = await _repository.updateAddress(updatedAddress);
     result.fold(
       (failure) => emit(AddressesActionError(failure.message)),
-      (_) => emit(AddressesActionSuccess()),
+      (_) async {
+        await getAddresses();
+        emit(AddressesActionSuccess());
+      },
     );
   }
 
@@ -52,13 +51,10 @@ class AddressesCubit extends Cubit<AddressesState> {
     final result = await _repository.deleteAddress(id);
     result.fold(
       (failure) => emit(AddressesActionError(failure.message)),
-      (_) => emit(AddressesActionSuccess()),
+      (_) async {
+        await getAddresses();
+        emit(AddressesActionSuccess());
+      },
     );
-  }
-
-  @override
-  Future<void> close() {
-    _subscription?.cancel();
-    return super.close();
   }
 }
