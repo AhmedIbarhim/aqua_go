@@ -1,4 +1,3 @@
-import 'package:aqua_go/core/components/custom_loading_indicator.dart';
 import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -8,6 +7,7 @@ import '../../../../core/themes/app_text_styles.dart';
 import '../../data/models/service_model.dart';
 import '../../controllers/services_controller/services_cubit.dart';
 import 'service_card.dart';
+import '../../../../core/helpers/shimmer_helper.dart';
 
 class ServicesPageView extends StatefulWidget {
   const ServicesPageView({super.key});
@@ -58,8 +58,8 @@ class _ServicesPageViewState extends State<ServicesPageView> {
           height: cardHeight,
           child: BlocBuilder<ServicesCubit, ServicesState>(
             builder: (context, state) {
-              if (state is ServicesLoading) {
-                return const Center(child: CustomLoadingIndicator(size: 60));
+              if (state is ServicesLoading || state is ServicesInitial) {
+                return ShimmerHelper.serviceCard(height: cardHeight);
               }
 
               if (state is ServicesError) {

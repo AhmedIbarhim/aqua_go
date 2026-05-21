@@ -7,9 +7,11 @@ import '../../../../generated/locale_keys.g.dart';
 import '../../data/models/offer_model.dart';
 import 'offer_card.dart';
 import '../views/offers_view.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class OffersListView extends StatefulWidget {
-  const OffersListView({super.key});
+  final bool isLoading;
+  const OffersListView({super.key, this.isLoading = false});
 
   @override
   State<OffersListView> createState() => _OffersListViewState();
@@ -25,7 +27,9 @@ class _OffersListViewState extends State<OffersListView> {
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.sizeOf(context).height;
-    return Column(
+    return Skeletonizer(
+      enabled: widget.isLoading,
+      child: Column(
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -93,6 +97,7 @@ class _OffersListViewState extends State<OffersListView> {
           ),
         ),
       ],
-    );
-  }
+    ),
+  );
+}
 }

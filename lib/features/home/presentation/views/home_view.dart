@@ -11,6 +11,7 @@ import '../widgets/home_banners_carosal.dart';
 import '../widgets/packages_list_view.dart';
 import '../widgets/services_page_view.dart';
 import '../widgets/offers_list_view.dart';
+import '../../../../core/helpers/shimmer_helper.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -68,6 +69,8 @@ class _HomeViewState extends State<HomeView> {
             children: [
               BlocBuilder<BannersCubit, BannersState>(
                 builder: (context, state) {
+                  final isLoading =
+                      state is BannersLoading || state is BannersInitial;
                   List<BannerModel> activeBanners = [];
                   if (state is BannersLoaded) {
                     activeBanners = state.banners;
@@ -90,9 +93,12 @@ class _HomeViewState extends State<HomeView> {
                       ),
                     ];
                   }
-                  return HomeBannersCarosal(
-                    carouselController: _carouselController,
-                    banners: activeBanners,
+                  return ShimmerHelper(
+                    enabled: isLoading,
+                    child: HomeBannersCarosal(
+                      carouselController: _carouselController,
+                      banners: activeBanners,
+                    ),
                   );
                 },
               ),

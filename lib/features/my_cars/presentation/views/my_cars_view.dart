@@ -1,4 +1,3 @@
-import 'package:aqua_go/core/components/custom_loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -8,6 +7,7 @@ import '../widgets/empty_cars_widget.dart';
 import '../widgets/my_cars_list_view.dart';
 import '../../data/models/my_car_model.dart';
 import '../../controllers/my_cars_cubit.dart';
+import '../../../../core/helpers/shimmer_helper.dart';
 
 class MyCarsView extends StatefulWidget {
   const MyCarsView({super.key});
@@ -68,8 +68,8 @@ class _MyCarsViewState extends State<MyCarsView> {
               current is MyCarsError ||
               current is MyCarsInitial,
           builder: (context, state) {
-            if (state is MyCarsLoading) {
-              return const Center(child: CustomLoadingIndicator(size: 100));
+            if (state is MyCarsLoading || state is MyCarsInitial) {
+              return ShimmerHelper.cars();
             }
             if (state is MyCarsError) {
               return Center(

@@ -8,8 +8,11 @@ import '../../data/models/package_model.dart';
 import 'package_card.dart';
 import '../views/packages_view.dart';
 
+import 'package:skeletonizer/skeletonizer.dart';
+
 class PackagesListView extends StatefulWidget {
-  const PackagesListView({super.key});
+  final bool isLoading;
+  const PackagesListView({super.key, this.isLoading = false});
 
   @override
   State<PackagesListView> createState() => _PackagesListViewState();
@@ -45,7 +48,9 @@ class _PackagesListViewState extends State<PackagesListView> {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
-    return Column(
+    return Skeletonizer(
+      enabled: widget.isLoading,
+      child: Column(
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -116,6 +121,7 @@ class _PackagesListViewState extends State<PackagesListView> {
           ),
         ),
       ],
-    );
-  }
+    ),
+  );
+}
 }

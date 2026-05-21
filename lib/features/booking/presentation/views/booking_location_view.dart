@@ -18,6 +18,7 @@ import '../../../address/presentation/views/new_address_map_view.dart';
 import '../../../address/data/models/address_model.dart';
 import '../../presentation/controllers/booking_cubit.dart';
 import '../../../../core/route/app_router.dart';
+import '../../../../core/helpers/shimmer_helper.dart';
 
 class BookingLocationView extends StatefulWidget {
   const BookingLocationView({super.key});
@@ -150,6 +151,18 @@ class _BookingLocationViewState extends State<BookingLocationView> {
                               SizedBox(height: height * 0.01),
                               BlocBuilder<AddressesCubit, AddressesState>(
                                 builder: (context, state) {
+                                  if (state is AddressesLoading ||
+                                      state is AddressesInitial) {
+                                    return ShimmerHelper.bookingAddresses(
+                                      selectedAddressIndex:
+                                          selectedLocationIndex,
+                                      onAddressSelected: (index) {
+                                        setState(() {
+                                          selectedLocationIndex = index;
+                                        });
+                                      },
+                                    );
+                                  }
                                   if (state is AddressesLoaded) {
                                     return ListView.builder(
                                       physics:

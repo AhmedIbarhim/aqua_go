@@ -19,6 +19,7 @@ import '../widgets/date_time_picker.dart';
 import '../controllers/booking_cubit.dart';
 import '../controllers/booking_state.dart';
 import '../../../../core/route/app_router.dart';
+import '../../../../core/helpers/shimmer_helper.dart';
 
 class BookingDetailsView extends StatelessWidget {
   const BookingDetailsView({super.key});
@@ -76,6 +77,14 @@ class BookingDetailsView extends StatelessWidget {
           SizedBox(height: height * 0.02),
           BlocBuilder<MyCarsCubit, MyCarsState>(
             builder: (context, myCarsState) {
+              if (myCarsState is MyCarsLoading ||
+                  myCarsState is MyCarsInitial) {
+                return ShimmerHelper.bookingCars(
+                  onAddCar: () {
+                    context.pushNamed(Routes.addVehicle);
+                  },
+                );
+              }
               final cars = myCarsState is MyCarsLoaded
                   ? myCarsState.cars
                   : <MyCarModel>[];

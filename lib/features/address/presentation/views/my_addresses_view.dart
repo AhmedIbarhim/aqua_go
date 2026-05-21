@@ -1,6 +1,5 @@
 import 'package:aqua_go/core/components/custom_button.dart';
 import 'package:aqua_go/core/components/generic_app_bar.dart';
-import 'package:aqua_go/core/components/custom_loading_indicator.dart';
 import 'package:aqua_go/features/address/data/models/address_model.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -15,6 +14,7 @@ import 'new_address_map_view.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/config/di/service_locator.dart';
 import '../../controllers/addresses_controller/addresses_cubit.dart';
+import '../../../../core/helpers/shimmer_helper.dart';
 
 class MyAddressesView extends StatefulWidget {
   const MyAddressesView({super.key});
@@ -72,8 +72,11 @@ class _MyAddressesViewState extends State<MyAddressesView> {
               current is AddressesError ||
               current is AddressesInitial,
           builder: (context, state) {
-            if (state is AddressesLoading) {
-              return const Center(child: CustomLoadingIndicator(size: 100));
+            if (state is AddressesLoading || state is AddressesInitial) {
+              return Padding(
+                padding: EdgeInsets.all(width * 0.06),
+                child: ShimmerHelper.addresses(),
+              );
             }
 
             if (state is AddressesError) {
