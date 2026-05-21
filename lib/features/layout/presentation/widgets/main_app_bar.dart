@@ -1,6 +1,4 @@
-import 'package:aqua_go/core/config/networking/endpoints.dart';
 import 'package:aqua_go/core/helpers/fetch_user_data_helper.dart';
-import 'package:aqua_go/core/components/custom_network_image.dart';
 import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -42,7 +40,8 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(sw(40)),
-                    child: CustomNetworkImage(Endpoints.nameAvatar(userName)),
+                    child: Icon(Icons.person, color: context.colors.primary),
+                    // CustomNetworkImage(Endpoints.nameAvatar(userName)),
                   ),
                 ),
                 SizedBox(width: sw(8)),

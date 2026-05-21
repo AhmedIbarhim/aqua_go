@@ -1,8 +1,10 @@
 import 'package:aqua_go/core/config/di/service_locator.dart';
 import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/features/auth/controllers/auth_cubit/auth_cubit.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../generated/locale_keys.g.dart';
 import '../widgets/auth_scaffold.dart';
 import '../widgets/phone_otp_content.dart';
 
@@ -25,11 +27,14 @@ class PhoneOtpView extends StatelessWidget {
             context.showLoadingOverlay();
           } else {
             context.hideLoadingOverlay();
+            if (state is LoginSuccess) {
+              context.showSuccessSnackBar(
+                LocaleKeys.snackbar_login_success.tr(),
+              );
+            }
           }
         },
-        child: AuthScaffold(
-          content: PhoneOtpContent(phoneNumber: phoneNumber),
-        ),
+        child: AuthScaffold(content: PhoneOtpContent(phoneNumber: phoneNumber)),
       ),
     );
   }

@@ -6,6 +6,8 @@ import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../data/models/service_model.dart';
 
+import '../../../../core/helpers/fetch_user_data_helper.dart';
+
 class ServiceCard extends StatelessWidget {
   const ServiceCard({super.key, required this.serviceModel});
 
@@ -16,7 +18,11 @@ class ServiceCard extends StatelessWidget {
     final width = MediaQuery.of(context).size.width;
     return InkWell(
       onTap: () {
-        context.pushNamed(Routes.bookingLocation, arguments: serviceModel);
+        if (FetchUserData.isGuest()) {
+          FetchUserData.promptGuestToLogin(context);
+        } else {
+          context.pushNamed(Routes.bookingLocation, arguments: serviceModel);
+        }
       },
       child: Container(
         width: width,

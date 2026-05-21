@@ -6,3 +6,4 @@ const String kThemeMode = "kThemeMode";
 const String kUserData = "kUserData";
 const String kAccessToken = "kAccessToken";
 const String kRefreshToken = "kRefreshToken";
+const String kIsGuest = "kIsGuest";

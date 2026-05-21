@@ -8,6 +8,8 @@ import '../widgets/my_cars_list_view.dart';
 import '../../data/models/my_car_model.dart';
 import '../../controllers/my_cars_cubit.dart';
 import '../../../../core/helpers/shimmer_helper.dart';
+import '../../../../core/helpers/fetch_user_data_helper.dart';
+import '../../../../core/components/guest_placeholder_widget.dart';
 
 class MyCarsView extends StatefulWidget {
   const MyCarsView({super.key});
@@ -21,7 +23,9 @@ class _MyCarsViewState extends State<MyCarsView> {
 
   @override
   void initState() {
-    _myCarsCubit.getCars();
+    if (!FetchUserData.isGuest()) {
+      _myCarsCubit.getCars();
+    }
     super.initState();
   }
 
@@ -33,6 +37,27 @@ class _MyCarsViewState extends State<MyCarsView> {
 
   @override
   Widget build(BuildContext context) {
+    if (FetchUserData.isGuest()) {
+      return Container(
+        height: double.infinity,
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: context.colors.background,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+        ),
+        child: const GuestPlaceholderWidget(
+          titleEn: "Your Vehicles",
+          titleAr: "مركباتك",
+          descEn: "Please log in to manage your vehicles and access booking services.",
+          descAr: "يرجى تسجيل الدخول لإدارة سياراتك والوصول إلى خدمات الحجز.",
+        ),
+      );
+    }
+
     return BlocProvider.value(
       value: _myCarsCubit,
       child: Container(

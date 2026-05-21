@@ -26,9 +26,10 @@ class _SplashViewState extends State<SplashView> {
     if (!mounted) return;
 
     final token = await SecureStorage.getSecuredString(kAccessToken);
+    final isGuest = CacheClient.getBool(kIsGuest);
     if (!mounted) return;
 
-    if (token != null && token.isNotEmpty) {
+    if ((token != null && token.isNotEmpty) || isGuest) {
       context.pushReplacementNamed(Routes.layout);
     } else {
       final isNotFirstUse = CacheClient.getBool(kNotFirstUse);

@@ -3,6 +3,8 @@ import '../../../../core/extentions/context_extentions.dart';
 import '../../data/models/my_bookings_model.dart';
 import '../widgets/my_bookings_list_view.dart';
 import '../widgets/my_bookings_tabs.dart';
+import '../../../../core/helpers/fetch_user_data_helper.dart';
+import '../../../../core/components/guest_placeholder_widget.dart';
 
 class MyBookingsView extends StatefulWidget {
   const MyBookingsView({super.key});
@@ -81,6 +83,30 @@ class _MyBookingsViewState extends State<MyBookingsView> {
 
   @override
   Widget build(BuildContext context) {
+    if (FetchUserData.isGuest()) {
+      return Scaffold(
+        backgroundColor: context.colors.screenBG,
+        body: Container(
+          height: double.infinity,
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: context.colors.background,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+          ),
+          child: const GuestPlaceholderWidget(
+            titleEn: "Your Bookings",
+            titleAr: "حجوزاتك",
+            descEn: "Please log in to track and view your active and past bookings.",
+            descAr: "يرجى تسجيل الدخول لمتابعة وعرض حجوزاتك الحالية والسابقة.",
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: context.colors.screenBG,
       body: Container(

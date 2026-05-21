@@ -2,8 +2,10 @@ import 'package:aqua_go/core/config/di/service_locator.dart';
 import 'package:aqua_go/core/route/routes.dart';
 import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/features/auth/controllers/auth_cubit/auth_cubit.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../generated/locale_keys.g.dart';
 import '../widgets/auth_scaffold.dart';
 import '../widgets/email_otp_content.dart';
 
@@ -14,7 +16,11 @@ class EmailOtpArgs {
 }
 
 class EmailOtpView extends StatelessWidget {
-  const EmailOtpView({super.key, required this.email, required this.otpSessionId});
+  const EmailOtpView({
+    super.key,
+    required this.email,
+    required this.otpSessionId,
+  });
   final String email;
   final String otpSessionId;
 
@@ -30,6 +36,9 @@ class EmailOtpView extends StatelessWidget {
             context.hideLoadingOverlay();
           }
           if (state is LoginSuccess) {
+            context.showSuccessSnackBar(
+              LocaleKeys.snackbar_update_email_success.tr(),
+            );
             Navigator.pushNamedAndRemoveUntil(
               context,
               Routes.layout,
@@ -40,10 +49,7 @@ class EmailOtpView extends StatelessWidget {
           }
         },
         child: AuthScaffold(
-          content: EmailOtpContent(
-            email: email,
-            otpSessionId: otpSessionId,
-          ),
+          content: EmailOtpContent(email: email, otpSessionId: otpSessionId),
         ),
       ),
     );

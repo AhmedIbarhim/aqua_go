@@ -319,5 +319,13 @@
         "faq": "FAQ",
         "complaint_log": "Complaint Log",
         "whatsapp_contact": "Contact via WhatsApp"
+    },
+    "snackbar": {
+        "login_success": "Logged in successfully",
+        "logout_success": "Logged out successfully",
+        "profile_updated_success": "Profile updated successfully",
+        "update_email_success": "Email updated successfully",
+        "error": "Error occurred",
+        "no_internet": "No internet connection"
     }
 }

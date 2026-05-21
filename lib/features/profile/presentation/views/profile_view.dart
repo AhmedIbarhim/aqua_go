@@ -74,15 +74,19 @@ class ProfileView extends StatelessWidget {
                       color: context.colors.textPrimary,
                     ),
                   ),
-                  SizedBox(height: sh(8)),
-                  // Phone
-                  Text(
-                    FetchUserData.getPhone().replaceFirst("+966", "+966 "),
-                    textDirection: ui.TextDirection.ltr,
-                    style: AppTextStyles.regular14.copyWith(
-                      color: context.colors.textSecondary,
+                  if (!FetchUserData.isGuest()) ...[
+                    SizedBox(height: sh(8)),
+                    // Phone
+                    Text(
+                      FetchUserData.getPhone().replaceFirst("+966", "+966 "),
+                      textDirection: ui.TextDirection.ltr,
+                      style: AppTextStyles.regular14.copyWith(
+                        color: context.colors.textSecondary,
+                      ),
                     ),
-                  ),
+                  ] else ...[
+                    SizedBox(height: sh(8)),
+                  ],
                   SizedBox(height: sh(32)),
                   Container(
                     width: double.infinity,
@@ -109,40 +113,56 @@ class ProfileView extends StatelessWidget {
                         ),
                         SizedBox(height: sh(8)),
                         ProfileTile(
-                          title:
-                              FetchUserData.getEmail() ??
-                              LocaleKeys.profile_add_email.tr(),
+                          title: FetchUserData.isGuest()
+                              ? LocaleKeys.profile_add_email.tr()
+                              : (FetchUserData.getEmail() ??
+                                    LocaleKeys.profile_add_email.tr()),
                           icon: AppAssets.mail,
-                          isVerified: FetchUserData.getEmail() != null,
-                          onTap: FetchUserData.getEmail() == null
-                              ? () {
-                                  context.pushNamed(Routes.addEmail);
-                                }
-                              : null,
+                          isVerified:
+                              !FetchUserData.isGuest() &&
+                              FetchUserData.getEmail() != null,
+                          onTap: () {
+                            if (FetchUserData.isGuest()) {
+                              _promptGuestToLogin(context);
+                            } else if (FetchUserData.getEmail() == null) {
+                              context.pushNamed(Routes.addEmail);
+                            }
+                          },
                         ),
 
-                        SizedBox(height: sh(8)),
-                        ProfileTile(
-                          title: FetchUserData.getPhone().replaceFirst(
-                            "+966",
-                            "+966 ",
+                        if (!FetchUserData.isGuest()) ...[
+                          SizedBox(height: sh(8)),
+                          ProfileTile(
+                            title: FetchUserData.getPhone().replaceFirst(
+                              "+966",
+                              "+966 ",
+                            ),
+                            isPhoneNumber: true,
+                            icon: AppAssets.phone,
+                            isVerified: true,
                           ),
-                          isPhoneNumber: true,
-                          icon: AppAssets.phone,
-                          isVerified: true,
-                        ),
+                        ],
                         SizedBox(height: sh(8)),
                         ProfileTile(
                           title: LocaleKeys.profile_my_addresses.tr(),
                           icon: AppAssets.location,
                           onTap: () {
-                            context.pushNamed(Routes.myAddresses);
+                            if (FetchUserData.isGuest()) {
+                              _promptGuestToLogin(context);
+                            } else {
+                              context.pushNamed(Routes.myAddresses);
+                            }
                           },
                         ),
                         SizedBox(height: sh(8)),
                         ProfileTile(
                           title: LocaleKeys.profile_my_wallet.tr(),
                           icon: AppAssets.wallet,
+                          onTap: () {
+                            if (FetchUserData.isGuest()) {
+                              _promptGuestToLogin(context);
+                            }
+                          },
                         ),
 
                         SizedBox(height: sh(8)),
@@ -150,6 +170,11 @@ class ProfileView extends StatelessWidget {
                         ProfileTile(
                           title: LocaleKeys.profile_my_packages.tr(),
                           icon: AppAssets.packages,
+                          onTap: () {
+                            if (FetchUserData.isGuest()) {
+                              _promptGuestToLogin(context);
+                            }
+                          },
                         ),
                         SizedBox(height: sh(24)),
                         _buildSectionTitle(
@@ -182,11 +207,23 @@ class ProfileView extends StatelessWidget {
                         ),
                         SizedBox(height: sh(8)),
                         ProfileTile(
-                          title: LocaleKeys.auth_logout.tr(),
-                          icon: AppAssets.logout,
                           alreadyColoredIcon: true,
-                          textColor: context.colors.error,
-                          onTap: () => _logout(context),
+                          title: FetchUserData.isGuest()
+                              ? LocaleKeys.auth_login.tr()
+                              : LocaleKeys.auth_logout.tr(),
+                          icon: FetchUserData.isGuest()
+                              ? AppAssets.login
+                              : AppAssets.logout,
+                          textColor: FetchUserData.isGuest()
+                              ? context.colors.success
+                              : context.colors.error,
+                          onTap: () {
+                            if (FetchUserData.isGuest()) {
+                              context.read<AuthCubit>().logout();
+                            } else {
+                              _logout(context);
+                            }
+                          },
                         ),
 
                         SizedBox(height: sh(120)),
@@ -209,7 +246,11 @@ class ProfileView extends StatelessWidget {
   ) {
     return GestureDetector(
       onTap: () {
-        context.pushNamed(Routes.profileData);
+        if (FetchUserData.isGuest()) {
+          _promptGuestToLogin(context);
+        } else {
+          context.pushNamed(Routes.profileData);
+        }
       },
       child: Container(
         padding: EdgeInsets.all(sw(12)),
@@ -280,14 +321,22 @@ class ProfileView extends StatelessWidget {
     );
   }
 
+  void _promptGuestToLogin(BuildContext context) {
+    FetchUserData.promptGuestToLogin(context);
+  }
+
   void _logout(BuildContext context) {
-    context.showWarningAlert(
-      message: LocaleKeys.profile_confirm_logout.tr(),
-      primaryButtonText: LocaleKeys.auth_logout.tr(),
-      onPrimaryPressed: () {
-        context.read<AuthCubit>().logout();
-        Navigator.pop(context);
-      },
-    );
+    if (FetchUserData.isGuest()) {
+      context.read<AuthCubit>().logout();
+    } else {
+      context.showWarningAlert(
+        message: LocaleKeys.profile_confirm_logout.tr(),
+        primaryButtonText: LocaleKeys.auth_logout.tr(),
+        onPrimaryPressed: () {
+          context.read<AuthCubit>().logout();
+          Navigator.pop(context);
+        },
+      );
+    }
   }
 }

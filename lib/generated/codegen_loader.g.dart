@@ -335,6 +335,14 @@ class CodegenLoader extends AssetLoader{
     "faq": "الأسئلة الشائعة",
     "complaint_log": "سجل الشكاوي",
     "whatsapp_contact": "التواصل عن طريق الواتس اب"
+  },
+  "snackbar": {
+    "login_success": "تم تسجيل الدخول بنجاح",
+    "logout_success": "تم تسجيل الخروج بنجاح",
+    "profile_updated_success": "تم تحديث الملف الشخصي بنجاح",
+    "update_email_success": "تم تحديث البريد الإلكتروني بنجاح",
+    "error": "حدث خطأ",
+    "no_internet": "لا يوجد اتصال بالإنترنت"
   }
 };
 static const Map<String,dynamic> _en = {
@@ -658,6 +666,14 @@ static const Map<String,dynamic> _en = {
     "faq": "FAQ",
     "complaint_log": "Complaint Log",
     "whatsapp_contact": "Contact via WhatsApp"
+  },
+  "snackbar": {
+    "login_success": "Logged in successfully",
+    "logout_success": "Logged out successfully",
+    "profile_updated_success": "Profile updated successfully",
+    "update_email_success": "Email updated successfully",
+    "error": "Error occurred",
+    "no_internet": "No internet connection"
   }
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"ar": _ar, "en": _en};

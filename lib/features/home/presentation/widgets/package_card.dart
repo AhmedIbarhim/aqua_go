@@ -8,6 +8,8 @@ import '../../../../generated/locale_keys.g.dart';
 import '../../../booking/presentation/widgets/booking_package_bottom_sheet.dart';
 import '../../data/models/package_model.dart';
 
+import '../../../../core/helpers/fetch_user_data_helper.dart';
+
 class PackageCard extends StatelessWidget {
   const PackageCard({
     super.key,
@@ -24,7 +26,11 @@ class PackageCard extends StatelessWidget {
     final height = MediaQuery.of(context).size.height;
     return GestureDetector(
       onTap: () {
-        BookingPackageBottomSheet.show(context, packageModel: packageModel);
+        if (FetchUserData.isGuest()) {
+          FetchUserData.promptGuestToLogin(context);
+        } else {
+          BookingPackageBottomSheet.show(context, packageModel: packageModel);
+        }
       },
       child: Container(
         width: atHome == true ? height * 0.35 : width,

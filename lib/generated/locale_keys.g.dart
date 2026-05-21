@@ -303,5 +303,12 @@ abstract class  LocaleKeys {
   static const support_complaint_log = 'support.complaint_log';
   static const support_whatsapp_contact = 'support.whatsapp_contact';
   static const support = 'support';
+  static const snackbar_login_success = 'snackbar.login_success';
+  static const snackbar_logout_success = 'snackbar.logout_success';
+  static const snackbar_profile_updated_success = 'snackbar.profile_updated_success';
+  static const snackbar_update_email_success = 'snackbar.update_email_success';
+  static const snackbar_error = 'snackbar.error';
+  static const snackbar_no_internet = 'snackbar.no_internet';
+  static const snackbar = 'snackbar';
 
 }

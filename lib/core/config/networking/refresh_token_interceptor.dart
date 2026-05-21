@@ -132,6 +132,7 @@ class RefreshTokenInterceptor extends Interceptor {
     await SecureStorage.deleteSecuredString(kAccessToken);
     await SecureStorage.deleteSecuredString(kRefreshToken);
     await CacheClient.removeString(kUserData);
+    await CacheClient.removeString(kIsGuest);
 
     AppRouter.navigatorKey.currentState?.pushNamedAndRemoveUntil(
       Routes.login,
