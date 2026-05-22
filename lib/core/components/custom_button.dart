@@ -1,3 +1,4 @@
+import 'package:aqua_go/core/themes/app_colors.dart';
 import 'package:aqua_go/core/themes/app_text_styles.dart';
 import 'package:flutter/material.dart';
 
@@ -29,7 +30,7 @@ class CustomButton extends StatelessWidget {
     return MaterialButton(
       onPressed: enabled ? onPressed : null,
       color: color ?? context.colors.primary,
-      disabledColor: context.colors.brandSubtle,
+      disabledColor: darkAppColors.brandSubtle,
       shape: RoundedRectangleBorder(
         side: BorderSide(
           color: enabled

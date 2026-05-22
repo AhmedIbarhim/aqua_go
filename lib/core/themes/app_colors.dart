@@ -197,7 +197,8 @@ const darkAppColors = AppColors(
 // -----------------------------------------------------------------------------
 const lightAppColors = AppColors(
   splashColor: Color(0xFF0D0D0D),
-  primary: Color(0xFF00BEC3), // Darker cyan for contrast on light mode
+  primary: Color(0xFF0095AA),
+  // primary: Color(0xFF00BEC3), // Darker cyan for contrast on light mode
   brandSubtle: Color(0xFFE0F7F8),
   brandHover: Color(0xFFBFFCFF),
   themeColor: Color(0xFFFFFFFF), // Inverted for light mode

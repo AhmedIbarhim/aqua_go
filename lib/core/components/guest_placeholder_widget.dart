@@ -4,6 +4,7 @@ import 'package:svg_flutter/svg.dart';
 import '../../features/auth/controllers/auth_cubit/auth_cubit.dart';
 import '../config/di/service_locator.dart';
 import '../extentions/context_extentions.dart';
+import '../helpers/fetch_user_data_helper.dart';
 import '../themes/app_text_styles.dart';
 import '../utils/app_assets.dart';
 import '../components/custom_button.dart';
@@ -79,7 +80,7 @@ class GuestPlaceholderWidget extends StatelessWidget {
                     width: MediaQuery.sizeOf(context).width * 0.6,
                     child: CustomButton(
                       onPressed: () {
-                        context.read<AuthCubit>().logout();
+                        FetchUserData.promptGuestToLogin(context);
                       },
                       text: LocaleKeys.auth_login.tr(),
                     ),

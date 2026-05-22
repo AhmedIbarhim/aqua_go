@@ -1,10 +1,9 @@
 import 'package:aqua_go/core/config/di/service_locator.dart';
+import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:aqua_go/features/auth/data/models/user_model.dart';
 import 'package:aqua_go/features/auth/data/repos/auth_repository.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:aqua_go/core/config/local_storage/shared_prefs.dart';
-import 'package:aqua_go/core/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/core/route/routes.dart';
@@ -51,16 +50,19 @@ class FetchUserData {
   }
 
   static bool isGuest() {
-    return CacheClient.getBool(kIsGuest);
+    return getUser() == null;
   }
 
   static void promptGuestToLogin(BuildContext context) {
     context.showWarningAlert(
       title: LocaleKeys.auth_login.tr(),
+      iconPath: AppAssets.loginAlert,
       message: context.isAr
           ? "يرجى تسجيل الدخول للوصول إلى هذه الميزة"
           : "Please log in to access this feature",
       primaryButtonText: LocaleKeys.auth_login.tr(),
+      mainButtonColor: context.colors.primary,
+      mainButtonTextColor: context.colors.themeColor,
       onPrimaryPressed: () {
         Navigator.pop(context);
         locator<AuthRepository>().logout().then((_) {

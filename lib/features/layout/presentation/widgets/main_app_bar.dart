@@ -18,7 +18,6 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
     final double screenHeight = size.height;
     final userName = FetchUserData.getUserName();
 
-    // Scaling helpers
     double sw(double width) => (width / 414) * screenWidth;
     double sh(double height) => (height / 896) * screenHeight;
 
@@ -28,7 +27,6 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Right Side: Greeting and Avatar
             Row(
               children: [
                 Container(
@@ -50,7 +48,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      '${LocaleKeys.layout_welcome.tr()} $userName,',
+                      '${LocaleKeys.layout_welcome.tr()} $userName.',
                       style: AppTextStyles.regular12.copyWith(
                         color: context.colors.textSecondary,
                       ),

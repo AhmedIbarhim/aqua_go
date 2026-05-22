@@ -84,12 +84,14 @@ class SuccessAlertBox extends StatelessWidget {
     this.title,
     this.message,
     this.buttonText,
+    this.iconPath,
     // this.onPressed,
   });
 
   final String? title;
   final String? message;
   final String? buttonText;
+  final String? iconPath;
   // final VoidCallback? onPressed;
 
   static Future<T?> show<T>({
@@ -97,6 +99,7 @@ class SuccessAlertBox extends StatelessWidget {
     String? title,
     String? message,
     String? buttonText,
+    String? iconPath,
     // VoidCallback? onPressed,
   }) {
     return CustomAlertBox.show<T>(
@@ -105,6 +108,7 @@ class SuccessAlertBox extends StatelessWidget {
         title: title,
         message: message,
         buttonText: buttonText,
+        iconPath: iconPath,
         // onPressed: onPressed,
       ),
     );
@@ -118,7 +122,7 @@ class SuccessAlertBox extends StatelessWidget {
       children: [
         // Success Icon
         SvgPicture.asset(
-          AppAssets.successIcon,
+          iconPath ?? AppAssets.successIcon,
           width: width * 0.28,
           height: width * 0.28,
         ),
@@ -153,11 +157,21 @@ class WarningBox extends StatelessWidget {
     this.onPrimaryPressed,
     this.secondaryButtonText,
     this.onSecondaryPressed,
+    this.iconPath,
+    this.mainButtonColor,
+    this.secondaryButtonColor,
+    this.mainButtonTextColor,
+    this.secondaryButtonTextColor,
   });
 
   final String? title;
   final String message;
+  final String? iconPath;
   final String? primaryButtonText;
+  final Color? mainButtonColor;
+  final Color? secondaryButtonColor;
+  final Color? mainButtonTextColor;
+  final Color? secondaryButtonTextColor;
   final VoidCallback? onPrimaryPressed;
   final String? secondaryButtonText;
   final VoidCallback? onSecondaryPressed;
@@ -170,6 +184,11 @@ class WarningBox extends StatelessWidget {
     VoidCallback? onPrimaryPressed,
     String? secondaryButtonText,
     VoidCallback? onSecondaryPressed,
+    String? iconPath,
+    Color? mainButtonColor,
+    Color? secondaryButtonColor,
+    Color? mainButtonTextColor,
+    Color? secondaryButtonTextColor,
   }) {
     return CustomAlertBox.show<T>(
       context: context,
@@ -180,6 +199,11 @@ class WarningBox extends StatelessWidget {
         onPrimaryPressed: onPrimaryPressed,
         secondaryButtonText: secondaryButtonText,
         onSecondaryPressed: onSecondaryPressed,
+        iconPath: iconPath,
+        mainButtonColor: mainButtonColor,
+        secondaryButtonColor: secondaryButtonColor,
+        mainButtonTextColor: mainButtonTextColor,
+        secondaryButtonTextColor: secondaryButtonTextColor,
       ),
     );
   }
@@ -191,7 +215,7 @@ class WarningBox extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         SvgPicture.asset(
-          AppAssets.warningIcon,
+          iconPath ?? AppAssets.warningIcon,
           width: width * 0.28,
           height: width * 0.28,
         ),
@@ -218,10 +242,10 @@ class WarningBox extends StatelessWidget {
           children: [
             Expanded(
               child: CustomButton(
-                color: context.colors.error,
-                borderColor: context.colors.error,
+                color: mainButtonColor ?? context.colors.error,
+                borderColor: mainButtonColor ?? context.colors.error,
                 text: primaryButtonText ?? LocaleKeys.delete.tr(),
-                textColor: lightAppColors.themeColor,
+                textColor: mainButtonTextColor ?? lightAppColors.themeColor,
                 onPressed: onPrimaryPressed ?? () => Navigator.pop(context),
               ),
             ),

@@ -126,7 +126,6 @@ class AuthRepository {
   Future<void> saveUser(UserModel user) async {
     _cachedUser = user;
     await CacheClient.setString(kUserData, user.toEncodedJson());
-    await CacheClient.removeString(kIsGuest);
   }
 
   UserModel? getUser() {
@@ -156,7 +155,6 @@ class AuthRepository {
       await SecureStorage.deleteSecuredString(kAccessToken);
       await SecureStorage.deleteSecuredString(kRefreshToken);
       await CacheClient.removeString(kUserData);
-      await CacheClient.removeString(kIsGuest);
     }
   }
 }

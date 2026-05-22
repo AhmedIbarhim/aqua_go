@@ -2,8 +2,6 @@ import 'package:aqua_go/core/components/custom_button.dart';
 import 'package:aqua_go/core/themes/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:aqua_go/core/config/local_storage/shared_prefs.dart';
-import 'package:aqua_go/core/constants.dart';
 
 import '../../../../core/components/custom_text_form_field.dart';
 import '../../../../core/extentions/context_extentions.dart';
@@ -97,11 +95,8 @@ class _LoginContentState extends State<LoginContent> {
                 text: LocaleKeys.auth_continue_as_guest.tr(),
                 color: darkAppColors.themeColor,
                 textColor: context.colors.primary,
-                onPressed: () async {
-                  await CacheClient.setBool(kIsGuest, true);
-                  if (context.mounted) {
-                    context.pushReplacementNamed(Routes.layout);
-                  }
+                onPressed: () {
+                  context.pushReplacementNamed(Routes.layout);
                 },
               ),
               SizedBox(height: height * 0.02),

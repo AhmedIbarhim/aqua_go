@@ -5,9 +5,6 @@ import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:aqua_go/core/config/controllers/theme_controller/theme_cubit.dart';
-
 import '../../../../core/route/routes.dart';
 
 import '../widgets/profile_tile.dart';
@@ -85,22 +82,22 @@ class _SettingsViewState extends State<SettingsView> {
                         context.pushNamed(Routes.termsAndConditions);
                       },
                     ),
-                    SizedBox(height: sh(8)),
-                    BlocBuilder<ThemeCubit, ThemeState>(
-                      builder: (context, themeState) {
-                        final isDarkMode =
-                            themeState.themeMode == ThemeMode.dark;
-                        return ProfileTile(
-                          title: LocaleKeys.settings_dark_mode.tr(),
-                          icon: AppAssets.darkMode,
-                          hasToggle: true,
-                          toggleValue: isDarkMode,
-                          onToggleChanged: (val) {
-                            context.read<ThemeCubit>().toggleTheme(val);
-                          },
-                        );
-                      },
-                    ),
+                    // SizedBox(height: sh(8)),
+                    // BlocBuilder<ThemeCubit, ThemeState>(
+                    //   builder: (context, themeState) {
+                    //     final isDarkMode =
+                    //         themeState.themeMode == ThemeMode.dark;
+                    //     return ProfileTile(
+                    //       title: LocaleKeys.settings_dark_mode.tr(),
+                    //       icon: AppAssets.darkMode,
+                    //       hasToggle: true,
+                    //       toggleValue: isDarkMode,
+                    //       onToggleChanged: (val) {
+                    //         context.read<ThemeCubit>().toggleTheme(val);
+                    //       },
+                    //     );
+                    //   },
+                    // ),
                     SizedBox(height: sh(24)),
                     _buildSectionTitle(
                       LocaleKeys.settings_get_notifications.tr(),

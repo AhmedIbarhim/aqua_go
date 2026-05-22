@@ -71,12 +71,14 @@ extension AlertDialogExtension on BuildContext {
     String? title,
     String? message,
     String? buttonText,
+    String? iconPath,
   }) {
     return SuccessAlertBox.show<T>(
       context: this,
       title: title,
       message: message,
       buttonText: buttonText,
+      iconPath: iconPath,
     );
   }
 
@@ -87,6 +89,11 @@ extension AlertDialogExtension on BuildContext {
     VoidCallback? onPrimaryPressed,
     String? secondaryButtonText,
     VoidCallback? onSecondaryPressed,
+    String? iconPath,
+    Color? mainButtonColor,
+    Color? secondaryButtonColor,
+    Color? mainButtonTextColor,
+    Color? secondaryButtonTextColor,
   }) {
     return WarningBox.show<T>(
       context: this,
@@ -96,6 +103,11 @@ extension AlertDialogExtension on BuildContext {
       onPrimaryPressed: onPrimaryPressed,
       secondaryButtonText: secondaryButtonText,
       onSecondaryPressed: onSecondaryPressed,
+      iconPath: iconPath,
+      mainButtonColor: mainButtonColor,
+      secondaryButtonColor: secondaryButtonColor,
+      mainButtonTextColor: mainButtonTextColor,
+      secondaryButtonTextColor: secondaryButtonTextColor,
     );
   }
 

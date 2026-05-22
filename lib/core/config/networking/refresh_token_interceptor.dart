@@ -126,13 +126,13 @@ class RefreshTokenInterceptor extends Interceptor {
   /// Wipes all local credentials and navigates to the login screen
   /// without requiring a BuildContext.
   Future<void> _clearSessionAndRedirect() async {
-    if (_isRedirecting) return;
-    _isRedirecting = true;
-
+    // Always guarantee that local cache is wiped first and awaited by all parallel callers
     await SecureStorage.deleteSecuredString(kAccessToken);
     await SecureStorage.deleteSecuredString(kRefreshToken);
     await CacheClient.removeString(kUserData);
-    await CacheClient.removeString(kIsGuest);
+
+    if (_isRedirecting) return;
+    _isRedirecting = true;
 
     AppRouter.navigatorKey.currentState?.pushNamedAndRemoveUntil(
       Routes.login,
