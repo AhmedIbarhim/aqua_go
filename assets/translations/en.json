@@ -19,6 +19,8 @@
     "take_photo": "Take Photo",
     "select_from_gallery": "Select From Gallery",
     "duration": "Duration",
+    "retry": "Retry",
+    "all": "All",
     "onboarding": {
         "title1": "Effortless Car Care",
         "title2": "Shine Anytime, Anywhere",
@@ -266,7 +268,8 @@
         "no_notifications": "There are no notifications yet",
         "no_notification_desc": "Your notifications will appear here once you have any",
         "today": "Today",
-        "yesterday": "Yesterday"
+        "yesterday": "Yesterday",
+        "mark_all_read": "Mark all as read"
     },
     "privacy": {
         "title": "Privacy Policy",

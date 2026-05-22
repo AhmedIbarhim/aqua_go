@@ -3,10 +3,14 @@ import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:svg_flutter/svg.dart';
+import '../../../../core/config/di/service_locator.dart';
 import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
+import '../../../notifications/controllers/notifications_cubit/notifications_cubit.dart';
+import '../../../notifications/controllers/notifications_cubit/notifications_state.dart';
 
 class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   const MainAppBar({super.key});
@@ -75,49 +79,76 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
             // Left Side: Gift and Notifications
             Row(
               children: [
-                Stack(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        context.pushNamed(Routes.notification);
-                      },
-                      child: Container(
-                        padding: EdgeInsets.all(sw(8)),
-                        decoration: BoxDecoration(
-                          color: Colors.transparent,
-                          borderRadius: BorderRadius.circular(sw(8)),
-                        ),
-                        child: SvgPicture.asset(
-                          AppAssets.notification,
-                          width: sw(24),
-                          height: sw(24),
-                          placeholderBuilder: (context) =>
-                              SizedBox(width: sw(24), height: sw(24)),
-                          colorFilter: ColorFilter.mode(
-                            context.colors.textPrimary,
-                            BlendMode.srcIn,
+                BlocProvider(
+                  create: (context) =>
+                      locator<NotificationsCubit>()..fetchUnreadCount(),
+                  child: BlocBuilder<NotificationsCubit, NotificationsState>(
+                    builder: (context, state) {
+                      final int unreadCount = state is NotificationsSuccess
+                          ? state.unreadCount
+                          : 0;
+                      return Stack(
+                        children: [
+                          GestureDetector(
+                            onTap: () async {
+                              await context.pushNamed(Routes.notification);
+                              if (context.mounted) {
+                                context
+                                    .read<NotificationsCubit>()
+                                    .fetchUnreadCount();
+                              }
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(sw(8)),
+                              decoration: BoxDecoration(
+                                color: Colors.transparent,
+                                borderRadius: BorderRadius.circular(sw(8)),
+                              ),
+                              child: SvgPicture.asset(
+                                AppAssets.notification,
+                                width: sw(24),
+                                height: sw(24),
+                                placeholderBuilder: (context) =>
+                                    SizedBox(width: sw(24), height: sw(24)),
+                                colorFilter: ColorFilter.mode(
+                                  context.colors.textPrimary,
+                                  BlendMode.srcIn,
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      left: context.isEn ? sw(8) : null,
-                      right: context.isAr ? sw(8) : null,
-                      top: sw(8),
-                      child: Container(
-                        width: sw(10),
-                        height: sw(10),
-                        decoration: BoxDecoration(
-                          color: context.colors.warning,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: context.colors.screenBG,
-                            width: 1.5,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                          if (unreadCount > 0)
+                            Positioned(
+                              left: context.isEn ? sw(8) : null,
+                              right: context.isAr ? sw(8) : null,
+                              top: sw(4),
+                              child: Container(
+                                padding: EdgeInsets.all(sw(2)),
+                                decoration: BoxDecoration(
+                                  color: context.colors.warning,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: context.colors.screenBG,
+                                    width: 1.5,
+                                  ),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    unreadCount > 99 ? '99+' : '$unreadCount',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: sw(9),
+                                      fontWeight: FontWeight.bold,
+                                      height: 1.0,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      );
+                    },
+                  ),
                 ),
                 SizedBox(width: sw(8)),
                 GestureDetector(

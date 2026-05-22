@@ -35,6 +35,8 @@ class CodegenLoader extends AssetLoader{
   "take_photo": "التقاط صورة",
   "select_from_gallery": "اختر من المعرض",
   "duration": "المدة",
+  "retry": "إعادة المحاولة",
+  "all": "الكل",
   "onboarding": {
     "title1": "نظافة السيارة بسهولة",
     "title2": "تألق في أي وقت وأي مكان",
@@ -282,7 +284,8 @@ class CodegenLoader extends AssetLoader{
     "no_notifications": "لا توجد اشعارات حالية",
     "no_notification_desc": "سيتم عرض الإشعارات الخاصة بك في هذه الصفحة",
     "today": "اليوم",
-    "yesterday": "أمس"
+    "yesterday": "أمس",
+    "mark_all_read": "وضع علامة مقروءة للكل"
   },
   "privacy": {
     "title": "سياسة الخصوصية",
@@ -366,6 +369,8 @@ static const Map<String,dynamic> _en = {
   "take_photo": "Take Photo",
   "select_from_gallery": "Select From Gallery",
   "duration": "Duration",
+  "retry": "Retry",
+  "all": "All",
   "onboarding": {
     "title1": "Effortless Car Care",
     "title2": "Shine Anytime, Anywhere",
@@ -613,7 +618,8 @@ static const Map<String,dynamic> _en = {
     "no_notifications": "There are no notifications yet",
     "no_notification_desc": "Your notifications will appear here once you have any",
     "today": "Today",
-    "yesterday": "Yesterday"
+    "yesterday": "Yesterday",
+    "mark_all_read": "Mark all as read"
   },
   "privacy": {
     "title": "Privacy Policy",

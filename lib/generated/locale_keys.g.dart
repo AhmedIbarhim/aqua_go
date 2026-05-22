@@ -23,6 +23,8 @@ abstract class  LocaleKeys {
   static const take_photo = 'take_photo';
   static const select_from_gallery = 'select_from_gallery';
   static const duration = 'duration';
+  static const retry = 'retry';
+  static const all = 'all';
   static const onboarding_title1 = 'onboarding.title1';
   static const onboarding_title2 = 'onboarding.title2';
   static const onboarding_title3 = 'onboarding.title3';
@@ -254,6 +256,7 @@ abstract class  LocaleKeys {
   static const notifications_no_notification_desc = 'notifications.no_notification_desc';
   static const notifications_today = 'notifications.today';
   static const notifications_yesterday = 'notifications.yesterday';
+  static const notifications_mark_all_read = 'notifications.mark_all_read';
   static const notifications = 'notifications';
   static const privacy_title = 'privacy.title';
   static const privacy_intro = 'privacy.intro';
