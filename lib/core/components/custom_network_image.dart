@@ -1,3 +1,4 @@
+import 'package:aqua_go/core/components/custom_loading_indicator.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
@@ -16,7 +17,8 @@ class CustomNetworkImage extends StatelessWidget {
     return CachedNetworkImage(
       imageUrl: image,
       fit: fit,
-      placeholder: (context, url) => const SizedBox(width: 30, height: 30),
+
+      placeholder: (context, url) => const CustomLoadingIndicator(),
       errorWidget: (context, url, error) {
         return SvgPicture.asset(
           AppAssets.imageNotFound,

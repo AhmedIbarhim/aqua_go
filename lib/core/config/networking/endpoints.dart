@@ -1,22 +1,22 @@
 abstract class Endpoints {
   static const String baseUrl = 'https://api.aquago.sa/api/customer';
 
-  // Customer Auth Endpoints
+  //  Auth Endpoints
   static const String sendOtp = '/login/otp';
   static const String verifyOtp = '/login/otp/verify';
   static const String logout = '/auth/logout';
   static const String refreshToken = '/auth/token/refresh';
 
-  // Customer Profile & Account Endpoints
+  //  Profile & Account Endpoints
   static const String customerMe = '/me';
   static const String deletionRequest = '/me/deletion-request';
   static const String dataExport = '/me/data-export';
 
-  // Customer Email Verification
+  //  Email Verification
   static const String verifyRequest = '/me/email/verify/request';
   static const String emailVerifyConfirm = '/me/email/verify/confirm';
 
-  // Customer Vehicles Endpoints
+  //  Vehicles Endpoints
   static const String myVehicles = '/me/vehicles';
   static String myVehicle(String vehicleId) => '/me/vehicles/$vehicleId';
 
@@ -26,13 +26,12 @@ abstract class Endpoints {
       '/catalog/vehicle-makes/$brandId/models';
   static const String services = '/services';
 
-  // Customer Saved Addresses Endpoints
-  static const String myAddresses =
-      '/me/addresses'; // Kept for compatibility with existing typo usage
+  //  Addresses Endpoints
+  static const String myAddresses = '/me/addresses';
 
   static String myAddress(String addressId) => '/me/addresses/$addressId';
 
-  // Customer Bookings & Quotes Endpoints
+  //  Bookings & Quotes Endpoints
   static const String quotes = '/quotes';
   static const String bookings = '/bookings';
   static String bookingDetail(String bookingId) => '/bookings/$bookingId';
@@ -44,28 +43,28 @@ abstract class Endpoints {
       '/bookings/$bookingId/schedule';
   static String rateBooking(String bookingId) => '/bookings/$bookingId/rating';
 
-  // Customer Banners Endpoints
+  //  Banners Endpoints
   static const String banners = '/banners';
 
-  // Customer Geo & Zone Coverage Endpoints
+  //  Geo & Zone Coverage Endpoints
   static const String zoneCheck = '/geo/zone-check';
   static const String geoPlacesAutocomplete = '/geo/places/autocomplete';
   static String geoPlaceDetail(String placeId) => '/geo/places/$placeId';
 
-  // Customer Subscriptions Endpoints
+  //  Subscriptions Endpoints
   static const String subscriptions = '/subscriptions';
   static String subscriptionDetail(String subscriptionId) =>
       '/subscriptions/$subscriptionId';
   static String cancelSubscription(String subscriptionId) =>
       '/subscriptions/$subscriptionId/cancel';
 
-  // Customer Availability Endpoints
+  //  Availability Endpoints
   static const String availability = '/availability';
 
-  // Customer Notification Preferences Endpoints
+  //  Notification Preferences Endpoints
   static const String notificationPreferences = '/me/notification-preferences';
 
-  // Customer Notification Inbox & Devices Endpoints
+  // Notification Inbox & Devices Endpoints
   static const String notifications = '/me/notifications';
   static const String readAllNotifications = '/me/notifications/read-all';
   static const String unreadNotificationsCount =
@@ -75,7 +74,7 @@ abstract class Endpoints {
   static const String registerDevice = '/me/devices';
   static String deregisterDevice(String deviceId) => '/me/devices/$deviceId';
 
-  // Customer Consent Endpoints
+  //  Consent Endpoints
   static const String consents = '/me/consents';
 
   // Customer Policies Endpoints
