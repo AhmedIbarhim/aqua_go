@@ -344,8 +344,12 @@ class CodegenLoader extends AssetLoader{
     "logout_success": "تم تسجيل الخروج بنجاح",
     "profile_updated_success": "تم تحديث الملف الشخصي بنجاح",
     "update_email_success": "تم تحديث البريد الإلكتروني بنجاح",
+    "car_added_success": "تم إضافة السيارة بنجاح",
+    "car_updated_success": "تم تعديل السيارة بنجاح",
+    "car_deleted_success": "تم حذف السيارة بنجاح",
     "error": "حدث خطأ",
-    "no_internet": "لا يوجد اتصال بالإنترنت"
+    "no_internet": "لا يوجد اتصال بالإنترنت",
+    "default_error": "عذرا، حدث خطأ ما. يرجى المحاولة مرة أخرى لاحقًا"
   }
 };
 static const Map<String,dynamic> _en = {
@@ -678,8 +682,12 @@ static const Map<String,dynamic> _en = {
     "logout_success": "Logged out successfully",
     "profile_updated_success": "Profile updated successfully",
     "update_email_success": "Email updated successfully",
+    "car_added_success": "Car added successfully",
+    "car_updated_success": "Car updated successfully",
+    "car_deleted_success": "Car deleted successfully",
     "error": "Error occurred",
-    "no_internet": "No internet connection"
+    "no_internet": "No internet connection",
+    "default_error": "Oops, something went wrong. Please try again later"
   }
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"ar": _ar, "en": _en};

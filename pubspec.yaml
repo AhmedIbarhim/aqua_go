@@ -32,6 +32,7 @@ dependencies:
   bloc: ^9.2.0
   cached_network_image: ^3.4.1
   carousel_slider: ^5.1.2
+  connectivity_plus: ^7.1.1
   cupertino_icons: ^1.0.8
   dartz: ^0.10.1
   date_picker_plus: ^7.0.0

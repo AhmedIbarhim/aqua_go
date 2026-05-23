@@ -5,6 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'core/components/offline_indicator.dart';
 import 'core/themes/app_colors.dart';
 
 class MyApp extends StatelessWidget {
@@ -65,7 +66,12 @@ class MyApp extends StatelessWidget {
                   data: MediaQuery.of(
                     context,
                   ).copyWith(textScaler: const TextScaler.linear(1.0)),
-                  child: child!,
+                  child: Column(
+                    children: [
+                      const OfflineIndicator(),
+                      Expanded(child: child!),
+                    ],
+                  ),
                 );
               },
             );

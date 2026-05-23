@@ -7,6 +7,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/config/bloc_observer.dart';
 import 'core/config/controllers/language_controller/language_cubit.dart';
 import 'core/config/controllers/theme_controller/theme_cubit.dart';
+import 'core/config/controllers/connectivity_controller/connectivity_cubit.dart';
+import 'core/helpers/connectivity_helper.dart';
 
 import 'core/config/local_storage/shared_prefs.dart';
 import 'core/constants.dart';
@@ -15,6 +17,7 @@ import 'package:flutter/services.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  ConnectivityHelper().init();
   await initServiceLocator();
   await EasyLocalization.ensureInitialized();
   await CacheClient.init();
@@ -41,6 +44,7 @@ void main() async {
         providers: [
           BlocProvider(create: (context) => LanguageCubit()),
           BlocProvider(create: (context) => ThemeCubit()),
+          BlocProvider(create: (context) => ConnectivityCubit()),
         ],
         child: const MyApp(),
       ),

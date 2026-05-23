@@ -1,10 +1,11 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'failure.dart';
 
 class ServerFailure extends Failure {
-  static const String _defaultMessage =
-      'Oops, something went wrong. Please try again later';
+  static String get _defaultMessage => LocaleKeys.snackbar_default_error.tr();
 
   const ServerFailure(String message, {FailureType type = FailureType.unknown})
     : super(message, type);
@@ -61,7 +62,7 @@ class ServerFailure extends Failure {
           );
         }
 
-        return const ServerFailure(_defaultMessage);
+        return ServerFailure(_defaultMessage);
     }
   }
 
@@ -107,7 +108,7 @@ class ServerFailure extends Failure {
         );
 
       default:
-        return const ServerFailure(_defaultMessage);
+        return ServerFailure(_defaultMessage);
     }
   }
 

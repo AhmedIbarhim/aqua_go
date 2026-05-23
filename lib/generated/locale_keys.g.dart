@@ -315,6 +315,7 @@ abstract class  LocaleKeys {
   static const snackbar_car_deleted_success = 'snackbar.car_deleted_success';
   static const snackbar_error = 'snackbar.error';
   static const snackbar_no_internet = 'snackbar.no_internet';
+  static const snackbar_default_error = 'snackbar.default_error';
   static const snackbar = 'snackbar';
 
 }
