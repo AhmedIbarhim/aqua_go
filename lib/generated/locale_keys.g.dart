@@ -310,6 +310,9 @@ abstract class  LocaleKeys {
   static const snackbar_logout_success = 'snackbar.logout_success';
   static const snackbar_profile_updated_success = 'snackbar.profile_updated_success';
   static const snackbar_update_email_success = 'snackbar.update_email_success';
+  static const snackbar_car_added_success = 'snackbar.car_added_success';
+  static const snackbar_car_updated_success = 'snackbar.car_updated_success';
+  static const snackbar_car_deleted_success = 'snackbar.car_deleted_success';
   static const snackbar_error = 'snackbar.error';
   static const snackbar_no_internet = 'snackbar.no_internet';
   static const snackbar = 'snackbar';

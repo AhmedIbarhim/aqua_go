@@ -31,7 +31,8 @@ class _HomeBannersCarosalState extends State<HomeBannersCarosal> {
           itemBuilder: (context, index, realIndex) {
             final bannerImage = widget.banners[index].image;
             final isNetworkImage =
-                bannerImage.startsWith('http') || bannerImage.startsWith('https');
+                bannerImage.startsWith('http') ||
+                bannerImage.startsWith('https');
 
             return Container(
               decoration: BoxDecoration(
@@ -47,9 +48,9 @@ class _HomeBannersCarosalState extends State<HomeBannersCarosal> {
                         height: double.infinity,
                         placeholder: (context, url) => Container(
                           color: context.colors.defaultSubtle,
-                          child: const Center(
-                            child: CircularProgressIndicator(),
-                          ),
+                          // child: const Center(
+                          //   child: CircularProgressIndicator(),
+                          // ),
                         ),
                         errorWidget: (context, url, error) => Image.asset(
                           "assets/images/banner_demo.png",

@@ -82,15 +82,11 @@ class _AddCarViewState extends State<AddCarView> {
         }
 
         if (state is MyCarsActionSuccess) {
-          Navigator.pop(context);
+          context.pop(true);
         }
 
         if (state is MyCarsActionError) {
-          context.showWarningAlert(
-            title: 'Error',
-            message: state.message,
-            primaryButtonText: 'OK',
-          );
+          context.showErrorSnackBar(state.message);
         }
       },
       builder: (context, state) {
@@ -234,7 +230,7 @@ class _AddCarViewState extends State<AddCarView> {
           Expanded(
             flex: 1,
             child: CustomButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => context.pop(),
               text: LocaleKeys.cancel.tr(),
               color: context.colors.background,
               textColor: context.colors.primary,

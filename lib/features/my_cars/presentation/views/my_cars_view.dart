@@ -52,7 +52,8 @@ class _MyCarsViewState extends State<MyCarsView> {
         child: const GuestPlaceholderWidget(
           titleEn: "Your Vehicles",
           titleAr: "مركباتك",
-          descEn: "Please log in to manage your vehicles and access booking services.",
+          descEn:
+              "Please log in to manage your vehicles and access booking services.",
           descAr: "يرجى تسجيل الدخول لإدارة سياراتك والوصول إلى خدمات الحجز.",
         ),
       );
@@ -79,12 +80,12 @@ class _MyCarsViewState extends State<MyCarsView> {
               context.hideLoadingOverlay();
             }
 
+            if (state is MyCarsActionSuccess && state is! MyCarsActionAdding) {
+              context.showSuccessSnackBar(state.message);
+            }
+
             if (state is MyCarsActionError) {
-              context.showWarningAlert(
-                title: 'Error',
-                message: state.message,
-                primaryButtonText: 'OK',
-              );
+              context.showErrorSnackBar(state.message);
             }
           },
           buildWhen: (previous, current) =>

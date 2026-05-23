@@ -328,6 +328,9 @@
         "logout_success": "Logged out successfully",
         "profile_updated_success": "Profile updated successfully",
         "update_email_success": "Email updated successfully",
+        "car_added_success": "Car added successfully",
+        "car_updated_success": "Car updated successfully",
+        "car_deleted_success": "Car deleted successfully",
         "error": "Error occurred",
         "no_internet": "No internet connection"
     }

@@ -8,6 +8,8 @@ import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../../../../core/route/routes.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../controllers/my_cars_cubit.dart';
 
 class EmptyCarsWidget extends StatelessWidget {
   const EmptyCarsWidget({super.key});
@@ -37,7 +39,11 @@ class EmptyCarsWidget extends StatelessWidget {
             width: MediaQuery.of(context).size.width * 0.6,
             child: CustomButton(
               onPressed: () {
-                Navigator.pushNamed(context, Routes.addVehicle);
+                context.pushNamed(Routes.addVehicle).then((val) {
+                  if (val == true && context.mounted) {
+                    context.read<MyCarsCubit>().getCars();
+                  }
+                });
               },
               text: LocaleKeys.my_cars_add_car.tr(),
               preWidget: Icon(Icons.add),

@@ -7,6 +7,7 @@ import '../../data/models/my_car_model.dart';
 import 'my_car_card.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../controllers/my_cars_cubit.dart';
+import '../../../../core/extentions/context_extentions.dart';
 
 class MyCarsListView extends StatelessWidget {
   const MyCarsListView({super.key, required this.cars});
@@ -20,8 +21,8 @@ class MyCarsListView extends StatelessWidget {
           text: LocaleKeys.my_cars_add_car.tr(),
           preWidget: const Icon(Icons.add),
           onPressed: () {
-            Navigator.pushNamed(context, Routes.addVehicle).then((_) {
-              if (context.mounted) {
+            context.pushNamed(Routes.addVehicle).then((val) {
+              if (val == true && context.mounted) {
                 context.read<MyCarsCubit>().getCars();
               }
             });
@@ -35,9 +36,11 @@ class MyCarsListView extends StatelessWidget {
               return MyCarCard(
                 car: car,
                 onEdit: () {
-                  Navigator.pushNamed(context, Routes.addVehicle,
-                      arguments: car).then((_) {
-                    if (context.mounted) {
+                  context.pushNamed(
+                    Routes.addVehicle,
+                    arguments: car,
+                  ).then((val) {
+                    if (val == true && context.mounted) {
                       context.read<MyCarsCubit>().getCars();
                     }
                   });

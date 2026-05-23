@@ -67,7 +67,7 @@ class NotificationViewBody extends StatelessWidget {
         child: BlocBuilder<NotificationsCubit, NotificationsState>(
           builder: (context, state) {
             if (state is NotificationsLoading) {
-              return const Center(child: CustomLoadingIndicator());
+              return const Center(child: CustomLoadingIndicator(size: 100));
             } else if (state is NotificationsFailure) {
               return Center(
                 child: Column(

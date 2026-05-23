@@ -81,8 +81,8 @@ class BookingDetailsView extends StatelessWidget {
                   myCarsState is MyCarsInitial) {
                 return ShimmerHelper.bookingCars(
                   onAddCar: () {
-                    context.pushNamed(Routes.addVehicle).then((_) {
-                      if (context.mounted) {
+                    context.pushNamed(Routes.addVehicle).then((val) {
+                      if (val == true && context.mounted) {
                         context.read<MyCarsCubit>().getCars();
                       }
                     });
@@ -107,8 +107,8 @@ class BookingDetailsView extends StatelessWidget {
                   context.read<BookingCubit>().selectCar(cars[index]);
                 },
                 onAddCar: () {
-                  context.pushNamed(Routes.addVehicle).then((_) {
-                    if (context.mounted) {
+                  context.pushNamed(Routes.addVehicle).then((val) {
+                    if (val == true && context.mounted) {
                       context.read<MyCarsCubit>().getCars();
                     }
                   });

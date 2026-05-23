@@ -5,6 +5,8 @@ import '../data/models/my_car_model.dart';
 import '../data/models/vehicle_brand_model.dart';
 import '../data/models/vehicle_model_model.dart';
 import '../data/repos/cars_repository.dart';
+import 'package:easy_localization/easy_localization.dart';
+import '../../../../generated/locale_keys.g.dart';
 
 part 'my_cars_state.dart';
 
@@ -31,7 +33,7 @@ class MyCarsCubit extends Cubit<MyCarsState> {
       _,
     ) async {
       await getCars();
-      emit(MyCarsActionSuccess());
+      emit(MyCarsActionAdding(LocaleKeys.snackbar_car_added_success.tr()));
     });
   }
 
@@ -42,7 +44,7 @@ class MyCarsCubit extends Cubit<MyCarsState> {
       _,
     ) async {
       await getCars();
-      emit(MyCarsActionSuccess());
+      emit(MyCarsActionUpdating(LocaleKeys.snackbar_car_updated_success.tr()));
     });
   }
 
@@ -53,7 +55,7 @@ class MyCarsCubit extends Cubit<MyCarsState> {
       _,
     ) async {
       await getCars();
-      emit(MyCarsActionSuccess());
+      emit(MyCarsActionDeleting(LocaleKeys.snackbar_car_deleted_success.tr()));
     });
   }
 

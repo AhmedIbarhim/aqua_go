@@ -31,7 +31,25 @@ final class MyCarsError extends MyCarsState {
 // --- Action States (Add, Update, Delete) ---
 final class MyCarsActionLoading extends MyCarsState {}
 
-final class MyCarsActionSuccess extends MyCarsState {}
+sealed class MyCarsActionSuccess extends MyCarsState {
+  final String message;
+  const MyCarsActionSuccess(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
+final class MyCarsActionAdding extends MyCarsActionSuccess {
+  const MyCarsActionAdding(super.message);
+}
+
+final class MyCarsActionUpdating extends MyCarsActionSuccess {
+  const MyCarsActionUpdating(super.message);
+}
+
+final class MyCarsActionDeleting extends MyCarsActionSuccess {
+  const MyCarsActionDeleting(super.message);
+}
 
 final class MyCarsActionError extends MyCarsState {
   final String message;
