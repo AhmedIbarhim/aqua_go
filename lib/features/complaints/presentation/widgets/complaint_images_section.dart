@@ -10,16 +10,16 @@ import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../../core/utils/image_picker_helper.dart';
 import '../../../../generated/locale_keys.g.dart';
-import 'complain_image_field.dart';
+import 'complaint_image_field.dart';
 
-class ComplainImagesSection extends StatefulWidget {
-  const ComplainImagesSection({super.key});
+class ComplaintImagesSection extends StatefulWidget {
+  const ComplaintImagesSection({super.key});
 
   @override
-  State<ComplainImagesSection> createState() => _ComplainImagesSectionState();
+  State<ComplaintImagesSection> createState() => _ComplaintImagesSectionState();
 }
 
-class _ComplainImagesSectionState extends State<ComplainImagesSection>
+class _ComplaintImagesSectionState extends State<ComplaintImagesSection>
     with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
@@ -85,7 +85,7 @@ class _ComplainImagesSectionState extends State<ComplainImagesSection>
                   itemCount: images.length < 4 ? images.length + 1 : 4,
 
                   itemBuilder: (context, index) {
-                    return ComplainImageField(
+                    return ComplaintImageField(
                       initialImage: index < images.length
                           ? images[index]
                           : null,

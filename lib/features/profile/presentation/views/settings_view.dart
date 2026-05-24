@@ -46,13 +46,9 @@ class _SettingsViewState extends State<SettingsView> {
           }
 
           if (state is NotificationPreferencesUpdateError) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(state.message)));
+            context.showErrorSnackBar(state.message);
           } else if (state is NotificationPreferencesError) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(state.message)));
+            context.showErrorSnackBar(state.message);
           }
         },
         child: Scaffold(

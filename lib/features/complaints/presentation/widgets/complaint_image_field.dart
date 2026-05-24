@@ -12,8 +12,8 @@ import '../../../../core/utils/app_assets.dart';
 import '../../../../core/utils/image_picker_helper.dart';
 import '../../../../generated/locale_keys.g.dart';
 
-class ComplainImageField extends StatefulWidget {
-  const ComplainImageField({
+class ComplaintImageField extends StatefulWidget {
+  const ComplaintImageField({
     super.key,
     required this.onFileChanged,
     this.initialImage,
@@ -23,10 +23,10 @@ class ComplainImageField extends StatefulWidget {
   final File? initialImage;
 
   @override
-  State<ComplainImageField> createState() => _ComplainImageFieldState();
+  State<ComplaintImageField> createState() => _ComplaintImageFieldState();
 }
 
-class _ComplainImageFieldState extends State<ComplainImageField> {
+class _ComplaintImageFieldState extends State<ComplaintImageField> {
   bool isLoading = false;
   File? imageFile;
 
@@ -37,7 +37,7 @@ class _ComplainImageFieldState extends State<ComplainImageField> {
   }
 
   @override
-  void didUpdateWidget(covariant ComplainImageField oldWidget) {
+  void didUpdateWidget(covariant ComplaintImageField oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.initialImage != oldWidget.initialImage) {
       imageFile = widget.initialImage;

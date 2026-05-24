@@ -7,6 +7,7 @@ import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/utils/app_assets.dart';
 
 import '../widgets/profile_tile.dart';
+import '../../../../core/route/routes.dart';
 
 class SupportView extends StatelessWidget {
   const SupportView({super.key});
@@ -55,7 +56,7 @@ class SupportView extends StatelessWidget {
                     title: LocaleKeys.support_complaint_log.tr(),
                     icon: AppAssets.documentCopy,
                     onTap: () {
-                      // TODO: Navigate to Complaint Log
+                      context.pushNamed(Routes.complainsRecord);
                     },
                   ),
                   SizedBox(height: sh(12)),

@@ -167,7 +167,7 @@
         "booking_procedures": "إجراءات الحجز",
         "rate_service": "تقييم الخدمة",
         "submit_complaint": "تقديم شكوى",
-        "complain": "شكوى",
+        "complaint": "شكوى",
         "booking_number": "رقم الحجز",
         "car": "السيارة",
         "your_biker": "البايكر الخاص بك",
@@ -177,9 +177,9 @@
         "go_to_invoice_list": "الذهاب لقائمة الفواتير",
         "edit_booking": "تعديل الحجز",
         "worker_name": "اسم العامل",
-        "complain_type": "نوع الشكوى",
+        "complaint_type": "نوع الشكوى",
         "select_complaint_type": "اختر نوع الشكوي",
-        "complain_details": "تفاصيل الشكوى",
+        "complaint_details": "تفاصيل الشكوى",
         "upload_images": "انقر هنا لرفع الصور",
         "complaint_submitted": "تم تسجيل شكواك بنجاح",
         "add_image": "أضف صورة",
@@ -322,6 +322,12 @@
         "faq": "الأسئلة الشائعة",
         "complaint_log": "سجل الشكاوي",
         "whatsapp_contact": "التواصل عن طريق الواتس اب"
+    },
+    "complaint": {
+        "status_open": "مفتوحة",
+        "status_closed": "مغلقة",
+        "status_resolved": "تم حلها",
+        "status_pending": "معلقة"
     },
     "snackbar": {
         "login_success": "تم تسجيل الدخول بنجاح",

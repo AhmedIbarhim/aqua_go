@@ -35,6 +35,8 @@ class AppColors extends ThemeExtension<AppColors> {
   final Color success;
   final Color error;
   final Color warning;
+  final Color successLight;
+  final Color errorLight;
 
   const AppColors({
     required this.splashColor,
@@ -60,6 +62,8 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.success,
     required this.error,
     required this.warning,
+    required this.successLight,
+    required this.errorLight,
   });
 
   @override
@@ -86,6 +90,8 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? success,
     Color? error,
     Color? warning,
+    Color? successLight,
+    Color? errorLight,
   }) {
     return AppColors(
       splashColor: splashColor,
@@ -112,6 +118,8 @@ class AppColors extends ThemeExtension<AppColors> {
       success: success ?? this.success,
       error: error ?? this.error,
       warning: warning ?? this.warning,
+      successLight: successLight ?? this.successLight,
+      errorLight: errorLight ?? this.errorLight,
     );
   }
 
@@ -157,6 +165,8 @@ class AppColors extends ThemeExtension<AppColors> {
       success: Color.lerp(success, other.success, t)!,
       error: Color.lerp(error, other.error, t)!,
       warning: Color.lerp(warning, other.warning, t)!,
+      successLight: Color.lerp(successLight, other.successLight, t)!,
+      errorLight: Color.lerp(errorLight, other.errorLight, t)!,
     );
   }
 }
@@ -187,8 +197,8 @@ const darkAppColors = AppColors(
   contentDisabled: Color(0xFF737373),
   success: Color(0xFF0E612C),
   error: Color(0xFFD90421),
-  // success: Color(0xFF22C55E),
-  // error: Color(0xFFEF4444),
+  successLight: Color(0xFF22C55E),
+  errorLight: Color(0xFFEF4444),
   warning: Color(0xFFF59E0B),
 );
 
@@ -219,7 +229,7 @@ const lightAppColors = AppColors(
   contentDisabled: Color(0xFF94A3B8),
   success: Color(0xFF0E612C),
   error: Color(0xFFD90421),
-  // success: Color(0xFF22C55E),
-  // error: Color(0xFFEF4444),
+  successLight: Color(0xFF22C55E),
+  errorLight: Color(0xFFEF4444),
   warning: Color(0xFFD97706),
 );

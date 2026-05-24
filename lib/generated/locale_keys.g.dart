@@ -162,7 +162,7 @@ abstract class  LocaleKeys {
   static const bookings_booking_procedures = 'bookings.booking_procedures';
   static const bookings_rate_service = 'bookings.rate_service';
   static const bookings_submit_complaint = 'bookings.submit_complaint';
-  static const bookings_complain = 'bookings.complain';
+  static const bookings_complaint = 'bookings.complaint';
   static const bookings_booking_number = 'bookings.booking_number';
   static const bookings_car = 'bookings.car';
   static const bookings_your_biker = 'bookings.your_biker';
@@ -172,9 +172,9 @@ abstract class  LocaleKeys {
   static const bookings_go_to_invoice_list = 'bookings.go_to_invoice_list';
   static const bookings_edit_booking = 'bookings.edit_booking';
   static const bookings_worker_name = 'bookings.worker_name';
-  static const bookings_complain_type = 'bookings.complain_type';
+  static const bookings_complaint_type = 'bookings.complaint_type';
   static const bookings_select_complaint_type = 'bookings.select_complaint_type';
-  static const bookings_complain_details = 'bookings.complain_details';
+  static const bookings_complaint_details = 'bookings.complaint_details';
   static const bookings_upload_images = 'bookings.upload_images';
   static const bookings_complaint_submitted = 'bookings.complaint_submitted';
   static const bookings_add_image = 'bookings.add_image';
@@ -306,6 +306,11 @@ abstract class  LocaleKeys {
   static const support_complaint_log = 'support.complaint_log';
   static const support_whatsapp_contact = 'support.whatsapp_contact';
   static const support = 'support';
+  static const complaint_status_open = 'complaint.status_open';
+  static const complaint_status_closed = 'complaint.status_closed';
+  static const complaint_status_resolved = 'complaint.status_resolved';
+  static const complaint_status_pending = 'complaint.status_pending';
+  static const complaint = 'complaint';
   static const snackbar_login_success = 'snackbar.login_success';
   static const snackbar_logout_success = 'snackbar.logout_success';
   static const snackbar_profile_updated_success = 'snackbar.profile_updated_success';

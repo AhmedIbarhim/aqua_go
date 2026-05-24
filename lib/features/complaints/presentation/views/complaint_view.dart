@@ -6,30 +6,30 @@ import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/core/themes/app_text_styles.dart';
 import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:aqua_go/features/my_bookings/data/models/my_bookings_model.dart';
-import 'package:aqua_go/features/my_bookings/presentation/widgets/complain_types.dart';
+import 'package:aqua_go/features/complaints/presentation/widgets/complaint_types.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
 
 import '../../../../core/components/bottom_action_sheet_container.dart';
 import '../../../../generated/locale_keys.g.dart';
-import '../widgets/complain_images_section.dart';
+import '../widgets/complaint_images_section.dart';
 
-class ComplainArgs {
+class ComplaintArgs {
   final MyBookingsModel booking;
-  ComplainArgs({required this.booking});
+  ComplaintArgs({required this.booking});
 }
 
-class ComplainView extends StatefulWidget {
+class ComplaintView extends StatefulWidget {
   final MyBookingsModel booking;
 
-  const ComplainView({super.key, required this.booking});
+  const ComplaintView({super.key, required this.booking});
 
   @override
-  State<ComplainView> createState() => _ComplainViewState();
+  State<ComplaintView> createState() => _ComplaintViewState();
 }
 
-class _ComplainViewState extends State<ComplainView> {
+class _ComplaintViewState extends State<ComplaintView> {
   final TextEditingController _typeController = TextEditingController();
   final TextEditingController _detailsController = TextEditingController();
 
@@ -44,7 +44,7 @@ class _ComplainViewState extends State<ComplainView> {
     CustomBottomSheet.show(
       context: context,
       title: LocaleKeys.bookings_select_complaint_type.tr(),
-      child: ComplainTypes(
+      child: ComplaintTypes(
         initialValue: _typeController.text,
         onSelected: (value) {
           setState(() {
@@ -79,7 +79,7 @@ class _ComplainViewState extends State<ComplainView> {
                     onTap: _showComplainTypes,
                     child: AbsorbPointer(
                       child: CustomTextField(
-                        label: LocaleKeys.bookings_complain_type.tr(),
+                        label: LocaleKeys.bookings_complaint_type.tr(),
                         hint: LocaleKeys.select_here.tr(),
                         controller: _typeController,
                         isRequired: true,
@@ -90,7 +90,7 @@ class _ComplainViewState extends State<ComplainView> {
                   _buildDetailsInput(),
                   const SizedBox(height: 24),
 
-                  ComplainImagesSection(),
+                  ComplaintImagesSection(),
                   // _buildImageUploadSection(),
                 ],
               ),
@@ -201,7 +201,7 @@ class _ComplainViewState extends State<ComplainView> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          LocaleKeys.bookings_complain_details.tr(),
+          LocaleKeys.bookings_complaint_details.tr(),
           style: AppTextStyles.medium14,
         ),
         const SizedBox(height: 8),

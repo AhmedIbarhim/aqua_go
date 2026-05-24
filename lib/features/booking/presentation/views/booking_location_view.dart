@@ -16,7 +16,7 @@ import '../../../address/controllers/maps_controller/maps_cubit.dart';
 import '../widgets/location_selection_card.dart';
 import '../../../address/presentation/views/new_address_map_view.dart';
 import '../../../address/data/models/address_model.dart';
-import '../../presentation/controllers/booking_cubit.dart';
+import '../../controllers/booking_cubit.dart';
 import '../../../../core/route/app_router.dart';
 import '../../../../core/helpers/shimmer_helper.dart';
 
@@ -210,16 +210,18 @@ class _BookingLocationViewState extends State<BookingLocationView> {
                                 ),
                                 text: LocaleKeys.address_add_new_location.tr(),
                                 onPressed: () {
-                                  context.pushNamed(
-                                    Routes.newAddressMap,
-                                    arguments: NewAddressMapArgs(
-                                      forAddingAddress: true,
-                                    ),
-                                  ).then((_) {
-                                    if (context.mounted) {
-                                      _addressCubit.getAddresses();
-                                    }
-                                  });
+                                  context
+                                      .pushNamed(
+                                        Routes.newAddressMap,
+                                        arguments: NewAddressMapArgs(
+                                          forAddingAddress: true,
+                                        ),
+                                      )
+                                      .then((_) {
+                                        if (context.mounted) {
+                                          _addressCubit.getAddresses();
+                                        }
+                                      });
                                 },
                               ),
                               const SizedBox(height: 30),

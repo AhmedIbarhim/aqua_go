@@ -1,9 +1,8 @@
 import 'package:equatable/equatable.dart';
-import '../../../address/data/models/address_model.dart';
-import '../../../my_cars/data/models/my_car_model.dart';
-import '../../../home/data/models/service_model.dart';
-import '../../../../core/enums/payment_method_enum.dart';
-
+import '../../address/data/models/address_model.dart';
+import '../../my_cars/data/models/my_car_model.dart';
+import '../../home/data/models/service_model.dart';
+import '../../../core/enums/payment_method_enum.dart';
 
 enum BookingStatus { initial, loading, success, failure }
 
@@ -65,16 +64,16 @@ class BookingState extends Equatable {
 
   @override
   List<Object?> get props => [
-        status,
-        selectedService,
-        selectedAddress,
-        selectedCar,
-        selectedServiceIndices,
-        selectedDate,
-        selectedTime,
-        bikerNotes,
-        specialNoteText,
-        paymentMethod,
-        errorMessage,
-      ];
+    status,
+    selectedService,
+    selectedAddress,
+    selectedCar,
+    selectedServiceIndices,
+    selectedDate,
+    selectedTime,
+    bikerNotes,
+    specialNoteText,
+    paymentMethod,
+    errorMessage,
+  ];
 }

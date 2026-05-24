@@ -183,7 +183,7 @@ class CodegenLoader extends AssetLoader{
     "booking_procedures": "إجراءات الحجز",
     "rate_service": "تقييم الخدمة",
     "submit_complaint": "تقديم شكوى",
-    "complain": "شكوى",
+    "complaint": "شكوى",
     "booking_number": "رقم الحجز",
     "car": "السيارة",
     "your_biker": "البايكر الخاص بك",
@@ -193,9 +193,9 @@ class CodegenLoader extends AssetLoader{
     "go_to_invoice_list": "الذهاب لقائمة الفواتير",
     "edit_booking": "تعديل الحجز",
     "worker_name": "اسم العامل",
-    "complain_type": "نوع الشكوى",
+    "complaint_type": "نوع الشكوى",
     "select_complaint_type": "اختر نوع الشكوي",
-    "complain_details": "تفاصيل الشكوى",
+    "complaint_details": "تفاصيل الشكوى",
     "upload_images": "انقر هنا لرفع الصور",
     "complaint_submitted": "تم تسجيل شكواك بنجاح",
     "add_image": "أضف صورة",
@@ -338,6 +338,12 @@ class CodegenLoader extends AssetLoader{
     "faq": "الأسئلة الشائعة",
     "complaint_log": "سجل الشكاوي",
     "whatsapp_contact": "التواصل عن طريق الواتس اب"
+  },
+  "complaint": {
+    "status_open": "مفتوحة",
+    "status_closed": "مغلقة",
+    "status_resolved": "تم حلها",
+    "status_pending": "معلقة"
   },
   "snackbar": {
     "login_success": "تم تسجيل الدخول بنجاح",
@@ -521,7 +527,7 @@ static const Map<String,dynamic> _en = {
     "booking_procedures": "Booking Procedures",
     "rate_service": "Rate Service",
     "submit_complaint": "Submit Complaint",
-    "complain": "Complain",
+    "complaint": "Complaint",
     "booking_number": "Booking Number",
     "car": "Car",
     "your_biker": "Your Biker",
@@ -531,9 +537,9 @@ static const Map<String,dynamic> _en = {
     "go_to_invoice_list": "Go to Invoice List",
     "edit_booking": "Edit Booking",
     "worker_name": "Worker Name",
-    "complain_type": "Complain Type",
+    "complaint_type": "Complaint Type",
     "select_complaint_type": "Select Complaint Type",
-    "complain_details": "Complain Details",
+    "complaint_details": "Complaint Details",
     "upload_images": "Click Here To Upload Images",
     "complaint_submitted": "Complaint Submitted",
     "add_image": "Add Image",
@@ -676,6 +682,12 @@ static const Map<String,dynamic> _en = {
     "faq": "FAQ",
     "complaint_log": "Complaint Log",
     "whatsapp_contact": "Contact via WhatsApp"
+  },
+  "complaint": {
+    "status_open": "Open",
+    "status_closed": "Closed",
+    "status_resolved": "Resolved",
+    "status_pending": "Pending"
   },
   "snackbar": {
     "login_success": "Logged in successfully",

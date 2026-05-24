@@ -6,7 +6,7 @@ import 'package:aqua_go/features/my_bookings/data/models/my_bookings_model.dart'
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import '../views/complain_view.dart';
+import '../../../complaints/presentation/views/complaint_view.dart';
 
 import 'rating_bottom_sheet.dart';
 
@@ -43,7 +43,7 @@ class MyBookingProceduresBottomSheet extends StatelessWidget {
           onTap: () {
             context.pushNamed(
               Routes.complain,
-              arguments: ComplainArgs(booking: booking),
+              arguments: ComplaintArgs(booking: booking),
             );
           },
         ),

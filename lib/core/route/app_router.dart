@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../features/booking/presentation/controllers/booking_cubit.dart';
+import '../../features/booking/controllers/booking_cubit.dart';
 import '../../../../core/config/di/service_locator.dart';
 import '../../features/address/presentation/views/my_addresses_view.dart';
 import '../../features/address/presentation/views/new_address_map_view.dart';
@@ -14,7 +14,8 @@ import '../../features/booking/presentation/views/booking_summary_view.dart';
 import '../../features/home/presentation/views/offers_view.dart';
 import '../../features/home/presentation/views/packages_view.dart';
 import '../../features/layout/presentation/views/main_layout.dart';
-import '../../features/my_bookings/presentation/views/complain_view.dart';
+import '../../features/complaints/presentation/views/complaint_view.dart';
+import '../../features/complaints/presentation/views/complaints_record_view.dart';
 import '../../features/my_bookings/presentation/views/gallery_view.dart';
 import '../../features/my_bookings/presentation/views/my_booking_deatails_view.dart';
 import '../../features/my_cars/data/models/my_car_model.dart';
@@ -134,10 +135,13 @@ abstract class AppRouter {
           ),
         );
       case Routes.complain:
-        final args = settings.arguments as ComplainArgs;
+        final args = settings.arguments as ComplaintArgs;
         return MaterialPageRoute(
-          builder: (_) => ComplainView(booking: args.booking),
+          builder: (_) => ComplaintView(booking: args.booking),
         );
+
+      case Routes.complainsRecord:
+        return MaterialPageRoute(builder: (_) => const ComplaintsRecordView());
 
       case Routes.myBookingDetails:
         final args = settings.arguments as MyBookingDetailsArgs;

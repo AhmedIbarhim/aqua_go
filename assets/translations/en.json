@@ -167,7 +167,7 @@
         "booking_procedures": "Booking Procedures",
         "rate_service": "Rate Service",
         "submit_complaint": "Submit Complaint",
-        "complain": "Complain",
+        "complaint": "Complaint",
         "booking_number": "Booking Number",
         "car": "Car",
         "your_biker": "Your Biker",
@@ -177,9 +177,9 @@
         "go_to_invoice_list": "Go to Invoice List",
         "edit_booking": "Edit Booking",
         "worker_name": "Worker Name",
-        "complain_type": "Complain Type",
+        "complaint_type": "Complaint Type",
         "select_complaint_type": "Select Complaint Type",
-        "complain_details": "Complain Details",
+        "complaint_details": "Complaint Details",
         "upload_images": "Click Here To Upload Images",
         "complaint_submitted": "Complaint Submitted",
         "add_image": "Add Image",
@@ -322,6 +322,12 @@
         "faq": "FAQ",
         "complaint_log": "Complaint Log",
         "whatsapp_contact": "Contact via WhatsApp"
+    },
+    "complaint": {
+        "status_open": "Open",
+        "status_closed": "Closed",
+        "status_resolved": "Resolved",
+        "status_pending": "Pending"
     },
     "snackbar": {
         "login_success": "Logged in successfully",

@@ -6,17 +6,21 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../../../generated/locale_keys.g.dart';
 
-class ComplainTypes extends StatefulWidget {
+class ComplaintTypes extends StatefulWidget {
   final String? initialValue;
   final ValueChanged<String> onSelected;
 
-  const ComplainTypes({super.key, this.initialValue, required this.onSelected});
+  const ComplaintTypes({
+    super.key,
+    this.initialValue,
+    required this.onSelected,
+  });
 
   @override
-  State<ComplainTypes> createState() => _ComplainTypesState();
+  State<ComplaintTypes> createState() => _ComplaintTypesState();
 }
 
-class _ComplainTypesState extends State<ComplainTypes> {
+class _ComplaintTypesState extends State<ComplaintTypes> {
   late String? _selectedValue;
 
   final List<String> _types = [
