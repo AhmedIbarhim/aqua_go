@@ -14,7 +14,7 @@ import '../../../../core/components/bottom_action_sheet_container.dart';
 import '../../../../core/config/di/service_locator.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../widgets/car_selection_list.dart';
-import '../widgets/additional_services_grid.dart';
+import '../widgets/add_ons_grid.dart';
 import '../widgets/date_time_picker.dart';
 import '../../controllers/booking_cubit.dart';
 import '../../controllers/booking_state.dart';
@@ -119,7 +119,7 @@ class BookingDetailsView extends StatelessWidget {
           SizedBox(height: height * 0.03),
           _buildSectionTitle(LocaleKeys.bookings_additional_services.tr()),
           SizedBox(height: height * 0.02),
-          AdditionalServicesGrid(
+          AddOnsGrid(
             selectedIndices: bookingState.selectedServiceIndices,
             onServiceToggled: (index) {
               context.read<BookingCubit>().toggleService(index);

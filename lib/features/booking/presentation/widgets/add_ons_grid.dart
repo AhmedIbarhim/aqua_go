@@ -4,11 +4,11 @@ import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 
-class AdditionalServicesGrid extends StatelessWidget {
+class AddOnsGrid extends StatelessWidget {
   final Set<int> selectedIndices;
   final Function(int index) onServiceToggled;
 
-  const AdditionalServicesGrid({
+  const AddOnsGrid({
     super.key,
     required this.selectedIndices,
     required this.onServiceToggled,

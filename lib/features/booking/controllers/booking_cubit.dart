@@ -6,11 +6,11 @@ import '../../address/data/models/address_model.dart';
 import '../../my_cars/data/models/my_car_model.dart';
 import '../../home/data/models/service_model.dart';
 import '../data/models/booking_model.dart';
-import '../data/models/additional_service_model.dart';
+import '../data/models/add_on_model.dart';
 import '../data/models/biker_note.dart';
 import '../data/repos/booking_repo.dart';
 import '../../../core/enums/payment_method_enum.dart';
-import '../presentation/widgets/additional_services_grid.dart';
+import '../presentation/widgets/add_ons_grid.dart';
 import 'booking_state.dart';
 
 class BookingCubit extends Cubit<BookingState> {
@@ -95,12 +95,12 @@ class BookingCubit extends Cubit<BookingState> {
 
     emit(state.copyWith(status: BookingStatus.loading));
 
-    final List<AdditionalServiceModel> addonsList = [];
+    final List<AddOnModel> addonsList = [];
     for (final idx in state.selectedServiceIndices) {
-      if (idx < AdditionalServicesGrid.additionalServices.length) {
-        final item = AdditionalServicesGrid.additionalServices[idx];
+      if (idx < AddOnsGrid.additionalServices.length) {
+        final item = AddOnsGrid.additionalServices[idx];
         addonsList.add(
-          AdditionalServiceModel(
+          AddOnModel(
             id: item['id'] ?? idx.toString(),
             name: item['title'] ?? '',
             price: double.tryParse(item['price'] ?? '0.00') ?? 0.0,

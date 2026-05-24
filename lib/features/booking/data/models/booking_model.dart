@@ -1,7 +1,7 @@
 import '../../../address/data/models/address_model.dart';
 import '../../../my_cars/data/models/my_car_model.dart';
 import '../../../home/data/models/service_model.dart';
-import 'additional_service_model.dart';
+import 'add_on_model.dart';
 import 'day_time_model.dart';
 import '../../../../core/enums/payment_method_enum.dart';
 
@@ -11,7 +11,7 @@ class BookingModel {
   final AddressModel? address;
   final DateTime? date;
   final String? time;
-  final List<AdditionalServiceModel> additionalServices;
+  final List<AddOnModel> additionalServices;
   final List<String> bikerNotes;
   final PaymentMethod? paymentMethod;
 
@@ -71,7 +71,7 @@ class BookingModel {
       date: DateTime.parse(json['date']),
       time: json['time'],
       additionalServices: (json['additionalServices'] as List)
-          .map((e) => AdditionalServiceModel.fromJson(e))
+          .map((e) => AddOnModel.fromJson(e))
           .toList(),
       bikerNotes: json['bikerNotes'] as List<String>,
       paymentMethod: PaymentMethodEnumExtension.fromString(

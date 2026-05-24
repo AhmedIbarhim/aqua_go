@@ -15,7 +15,7 @@ import '../widgets/payment_method_selection.dart';
 
 import '../../controllers/booking_cubit.dart';
 import '../../controllers/booking_state.dart';
-import '../widgets/additional_services_grid.dart';
+import '../widgets/add_ons_grid.dart';
 
 class BookingSummaryView extends StatefulWidget {
   const BookingSummaryView({super.key});
@@ -79,8 +79,8 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
     final List<Map<String, dynamic>> selectedAddons = [];
     double addonsTotal = 0.0;
     for (final idx in bookingState.selectedServiceIndices) {
-      if (idx < AdditionalServicesGrid.additionalServices.length) {
-        final item = AdditionalServicesGrid.additionalServices[idx];
+      if (idx < AddOnsGrid.additionalServices.length) {
+        final item = AddOnsGrid.additionalServices[idx];
         final price = double.tryParse(item['price'] ?? '0.00') ?? 0.00;
         selectedAddons.add({'name': item['title'] ?? '', 'price': price});
         addonsTotal += price;
