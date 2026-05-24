@@ -1,4 +1,3 @@
-import 'package:aqua_go/core/components/custom_network_image.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +6,7 @@ import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../../features/my_cars/data/models/my_car_model.dart';
+import '../../../my_cars/presentation/widgets/car_make_logo_network_svg.dart';
 
 class CarSelectionList extends StatelessWidget {
   final int? selectedCarIndex;
@@ -79,17 +79,9 @@ class CarSelectionList extends StatelessWidget {
           Opacity(
             opacity: isSelected ? 1.0 : 0.5,
             child: SizedBox(
-              height: height * 0.045,
-              width: width * 0.15,
-              child: car.typeImage.startsWith('http')
-                  ? CustomNetworkImage(
-                      car.typeImage,
-                      fit: BoxFit.contain,
-                    )
-                  : Image.asset(
-                      car.typeImage,
-                      fit: BoxFit.fitWidth,
-                    ),
+              height: height * 0.055,
+              width: width * 0.25,
+              child: CarMakeLogoNetworkSvg(logoUrl: car.typeImage),
             ),
           ),
           SizedBox(height: height * 0.01),

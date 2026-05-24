@@ -8,6 +8,7 @@ import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/themes/app_colors.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../generated/locale_keys.g.dart';
+import 'car_make_logo_network_svg.dart';
 
 class MyCarCard extends StatelessWidget {
   final MyCarModel car;
@@ -65,21 +66,7 @@ class MyCarCard extends StatelessWidget {
                   child: SizedBox(
                     height: height * 0.05,
                     width: height * 0.05,
-                    child: ShaderMask(
-                      shaderCallback: (bounds) {
-                        return const LinearGradient(
-                          colors: [
-                            Color(0xFFE3E3E3),
-                            Color(0xFF6D6B6B),
-                            Colors.grey,
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ).createShader(bounds);
-                      },
-                      blendMode: BlendMode.srcIn,
-                      child: SvgPicture.network(car.typeImage),
-                    ),
+                    child: CarMakeLogoNetworkSvg(logoUrl: car.typeImage),
                   ),
                 ),
                 // Edit and Delete Icons
