@@ -32,7 +32,7 @@ class MyCarsCubit extends Cubit<MyCarsState> {
     result.fold((failure) => emit(MyCarsActionError(failure.message)), (
       _,
     ) async {
-      await getCars();
+      // await getCars();
       emit(MyCarsActionAdding(LocaleKeys.snackbar_car_added_success.tr()));
     });
   }

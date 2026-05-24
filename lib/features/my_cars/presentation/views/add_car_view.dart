@@ -38,7 +38,7 @@ class _AddCarViewState extends State<AddCarView> {
     if (widget.car != null) {
       _selectedBrandModel = widget.car!.carBrand;
       _selectedModelModel = widget.car!.carModel;
-      _selectedYear = widget.car!.year;
+      _selectedYear = widget.car!.modelYear.toString();
       _selectedColor = Color(widget.car!.colorCode);
       _plateNumberController.text = widget.car!.boardNumber;
     }
@@ -214,6 +214,10 @@ class _AddCarViewState extends State<AddCarView> {
                   id: widget.car?.id ?? '',
                   makeId: brandId,
                   modelId: modelId,
+                  modelYear: int.parse(_selectedYear!),
+                  // != null
+                  //     ? (int.tryParse(_selectedYear!) ?? DateTime.now().year)
+                  //     : DateTime.now().year,
                   color: colorHex,
                   plateNumber: _plateNumberController.text.trim(),
                 );

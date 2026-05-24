@@ -1,3 +1,4 @@
+import '../../../../core/config/networking/endpoints.dart';
 import '../../../../core/helpers/car_color_helper.dart';
 import '../../../../core/utils/app_assets.dart';
 import 'vehicle_brand_model.dart';
@@ -8,6 +9,7 @@ class MyCarModel {
   final String makeId;
   final String modelId;
   final String color;
+  final int modelYear;
   final String plateNumber;
   final DateTime? createdAt;
   final VehicleBrandModel? carBrand;
@@ -18,6 +20,7 @@ class MyCarModel {
     required this.makeId,
     required this.modelId,
     required this.color,
+    required this.modelYear,
     required this.plateNumber,
     this.createdAt,
     this.carBrand,
@@ -39,7 +42,7 @@ class MyCarModel {
   // }
 
   // Getter for year (API does not have year; return default placeholder or fallback)
-  String get year => '2024';
+  // String get modelYear => '2024';
 
   // Board number maps to plate number
   String get boardNumber => plateNumber;
@@ -49,6 +52,9 @@ class MyCarModel {
 
   // Make brand logo
   String get typeImage {
+    if (carBrand != null) {
+      return '${Endpoints.baseUrl}${Endpoints.brandLogo(makeId)}';
+    }
     return AppAssets.demoToyota;
   }
 
@@ -81,6 +87,11 @@ class MyCarModel {
       makeId: json['makeId'] as String,
       modelId: json['modelId'] as String,
       color: json['color'] as String? ?? '0xFFFFFFFF',
+      modelYear: json['modelYear'] != null
+          ? (json['modelYear'] is int
+                ? json['modelYear'] as int
+                : int.tryParse(json['modelYear'].toString()) ?? 2024)
+          : 2024,
       plateNumber: json['plateNumber'] as String? ?? '',
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt'].toString())
@@ -96,6 +107,7 @@ class MyCarModel {
       'makeId': makeId,
       'modelId': modelId,
       'color': color,
+      'modelYear': modelYear,
       'plateNumber': plateNumber,
       if (createdAt != null) 'createdAt': createdAt!.toIso8601String(),
     };
@@ -106,6 +118,7 @@ class MyCarModel {
       'makeId': makeId,
       'modelId': modelId,
       'color': color,
+      'modelYear': modelYear,
       'plateNumber': plateNumber,
     };
   }
@@ -115,6 +128,7 @@ class MyCarModel {
     String? makeId,
     String? modelId,
     String? color,
+    int? modelYear,
     String? plateNumber,
     DateTime? createdAt,
     VehicleBrandModel? make,
@@ -125,6 +139,7 @@ class MyCarModel {
       makeId: makeId ?? this.makeId,
       modelId: modelId ?? this.modelId,
       color: color ?? this.color,
+      modelYear: modelYear ?? this.modelYear,
       plateNumber: plateNumber ?? this.plateNumber,
       createdAt: createdAt ?? this.createdAt,
       carBrand: make ?? carBrand,

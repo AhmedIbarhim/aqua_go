@@ -24,6 +24,8 @@ abstract class Endpoints {
   static const String vehicleBrands = '/catalog/vehicle-makes';
   static String vehicleModels(String brandId) =>
       '/catalog/vehicle-makes/$brandId/models';
+  static String brandLogo(String brandId) =>
+      '/catalog/vehicle-makes/$brandId/logo';
   static const String services = '/services';
 
   //  Addresses Endpoints

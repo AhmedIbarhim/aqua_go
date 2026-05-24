@@ -54,7 +54,7 @@ class BookingModel {
       'vehicleMake': car?.carBrand?.vehicleBrandName.nameEn,
       'vehicleModel': car?.carModel?.vehicleModelName.nameEn,
       'vehicleColor': car?.color,
-      'vehicleYear': int.parse(car?.year ?? '2020'),
+      'vehicleYear': car?.modelYear,
       'type': 'SCHEDULED',
       'scheduledAt': scheduledAt,
       if (car?.id != null) 'savedVehicleId': car?.id,

@@ -58,14 +58,28 @@ class MyCarCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                // Toyota Logo
+                // Brand Logo
                 Positioned(
                   right: width * 0.01,
-                  top: height * 0.005,
-                  child: Image.asset(
-                    car.typeImage,
-                    height: height * 0.03,
-                    fit: BoxFit.contain,
+                  top: 0,
+                  child: SizedBox(
+                    height: height * 0.05,
+                    width: height * 0.05,
+                    child: ShaderMask(
+                      shaderCallback: (bounds) {
+                        return const LinearGradient(
+                          colors: [
+                            Color(0xFFE3E3E3),
+                            Color(0xFF6D6B6B),
+                            Colors.grey,
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ).createShader(bounds);
+                      },
+                      blendMode: BlendMode.srcIn,
+                      child: SvgPicture.network(car.typeImage),
+                    ),
                   ),
                 ),
                 // Edit and Delete Icons
@@ -132,7 +146,11 @@ class MyCarCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              _buildSpecItem(context, text: car.year, icon: AppAssets.manfYear),
+              _buildSpecItem(
+                context,
+                text: car.modelYear.toString(),
+                icon: AppAssets.manfYear,
+              ),
               _buildDivider(context),
               _buildSpecItem(
                 context,

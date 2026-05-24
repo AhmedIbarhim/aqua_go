@@ -1,3 +1,4 @@
+import 'package:aqua_go/core/components/custom_network_image.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -77,11 +78,18 @@ class CarSelectionList extends StatelessWidget {
         children: [
           Opacity(
             opacity: isSelected ? 1.0 : 0.5,
-            child: Image.asset(
-              car.typeImage,
+            child: SizedBox(
               height: height * 0.045,
               width: width * 0.15,
-              fit: BoxFit.fitWidth,
+              child: car.typeImage.startsWith('http')
+                  ? CustomNetworkImage(
+                      car.typeImage,
+                      fit: BoxFit.contain,
+                    )
+                  : Image.asset(
+                      car.typeImage,
+                      fit: BoxFit.fitWidth,
+                    ),
             ),
           ),
           SizedBox(height: height * 0.01),
