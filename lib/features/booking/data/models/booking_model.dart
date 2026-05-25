@@ -4,6 +4,7 @@ import '../../../home/data/models/service_model.dart';
 import 'add_on_model.dart';
 import 'day_time_model.dart';
 import '../../../../core/enums/payment_method_enum.dart';
+import 'quote_model.dart';
 
 class BookingModel {
   final ServiceModel? service;
@@ -14,6 +15,7 @@ class BookingModel {
   final List<AddOnModel> additionalServices;
   final List<String> bikerNotes;
   final PaymentMethod? paymentMethod;
+  final QuoteModel? quote;
 
   BookingModel({
     this.service,
@@ -24,6 +26,7 @@ class BookingModel {
     this.additionalServices = const [],
     this.bikerNotes = const [],
     this.paymentMethod,
+    this.quote,
   });
 
   bool get isComplete =>
@@ -43,18 +46,22 @@ class BookingModel {
     }
 
     return {
+      if (quote?.quoteId != null) 'quoteId': quote!.quoteId,
       if (address?.id != null && address?.id != 'current_gps')
         'savedAddressId': address?.id,
-      'addressLabel': address?.label,
-      'lat': address?.lat,
-      'lng': address?.lng,
+      // 'addressLabel': address?.label,
+      // 'lat': address?.lat,
+      // 'lng': address?.lng,
+      'lat': 0,
+      'lng': 0,
       if (address?.arrivalNotes != null)
         'addressArrivalNotes': address?.arrivalNotes,
-      'plateText': car?.plateNumber,
-      'vehicleMake': car?.carBrand?.vehicleBrandName.nameEn,
-      'vehicleModel': car?.carModel?.vehicleModelName.nameEn,
-      'vehicleColor': car?.color,
-      'vehicleYear': car?.modelYear,
+      // 'plateText': car?.plateNumber,
+      // 'vehicleMake': car?.carBrand?.vehicleBrandName.nameEn,
+      // 'vehicleModel': car?.carModel?.vehicleModelName.nameEn,
+      // 'vehicleColor': car?.color,
+      // 'vehicleYear': car?.modelYear,
+      // 'paymentMethod': 'creditCard',
       'type': 'SCHEDULED',
       'scheduledAt': scheduledAt,
       if (car?.id != null) 'savedVehicleId': car?.id,
@@ -77,6 +84,7 @@ class BookingModel {
       paymentMethod: PaymentMethodEnumExtension.fromString(
         json['paymentMethod'],
       ),
+      quote: json['quote'] != null ? QuoteModel.fromJson(json['quote']) : null,
     );
   }
 }

@@ -8,6 +8,7 @@ import '../../home/data/models/service_model.dart';
 import '../data/models/booking_model.dart';
 import '../data/models/add_on_model.dart';
 import '../data/models/biker_note.dart';
+import '../data/models/quote_model.dart';
 import '../data/repos/booking_repo.dart';
 import '../../../core/enums/payment_method_enum.dart';
 import '../presentation/widgets/add_ons_grid.dart';
@@ -25,11 +26,11 @@ class BookingCubit extends Cubit<BookingState> {
   }
 
   void selectAddress(AddressModel address) {
-    emit(state.copyWith(selectedAddress: address));
+    emit(state.copyWith(selectedAddress: address, clearError: true));
   }
 
   void selectCar(MyCarModel car) {
-    emit(state.copyWith(selectedCar: car));
+    emit(state.copyWith(selectedCar: car, clearError: true));
   }
 
   void toggleService(int serviceIndex) {
@@ -39,23 +40,23 @@ class BookingCubit extends Cubit<BookingState> {
     } else {
       updatedServices.add(serviceIndex);
     }
-    emit(state.copyWith(selectedServiceIndices: updatedServices));
+    emit(state.copyWith(selectedServiceIndices: updatedServices, clearError: true));
   }
 
   void updateDateTime(DateTime? date, String? time) {
-    emit(state.copyWith(selectedDate: date, selectedTime: time));
+    emit(state.copyWith(selectedDate: date, selectedTime: time, clearError: true));
   }
 
   void updateNotes(Set<String> notes) {
-    emit(state.copyWith(bikerNotes: notes));
+    emit(state.copyWith(bikerNotes: notes, clearError: true));
   }
 
   void updateSpecialNoteText(String text) {
-    emit(state.copyWith(specialNoteText: text));
+    emit(state.copyWith(specialNoteText: text, clearError: true));
   }
 
   void updatePaymentMethod(PaymentMethod method) {
-    emit(state.copyWith(paymentMethod: method));
+    emit(state.copyWith(paymentMethod: method, clearError: true));
   }
 
   Future<bool> checkZone(double lat, double lng) async {
@@ -78,7 +79,38 @@ class BookingCubit extends Cubit<BookingState> {
     );
   }
 
-  Future<void> submitBooking() async {
+  Future<QuoteModel?> fetchQuote({String? promoCode}) async {
+    if (state.selectedService == null || state.selectedAddress == null) {
+      return null;
+    }
+
+    emit(state.copyWith(status: BookingStatus.loading));
+
+    final result = await _bookingRepo.getQuote(
+      packageId: state.selectedService!.id,
+      lat: state.selectedAddress!.lat,
+      lng: state.selectedAddress!.lng,
+      promoCode: promoCode,
+    );
+
+    return result.fold(
+      (failure) {
+        emit(
+          state.copyWith(
+            status: BookingStatus.failure,
+            errorMessage: failure.message,
+          ),
+        );
+        return null;
+      },
+      (quote) {
+        emit(state.copyWith(status: BookingStatus.initial, quote: quote));
+        return quote;
+      },
+    );
+  }
+
+  Future<void> submitBooking({String? promoCode}) async {
     if (state.selectedAddress == null ||
         state.selectedCar == null ||
         state.selectedDate == null ||
@@ -94,6 +126,35 @@ class BookingCubit extends Cubit<BookingState> {
     }
 
     emit(state.copyWith(status: BookingStatus.loading));
+
+    QuoteModel? quote = state.quote;
+    if (quote == null) {
+      final quoteResult = await _bookingRepo.getQuote(
+        packageId: state.selectedService!.id,
+        lat: state.selectedAddress!.lat,
+        lng: state.selectedAddress!.lng,
+        promoCode: promoCode,
+      );
+
+      final hasError = quoteResult.fold(
+        (failure) {
+          emit(
+            state.copyWith(
+              status: BookingStatus.failure,
+              errorMessage: failure.message,
+            ),
+          );
+          return true;
+        },
+        (fetchedQuote) {
+          quote = fetchedQuote;
+          emit(state.copyWith(quote: fetchedQuote));
+          return false;
+        },
+      );
+
+      if (hasError || quote == null) return;
+    }
 
     final List<AddOnModel> addonsList = [];
     for (final idx in state.selectedServiceIndices) {
@@ -136,6 +197,7 @@ class BookingCubit extends Cubit<BookingState> {
       additionalServices: addonsList,
       bikerNotes: notesList,
       paymentMethod: state.paymentMethod,
+      quote: quote,
     );
 
     final result = await _bookingRepo.createBooking(booking);

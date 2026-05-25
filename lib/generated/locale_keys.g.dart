@@ -321,6 +321,7 @@ abstract class  LocaleKeys {
   static const snackbar_error = 'snackbar.error';
   static const snackbar_no_internet = 'snackbar.no_internet';
   static const snackbar_default_error = 'snackbar.default_error';
+  static const snackbar_booking_created = 'snackbar.booking_created';
   static const snackbar = 'snackbar';
 
 }

@@ -39,6 +39,7 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
         }
 
         if (state.status == BookingStatus.success) {
+          context.showSuccessSnackBar(LocaleKeys.snackbar_booking_created.tr());
           context.showSuccessAlert().then((_) {
             if (!context.mounted) return;
             Navigator.popUntil(context, (route) => route.isFirst);
@@ -167,6 +168,7 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
     return BottomActionSheetContainer(
       child: CustomButton(
         text: LocaleKeys.bookings_confirm_booking.tr(),
+        enabled: bookingState.paymentMethod != null,
         onPressed: () {
           context.read<BookingCubit>().submitBooking();
         },

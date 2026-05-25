@@ -9,12 +9,12 @@ import '../../../../core/enums/payment_method_enum.dart';
 
 class PaymentMethodSelection extends StatefulWidget {
   final Function(PaymentMethod) onPaymentMethodChanged;
-  final PaymentMethod initialMethod;
+  final PaymentMethod? initialMethod;
 
   const PaymentMethodSelection({
     super.key,
     required this.onPaymentMethodChanged,
-    this.initialMethod = PaymentMethod.applePay,
+    this.initialMethod,
   });
 
   @override
@@ -22,7 +22,7 @@ class PaymentMethodSelection extends StatefulWidget {
 }
 
 class _PaymentMethodSelectionState extends State<PaymentMethodSelection> {
-  late PaymentMethod _selectedMethod;
+  PaymentMethod? _selectedMethod;
 
   @override
   void initState() {

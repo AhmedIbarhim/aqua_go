@@ -3,6 +3,7 @@ import '../../address/data/models/address_model.dart';
 import '../../my_cars/data/models/my_car_model.dart';
 import '../../home/data/models/service_model.dart';
 import '../../../core/enums/payment_method_enum.dart';
+import '../data/models/quote_model.dart';
 
 enum BookingStatus { initial, loading, success, failure }
 
@@ -17,6 +18,7 @@ class BookingState extends Equatable {
   final Set<String> bikerNotes;
   final String specialNoteText;
   final PaymentMethod? paymentMethod;
+  final QuoteModel? quote;
   final String? errorMessage;
 
   const BookingState({
@@ -30,6 +32,7 @@ class BookingState extends Equatable {
     this.bikerNotes = const {},
     this.specialNoteText = '',
     this.paymentMethod,
+    this.quote,
     this.errorMessage,
   });
 
@@ -44,10 +47,12 @@ class BookingState extends Equatable {
     Set<String>? bikerNotes,
     String? specialNoteText,
     PaymentMethod? paymentMethod,
+    QuoteModel? quote,
     String? errorMessage,
+    bool clearError = false,
   }) {
     return BookingState(
-      status: status ?? this.status,
+      status: status ?? (clearError ? BookingStatus.initial : this.status),
       selectedService: selectedService ?? this.selectedService,
       selectedAddress: selectedAddress ?? this.selectedAddress,
       selectedCar: selectedCar ?? this.selectedCar,
@@ -58,7 +63,8 @@ class BookingState extends Equatable {
       bikerNotes: bikerNotes ?? this.bikerNotes,
       specialNoteText: specialNoteText ?? this.specialNoteText,
       paymentMethod: paymentMethod ?? this.paymentMethod,
-      errorMessage: errorMessage ?? this.errorMessage,
+      quote: quote ?? this.quote,
+      errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
     );
   }
 
@@ -74,6 +80,7 @@ class BookingState extends Equatable {
     bikerNotes,
     specialNoteText,
     paymentMethod,
+    quote,
     errorMessage,
   ];
 }
