@@ -5,7 +5,7 @@ import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 
 import '../../../../core/config/networking/exceptions/failure.dart';
-import '../models/booking_model.dart';
+import '../models/booking_request_model.dart';
 import '../models/quote_model.dart';
 
 class BookingRepo {
@@ -29,20 +29,17 @@ class BookingRepo {
           if (promoCode != null && promoCode.isNotEmpty) 'promoCode': promoCode,
         },
       );
-      return response.fold(
-        (failure) => left(failure),
-        (data) {
-          if (data != null) {
-            try {
-              final quote = QuoteModel.fromJson(data as Map<String, dynamic>);
-              return right(quote);
-            } catch (e) {
-              return left(ServerFailure('Parsing error: $e'));
-            }
+      return response.fold((failure) => left(failure), (data) {
+        if (data != null) {
+          try {
+            final quote = QuoteModel.fromJson(data as Map<String, dynamic>);
+            return right(quote);
+          } catch (e) {
+            return left(ServerFailure('Parsing error: $e'));
           }
-          return left(ServerFailure('Failed to load quote details'));
-        },
-      );
+        }
+        return left(ServerFailure('Failed to load quote details'));
+      });
     } catch (error) {
       return left(ServerFailure(error.toString()));
     }
@@ -66,7 +63,9 @@ class BookingRepo {
     }
   }
 
-  Future<Either<Failure, void>> createBooking(BookingModel booking) async {
+  Future<Either<Failure, void>> createBooking(
+    BookingRequestModel booking,
+  ) async {
     try {
       final userId = FetchUserData.getUserId();
       final nowToMinutes = DateTime.now().toIso8601String().substring(0, 16);

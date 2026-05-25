@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/extentions/context_extentions.dart';
-import '../../data/models/my_bookings_model.dart';
+import '../../data/models/booking_response_model.dart';
 import '../widgets/my_bookings_list_view.dart';
 import '../widgets/my_bookings_tabs.dart';
 import '../../../../core/helpers/fetch_user_data_helper.dart';
@@ -16,8 +16,8 @@ class MyBookingsView extends StatefulWidget {
 class _MyBookingsViewState extends State<MyBookingsView> {
   int _selectedIndex = 0;
 
-  final List<MyBookingsModel> dummyBookings = [
-    const MyBookingsModel(
+  final List<BookingResponseModel> dummyBookings = [
+    const BookingResponseModel(
       id: '1234',
       title: 'غسلة (داخلي و خارجي). #1234',
       location: 'شارع احمد عبد الخالق, نجران السعودية',
@@ -27,7 +27,7 @@ class _MyBookingsViewState extends State<MyBookingsView> {
       latitude: 24.7136,
       longitude: 46.6753,
     ),
-    const MyBookingsModel(
+    const BookingResponseModel(
       id: '1235',
       title: 'التلميع الداخلي. #1235',
       location: 'شارع الملك فهد, الرياض السعودية',
@@ -37,7 +37,7 @@ class _MyBookingsViewState extends State<MyBookingsView> {
       latitude: 24.7136,
       longitude: 46.6753,
     ),
-    const MyBookingsModel(
+    const BookingResponseModel(
       id: '1235',
       title: 'التلميع الداخلي. #1235',
       location:
@@ -48,7 +48,7 @@ class _MyBookingsViewState extends State<MyBookingsView> {
       latitude: 24.7136,
       longitude: 46.6753,
     ),
-    const MyBookingsModel(
+    const BookingResponseModel(
       id: '1235',
       title: 'التلميع الداخلي. #1235',
       location: 'شارع الملك فهد, الرياض السعودية',
@@ -58,7 +58,7 @@ class _MyBookingsViewState extends State<MyBookingsView> {
       latitude: 24.7136,
       longitude: 46.6753,
     ),
-    const MyBookingsModel(
+    const BookingResponseModel(
       id: '1235',
       title: 'التلميع الداخلي. #1235',
       location: 'شارع الملك فهد, الرياض السعودية',
@@ -68,7 +68,7 @@ class _MyBookingsViewState extends State<MyBookingsView> {
       latitude: 24.7136,
       longitude: 46.6753,
     ),
-    const MyBookingsModel(
+    const BookingResponseModel(
       id: '1235',
       title: 'التلميع الداخلي. #1235',
       location:
@@ -100,7 +100,8 @@ class _MyBookingsViewState extends State<MyBookingsView> {
           child: const GuestPlaceholderWidget(
             titleEn: "Your Bookings",
             titleAr: "حجوزاتك",
-            descEn: "Please log in to track and view your active and past bookings.",
+            descEn:
+                "Please log in to track and view your active and past bookings.",
             descAr: "يرجى تسجيل الدخول لمتابعة وعرض حجوزاتك الحالية والسابقة.",
           ),
         ),

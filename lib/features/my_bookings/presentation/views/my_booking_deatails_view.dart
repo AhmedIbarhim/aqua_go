@@ -3,7 +3,7 @@ import 'package:aqua_go/core/components/generic_app_bar.dart';
 import 'package:aqua_go/core/themes/app_colors.dart';
 import 'package:aqua_go/core/themes/app_text_styles.dart';
 import 'package:aqua_go/core/utils/app_assets.dart';
-import 'package:aqua_go/features/my_bookings/data/models/my_bookings_model.dart';
+import 'package:aqua_go/features/my_bookings/data/models/booking_response_model.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -16,12 +16,12 @@ import '../widgets/my_booking_photos_section.dart';
 import '../widgets/my_booking_location_section.dart';
 
 class MyBookingDetailsArgs {
-  final MyBookingsModel booking;
+  final BookingResponseModel booking;
   MyBookingDetailsArgs({required this.booking});
 }
 
 class MyBookingDetailsView extends StatelessWidget {
-  final MyBookingsModel booking;
+  final BookingResponseModel booking;
 
   const MyBookingDetailsView({super.key, required this.booking});
 

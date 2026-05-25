@@ -7,11 +7,11 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
 
-import '../../data/models/my_bookings_model.dart';
+import '../../data/models/booking_response_model.dart';
 import '../views/my_booking_deatails_view.dart';
 
 class MyBookingsCard extends StatelessWidget {
-  final MyBookingsModel booking;
+  final BookingResponseModel booking;
 
   const MyBookingsCard({super.key, required this.booking});
 

@@ -5,7 +5,7 @@ import 'package:aqua_go/generated/locale_keys.g.dart';
 import '../../address/data/models/address_model.dart';
 import '../../my_cars/data/models/my_car_model.dart';
 import '../../home/data/models/service_model.dart';
-import '../data/models/booking_model.dart';
+import '../data/models/booking_request_model.dart';
 import '../data/models/add_on_model.dart';
 import '../data/models/biker_note.dart';
 import '../data/models/quote_model.dart';
@@ -40,11 +40,15 @@ class BookingCubit extends Cubit<BookingState> {
     } else {
       updatedServices.add(serviceIndex);
     }
-    emit(state.copyWith(selectedServiceIndices: updatedServices, clearError: true));
+    emit(
+      state.copyWith(selectedServiceIndices: updatedServices, clearError: true),
+    );
   }
 
   void updateDateTime(DateTime? date, String? time) {
-    emit(state.copyWith(selectedDate: date, selectedTime: time, clearError: true));
+    emit(
+      state.copyWith(selectedDate: date, selectedTime: time, clearError: true),
+    );
   }
 
   void updateNotes(Set<String> notes) {
@@ -188,7 +192,7 @@ class BookingCubit extends Cubit<BookingState> {
       }
     }
 
-    final booking = BookingModel(
+    final booking = BookingRequestModel(
       service: state.selectedService,
       car: state.selectedCar,
       address: state.selectedAddress,

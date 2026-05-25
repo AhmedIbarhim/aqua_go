@@ -1,4 +1,4 @@
-class MyBookingsModel {
+class BookingResponseModel {
   final String id;
   final String title;
   final String location;
@@ -8,7 +8,7 @@ class MyBookingsModel {
   final double latitude;
   final double longitude;
 
-  const MyBookingsModel({
+  const BookingResponseModel({
     required this.id,
     required this.title,
     required this.location,

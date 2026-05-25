@@ -6,7 +6,7 @@ import 'day_time_model.dart';
 import '../../../../core/enums/payment_method_enum.dart';
 import 'quote_model.dart';
 
-class BookingModel {
+class BookingRequestModel {
   final ServiceModel? service;
   final MyCarModel? car;
   final AddressModel? address;
@@ -17,7 +17,7 @@ class BookingModel {
   final PaymentMethod? paymentMethod;
   final QuoteModel? quote;
 
-  BookingModel({
+  BookingRequestModel({
     this.service,
     this.car,
     this.address,
@@ -70,21 +70,21 @@ class BookingModel {
     };
   }
 
-  factory BookingModel.fromJson(Map<String, dynamic> json) {
-    return BookingModel(
-      service: ServiceModel.fromJson(json['service']),
-      car: MyCarModel.fromJson(json['car']),
-      address: AddressModel.fromJson(json['address']),
-      date: DateTime.parse(json['date']),
-      time: json['time'],
-      additionalServices: (json['additionalServices'] as List)
-          .map((e) => AddOnModel.fromJson(e))
-          .toList(),
-      bikerNotes: json['bikerNotes'] as List<String>,
-      paymentMethod: PaymentMethodEnumExtension.fromString(
-        json['paymentMethod'],
-      ),
-      quote: json['quote'] != null ? QuoteModel.fromJson(json['quote']) : null,
-    );
-  }
+  // factory BookingModel.fromJson(Map<String, dynamic> json) {
+  //   return BookingModel(
+  //     service: ServiceModel.fromJson(json['service']),
+  //     car: MyCarModel.fromJson(json['car']),
+  //     address: AddressModel.fromJson(json['address']),
+  //     date: DateTime.parse(json['date']),
+  //     time: json['time'],
+  //     additionalServices: (json['additionalServices'] as List)
+  //         .map((e) => AddOnModel.fromJson(e))
+  //         .toList(),
+  //     bikerNotes: json['bikerNotes'] as List<String>,
+  //     paymentMethod: PaymentMethodEnumExtension.fromString(
+  //       json['paymentMethod'],
+  //     ),
+  //     quote: json['quote'] != null ? QuoteModel.fromJson(json['quote']) : null,
+  //   );
+  // }
 }

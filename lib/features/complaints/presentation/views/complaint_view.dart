@@ -5,7 +5,7 @@ import 'package:aqua_go/core/components/generic_app_bar.dart';
 import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/core/themes/app_text_styles.dart';
 import 'package:aqua_go/core/utils/app_assets.dart';
-import 'package:aqua_go/features/my_bookings/data/models/my_bookings_model.dart';
+import 'package:aqua_go/features/my_bookings/data/models/booking_response_model.dart';
 import 'package:aqua_go/features/complaints/presentation/widgets/complaint_types.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -16,12 +16,12 @@ import '../../../../generated/locale_keys.g.dart';
 import '../widgets/complaint_images_section.dart';
 
 class ComplaintArgs {
-  final MyBookingsModel booking;
+  final BookingResponseModel booking;
   ComplaintArgs({required this.booking});
 }
 
 class ComplaintView extends StatefulWidget {
-  final MyBookingsModel booking;
+  final BookingResponseModel booking;
 
   const ComplaintView({super.key, required this.booking});
 
