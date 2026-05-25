@@ -1,5 +1,5 @@
-// ignore_for_file: constant_identifier_names
 import 'package:flutter/material.dart';
+import 'package:svg_flutter/svg.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:aqua_go/core/themes/app_text_styles.dart';
 import 'package:aqua_go/core/extentions/context_extentions.dart';
@@ -76,11 +76,28 @@ class BookingDetailsVehicleCard extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.asset(
-                AppAssets.demoToyota,
+              SizedBox(
                 width: 48,
                 height: 48,
-                fit: BoxFit.contain,
+                child: (booking.vehicleMakeLogoUrl != null &&
+                        booking.vehicleMakeLogoUrl!.isNotEmpty)
+                    ? SvgPicture.network(
+                        booking.vehicleMakeLogoUrl!,
+                        width: 48,
+                        height: 48,
+                        fit: BoxFit.contain,
+                        placeholderBuilder: (BuildContext context) => const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      )
+                    : Image.asset(
+                        AppAssets.demoToyota,
+                        width: 48,
+                        height: 48,
+                        fit: BoxFit.contain,
+                      ),
               ),
               const SizedBox(width: 16),
               Expanded(

@@ -51,8 +51,12 @@ class BookingsListResponseModel {
 
   factory BookingsListResponseModel.fromJson(Map<String, dynamic> json) {
     return BookingsListResponseModel(
-      items: (json['items'] as List?)
-              ?.map((item) => BookingResponseModel.fromJson(item as Map<String, dynamic>))
+      items:
+          (json['items'] as List?)
+              ?.map(
+                (item) =>
+                    BookingResponseModel.fromJson(item as Map<String, dynamic>),
+              )
               .toList() ??
           [],
       nextCursor: json['nextCursor'] as String?,
@@ -107,64 +111,73 @@ class BookingResponseModel {
   String? vehicleMake;
   String? vehicleModel;
   String? vehicleColor;
+  PackageName? packageName;
+  String? vehicleMakeLogoUrl;
 
-  BookingResponseModel(
-      {this.id,
-      this.customerId,
-      this.workerId,
-      this.addressLabel,
-      this.addressLat,
-      this.addressLng,
-      this.zoneId,
-      this.packageId,
-      this.type,
-      this.status,
-      this.scheduledAt,
-      this.createdAt,
-      this.updatedAt,
-      this.quoteId,
-      this.totalAmountMinor,
-      this.currency,
-      this.paymentStatus,
-      this.paymentIntentId,
-      this.invoiceId,
-      this.paymentVoidedAt,
-      this.paymentStuckDetectedAt,
-      this.cancellationFeeMinor,
-      this.cancellationFeeWaived,
-      this.reschedulesUsed,
-      this.rescheduledAt,
-      this.cancellationPolicy,
-      this.pspRedirectUrl,
-      this.photos,
-      this.assignedWorker,
-      this.plateMasked,
-      this.invoice,
-      this.workerNotes,
-      this.vehicleYear,
-      this.addressArrivalNotes,
-      this.vehicleMake,
-      this.vehicleModel,
-      this.vehicleColor});
+  BookingResponseModel({
+    this.id,
+    this.customerId,
+    this.workerId,
+    this.addressLabel,
+    this.addressLat,
+    this.addressLng,
+    this.zoneId,
+    this.packageId,
+    this.type,
+    this.status,
+    this.scheduledAt,
+    this.createdAt,
+    this.updatedAt,
+    this.quoteId,
+    this.totalAmountMinor,
+    this.currency,
+    this.paymentStatus,
+    this.paymentIntentId,
+    this.invoiceId,
+    this.paymentVoidedAt,
+    this.paymentStuckDetectedAt,
+    this.cancellationFeeMinor,
+    this.cancellationFeeWaived,
+    this.reschedulesUsed,
+    this.rescheduledAt,
+    this.cancellationPolicy,
+    this.pspRedirectUrl,
+    this.photos,
+    this.assignedWorker,
+    this.plateMasked,
+    this.invoice,
+    this.workerNotes,
+    this.vehicleYear,
+    this.addressArrivalNotes,
+    this.vehicleMake,
+    this.vehicleModel,
+    this.vehicleColor,
+    this.packageName,
+    this.vehicleMakeLogoUrl,
+  });
 
   BookingResponseModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     customerId = json['customerId'];
     workerId = json['workerId'];
     addressLabel = json['addressLabel'];
-    
+
     // safe coordinate parsing
     addressLat = json['addressLat'] != null
         ? num.tryParse(json['addressLat'].toString())
         : (json['address_lat'] != null
-            ? num.tryParse(json['address_lat'].toString())
-            : (json['lat'] != null ? num.tryParse(json['lat'].toString()) : null));
-            
+              ? num.tryParse(json['address_lat'].toString())
+              : (json['lat'] != null
+                    ? num.tryParse(json['lat'].toString())
+                    : null));
+
     addressLng = json['addressLng'] != null
         ? num.tryParse(json['addressLng'].toString())
         : (json['address_lng'] != null
-            ? num.tryParse(json['address_lng'].toString())
-            : (json['lng'] != null ? num.tryParse(json['lng'].toString()) : null));
+              ? num.tryParse(json['address_lng'].toString())
+              : (json['lng'] != null
+                    ? num.tryParse(json['lng'].toString())
+                    : null));
 
     zoneId = json['zoneId'];
     packageId = json['packageId'];
@@ -198,19 +211,34 @@ class BookingResponseModel {
     assignedWorker = json['assignedWorker'] != null
         ? AssignedWorker.fromJson(json['assignedWorker'])
         : null;
-    plateMasked = json['plateMasked'] ?? json['plate_masked'] ?? json['plateText'] ?? json['plate_text'];
-    invoice =
-        json['invoice'] != null ? Invoice.fromJson(json['invoice']) : null;
-    workerNotes = json['workerNotes'] != null ? List<String>.from(json['workerNotes']) : null;
-    
+    plateMasked =
+        json['plateMasked'] ??
+        json['plate_masked'] ??
+        json['plateText'] ??
+        json['plate_text'];
+    invoice = json['invoice'] != null
+        ? Invoice.fromJson(json['invoice'])
+        : null;
+    workerNotes = json['workerNotes'] != null
+        ? List<String>.from(json['workerNotes'])
+        : null;
+
     vehicleYear = json['vehicleYear'] != null
         ? int.tryParse(json['vehicleYear'].toString())
-        : (json['vehicle_year'] != null ? int.tryParse(json['vehicle_year'].toString()) : null);
-        
+        : (json['vehicle_year'] != null
+              ? int.tryParse(json['vehicle_year'].toString())
+              : null);
+
     addressArrivalNotes = json['addressArrivalNotes'];
     vehicleMake = json['vehicleMake'] ?? json['vehicle_make'];
     vehicleModel = json['vehicleModel'] ?? json['vehicle_model'];
     vehicleColor = json['vehicleColor'] ?? json['vehicle_color'];
+
+    packageName = json['packageName'] != null
+        ? PackageName.fromJson(json['packageName'])
+        : null;
+    vehicleMakeLogoUrl =
+        json['vehicleMakeLogoUrl'] ?? json['vehicle_make_logo_url'];
   }
 
   Map<String, dynamic> toJson() {
@@ -260,6 +288,10 @@ class BookingResponseModel {
     data['vehicleMake'] = vehicleMake;
     data['vehicleModel'] = vehicleModel;
     data['vehicleColor'] = vehicleColor;
+    if (packageName != null) {
+      data['packageName'] = packageName!.toJson();
+    }
+    data['vehicleMakeLogoUrl'] = vehicleMakeLogoUrl;
     return data;
   }
 
@@ -271,11 +303,15 @@ class BookingResponseModel {
   String get location => addressLabel ?? '';
 
   double get latitude => addressLat != null
-      ? (addressLat!.toDouble().abs() > 180.0 ? addressLat!.toDouble() / 1000000.0 : addressLat!.toDouble())
+      ? (addressLat!.toDouble().abs() > 180.0
+            ? addressLat!.toDouble() / 1000000.0
+            : addressLat!.toDouble())
       : 0.0;
 
   double get longitude => addressLng != null
-      ? (addressLng!.toDouble().abs() > 180.0 ? addressLng!.toDouble() / 1000000.0 : addressLng!.toDouble())
+      ? (addressLng!.toDouble().abs() > 180.0
+            ? addressLng!.toDouble() / 1000000.0
+            : addressLng!.toDouble())
       : 0.0;
 
   double get totalAmount => (totalAmountMinor ?? 0) / 100.0;
@@ -305,11 +341,12 @@ class CancellationPolicy {
   String? freeUntil;
   String? currency;
 
-  CancellationPolicy(
-      {this.isFreeNow,
-      this.feeIfCancelledNowMinor,
-      this.freeUntil,
-      this.currency});
+  CancellationPolicy({
+    this.isFreeNow,
+    this.feeIfCancelledNowMinor,
+    this.freeUntil,
+    this.currency,
+  });
 
   CancellationPolicy.fromJson(Map<String, dynamic> json) {
     isFreeNow = json['isFreeNow'];
@@ -381,14 +418,15 @@ class Invoice {
   String? pdfUrl;
   String? pdfUrlExpiresAt;
 
-  Invoice(
-      {this.invoiceUuid,
-      this.invoiceNumber,
-      this.qrTlvBase64,
-      this.reportStatus,
-      this.reportedAt,
-      this.pdfUrl,
-      this.pdfUrlExpiresAt});
+  Invoice({
+    this.invoiceUuid,
+    this.invoiceNumber,
+    this.qrTlvBase64,
+    this.reportStatus,
+    this.reportedAt,
+    this.pdfUrl,
+    this.pdfUrlExpiresAt,
+  });
 
   Invoice.fromJson(Map<String, dynamic> json) {
     invoiceUuid = json['invoiceUuid'];
@@ -410,5 +448,24 @@ class Invoice {
     data['pdfUrl'] = pdfUrl;
     data['pdfUrlExpiresAt'] = pdfUrlExpiresAt;
     return data;
+  }
+}
+
+class PackageName {
+  String? en;
+  String? ar;
+
+  PackageName({this.en, this.ar});
+
+  PackageName.fromJson(Map<String, dynamic> json) {
+    en = json['en'];
+    ar = json['ar_SA'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> json = <String, dynamic>{};
+    json['en'] = en;
+    json['ar_SA'] = ar;
+    return json;
   }
 }

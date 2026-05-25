@@ -83,38 +83,43 @@ class ServiceCard extends StatelessWidget {
                               ),
                             ],
                           ),
-                          const Spacer(),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              if (serviceModel.oldPrice.isNotEmpty) ...[
-                                Text(
-                                  serviceModel.oldPrice,
-                                  style: AppTextStyles.regular12.copyWith(
-                                    color: context.colors.textPrimary
-                                        .withValues(alpha: 0.5),
-                                    decoration: TextDecoration.lineThrough,
-                                    decorationColor: context.colors.textPrimary,
-                                    decorationThickness: 0.9,
+                          if (serviceModel.price.isNotEmpty) ...[
+                            const Spacer(),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                if (serviceModel.oldPrice.isNotEmpty) ...[
+                                  Text(
+                                    serviceModel.oldPrice,
+                                    style: AppTextStyles.regular12.copyWith(
+                                      color: context.colors.textPrimary
+                                          .withValues(alpha: 0.5),
+                                      decoration: TextDecoration.lineThrough,
+                                      decorationColor:
+                                          context.colors.textPrimary,
+                                      decorationThickness: 0.9,
+                                    ),
                                   ),
+                                  const SizedBox(width: 8),
+                                ],
+                                Text(
+                                  serviceModel.priceMinor != null
+                                      ? serviceModel.priceMinor.toString()
+                                      : serviceModel.price,
+                                  style: AppTextStyles.bold18,
                                 ),
-                                const SizedBox(width: 8),
+                                const SizedBox(width: 4),
+                                SvgPicture.asset(
+                                  AppAssets.currency,
+                                  width: 18,
+                                  height: 18,
+                                  // ignore: deprecated_member_use
+                                  color: context.colors.textPrimary,
+                                ),
                               ],
-                              Text(
-                                serviceModel.price,
-                                style: AppTextStyles.bold18,
-                              ),
-                              const SizedBox(width: 4),
-                              SvgPicture.asset(
-                                AppAssets.currency,
-                                width: 18,
-                                height: 18,
-                                // ignore: deprecated_member_use
-                                color: context.colors.textPrimary,
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ],
                       ),
                     ),

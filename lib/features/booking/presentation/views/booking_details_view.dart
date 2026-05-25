@@ -184,7 +184,9 @@ class BookingDetailsView extends StatelessWidget {
               ),
               const Spacer(),
               Text(
-                bookingState.selectedService?.price ?? '0.00',
+                bookingState.selectedService?.price.isNotEmpty == true
+                    ? bookingState.selectedService!.price
+                    : (bookingState.selectedService?.priceDouble.toStringAsFixed(2) ?? '0.00'),
                 style: AppTextStyles.medium24,
               ),
               const SizedBox(width: 4),
