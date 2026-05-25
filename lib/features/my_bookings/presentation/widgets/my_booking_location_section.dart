@@ -70,6 +70,7 @@ class MyBookingLocationSection extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                   child: AbsorbPointer(
                     child: GoogleMap(
+                      key: ValueKey('$latitude,$longitude'),
                       initialCameraPosition: CameraPosition(
                         target: LatLng(latitude, longitude),
                         zoom: 15,

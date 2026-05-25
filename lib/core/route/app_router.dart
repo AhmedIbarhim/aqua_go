@@ -33,6 +33,8 @@ import '../../features/profile/presentation/views/about_us_view.dart';
 import '../../features/profile/presentation/views/terms_view.dart';
 import '../../features/profile/presentation/views/support_view.dart';
 
+import '../../features/my_bookings/controllers/my_booking_details_cubit.dart';
+
 import 'routes.dart';
 
 abstract class AppRouter {
@@ -146,7 +148,10 @@ abstract class AppRouter {
       case Routes.myBookingDetails:
         final args = settings.arguments as MyBookingDetailsArgs;
         return MaterialPageRoute(
-          builder: (_) => MyBookingDetailsView(booking: args.booking),
+          builder: (_) => BlocProvider(
+            create: (_) => locator<MyBookingDetailsCubit>()..fetchBookingDetails(args.booking.id ?? ''),
+            child: MyBookingDetailsView(booking: args.booking),
+          ),
         );
 
       case Routes.gallery:

@@ -52,8 +52,8 @@ class BookingRequestModel {
       // 'addressLabel': address?.label,
       // 'lat': address?.lat,
       // 'lng': address?.lng,
-      'lat': 0,
-      'lng': 0,
+      // 'lat': 0,
+      // 'lng': 0,
       if (address?.arrivalNotes != null)
         'addressArrivalNotes': address?.arrivalNotes,
       // 'plateText': car?.plateNumber,
