@@ -61,13 +61,12 @@ abstract class AppAssets {
   static const String warningIcon = 'assets/svg/warning_icon.svg';
 
   // My Vehicles
-  static const String manfYear = 'assets/svg/manf_year.svg';
+  static const String calender = 'assets/svg/calender.svg';
   static const String colorSwatch = 'assets/svg/color_swatch.svg';
   static const String colorDropper = 'assets/images/color_dropper.png';
   static const String note = 'assets/svg/note.svg';
   static const String myCar = 'assets/images/my_car.png';
   static const String demoLandcroser = 'assets/images/demo_landcroser.png';
-  static const String demoToyota = 'assets/images/demo_toyota.png';
 
   // Booking
   static const String bookingHeaderImage =
@@ -75,6 +74,7 @@ abstract class AppAssets {
   static const String addCarIcon = 'assets/svg/add_car.svg';
   static const String date = 'assets/svg/date.svg';
   static const String document = 'assets/svg/document.svg';
+  static const String money = 'assets/svg/money.svg';
   static const String time = 'assets/svg/time.svg';
   static const String fragant = 'assets/svg/fragant.svg';
   static const String pedals = 'assets/svg/pedals.svg';

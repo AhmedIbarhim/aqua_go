@@ -73,7 +73,7 @@ class BookingDetailsNumberCard extends StatelessWidget {
           statusText = context.locale.languageCode == 'ar'
               ? 'ملغي'
               : 'Cancelled';
-          statusBg = context.colors.error;
+          statusBg = Colors.red;
           statusTextColor = Colors.white;
           break;
       }

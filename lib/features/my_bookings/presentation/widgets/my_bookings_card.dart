@@ -81,7 +81,7 @@ class MyBookingsCard extends StatelessWidget {
                       context: context,
                       title: LocaleKeys.bookings_car_location.tr(),
                       value: booking.location,
-                      iconData: Icons.location_on_outlined,
+                      iconPath: AppAssets.location,
                     ),
                     const SizedBox(height: 12),
                     // Date & Time
@@ -89,7 +89,7 @@ class MyBookingsCard extends StatelessWidget {
                       context: context,
                       title: LocaleKeys.bookings_date_and_time.tr(),
                       value: booking.formattedDateTime,
-                      iconData: Icons.calendar_today_outlined,
+                      iconPath: AppAssets.calender,
                     ),
                     const SizedBox(height: 12),
                     // Total Amount
@@ -97,7 +97,7 @@ class MyBookingsCard extends StatelessWidget {
                       context: context,
                       title: LocaleKeys.bookings_total_amount.tr(),
                       value: booking.totalAmount.toStringAsFixed(2),
-                      iconData: Icons.payments_outlined,
+                      iconPath: AppAssets.money,
                       isAmount: true,
                     ),
                   ],
@@ -148,7 +148,7 @@ class MyBookingsCard extends StatelessWidget {
     required BuildContext context,
     required String title,
     required String value,
-    required IconData iconData,
+    required String iconPath,
     bool isAmount = false,
   }) {
     return Row(
@@ -159,7 +159,15 @@ class MyBookingsCard extends StatelessWidget {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(iconData, size: 20, color: context.colors.textSecondary),
+            SvgPicture.asset(
+              iconPath,
+              width: 20,
+              height: 20,
+              colorFilter: ColorFilter.mode(
+                context.colors.textSecondary,
+                BlendMode.srcIn,
+              ),
+            ),
             const SizedBox(width: 8),
             Text(
               title,

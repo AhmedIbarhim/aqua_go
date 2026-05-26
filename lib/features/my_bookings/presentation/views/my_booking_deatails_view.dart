@@ -84,15 +84,18 @@ class MyBookingDetailsView extends StatelessWidget {
                           const SizedBox(height: 16),
                         ],
                         BookingDetailsSummaryCard(booking: activeBooking),
-                        const SizedBox(height: 16),
 
-                        MyBookingLocationSection(
-                          address: activeBooking.location,
-                          latitude: activeBooking.latitude,
-                          longitude: activeBooking.longitude,
-                        ),
+                        if (activeBooking.status !=
+                            BookingStatus.COMPLETED) ...[
+                          const SizedBox(height: 16),
+                          MyBookingLocationSection(
+                            address: activeBooking.location,
+                            latitude: activeBooking.latitude,
+                            longitude: activeBooking.longitude,
+                          ),
+                        ],
                         const SizedBox(height: 16),
-                        if (!activeBooking.isUpcoming)
+                        if (activeBooking.status == BookingStatus.COMPLETED)
                           MyBookingPhotosSection(photos: activeBooking.photos),
                         const SizedBox(height: 16),
                         _buildInvoicesLink(context, activeBooking),

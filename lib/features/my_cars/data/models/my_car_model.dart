@@ -52,10 +52,7 @@ class MyCarModel {
 
   // Make brand logo
   String get typeImage {
-    if (carBrand != null) {
-      return '${Endpoints.baseUrl}${Endpoints.brandLogo(makeId)}';
-    }
-    return AppAssets.demoToyota;
+    return '${Endpoints.baseUrl}${Endpoints.brandLogo(makeId)}';
   }
 
   // Color code integer getter parsed from hex string color (e.g. "0xFFFFFF" or "#FFFFFF")

@@ -15,12 +15,30 @@ class MyBookingPhotosSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<String> imageUrls = (photos != null && photos!.isNotEmpty)
-        ? photos!.map((p) => p.url ?? '').where((u) => u.isNotEmpty).toList()
-        : const [
-            'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?q=80&w=2070&auto=format&fit=crop', // Before
-            'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?q=80&w=2070&auto=format&fit=crop', // After
-          ];
+    // Filter the photos to find BEFORE stage and FRONT angle
+    final beforePhoto = photos?.firstWhere(
+      (p) =>
+          p.stage?.toUpperCase() == 'BEFORE' &&
+          p.angle?.toUpperCase() == 'FRONT',
+      orElse: () => Photos(),
+    );
+
+    // Filter the photos to find AFTER stage and FRONT angle
+    final afterPhoto = photos?.firstWhere(
+      (p) =>
+          p.stage?.toUpperCase() == 'AFTER' &&
+          p.angle?.toUpperCase() == 'FRONT',
+      orElse: () => Photos(),
+    );
+
+    final List<String> imageUrls = [
+      (beforePhoto?.url != null && beforePhoto!.url!.isNotEmpty)
+          ? beforePhoto.url!
+          : '',
+      (afterPhoto?.url != null && afterPhoto!.url!.isNotEmpty)
+          ? afterPhoto.url!
+          : '',
+    ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

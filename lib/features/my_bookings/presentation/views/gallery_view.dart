@@ -134,6 +134,7 @@ class _GalleryViewState extends State<GalleryView> {
         const SizedBox(height: 16),
         Text(
           _getImageLabel(index),
+          textAlign: TextAlign.center,
           style: AppTextStyles.regular18.copyWith(
             color: context.colors.textPrimary,
           ),
@@ -148,12 +149,17 @@ class _GalleryViewState extends State<GalleryView> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            LocaleKeys.bookings_photo_gallery.tr(),
-            style: AppTextStyles.regular18.copyWith(
-              color: context.colors.textPrimary,
+          Expanded(
+            child: Text(
+              LocaleKeys.bookings_photo_gallery.tr(),
+              style: AppTextStyles.regular18.copyWith(
+                color: context.colors.textPrimary,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
+          const SizedBox(width: 8),
           IconButton(
             onPressed: () => Navigator.pop(context),
             icon: SvgPicture.asset(
@@ -172,40 +178,45 @@ class _GalleryViewState extends State<GalleryView> {
   }
 
   Widget _buildThumbnails() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: List.generate(widget.images.length, (index) {
-          final isSelected = _currentIndex == index;
-          return GestureDetector(
-            onTap: () {
-              _pageController.animateToPage(
-                index,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-              );
-            },
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 6),
-              width: 136,
-              height: 72,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                border: isSelected
-                    ? Border.all(color: context.colors.primary, width: 2)
-                    : null,
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: CustomNetworkImage(
-                  widget.images[index],
-                  fit: BoxFit.cover,
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      physics: const BouncingScrollPhysics(),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: List.generate(widget.images.length, (index) {
+            final isSelected = _currentIndex == index;
+            return GestureDetector(
+              onTap: () {
+                _pageController.animateToPage(
+                  index,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                );
+              },
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 6),
+                width: 136,
+                height: 72,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  border: isSelected
+                      ? Border.all(color: context.colors.primary, width: 2)
+                      : null,
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: CustomNetworkImage(
+                    widget.images[index],
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
-            ),
-          );
-        }),
+            );
+          }),
+        ),
       ),
     );
   }

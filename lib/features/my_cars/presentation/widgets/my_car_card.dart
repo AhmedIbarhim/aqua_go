@@ -1,5 +1,6 @@
 import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:aqua_go/features/my_cars/data/models/my_car_model.dart';
+import 'package:aqua_go/features/my_cars/presentation/widgets/car_make_logo_network_svg.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg_flutter.dart';
@@ -8,7 +9,6 @@ import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/themes/app_colors.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../generated/locale_keys.g.dart';
-import 'car_make_logo_network_svg.dart';
 
 class MyCarCard extends StatelessWidget {
   final MyCarModel car;
@@ -66,7 +66,7 @@ class MyCarCard extends StatelessWidget {
                   child: SizedBox(
                     height: height * 0.05,
                     width: height * 0.05,
-                    child: CarMakeLogoNetworkSvg(logoUrl: car.typeImage),
+                    child: CarMakeNetworkLogo(logoUrl: car.typeImage),
                   ),
                 ),
                 // Edit and Delete Icons
@@ -136,7 +136,7 @@ class MyCarCard extends StatelessWidget {
               _buildSpecItem(
                 context,
                 text: car.modelYear.toString(),
-                icon: AppAssets.manfYear,
+                icon: AppAssets.calender,
               ),
               _buildDivider(context),
               _buildSpecItem(

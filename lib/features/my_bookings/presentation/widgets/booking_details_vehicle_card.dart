@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:svg_flutter/svg.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:svg_flutter/svg.dart';
 import 'package:aqua_go/core/themes/app_text_styles.dart';
 import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:aqua_go/core/helpers/car_color_helper.dart';
+import 'package:aqua_go/features/my_cars/presentation/widgets/car_make_logo_network_svg.dart';
 import '../../data/models/booking_response_model.dart';
 
 class BookingDetailsVehicleCard extends StatelessWidget {
@@ -19,9 +20,7 @@ class BookingDetailsVehicleCard extends StatelessWidget {
     String brandModelText =
         '${booking.vehicleMake ?? ""} ${booking.vehicleModel ?? ""}'.trim();
     if (brandModelText.isEmpty) {
-      brandModelText = context.locale.languageCode == 'ar'
-          ? 'مركبة غير محددة'
-          : 'Unspecified Vehicle';
+      brandModelText = context.isAr ? 'مركبة غير محددة' : 'Unspecified Vehicle';
     }
 
     // Resolve Vehicle Color
@@ -79,24 +78,24 @@ class BookingDetailsVehicleCard extends StatelessWidget {
               SizedBox(
                 width: 48,
                 height: 48,
-                child: (booking.vehicleMakeLogoUrl != null &&
+                child:
+                    (booking.vehicleMakeLogoUrl != null &&
                         booking.vehicleMakeLogoUrl!.isNotEmpty)
-                    ? SvgPicture.network(
-                        booking.vehicleMakeLogoUrl!,
+                    ? CarMakeNetworkLogo(
+                        logoUrl: booking.vehicleMakeLogoUrl!,
                         width: 48,
                         height: 48,
                         fit: BoxFit.contain,
-                        placeholderBuilder: (BuildContext context) => const SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
                       )
-                    : Image.asset(
-                        AppAssets.demoToyota,
+                    : SvgPicture.asset(
+                        AppAssets.raceCar,
                         width: 48,
                         height: 48,
                         fit: BoxFit.contain,
+                        colorFilter: ColorFilter.mode(
+                          context.colors.textPrimary.withValues(alpha: 0.3),
+                          BlendMode.srcIn,
+                        ),
                       ),
               ),
               const SizedBox(width: 16),

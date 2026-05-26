@@ -81,7 +81,7 @@ class CarSelectionList extends StatelessWidget {
             child: SizedBox(
               height: height * 0.055,
               width: width * 0.25,
-              child: CarMakeLogoNetworkSvg(logoUrl: car.typeImage),
+              child: CarMakeNetworkLogo(logoUrl: car.typeImage),
             ),
           ),
           SizedBox(height: height * 0.01),
