@@ -69,6 +69,7 @@ class MyBookingPhotosSection extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
+            spacing: 12,
             children: List.generate(imageUrls.length.clamp(0, 2), (index) {
               return Expanded(
                 child: Padding(

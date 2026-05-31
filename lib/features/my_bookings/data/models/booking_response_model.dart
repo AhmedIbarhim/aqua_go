@@ -1,42 +1,7 @@
-// ignore_for_file: constant_identifier_names
-import 'package:intl/intl.dart';
+import 'package:easy_localization/easy_localization.dart';
 
-enum BookingType {
-  ON_DEMAND,
-  SCHEDULED;
-
-  static BookingType? fromString(String? val) {
-    if (val == null) return null;
-    return BookingType.values.firstWhere(
-      (e) => e.name == val.toUpperCase(),
-      orElse: () => BookingType.ON_DEMAND,
-    );
-  }
-
-  String toJson() => name;
-}
-
-enum BookingStatus {
-  UNSCHEDULED,
-  PENDING,
-  ASSIGNED,
-  ON_THE_WAY,
-  ARRIVED,
-  STARTED,
-  COMPLETED,
-  CANCELLED;
-
-  static BookingStatus? fromString(String? val) {
-    if (val == null) return null;
-    final upperVal = val.toUpperCase().replaceAll(' ', '_');
-    return BookingStatus.values.firstWhere(
-      (e) => e.name == upperVal,
-      orElse: () => BookingStatus.PENDING,
-    );
-  }
-
-  String toJson() => name;
-}
+import 'booking_status_enum.dart';
+import 'booking_type_enum.dart';
 
 class BookingsListResponseModel {
   final List<BookingResponseModel> items;

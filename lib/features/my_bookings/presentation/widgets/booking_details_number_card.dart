@@ -12,72 +12,12 @@ class BookingDetailsNumberCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String statusText = context.locale.languageCode == 'ar'
-        ? 'قيد الانتظار'
-        : 'Pending';
-    Color statusBg = context.colors.warning;
-    Color statusTextColor = Colors.black;
-
-    if (booking.status != null) {
-      switch (booking.status!) {
-        case BookingStatus.UNSCHEDULED:
-          statusText = context.locale.languageCode == 'ar'
-              ? 'غير مجدول'
-              : 'Unscheduled';
-          statusBg = Colors.grey.shade400;
-          statusTextColor = Colors.white;
-          break;
-        case BookingStatus.PENDING:
-          statusText = context.locale.languageCode == 'ar'
-              ? 'قيد الانتظار'
-              : 'Pending';
-          statusBg = Colors.orange;
-          statusTextColor = Colors.white;
-          break;
-        case BookingStatus.ASSIGNED:
-          statusText = context.locale.languageCode == 'ar'
-              ? 'تم تعيين السائق'
-              : 'Biker Assigned';
-          statusBg = Colors.teal;
-          statusTextColor = Colors.white;
-          break;
-        case BookingStatus.ON_THE_WAY:
-          statusText = context.locale.languageCode == 'ar'
-              ? 'في الطريق'
-              : 'On the Way';
-          statusBg = Colors.blueAccent;
-          statusTextColor = Colors.white;
-          break;
-        case BookingStatus.ARRIVED:
-          statusText = context.locale.languageCode == 'ar'
-              ? 'وصل السائق'
-              : 'Biker Arrived';
-          statusBg = Colors.purple;
-          statusTextColor = Colors.white;
-          break;
-        case BookingStatus.STARTED:
-          statusText = context.locale.languageCode == 'ar'
-              ? 'بدأ الغسيل'
-              : 'Washing Started';
-          statusBg = Colors.blue;
-          statusTextColor = Colors.white;
-          break;
-        case BookingStatus.COMPLETED:
-          statusText = context.locale.languageCode == 'ar'
-              ? 'مكتمل'
-              : 'Completed';
-          statusBg = Colors.green;
-          statusTextColor = Colors.white;
-          break;
-        case BookingStatus.CANCELLED:
-          statusText = context.locale.languageCode == 'ar'
-              ? 'ملغي'
-              : 'Cancelled';
-          statusBg = Colors.red;
-          statusTextColor = Colors.white;
-          break;
-      }
-    }
+    final status = booking.status;
+    final statusText =
+        status?.getStatusText(context) ??
+        (context.isAr ? 'قيد الانتظار' : 'Pending');
+    final statusBg = status?.getStatusBg(context) ?? context.colors.warning;
+    final statusTextColor = status?.getStatusTextColor(context) ?? Colors.black;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
