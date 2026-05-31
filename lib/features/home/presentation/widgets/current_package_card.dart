@@ -1,7 +1,7 @@
 import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/core/themes/app_text_styles.dart';
 import 'package:aqua_go/core/utils/app_assets.dart';
-import 'package:aqua_go/features/home/data/models/subscribed_package_model.dart';
+import 'package:aqua_go/features/booking_and_subscriptions/subscriptions/data/models/subscribed_package_model.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
@@ -73,10 +73,20 @@ class CurrentPackageCard extends StatelessWidget {
                           color: context.colors.primary,
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Image.asset(
-                          package.image,
-                          color: context.colors.textTheme,
-                        ),
+                        child: package.image.startsWith('http')
+                            ? Image.network(
+                                package.image,
+                                color: context.colors.textTheme,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    Image.asset(
+                                  'assets/images/gift_demo.png',
+                                  color: context.colors.textTheme,
+                                ),
+                              )
+                            : Image.asset(
+                                package.image,
+                                color: context.colors.textTheme,
+                              ),
                       ),
 
                       Container(

@@ -9,17 +9,20 @@ import 'package:aqua_go/features/auth/data/services/auth_service.dart';
 import 'package:aqua_go/features/my_cars/data/data_sources/cars_remote_data_source.dart';
 import 'package:aqua_go/features/my_cars/data/repos/cars_repository.dart';
 import 'package:aqua_go/features/my_cars/controllers/my_cars_cubit.dart';
-import 'package:aqua_go/features/booking/data/repos/booking_repo.dart';
-import 'package:aqua_go/features/booking/controllers/booking_cubit.dart';
+import 'package:aqua_go/features/booking_and_subscriptions/booking/data/repos/booking_repo.dart';
+import 'package:aqua_go/features/booking_and_subscriptions/booking/controllers/booking_cubit.dart';
 import 'package:aqua_go/features/home/data/data_source/services_remote_data_source.dart';
 import 'package:aqua_go/features/home/data/data_source/banners_remote_data_source.dart';
 import 'package:aqua_go/features/home/data/data_source/packages_remote_data_source.dart';
+import 'package:aqua_go/features/booking_and_subscriptions/subscriptions/data/data_sources/subscriptions_remote_data_source.dart';
 import 'package:aqua_go/features/home/data/repos/services_repository.dart';
 import 'package:aqua_go/features/home/data/repos/banners_repository.dart';
 import 'package:aqua_go/features/home/data/repos/packages_repository.dart';
+import 'package:aqua_go/features/booking_and_subscriptions/subscriptions/data/repos/subscriptions_repository.dart';
 import 'package:aqua_go/features/home/controllers/services_controller/services_cubit.dart';
 import 'package:aqua_go/features/home/controllers/banners_controller/banners_cubit.dart';
 import 'package:aqua_go/features/home/controllers/packages_controller/packages_cubit.dart';
+import 'package:aqua_go/features/booking_and_subscriptions/subscriptions/controllers/subscriptions_controller/subscriptions_cubit.dart';
 import 'package:aqua_go/features/profile/data/data_sources/profile_remote_data_source.dart';
 import 'package:aqua_go/features/profile/data/repos/profile_repository.dart';
 import 'package:aqua_go/features/profile/controllers/notification_preferences_cubit/notification_preferences_cubit.dart';
@@ -66,6 +69,9 @@ Future<void> initServiceLocator() async {
   locator.registerLazySingleton<PackagesRemoteDataSource>(
     () => PackagesRemoteDataSource(locator()),
   );
+  locator.registerLazySingleton<SubscriptionsRemoteDataSource>(
+    () => SubscriptionsRemoteDataSource(locator()),
+  );
   locator.registerLazySingleton<ProfileRemoteDataSource>(
     () => ProfileRemoteDataSource(locator()),
   );
@@ -100,6 +106,10 @@ Future<void> initServiceLocator() async {
 
   locator.registerLazySingleton<PackagesRepository>(
     () => PackagesRepository(locator()),
+  );
+
+  locator.registerLazySingleton<SubscriptionsRepository>(
+    () => SubscriptionsRepository(locator()),
   );
 
   locator.registerLazySingleton<AuthRepository>(
@@ -143,6 +153,10 @@ Future<void> initServiceLocator() async {
 
   locator.registerFactory<PackagesCubit>(
     () => PackagesCubit(packagesRepository: locator()),
+  );
+
+  locator.registerFactory<SubscriptionsCubit>(
+    () => SubscriptionsCubit(subscriptionsRepository: locator()),
   );
 
   locator.registerFactory<AuthCubit>(() => AuthCubit(locator()));

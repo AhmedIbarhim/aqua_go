@@ -5,7 +5,7 @@ import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../../generated/locale_keys.g.dart';
-import '../../../booking/presentation/widgets/booking_package_bottom_sheet.dart';
+import '../../../booking_and_subscriptions/subscriptions/presentation/widgets/package_subscribtion_bottom_sheet.dart';
 import '../../data/models/package_model.dart';
 
 import '../../../../core/helpers/fetch_user_data_helper.dart';
@@ -29,7 +29,10 @@ class PackageCard extends StatelessWidget {
         if (FetchUserData.isGuest()) {
           FetchUserData.promptGuestToLogin(context);
         } else {
-          BookingPackageBottomSheet.show(context, packageModel: packageModel);
+          PackageSubscribtionBottomSheet.show(
+            context,
+            packageModel: packageModel,
+          );
         }
       },
       child: Container(
@@ -90,9 +93,9 @@ class PackageCard extends StatelessWidget {
                                   color: context.colors.textTheme,
                                   errorBuilder: (context, error, stackTrace) =>
                                       Image.asset(
-                                    'assets/images/gift_demo.png',
-                                    color: context.colors.textTheme,
-                                  ),
+                                        'assets/images/gift_demo.png',
+                                        color: context.colors.textTheme,
+                                      ),
                                 )
                               : Image.asset(
                                   packageModel.image,
