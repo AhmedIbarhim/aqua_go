@@ -13,10 +13,13 @@ import 'package:aqua_go/features/booking/data/repos/booking_repo.dart';
 import 'package:aqua_go/features/booking/controllers/booking_cubit.dart';
 import 'package:aqua_go/features/home/data/data_source/services_remote_data_source.dart';
 import 'package:aqua_go/features/home/data/data_source/banners_remote_data_source.dart';
+import 'package:aqua_go/features/home/data/data_source/packages_remote_data_source.dart';
 import 'package:aqua_go/features/home/data/repos/services_repository.dart';
 import 'package:aqua_go/features/home/data/repos/banners_repository.dart';
+import 'package:aqua_go/features/home/data/repos/packages_repository.dart';
 import 'package:aqua_go/features/home/controllers/services_controller/services_cubit.dart';
 import 'package:aqua_go/features/home/controllers/banners_controller/banners_cubit.dart';
+import 'package:aqua_go/features/home/controllers/packages_controller/packages_cubit.dart';
 import 'package:aqua_go/features/profile/data/data_sources/profile_remote_data_source.dart';
 import 'package:aqua_go/features/profile/data/repos/profile_repository.dart';
 import 'package:aqua_go/features/profile/controllers/notification_preferences_cubit/notification_preferences_cubit.dart';
@@ -60,6 +63,9 @@ Future<void> initServiceLocator() async {
   locator.registerLazySingleton<BannersRemoteDataSource>(
     () => BannersRemoteDataSource(locator()),
   );
+  locator.registerLazySingleton<PackagesRemoteDataSource>(
+    () => PackagesRemoteDataSource(locator()),
+  );
   locator.registerLazySingleton<ProfileRemoteDataSource>(
     () => ProfileRemoteDataSource(locator()),
   );
@@ -90,6 +96,10 @@ Future<void> initServiceLocator() async {
 
   locator.registerLazySingleton<BannersRepository>(
     () => BannersRepository(locator()),
+  );
+
+  locator.registerLazySingleton<PackagesRepository>(
+    () => PackagesRepository(locator()),
   );
 
   locator.registerLazySingleton<AuthRepository>(
@@ -129,6 +139,10 @@ Future<void> initServiceLocator() async {
 
   locator.registerFactory<BannersCubit>(
     () => BannersCubit(bannersRepository: locator()),
+  );
+
+  locator.registerFactory<PackagesCubit>(
+    () => PackagesCubit(packagesRepository: locator()),
   );
 
   locator.registerFactory<AuthCubit>(() => AuthCubit(locator()));

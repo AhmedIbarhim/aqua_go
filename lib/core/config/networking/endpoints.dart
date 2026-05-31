@@ -1,93 +1,93 @@
 abstract class Endpoints {
-  static const String baseUrl = 'https://api.aquago.sa/api/customer';
+  static const String baseUrl = 'https://api.aquago.sa/api/customer/';
 
   //  Auth Endpoints
-  static const String sendOtp = '/login/otp';
-  static const String verifyOtp = '/login/otp/verify';
-  static const String logout = '/auth/logout';
-  static const String refreshToken = '/auth/token/refresh';
+  static const String sendOtp = 'login/otp';
+  static const String verifyOtp = 'login/otp/verify';
+  static const String logout = 'auth/logout';
+  static const String refreshToken = 'auth/token/refresh';
 
   //  Profile & Account Endpoints
-  static const String customerMe = '/me';
-  static const String deletionRequest = '/me/deletion-request';
-  static const String dataExport = '/me/data-export';
+  static const String customerMe = 'me';
+  static const String deletionRequest = 'me/deletion-request';
+  static const String dataExport = 'me/data-export';
 
   //  Email Verification
-  static const String verifyRequest = '/me/email/verify/request';
-  static const String emailVerifyConfirm = '/me/email/verify/confirm';
+  static const String verifyRequest = 'me/email/verify/request';
+  static const String emailVerifyConfirm = 'me/email/verify/confirm';
 
   //  Vehicles Endpoints
-  static const String myVehicles = '/me/vehicles';
-  static String myVehicle(String vehicleId) => '/me/vehicles/$vehicleId';
+  static const String myVehicles = 'me/vehicles';
+  static String myVehicle(String vehicleId) => 'me/vehicles/$vehicleId';
 
   // Catalog / Services Endpoints
-  static const String vehicleBrands = '/catalog/vehicle-makes';
+  static const String vehicleBrands = 'catalog/vehicle-makes';
   static String vehicleModels(String brandId) =>
-      '/catalog/vehicle-makes/$brandId/models';
+      'catalog/vehicle-makes/$brandId/models';
   static String brandLogo(String brandId) =>
-      '/catalog/vehicle-makes/$brandId/logo';
-  static const String services = '/services';
+      'catalog/vehicle-makes/$brandId/logo';
+  static const String services = 'services';
 
   //  Addresses Endpoints
-  static const String myAddresses = '/me/addresses';
+  static const String myAddresses = 'me/addresses';
 
-  static String myAddress(String addressId) => '/me/addresses/$addressId';
+  static String myAddress(String addressId) => 'me/addresses/$addressId';
 
   //  Bookings & Quotes Endpoints
-  static const String quotes = '/quotes';
-  static const String bookings = '/bookings';
-  static String bookingDetail(String bookingId) => '/bookings/$bookingId';
-  static String cancelBooking(String bookingId) =>
-      '/bookings/$bookingId/cancel';
+  static const String quotes = 'quotes';
+  static const String bookings = 'bookings';
+  static String bookingDetail(String bookingId) => 'bookings/$bookingId';
+  static String cancelBooking(String bookingId) => 'bookings/$bookingId/cancel';
   static String rescheduleBooking(String bookingId) =>
-      '/bookings/$bookingId/reschedule';
+      'bookings/$bookingId/reschedule';
   static String scheduleBooking(String bookingId) =>
-      '/bookings/$bookingId/schedule';
-  static String rateBooking(String bookingId) => '/bookings/$bookingId/rating';
+      'bookings/$bookingId/schedule';
+  static String rateBooking(String bookingId) => 'bookings/$bookingId/rating';
 
   //  Banners Endpoints
-  static const String banners = '/banners';
+  static const String banners = 'banners';
 
   //  Geo & Zone Coverage Endpoints
-  static const String zoneCheck = '/geo/zone-check';
-  static const String geoPlacesAutocomplete = '/geo/places/autocomplete';
-  static String geoPlaceDetail(String placeId) => '/geo/places/$placeId';
+  static const String zoneCheck = 'geo/zone-check';
+  static const String geoPlacesAutocomplete = 'geo/places/autocomplete';
+  static String geoPlaceDetail(String placeId) => 'geo/places/$placeId';
 
-  //  Subscriptions Endpoints
-  static const String subscriptions = '/subscriptions';
+  //  Packages & Subscriptions Endpoints
+  static const String packages = 'subscription-packages';
+  static const String subscriptions = 'subscriptions';
   static String subscriptionDetail(String subscriptionId) =>
-      '/subscriptions/$subscriptionId';
+      'subscriptions/$subscriptionId';
   static String cancelSubscription(String subscriptionId) =>
-      '/subscriptions/$subscriptionId/cancel';
+      'subscriptions/$subscriptionId/cancel';
 
   //  Availability Endpoints
-  static const String availability = '/availability';
+  static const String availability = 'availability';
 
   //  Notification Preferences Endpoints
-  static const String notificationPreferences = '/me/notification-preferences';
+  static const String notificationPreferences = 'me/notification-preferences';
 
   // Notification Inbox & Devices Endpoints
-  static const String notifications = '/me/notifications';
-  static const String readAllNotifications = '/me/notifications/read-all';
+  static const String notifications = 'me/notifications';
+  static const String readAllNotifications = 'me/notifications/read-all';
   static const String unreadNotificationsCount =
-      '/me/notifications/unread-count';
+      'me/notifications/unread-count';
   static String readNotification(String notificationId) =>
-      '/me/notifications/$notificationId/read';
-  static const String registerDevice = '/me/devices';
-  static String deregisterDevice(String deviceId) => '/me/devices/$deviceId';
+      'me/notifications/$notificationId/read';
+  static const String registerDevice = 'me/devices';
+  static String deregisterDevice(String deviceId) => 'me/devices/$deviceId';
 
   //  Consent Endpoints
-  static const String consents = '/me/consents';
+  static const String consents = 'me/consents';
 
   // Customer Policies Endpoints
-  static String policy(String type) => '/policies/$type';
+  static String policy(String type) => 'policies/$type';
 
   // Customer Complaints Endpoints
-  static const String complaints = '/complaints';
+  static const String complaints = 'complaints';
   static String complaintDetail(String complaintId) =>
-      '/complaints/$complaintId';
+      'complaints/$complaintId';
   static String complaintPhotoPresign(String complaintId) =>
-      '/complaints/$complaintId/photos/presign';
+      'complaints/$complaintId/photos/presign';
 
   // External Google Maps Endpoints (Legacy Direct Calls)
   static const String googleMapsAutocompleteUrl =

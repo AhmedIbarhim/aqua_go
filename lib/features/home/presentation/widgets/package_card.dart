@@ -84,10 +84,20 @@ class PackageCard extends StatelessWidget {
                             color: context.colors.primary,
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: Image.asset(
-                            packageModel.image,
-                            color: context.colors.textTheme,
-                          ),
+                          child: packageModel.image.startsWith('http')
+                              ? Image.network(
+                                  packageModel.image,
+                                  color: context.colors.textTheme,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      Image.asset(
+                                    'assets/images/gift_demo.png',
+                                    color: context.colors.textTheme,
+                                  ),
+                                )
+                              : Image.asset(
+                                  packageModel.image,
+                                  color: context.colors.textTheme,
+                                ),
                         ),
 
                         Flexible(

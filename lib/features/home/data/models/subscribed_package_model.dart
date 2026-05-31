@@ -1,4 +1,4 @@
-class CurrentPackageModel {
+class SubscribedPackageModel {
   final String title;
   final String description;
   final String image;
@@ -6,7 +6,7 @@ class CurrentPackageModel {
   final int totalWashes;
   final DateTime expiryDate;
 
-  CurrentPackageModel({
+  SubscribedPackageModel({
     required this.title,
     required this.description,
     required this.image,
@@ -15,8 +15,8 @@ class CurrentPackageModel {
     required this.expiryDate,
   });
 
-  factory CurrentPackageModel.fromJson(Map<String, dynamic> json) {
-    return CurrentPackageModel(
+  factory SubscribedPackageModel.fromJson(Map<String, dynamic> json) {
+    return SubscribedPackageModel(
       title: json['title'],
       description: json['description'],
       image: json['image'],

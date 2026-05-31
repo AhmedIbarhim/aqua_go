@@ -4,9 +4,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/config/di/service_locator.dart';
 import '../../data/models/banner_model.dart';
-import '../../data/models/current_package_model.dart';
+import '../../data/models/subscribed_package_model.dart';
 import '../../controllers/services_controller/services_cubit.dart';
 import '../../controllers/banners_controller/banners_cubit.dart';
+import '../../controllers/packages_controller/packages_cubit.dart';
 import '../widgets/home_banners_carosal.dart';
 import '../widgets/packages_list_view.dart';
 import '../widgets/services_page_view.dart';
@@ -25,8 +26,9 @@ class _HomeViewState extends State<HomeView> {
       CarouselSliderController();
   final ServicesCubit _servicesCubit = locator<ServicesCubit>();
   final BannersCubit _bannersCubit = locator<BannersCubit>();
+  final PackagesCubit _packagesCubit = locator<PackagesCubit>();
 
-  CurrentPackageModel dummyPackage = CurrentPackageModel(
+  SubscribedPackageModel dummyPackage = SubscribedPackageModel(
     title: 'باقة اكوا كلاسيك',
     description:
         '5 غسلات . 5 مجاناً.....................................................................................',
@@ -41,12 +43,14 @@ class _HomeViewState extends State<HomeView> {
     super.initState();
     _servicesCubit.getServices();
     _bannersCubit.getBanners();
+    _packagesCubit.getPackages();
   }
 
   @override
   void dispose() {
     _servicesCubit.close();
     _bannersCubit.close();
+    _packagesCubit.close();
     super.dispose();
   }
 
@@ -56,12 +60,14 @@ class _HomeViewState extends State<HomeView> {
       providers: [
         BlocProvider.value(value: _servicesCubit),
         BlocProvider.value(value: _bannersCubit),
+        BlocProvider.value(value: _packagesCubit),
       ],
       child: RefreshIndicator(
         onRefresh: () async {
           await Future.wait([
             _servicesCubit.getServices(),
             _bannersCubit.getBanners(),
+            _packagesCubit.getPackages(),
           ]);
         },
         child: SingleChildScrollView(
