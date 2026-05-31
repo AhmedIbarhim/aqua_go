@@ -1,5 +1,6 @@
 import '../../../../core/config/local_storage/shared_prefs.dart';
 import '../../../../core/constants.dart';
+import 'package_addon_model.dart';
 
 class PackageModel {
   final String id;
@@ -68,7 +69,8 @@ class PackageModel {
     return lang == 'en' ? '$validityDays Days' : '$validityDays يوم';
   }
 
-  String get image => imageUrl.isNotEmpty ? imageUrl : 'assets/images/gift_demo.png';
+  String get image =>
+      imageUrl.isNotEmpty ? imageUrl : 'assets/images/gift_demo.png';
 
   String get total =>
       (num.parse(price) + (num.parse(price) * .14)).toStringAsFixed(2);
@@ -81,31 +83,38 @@ class PackageModel {
       nameEn: json['nameEn'] as String? ?? '',
       descriptionAr: json['descriptionAr'] as String? ?? '',
       descriptionEn: json['descriptionEn'] as String? ?? '',
-      numWashes: json['numWashes'] as int? ?? 0,
-      validityDays: json['validityDays'] as int? ?? 0,
-      priceMinor: json['priceMinor'] as int? ?? 0,
+      numWashes: (json['numWashes'] as num?)?.toInt() ?? 0,
+      validityDays: (json['validityDays'] as num?)?.toInt() ?? 0,
+      priceMinor: (json['priceMinor'] as num?)?.toInt() ?? 0,
       currency: json['currency'] as String? ?? '',
-      maxActivePerCustomer: json['maxActivePerCustomer'] as int? ?? 0,
+      maxActivePerCustomer: (json['maxActivePerCustomer'] as num?)?.toInt() ?? 0,
       allowScheduleLater: json['allowScheduleLater'] as bool? ?? true,
       active: json['active'] as bool? ?? true,
-      bundledServiceIds: (json['bundledServiceIds'] as List<dynamic>?)
+      bundledServiceIds:
+          (json['bundledServiceIds'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           [],
-      includedAddons: (json['includedAddons'] as List<dynamic>?)
-              ?.map((e) => PackageAddonModel.fromJson(e as Map<String, dynamic>))
+      includedAddons:
+          (json['includedAddons'] as List<dynamic>?)
+              ?.map(
+                (e) => PackageAddonModel.fromJson(e as Map<String, dynamic>),
+              )
               .toList() ??
           [],
-      optionalAddons: (json['optionalAddons'] as List<dynamic>?)
-              ?.map((e) => PackageAddonModel.fromJson(e as Map<String, dynamic>))
+      optionalAddons:
+          (json['optionalAddons'] as List<dynamic>?)
+              ?.map(
+                (e) => PackageAddonModel.fromJson(e as Map<String, dynamic>),
+              )
               .toList() ??
           [],
       createdAt: json['createdAt'] as String? ?? '',
       updatedAt: json['updatedAt'] as String? ?? '',
-      version: json['version'] as int? ?? 0,
+      version: (json['version'] as num?)?.toInt() ?? 0,
       imageUrl: json['imageUrl'] as String? ?? '',
       isPopular: json['isPopular'] as bool? ?? false,
-      carsPerWash: json['carsPerWash'] as int? ?? 0,
+      carsPerWash: (json['carsPerWash'] as num?)?.toInt() ?? 0,
       effectiveFromAt: json['effectiveFromAt'] as String? ?? '',
     );
   }
@@ -134,34 +143,6 @@ class PackageModel {
       'isPopular': isPopular,
       'carsPerWash': carsPerWash,
       'effectiveFromAt': effectiveFromAt,
-    };
-  }
-}
-
-class PackageAddonModel {
-  final String addonId;
-  final int qty;
-  final int deltaPriceMinor;
-
-  PackageAddonModel({
-    required this.addonId,
-    required this.qty,
-    required this.deltaPriceMinor,
-  });
-
-  factory PackageAddonModel.fromJson(Map<String, dynamic> json) {
-    return PackageAddonModel(
-      addonId: json['addonId'] as String? ?? '',
-      qty: json['qty'] as int? ?? 0,
-      deltaPriceMinor: json['deltaPriceMinor'] as int? ?? 0,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'addonId': addonId,
-      'qty': qty,
-      'deltaPriceMinor': deltaPriceMinor,
     };
   }
 }

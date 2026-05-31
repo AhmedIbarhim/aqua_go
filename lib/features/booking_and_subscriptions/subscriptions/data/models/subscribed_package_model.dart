@@ -1,6 +1,6 @@
 import 'package:aqua_go/core/config/local_storage/shared_prefs.dart';
 import 'package:aqua_go/core/constants.dart';
-import 'package:aqua_go/features/home/data/models/package_model.dart';
+import 'package:aqua_go/features/home/data/models/package_addon_model.dart';
 
 class SubscribedPackageModel {
   final String id;
@@ -9,14 +9,14 @@ class SubscribedPackageModel {
   final String status;
   final int totalWashes;
   final int consumedWashes;
-  final int packagePriceMinor;
+  final num packagePriceMinor;
   final String currency;
   final String validityStartsAt;
   final String validityEndsAt;
   final String purchasedAt;
   final String? cancelledAt;
   final String? cancelReason;
-  final int? refundedMinor;
+  final num? refundedMinor;
   final String? refundStatus;
   final PackageSnapshot packageSnapshot;
 
@@ -56,7 +56,8 @@ class SubscribedPackageModel {
 
   int get remainingWashes => totalWashes - consumedWashes;
 
-  DateTime get expiryDate => DateTime.tryParse(validityEndsAt) ?? DateTime.now();
+  DateTime get expiryDate =>
+      DateTime.tryParse(validityEndsAt) ?? DateTime.now();
 
   factory SubscribedPackageModel.fromJson(Map<String, dynamic> json) {
     return SubscribedPackageModel(
@@ -64,16 +65,16 @@ class SubscribedPackageModel {
       customerId: json['customerId'] as String? ?? '',
       packageId: json['packageId'] as String? ?? '',
       status: json['status'] as String? ?? '',
-      totalWashes: json['totalWashes'] as int? ?? 0,
-      consumedWashes: json['consumedWashes'] as int? ?? 0,
-      packagePriceMinor: json['packagePriceMinor'] as int? ?? 0,
+      totalWashes: (json['totalWashes'] as num?)?.toInt() ?? 0,
+      consumedWashes: (json['consumedWashes'] as num?)?.toInt() ?? 0,
+      packagePriceMinor: (json['packagePriceMinor'] as num?)?.toInt() ?? 0,
       currency: json['currency'] as String? ?? '',
       validityStartsAt: json['validityStartsAt'] as String? ?? '',
       validityEndsAt: json['validityEndsAt'] as String? ?? '',
       purchasedAt: json['purchasedAt'] as String? ?? '',
       cancelledAt: json['cancelledAt'] as String?,
       cancelReason: json['cancelReason'] as String?,
-      refundedMinor: json['refundedMinor'] as int?,
+      refundedMinor: (json['refundedMinor'] as num?)?.toInt(),
       refundStatus: json['refundStatus'] as String?,
       packageSnapshot: PackageSnapshot.fromJson(
         json['packageSnapshot'] as Map<String, dynamic>? ?? {},
@@ -132,23 +133,30 @@ class PackageSnapshot {
     return PackageSnapshot(
       nameAr: json['nameAr'] as String? ?? '',
       nameEn: json['nameEn'] as String? ?? '',
-      numWashes: json['numWashes'] as int? ?? 0,
-      validityDays: json['validityDays'] as int? ?? 0,
+      numWashes: (json['numWashes'] as num?)?.toInt() ?? 0,
+      validityDays: (json['validityDays'] as num?)?.toInt() ?? 0,
       allowScheduleLater: json['allowScheduleLater'] as bool? ?? true,
-      bundledServiceIds: (json['bundledServiceIds'] as List<dynamic>?)
+      bundledServiceIds:
+          (json['bundledServiceIds'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           [],
-      includedAddons: (json['includedAddons'] as List<dynamic>?)
-              ?.map((e) => PackageAddonModel.fromJson(e as Map<String, dynamic>))
+      includedAddons:
+          (json['includedAddons'] as List<dynamic>?)
+              ?.map(
+                (e) => PackageAddonModel.fromJson(e as Map<String, dynamic>),
+              )
               .toList() ??
           [],
-      optionalAddons: (json['optionalAddons'] as List<dynamic>?)
-              ?.map((e) => PackageAddonModel.fromJson(e as Map<String, dynamic>))
+      optionalAddons:
+          (json['optionalAddons'] as List<dynamic>?)
+              ?.map(
+                (e) => PackageAddonModel.fromJson(e as Map<String, dynamic>),
+              )
               .toList() ??
           [],
       isPopular: json['isPopular'] as bool? ?? false,
-      carsPerWash: json['carsPerWash'] as int? ?? 0,
+      carsPerWash: (json['carsPerWash'] as num?)?.toInt() ?? 0,
     );
   }
 

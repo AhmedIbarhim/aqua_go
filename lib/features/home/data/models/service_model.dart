@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-
+import 'service_addon_model.dart';
 import '../../../../core/utils/app_assets.dart';
 
 class ServiceModel extends Equatable {
@@ -8,7 +8,7 @@ class ServiceModel extends Equatable {
   final ServiceName rawName;
   final ServiceDescription rawDescription;
   final bool active;
-  final List<dynamic> addons;
+  final List<ServiceAddonModel> addons;
   final int? priceMinor;
   final int? vatMinor;
   final String? currency;
@@ -57,9 +57,12 @@ class ServiceModel extends Equatable {
       rawName: ServiceName.fromJson(json['name']),
       rawDescription: ServiceDescription.fromJson(json['description']),
       active: json['active'] as bool? ?? true,
-      addons: json['addons'] as List<dynamic>? ?? const [],
-      priceMinor: json['priceMinor'] as int?,
-      vatMinor: json['vatMinor'] as int?,
+      addons: (json['addons'] as List<dynamic>?)
+              ?.map((e) => ServiceAddonModel.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
+      priceMinor: (json['priceMinor'] as num?)?.toInt(),
+      vatMinor: (json['vatMinor'] as num?)?.toInt(),
       currency: json['currency'] as String?,
     );
   }
@@ -71,7 +74,7 @@ class ServiceModel extends Equatable {
       'name': rawName.toJson(),
       'description': rawDescription.toJson(),
       'active': active,
-      'addons': addons,
+      'addons': addons.map((e) => e.toJson()).toList(),
       'priceMinor': priceMinor,
       'vatMinor': vatMinor,
       'currency': currency,

@@ -1,3 +1,4 @@
+import 'package:aqua_go/core/components/custom_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
@@ -88,15 +89,7 @@ class PackageCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: packageModel.image.startsWith('http')
-                              ? Image.network(
-                                  packageModel.image,
-                                  color: context.colors.textTheme,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      Image.asset(
-                                        'assets/images/gift_demo.png',
-                                        color: context.colors.textTheme,
-                                      ),
-                                )
+                              ? CustomNetworkImage(packageModel.image)
                               : Image.asset(
                                   packageModel.image,
                                   color: context.colors.textTheme,

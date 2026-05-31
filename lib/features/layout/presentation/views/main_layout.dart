@@ -7,6 +7,7 @@ import '../../../my_cars/presentation/views/my_cars_view.dart';
 import '../../../profile/presentation/views/profile_view.dart';
 import '../widgets/main_navigation_bar.dart';
 import '../widgets/main_app_bar.dart';
+import '../widgets/lazy_indexed_stack.dart';
 
 class MainLayout extends StatefulWidget {
   const MainLayout({super.key});
@@ -43,7 +44,7 @@ class _MainLayoutState extends State<MainLayout> {
           Scaffold(
             backgroundColor: Colors.transparent,
             appBar: _currentIndex == 3 ? null : const MainAppBar(),
-            body: IndexedStack(
+            body: LazyIndexedStack(
               index: _currentIndex,
               children: List.generate(
                 _pageBuilders.length,
