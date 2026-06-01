@@ -150,7 +150,10 @@ abstract class AppRouter {
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
             create: (_) => locator<MyBookingDetailsCubit>()..fetchBookingDetails(args.booking.id ?? ''),
-            child: MyBookingDetailsView(booking: args.booking),
+            child: MyBookingDetailsView(
+              booking: args.booking,
+              isFromBookingFlow: args.isFromBookingFlow,
+            ),
           ),
         );
 

@@ -28,11 +28,13 @@ class BookingCubit extends Cubit<BookingState> {
 
   void selectAddress(AddressModel address) {
     final defaultDate = state.selectedDate ?? DateTime.now();
-    emit(state.copyWith(
-      selectedAddress: address,
-      selectedDate: defaultDate,
-      clearError: true,
-    ));
+    emit(
+      state.copyWith(
+        selectedAddress: address,
+        selectedDate: defaultDate,
+        clearError: true,
+      ),
+    );
     if (state.selectedService != null) {
       fetchAvailability(targetDate: defaultDate);
     }
@@ -97,10 +99,12 @@ class BookingCubit extends Cubit<BookingState> {
         final isAvailable = data['inServiceArea'] as bool? ?? false;
         final zoneId = data['zoneId'] as String?;
         if (isAvailable && state.selectedAddress != null) {
-          emit(state.copyWith(
-            status: BookingStatus.initial,
-            selectedAddress: state.selectedAddress!.copyWith(zoneId: zoneId),
-          ));
+          emit(
+            state.copyWith(
+              status: BookingStatus.initial,
+              selectedAddress: state.selectedAddress!.copyWith(zoneId: zoneId),
+            ),
+          );
         } else {
           emit(state.copyWith(status: BookingStatus.initial));
         }
@@ -125,16 +129,21 @@ class BookingCubit extends Cubit<BookingState> {
     String? zoneId = address.zoneId;
     if (zoneId == null || zoneId.isEmpty) {
       emit(state.copyWith(isAvailabilityLoading: true));
-      final result = await _bookingRepo.checkZoneAvailability(address.lat, address.lng);
+      final result = await _bookingRepo.checkZoneAvailability(
+        address.lat,
+        address.lng,
+      );
       final fetchedZoneId = result.fold(
         (failure) => null,
         (data) => data['zoneId'] as String?,
       );
       if (fetchedZoneId == null) {
-        emit(state.copyWith(
-          isAvailabilityLoading: false,
-          errorMessage: 'Failed to retrieve service zone details',
-        ));
+        emit(
+          state.copyWith(
+            isAvailabilityLoading: false,
+            errorMessage: 'Failed to retrieve service zone details',
+          ),
+        );
         return;
       }
       zoneId = fetchedZoneId;
@@ -152,16 +161,20 @@ class BookingCubit extends Cubit<BookingState> {
 
     result.fold(
       (failure) {
-        emit(state.copyWith(
-          isAvailabilityLoading: false,
-          errorMessage: failure.message,
-        ));
+        emit(
+          state.copyWith(
+            isAvailabilityLoading: false,
+            errorMessage: failure.message,
+          ),
+        );
       },
       (response) {
-        emit(state.copyWith(
-          isAvailabilityLoading: false,
-          availabilitySlots: response.slots,
-        ));
+        emit(
+          state.copyWith(
+            isAvailabilityLoading: false,
+            availabilitySlots: response.slots,
+          ),
+        );
       },
     );
   }
@@ -295,7 +308,12 @@ class BookingCubit extends Cubit<BookingState> {
           errorMessage: failure.message,
         ),
       ),
-      (_) => emit(state.copyWith(status: BookingStatus.success)),
+      (bookingResponse) => emit(
+        state.copyWith(
+          status: BookingStatus.success,
+          createdBooking: bookingResponse,
+        ),
+      ),
     );
   }
 }

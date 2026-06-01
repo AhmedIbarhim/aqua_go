@@ -293,7 +293,7 @@ class BookingResponseModel {
       final dateTime = DateTime.parse(scheduledAt!).toLocal();
       final timeStr = DateFormat.jm().format(dateTime);
       final dateStr = DateFormat.yMd().format(dateTime);
-      return '$timeStr . $dateStr';
+      return '$dateStr - $timeStr';
     } catch (_) {
       return scheduledAt!;
     }

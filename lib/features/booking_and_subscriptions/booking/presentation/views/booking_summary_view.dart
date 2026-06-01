@@ -17,6 +17,9 @@ import '../../controllers/booking_cubit.dart';
 import '../../controllers/booking_state.dart';
 import '../widgets/add_ons_grid.dart';
 
+import 'package:aqua_go/core/route/routes.dart';
+import 'package:aqua_go/features/my_bookings/presentation/views/my_booking_deatails_view.dart';
+
 class BookingSummaryView extends StatefulWidget {
   const BookingSummaryView({super.key});
 
@@ -43,6 +46,16 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
           context.showSuccessAlert().then((_) {
             if (!context.mounted) return;
             Navigator.popUntil(context, (route) => route.isFirst);
+            if (state.createdBooking != null) {
+              Navigator.pushNamed(
+                context,
+                Routes.myBookingDetails,
+                arguments: MyBookingDetailsArgs(
+                  booking: state.createdBooking!,
+                  isFromBookingFlow: true,
+                ),
+              );
+            }
           });
         } else if (state.status == BookingStatus.failure) {
           context.showErrorSnackBar(state.errorMessage ?? '');

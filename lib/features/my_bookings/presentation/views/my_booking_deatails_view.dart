@@ -11,6 +11,8 @@ import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 
+import 'package:aqua_go/core/route/routes.dart';
+
 import '../../data/models/booking_response_model.dart';
 import '../../controllers/my_booking_details_cubit.dart';
 import '../../controllers/my_booking_details_state.dart';
@@ -26,13 +28,19 @@ import '../widgets/booking_details_summary_card.dart';
 
 class MyBookingDetailsArgs {
   final BookingResponseModel booking;
-  MyBookingDetailsArgs({required this.booking});
+  final bool isFromBookingFlow;
+  MyBookingDetailsArgs({required this.booking, this.isFromBookingFlow = false});
 }
 
 class MyBookingDetailsView extends StatelessWidget {
   final BookingResponseModel booking;
+  final bool isFromBookingFlow;
 
-  const MyBookingDetailsView({super.key, required this.booking});
+  const MyBookingDetailsView({
+    super.key,
+    required this.booking,
+    this.isFromBookingFlow = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -42,73 +50,98 @@ class MyBookingDetailsView extends StatelessWidget {
             ? state.booking
             : booking;
 
-        return Scaffold(
-          backgroundColor: context.colors.screenBG,
-          appBar: GenericAppBar(
-            title: LocaleKeys.bookings_booking_details.tr(),
-            actions: [
-              if (!activeBooking.isUpcoming)
-                IconButton(
-                  onPressed: () => MyBookingProceduresBottomSheet.show(
-                    context,
-                    activeBooking,
+        return PopScope(
+          canPop: !isFromBookingFlow,
+          onPopInvokedWithResult: (bool didPop, Object? result) {
+            if (didPop) return;
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              Routes.layout,
+              (route) => false,
+            );
+          },
+          child: Scaffold(
+            backgroundColor: context.colors.screenBG,
+            appBar: GenericAppBar(
+              title: LocaleKeys.bookings_booking_details.tr(),
+              automaticallyImplyLeading: !isFromBookingFlow,
+              actions: [
+                if (isFromBookingFlow)
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () {
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        Routes.layout,
+                        (route) => false,
+                      );
+                    },
+                  )
+                else if (!activeBooking.isUpcoming)
+                  IconButton(
+                    onPressed: () => MyBookingProceduresBottomSheet.show(
+                      context,
+                      activeBooking,
+                    ),
+                    icon: const Icon(Icons.more_vert),
                   ),
-                  icon: const Icon(Icons.more_vert),
-                ),
-            ],
-          ),
-          body: Column(
-            children: [
-              if (state is MyBookingDetailsLoading)
-                const LinearProgressIndicator(),
-              Expanded(
-                child: RefreshIndicator(
-                  color: context.colors.primary,
-                  onRefresh: () async {
-                    await context
-                        .read<MyBookingDetailsCubit>()
-                        .fetchBookingDetails(activeBooking.id ?? '');
-                  },
-                  child: SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        BookingDetailsNumberCard(booking: activeBooking),
-                        const SizedBox(height: 16),
-                        BookingDetailsVehicleCard(booking: activeBooking),
-                        const SizedBox(height: 16),
-                        if (activeBooking.status ==
-                            BookingStatus.COMPLETED) ...[
-                          BookingDetailsBikerCard(booking: activeBooking),
+              ],
+            ),
+            body: Column(
+              children: [
+                if (state is MyBookingDetailsLoading)
+                  const LinearProgressIndicator(),
+                Expanded(
+                  child: RefreshIndicator(
+                    color: context.colors.primary,
+                    onRefresh: () async {
+                      await context
+                          .read<MyBookingDetailsCubit>()
+                          .fetchBookingDetails(activeBooking.id ?? '');
+                    },
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          BookingDetailsNumberCard(booking: activeBooking),
                           const SizedBox(height: 16),
-                        ],
-                        BookingDetailsSummaryCard(booking: activeBooking),
+                          BookingDetailsVehicleCard(booking: activeBooking),
+                          const SizedBox(height: 16),
+                          if (activeBooking.status ==
+                              BookingStatus.COMPLETED) ...[
+                            BookingDetailsBikerCard(booking: activeBooking),
+                            const SizedBox(height: 16),
+                          ],
+                          BookingDetailsSummaryCard(booking: activeBooking),
 
-                        if (activeBooking.status !=
-                            BookingStatus.COMPLETED) ...[
+                          if (activeBooking.status !=
+                              BookingStatus.COMPLETED) ...[
+                            const SizedBox(height: 16),
+                            MyBookingLocationSection(
+                              address: activeBooking.location,
+                              latitude: activeBooking.latitude,
+                              longitude: activeBooking.longitude,
+                            ),
+                          ],
                           const SizedBox(height: 16),
-                          MyBookingLocationSection(
-                            address: activeBooking.location,
-                            latitude: activeBooking.latitude,
-                            longitude: activeBooking.longitude,
-                          ),
+                          if (activeBooking.status == BookingStatus.COMPLETED)
+                            MyBookingPhotosSection(
+                              photos: activeBooking.photos,
+                            ),
+                          const SizedBox(height: 16),
+                          _buildInvoicesLink(context, activeBooking),
+                          const SizedBox(height: 24),
                         ],
-                        const SizedBox(height: 16),
-                        if (activeBooking.status == BookingStatus.COMPLETED)
-                          MyBookingPhotosSection(photos: activeBooking.photos),
-                        const SizedBox(height: 16),
-                        _buildInvoicesLink(context, activeBooking),
-                        const SizedBox(height: 24),
-                      ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-              if (activeBooking.isUpcoming)
-                _buildActionSheet(context, activeBooking),
-            ],
+                if (activeBooking.isUpcoming)
+                  _buildActionSheet(context, activeBooking),
+              ],
+            ),
           ),
         );
       },

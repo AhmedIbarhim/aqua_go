@@ -5,6 +5,7 @@ import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 
 import '../../../../../core/config/networking/exceptions/failure.dart';
+import 'package:aqua_go/features/my_bookings/data/models/booking_response_model.dart';
 import '../models/booking_request_model.dart';
 import '../models/quote_model.dart';
 
@@ -85,7 +86,7 @@ class BookingRepo {
     }
   }
 
-  Future<Either<Failure, void>> createBooking(
+  Future<Either<Failure, BookingResponseModel>> createBooking(
     BookingRequestModel booking,
   ) async {
     try {
@@ -98,7 +99,20 @@ class BookingRepo {
         data: booking.toJson(),
         options: Options(headers: {'Idempotency-Key': idempotencyKey}),
       );
-      return response.fold((failure) => left(failure), (_) => right(null));
+      return response.fold(
+        (failure) => left(failure),
+        (data) {
+          if (data != null) {
+            try {
+              final bookingResponse = BookingResponseModel.fromJson(data as Map<String, dynamic>);
+              return right(bookingResponse);
+            } catch (e) {
+              return left(ServerFailure('Parsing error: $e'));
+            }
+          }
+          return left(ServerFailure('Failed to load created booking details'));
+        },
+      );
     } catch (error) {
       return left(ServerFailure(error.toString()));
     }
