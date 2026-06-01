@@ -106,30 +106,62 @@ class _NewAddressMapViewState extends State<NewAddressMapView> {
 
                   Positioned(
                     top: MediaQuery.of(context).padding.top + 16,
-                    left: 24,
-                    right: 24,
-                    child: LocationSearchField(
-                      controller: _searchController,
-                      predictions: state.placePredictions,
-                      showResults: state.showSearchResults,
-                      onSearchChanged: (query) {
-                        context.read<MapsCubit>().onSearchChanged(query);
-                      },
-                      onClear: () {
-                        _searchController.clear();
-                        context.read<MapsCubit>().clearSearch();
-                      },
-                      onPredictionTap: (placeId) {
-                        context.read<MapsCubit>().getPlaceDetails(
-                          placeId,
-                          onLocationFound: (latLng) async {
-                            final controller = await _controller.future;
-                            controller.animateCamera(
-                              CameraUpdate.newLatLngZoom(latLng, 15),
-                            );
-                          },
-                        );
-                      },
+                    left: 16,
+                    right: 16,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 48,
+                          height: 48,
+                          margin: const EdgeInsetsDirectional.only(end: 8),
+                          decoration: BoxDecoration(
+                            color: darkAppColors.themeColor.withValues(alpha: 0.5),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: darkAppColors.textSecondary,
+                              width: 1.5,
+                            ),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: BackdropFilter(
+                              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                              child: BackButton(
+                                color: Colors.white,
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: LocationSearchField(
+                            controller: _searchController,
+                            predictions: state.placePredictions,
+                            showResults: state.showSearchResults,
+                            onSearchChanged: (query) {
+                              context.read<MapsCubit>().onSearchChanged(query);
+                            },
+                            onClear: () {
+                              _searchController.clear();
+                              context.read<MapsCubit>().clearSearch();
+                            },
+                            onPredictionTap: (placeId) {
+                              context.read<MapsCubit>().getPlaceDetails(
+                                placeId,
+                                onLocationFound: (latLng) async {
+                                  final controller = await _controller.future;
+                                  controller.animateCamera(
+                                    CameraUpdate.newLatLngZoom(latLng, 15),
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                   ),
 

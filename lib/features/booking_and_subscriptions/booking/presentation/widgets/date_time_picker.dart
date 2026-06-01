@@ -5,12 +5,15 @@ import 'package:svg_flutter/svg.dart';
 import '../../../../../core/themes/app_text_styles.dart';
 import '../../../../../core/utils/app_assets.dart';
 import '../../../../../generated/locale_keys.g.dart';
+import '../../data/models/availability_response_model.dart';
 
 class BookingDateTimePicker extends StatefulWidget {
   final DateTime? initialDate;
   final String? initialTime;
   final Function(DateTime) onDateChanged;
   final Function(String) onTimeChanged;
+  final List<AvailabilitySlot> availabilitySlots;
+  final bool isLoading;
 
   const BookingDateTimePicker({
     super.key,
@@ -18,6 +21,8 @@ class BookingDateTimePicker extends StatefulWidget {
     required this.onDateChanged,
     required this.onTimeChanged,
     this.initialTime,
+    this.availabilitySlots = const [],
+    this.isLoading = false,
   });
 
   @override
@@ -27,19 +32,6 @@ class BookingDateTimePicker extends StatefulWidget {
 class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
   DateTime? selectedDate;
   String? selectedTime;
-
-  final List<String> availableTimes = [
-    '9:00 صباحاً',
-    '9:30 صباحاً',
-    '10:00 صباحاً',
-    '10:30 صباحاً',
-    '11:00 صباحاً',
-    '11:30 صباحاً',
-    '12:00 ظهراً',
-    '12:30 ظهراً',
-    '1:00 ظهراً',
-  ];
-
   late List<DateTime> dates;
 
   @override
@@ -51,6 +43,39 @@ class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
       8,
       (index) => DateTime.now().add(Duration(days: index)),
     );
+  }
+
+  @override
+  void didUpdateWidget(covariant BookingDateTimePicker oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialTime != oldWidget.initialTime) {
+      selectedTime = widget.initialTime;
+    }
+    if (widget.initialDate != oldWidget.initialDate) {
+      selectedDate = widget.initialDate;
+    }
+  }
+
+  String _formatTimeSlot(DateTime time, BuildContext context) {
+    if (context.isAr) {
+      final hour = time.hour;
+      final minute = time.minute;
+      final minStr = minute.toString().padLeft(2, '0');
+
+      String period;
+      int displayHour = hour;
+      if (hour >= 12) {
+        period = hour == 12 ? 'ظهراً' : 'مساءً';
+        if (hour > 12) displayHour = hour - 12;
+      } else {
+        period = 'صباحاً';
+        if (hour == 0) displayHour = 12;
+      }
+
+      return '$displayHour:$minStr $period';
+    } else {
+      return DateFormat('h:mm a').format(time);
+    }
   }
 
   @override
@@ -200,53 +225,82 @@ class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
           ),
         ),
         SizedBox(height: height * 0.02),
-        Wrap(
-          spacing: width * 0.02,
-          runSpacing: width * 0.02,
-          children: availableTimes.map((time) {
-            final isSelected = selectedTime == time;
-            // Mocking some disabled times for design consistency
-            final isDisabled = time.contains('1:00');
-
-            return GestureDetector(
-              onTap: isDisabled
-                  ? null
-                  : () {
-                      setState(() {
-                        selectedTime = time;
-                      });
-                      widget.onTimeChanged(time);
-                    },
-              child: Container(
-                width: (width - (width * 0.12 + width * 0.04)) / 3,
-                padding: EdgeInsets.symmetric(vertical: height * 0.015),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? context.colors.brandHover
-                      : context.colors.themeColor,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: isSelected
-                        ? context.colors.primary
-                        : context.colors.borderSecondary,
-                  ),
-                ),
-                child: Center(
-                  child: Text(
-                    time,
-                    style: isSelected
-                        ? AppTextStyles.medium14.copyWith(
-                            color: context.colors.textPrimary,
-                          )
-                        : AppTextStyles.regular14.copyWith(
-                            color: context.colors.textSecondary,
-                          ),
-                  ),
-                ),
+        if (widget.isLoading)
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              child: CircularProgressIndicator(color: context.colors.primary),
+            ),
+          )
+        else if (widget.availabilitySlots.isEmpty)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            alignment: Alignment.center,
+            child: Text(
+              selectedDate == null
+                  ? LocaleKeys.bookings_choose_day.tr()
+                  : (context.isAr
+                        ? 'لا توجد أوقات متاحة لهذا اليوم'
+                        : 'No available times for this day'),
+              style: AppTextStyles.regular14.copyWith(
+                color: context.colors.textSecondary,
               ),
-            );
-          }).toList(),
-        ),
+            ),
+          )
+        else
+          Wrap(
+            spacing: width * 0.02,
+            runSpacing: width * 0.02,
+            children: widget.availabilitySlots.map((slot) {
+              final timeStr = _formatTimeSlot(slot.start, context);
+              final isSelected = selectedTime == timeStr;
+              final isDisabled = !slot.available;
+
+              return GestureDetector(
+                onTap: isDisabled
+                    ? null
+                    : () {
+                        setState(() {
+                          selectedTime = timeStr;
+                        });
+                        widget.onTimeChanged(timeStr);
+                      },
+                child: Opacity(
+                  opacity: isDisabled ? 0.4 : 1.0,
+                  child: Container(
+                    width: (width - (width * 0.12 + width * 0.04)) / 3,
+                    padding: EdgeInsets.symmetric(vertical: height * 0.015),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? context.colors.brandHover
+                          : (isDisabled
+                                ? context.colors.defaultSubtle
+                                : context.colors.themeColor),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: isSelected
+                            ? context.colors.primary
+                            : context.colors.borderSecondary,
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        timeStr,
+                        style: isSelected
+                            ? AppTextStyles.medium14.copyWith(
+                                color: context.colors.textPrimary,
+                              )
+                            : AppTextStyles.regular14.copyWith(
+                                color: context.colors.textSecondary,
+                              ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
       ],
     );
   }

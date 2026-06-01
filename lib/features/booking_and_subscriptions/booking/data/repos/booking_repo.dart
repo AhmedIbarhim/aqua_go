@@ -8,6 +8,8 @@ import '../../../../../core/config/networking/exceptions/failure.dart';
 import '../models/booking_request_model.dart';
 import '../models/quote_model.dart';
 
+import '../models/availability_response_model.dart';
+
 class BookingRepo {
   final APIClient apiClient;
 
@@ -45,7 +47,7 @@ class BookingRepo {
     }
   }
 
-  Future<Either<Failure, bool>> checkZoneAvailability(
+  Future<Either<Failure, Map<String, dynamic>>> checkZoneAvailability(
     double lat,
     double lng,
   ) async {
@@ -54,10 +56,30 @@ class BookingRepo {
         Endpoints.zoneCheck,
         data: {'lat': lat, 'lng': lng},
       );
-      return response.fold((failure) => left(failure), (data) {
-        final inServiceArea = data?['inServiceArea'] as bool? ?? false;
-        return right(inServiceArea);
-      });
+      return response.fold(
+        (failure) => left(failure),
+        (data) => right(data as Map<String, dynamic>),
+      );
+    } catch (error) {
+      return left(ServerFailure(error.toString()));
+    }
+  }
+
+  Future<Either<Failure, AvailabilityResponse>> getAvailability({
+    required String zoneId,
+    required String date,
+    required String packageId,
+  }) async {
+    try {
+      return await apiClient.get<AvailabilityResponse>(
+        Endpoints.availability,
+        queryParameters: {
+          'zoneId': zoneId,
+          'date': date,
+          'packageId': packageId,
+        },
+        parser: (data) => AvailabilityResponse.fromJson(data as Map<String, dynamic>),
+      );
     } catch (error) {
       return left(ServerFailure(error.toString()));
     }

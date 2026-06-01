@@ -153,8 +153,7 @@ class LocationSearchField extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.7,
+                Expanded(
                   child: Text(
                     title,
                     textAlign: TextAlign.start,
@@ -169,7 +168,7 @@ class LocationSearchField extends StatelessWidget {
                           ),
                   ),
                 ),
-
+                const SizedBox(width: 8),
                 Icon(
                   Icons.search,
                   color: isSelected ? Colors.black : Colors.white,

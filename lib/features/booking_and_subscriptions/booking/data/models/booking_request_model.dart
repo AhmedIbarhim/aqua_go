@@ -47,15 +47,17 @@ class BookingRequestModel {
 
     return {
       if (quote?.quoteId != null) 'quoteId': quote!.quoteId,
-      if (address?.id != null && address?.id != 'current_gps')
+      if (address?.id != null &&
+          address?.id != 'current_gps' &&
+          address?.id != 'custom_map')
         'savedAddressId': address?.id,
       // 'addressLabel': address?.label,
       // 'lat': address?.lat,
       // 'lng': address?.lng,
       // 'lat': 0,
       // 'lng': 0,
-      if (address?.arrivalNotes != null)
-        'addressArrivalNotes': address?.arrivalNotes,
+      // if (address?.arrivalNotes != null)
+      //   'addressArrivalNotes': address?.arrivalNotes,
       // 'plateText': car?.plateNumber,
       // 'vehicleMake': car?.carBrand?.vehicleBrandName.nameEn,
       // 'vehicleModel': car?.carModel?.vehicleModelName.nameEn,

@@ -4,6 +4,7 @@ import '../../../my_cars/data/models/my_car_model.dart';
 import '../../../home/data/models/service_model.dart';
 import '../../../../core/enums/payment_method_enum.dart';
 import '../data/models/quote_model.dart';
+import '../data/models/availability_response_model.dart';
 
 enum BookingStatus { initial, loading, success, failure }
 
@@ -20,6 +21,8 @@ class BookingState extends Equatable {
   final PaymentMethod? paymentMethod;
   final QuoteModel? quote;
   final String? errorMessage;
+  final List<AvailabilitySlot> availabilitySlots;
+  final bool isAvailabilityLoading;
 
   const BookingState({
     this.status = BookingStatus.initial,
@@ -34,6 +37,8 @@ class BookingState extends Equatable {
     this.paymentMethod,
     this.quote,
     this.errorMessage,
+    this.availabilitySlots = const [],
+    this.isAvailabilityLoading = false,
   });
 
   BookingState copyWith({
@@ -49,6 +54,8 @@ class BookingState extends Equatable {
     PaymentMethod? paymentMethod,
     QuoteModel? quote,
     String? errorMessage,
+    List<AvailabilitySlot>? availabilitySlots,
+    bool? isAvailabilityLoading,
     bool clearError = false,
   }) {
     return BookingState(
@@ -65,6 +72,9 @@ class BookingState extends Equatable {
       paymentMethod: paymentMethod ?? this.paymentMethod,
       quote: quote ?? this.quote,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
+      availabilitySlots: availabilitySlots ?? this.availabilitySlots,
+      isAvailabilityLoading:
+          isAvailabilityLoading ?? this.isAvailabilityLoading,
     );
   }
 
@@ -82,5 +92,7 @@ class BookingState extends Equatable {
     paymentMethod,
     quote,
     errorMessage,
+    availabilitySlots,
+    isAvailabilityLoading,
   ];
 }

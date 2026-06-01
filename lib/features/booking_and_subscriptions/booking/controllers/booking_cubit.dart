@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:aqua_go/core/config/local_storage/shared_prefs.dart';
 import 'package:aqua_go/core/constants.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
+import 'package:intl/intl.dart';
 import '../../../address/data/models/address_model.dart';
 import '../../../my_cars/data/models/my_car_model.dart';
 import '../../../home/data/models/service_model.dart';
@@ -26,7 +27,15 @@ class BookingCubit extends Cubit<BookingState> {
   }
 
   void selectAddress(AddressModel address) {
-    emit(state.copyWith(selectedAddress: address, clearError: true));
+    final defaultDate = state.selectedDate ?? DateTime.now();
+    emit(state.copyWith(
+      selectedAddress: address,
+      selectedDate: defaultDate,
+      clearError: true,
+    ));
+    if (state.selectedService != null) {
+      fetchAvailability(targetDate: defaultDate);
+    }
   }
 
   void selectCar(MyCarModel car) {
@@ -46,9 +55,17 @@ class BookingCubit extends Cubit<BookingState> {
   }
 
   void updateDateTime(DateTime? date, String? time) {
+    final dateChanged = date != state.selectedDate;
     emit(
-      state.copyWith(selectedDate: date, selectedTime: time, clearError: true),
+      state.copyWith(
+        selectedDate: date,
+        selectedTime: dateChanged ? null : time,
+        clearError: true,
+      ),
     );
+    if (dateChanged && date != null) {
+      fetchAvailability(targetDate: date);
+    }
   }
 
   void updateNotes(Set<String> notes) {
@@ -76,9 +93,75 @@ class BookingCubit extends Cubit<BookingState> {
         );
         return false;
       },
-      (isAvailable) {
-        emit(state.copyWith(status: BookingStatus.initial));
+      (data) {
+        final isAvailable = data['inServiceArea'] as bool? ?? false;
+        final zoneId = data['zoneId'] as String?;
+        if (isAvailable && state.selectedAddress != null) {
+          emit(state.copyWith(
+            status: BookingStatus.initial,
+            selectedAddress: state.selectedAddress!.copyWith(zoneId: zoneId),
+          ));
+        } else {
+          emit(state.copyWith(status: BookingStatus.initial));
+        }
         return isAvailable;
+      },
+    );
+  }
+
+  Future<void> fetchAvailability({DateTime? targetDate}) async {
+    final date = targetDate ?? state.selectedDate ?? DateTime.now();
+    final address = state.selectedAddress;
+    final service = state.selectedService;
+
+    if (address == null || service == null) {
+      return;
+    }
+
+    // Format date as YYYY-MM-DD
+    final dateStr = DateFormat('yyyy-MM-dd').format(date);
+
+    // Get zoneId
+    String? zoneId = address.zoneId;
+    if (zoneId == null || zoneId.isEmpty) {
+      emit(state.copyWith(isAvailabilityLoading: true));
+      final result = await _bookingRepo.checkZoneAvailability(address.lat, address.lng);
+      final fetchedZoneId = result.fold(
+        (failure) => null,
+        (data) => data['zoneId'] as String?,
+      );
+      if (fetchedZoneId == null) {
+        emit(state.copyWith(
+          isAvailabilityLoading: false,
+          errorMessage: 'Failed to retrieve service zone details',
+        ));
+        return;
+      }
+      zoneId = fetchedZoneId;
+      // Update selectedAddress with the zoneId
+      emit(state.copyWith(selectedAddress: address.copyWith(zoneId: zoneId)));
+    }
+
+    emit(state.copyWith(isAvailabilityLoading: true));
+
+    final result = await _bookingRepo.getAvailability(
+      zoneId: zoneId,
+      date: dateStr,
+      packageId: service.id,
+    );
+
+    result.fold(
+      (failure) {
+        emit(state.copyWith(
+          isAvailabilityLoading: false,
+          errorMessage: failure.message,
+        ));
+      },
+      (response) {
+        emit(state.copyWith(
+          isAvailabilityLoading: false,
+          availabilitySlots: response.slots,
+        ));
       },
     );
   }

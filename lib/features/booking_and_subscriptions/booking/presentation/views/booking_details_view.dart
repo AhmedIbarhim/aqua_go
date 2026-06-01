@@ -129,6 +129,8 @@ class BookingDetailsView extends StatelessWidget {
           BookingDateTimePicker(
             initialDate: bookingState.selectedDate,
             initialTime: bookingState.selectedTime,
+            availabilitySlots: bookingState.availabilitySlots,
+            isLoading: bookingState.isAvailabilityLoading,
             onDateChanged: (date) {
               context.read<BookingCubit>().updateDateTime(
                 date,
