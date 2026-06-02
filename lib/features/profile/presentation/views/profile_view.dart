@@ -14,6 +14,8 @@ import '../../../../core/helpers/fetch_user_data_helper.dart';
 import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import '../../../../core/utils/image_picker_helper.dart';
 
 import '../widgets/profile_tile.dart';
 
@@ -34,7 +36,7 @@ class ProfileView extends StatelessWidget {
       create: (context) => locator<AuthCubit>(),
       child: BlocListener<AuthCubit, AuthState>(
         listener: (context, state) {
-          if (state is LogoutLoading) {
+          if (state is LogoutLoading || state is ProfileUpdateLoading) {
             context.showLoadingOverlay();
           } else {
             context.hideLoadingOverlay();
@@ -42,6 +44,10 @@ class ProfileView extends StatelessWidget {
 
           if (state is LogoutSuccess) {
             context.pushNamedAndRemoveUntil(Routes.login);
+          } else if (state is ProfileUpdateSuccess) {
+            context.showSuccessSnackBar(LocaleKeys.snackbar_profile_updated_success.tr());
+          } else if (state is ProfileUpdateError) {
+            context.showErrorSnackBar(state.message);
           } else if (state is LoginError) {
             context.showErrorSnackBar(state.message);
           }
@@ -53,18 +59,73 @@ class ProfileView extends StatelessWidget {
                 children: [
                   SizedBox(height: sh(48)),
                   // Avatar Placeholder
-                  Container(
-                    width: sw(134),
-                    height: sw(134),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: context.colors.primary,
-                    ),
-                    child: Icon(
-                      Icons.person,
-                      size: sw(80),
-                      color: context.colors.background,
-                    ),
+                  BlocBuilder<AuthCubit, AuthState>(
+                    builder: (context, state) {
+                      return GestureDetector(
+                        onTap: () async {
+                          if (FetchUserData.isGuest()) {
+                            _promptGuestToLogin(context);
+                          } else {
+                            final file = await ImagePickerHelper.showImageSourceDialog(context);
+                            if (file != null && context.mounted) {
+                              context.read<AuthCubit>().uploadAvatar(file.path);
+                            }
+                          }
+                        },
+                        child: Stack(
+                          alignment: Alignment.bottomRight,
+                          children: [
+                            Container(
+                              width: sw(134),
+                              height: sw(134),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: context.colors.primary,
+                                border: Border.all(color: context.colors.primary, width: 3),
+                              ),
+                              child: ClipOval(
+                                child: FetchUserData.getAvatarUrl() != null
+                                    ? CachedNetworkImage(
+                                        imageUrl: FetchUserData.getAvatarUrl()!,
+                                        fit: BoxFit.cover,
+                                        placeholder: (context, url) => const Center(
+                                          child: CircularProgressIndicator(color: Colors.white),
+                                        ),
+                                        errorWidget: (context, url, error) => Icon(
+                                          Icons.person,
+                                          size: sw(80),
+                                          color: context.colors.background,
+                                        ),
+                                      )
+                                    : Icon(
+                                        Icons.person,
+                                        size: sw(80),
+                                        color: context.colors.background,
+                                      ),
+                              ),
+                            ),
+                            if (!FetchUserData.isGuest())
+                              Positioned(
+                                right: sw(4),
+                                bottom: sw(4),
+                                child: Container(
+                                  padding: EdgeInsets.all(sw(6)),
+                                  decoration: BoxDecoration(
+                                    color: context.colors.primary,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: context.colors.background, width: 2),
+                                  ),
+                                  child: Icon(
+                                    Icons.camera_alt,
+                                    size: sw(16),
+                                    color: context.colors.background,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      );
+                    },
                   ),
                   SizedBox(height: sh(16)),
                   // Name

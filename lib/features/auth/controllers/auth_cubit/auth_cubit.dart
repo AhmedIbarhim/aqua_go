@@ -75,4 +75,13 @@ class AuthCubit extends Cubit<AuthState> {
     await _authRepo.logout();
     emit(LogoutSuccess());
   }
+
+  Future<void> uploadAvatar(String filePath) async {
+    emit(ProfileUpdateLoading());
+    final result = await _authRepo.uploadProfileImage(filePath);
+    result.fold(
+      (failure) => emit(ProfileUpdateError(failure.message)),
+      (updatedUser) => emit(ProfileUpdateSuccess(updatedUser)),
+    );
+  }
 }

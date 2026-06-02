@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:aqua_go/core/config/local_storage/shared_prefs.dart';
 import 'package:aqua_go/core/config/local_storage/secure_storage.dart';
 import 'package:aqua_go/core/constants.dart';
@@ -5,6 +6,7 @@ import 'package:aqua_go/core/config/networking/exceptions/failure.dart';
 import 'package:aqua_go/features/auth/data/models/user_model.dart';
 import 'package:aqua_go/features/auth/data/services/auth_service.dart';
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 
 class AuthRepository {
   final AuthService _authService;
@@ -156,5 +158,84 @@ class AuthRepository {
       await SecureStorage.deleteSecuredString(kRefreshToken);
       await CacheClient.removeString(kUserData);
     }
+  }
+
+  Future<Either<Failure, UserModel>> uploadProfileImage(String filePath) async {
+    final file = File(filePath);
+    if (!await file.exists()) {
+      return const Left(ServerFailure('File does not exist'));
+    }
+    final int sizeBytes = await file.length();
+    final String contentType = _getFileContentType(filePath);
+
+    final presignResult = await _authService.getProfileImagePresignedUrl(contentType);
+    return presignResult.fold(
+      (failure) => Left(failure),
+      (data) async {
+        if (data == null) {
+          return const Left(ServerFailure('Failed to get presigned URL'));
+        }
+        final String? uploadUrl = data['url'];
+        if (uploadUrl == null || uploadUrl.isEmpty) {
+          return const Left(ServerFailure('Presigned URL is empty'));
+        }
+
+        try {
+          final dio = Dio();
+          final bytes = await file.readAsBytes();
+          final uploadResponse = await dio.put(
+            uploadUrl,
+            data: Stream.fromIterable([bytes]),
+            options: Options(
+              headers: {
+                Headers.contentTypeHeader: contentType,
+                Headers.contentLengthHeader: sizeBytes,
+              },
+            ),
+          );
+
+          if (uploadResponse.statusCode != 200 && uploadResponse.statusCode != 201 && uploadResponse.statusCode != 204) {
+            return const Left(ServerFailure('Failed to upload image file to storage'));
+          }
+        } catch (e) {
+          return Left(ServerFailure('Failed to upload image binary: $e'));
+        }
+
+        final String idempotencyKey = DateTime.now().millisecondsSinceEpoch.toString();
+        final confirmResult = await _authService.confirmProfileImage(
+          contentType: contentType,
+          sizeBytes: sizeBytes,
+          idempotencyKey: idempotencyKey,
+        );
+
+        return confirmResult.fold(
+          (failure) => Left(failure),
+          (_) async {
+            final profileResult = await _authService.getProfile();
+            return profileResult.fold(
+              (failure) => Left(failure),
+              (profileData) async {
+                if (profileData != null) {
+                  final currentUser = getUser();
+                  final updatedUser = UserModel.fromJson(profileData).copyWith(phone: currentUser?.phone);
+                  await saveUser(updatedUser);
+                  return Right(updatedUser);
+                }
+                return const Left(ServerFailure('Failed to fetch updated profile details'));
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  String _getFileContentType(String filePath) {
+    final extension = filePath.split('.').last.toLowerCase();
+    if (extension == 'jpg' || extension == 'jpeg') return 'image/jpeg';
+    if (extension == 'png') return 'image/png';
+    if (extension == 'webp') return 'image/webp';
+    if (extension == 'gif') return 'image/gif';
+    return 'application/octet-stream';
   }
 }

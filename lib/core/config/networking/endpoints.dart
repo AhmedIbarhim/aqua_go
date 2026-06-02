@@ -11,6 +11,8 @@ abstract class Endpoints {
   static const String customerMe = 'me';
   static const String deletionRequest = 'me/deletion-request';
   static const String dataExport = 'me/data-export';
+  static const String profileImagePresign = 'me/profile-image/presign';
+  static const String profileImageConfirm = 'me/profile-image/confirm';
 
   //  Email Verification
   static const String verifyRequest = 'me/email/verify/request';

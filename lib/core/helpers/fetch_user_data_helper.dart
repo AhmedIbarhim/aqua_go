@@ -33,6 +33,10 @@ class FetchUserData {
   }
 
   static String? getAvatarUrl() {
+    final avatar = getUser()?.imageUrl;
+    if (avatar != null && avatar.isNotEmpty) {
+      return avatar;
+    }
     final name = getUser()?.name;
     return name != null ? Endpoints.nameAvatar(name) : null;
   }

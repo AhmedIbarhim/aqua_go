@@ -28,6 +28,32 @@ class AuthService {
     return _apiClient.patch(Endpoints.customerMe, data: data);
   }
 
+  Future<Either<Failure, dynamic>> getProfileImagePresignedUrl(String contentType) {
+    return _apiClient.post(
+      Endpoints.profileImagePresign,
+      data: {'contentType': contentType},
+    );
+  }
+
+  Future<Either<Failure, dynamic>> confirmProfileImage({
+    required String contentType,
+    required int sizeBytes,
+    required String idempotencyKey,
+  }) {
+    return _apiClient.post(
+      Endpoints.profileImageConfirm,
+      data: {
+        'contentType': contentType,
+        'sizeBytes': sizeBytes,
+      },
+      options: Options(
+        headers: {
+          'Idempotency-Key': idempotencyKey,
+        },
+      ),
+    );
+  }
+
   Future<Either<Failure, dynamic>> requestEmailVerify(String email) {
     return _apiClient.post(Endpoints.verifyRequest, data: {'email': email});
   }

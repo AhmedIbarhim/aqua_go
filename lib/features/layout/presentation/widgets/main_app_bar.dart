@@ -5,6 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:svg_flutter/svg.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../../../core/config/di/service_locator.dart';
 import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_text_styles.dart';
@@ -42,8 +43,29 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(sw(40)),
-                    child: Icon(Icons.person, color: context.colors.primary),
-                    // CustomNetworkImage(Endpoints.nameAvatar(userName)),
+                    child: FetchUserData.getAvatarUrl() != null
+                        ? CachedNetworkImage(
+                            imageUrl: FetchUserData.getAvatarUrl()!,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => Center(
+                              child: SizedBox(
+                                width: sw(16),
+                                height: sw(16),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: context.colors.primary,
+                                ),
+                              ),
+                            ),
+                            errorWidget: (context, url, error) => Icon(
+                              Icons.person,
+                              color: context.colors.primary,
+                            ),
+                          )
+                        : Icon(
+                            Icons.person,
+                            color: context.colors.primary,
+                          ),
                   ),
                 ),
                 SizedBox(width: sw(8)),
