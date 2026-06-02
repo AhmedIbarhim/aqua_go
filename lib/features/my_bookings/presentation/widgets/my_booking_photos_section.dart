@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../views/gallery_view.dart';
-import '../../data/models/booking_response_model.dart';
+import '../../data/models/booking_response_model/booking_response_model.dart';
 import '../../../../core/components/custom_network_image.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/route/routes.dart';

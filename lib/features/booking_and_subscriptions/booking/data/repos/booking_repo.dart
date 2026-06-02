@@ -5,7 +5,7 @@ import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 
 import '../../../../../core/config/networking/exceptions/failure.dart';
-import 'package:aqua_go/features/my_bookings/data/models/booking_response_model.dart';
+import 'package:aqua_go/features/my_bookings/data/models/booking_response_model/booking_response_model.dart';
 import '../models/booking_request_model.dart';
 import '../models/quote_model.dart';
 

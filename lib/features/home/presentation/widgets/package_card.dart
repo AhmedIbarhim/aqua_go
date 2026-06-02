@@ -50,26 +50,33 @@ class PackageCard extends StatelessWidget {
             children: [
               Positioned(
                 top: 0,
-                left: 0,
+                left: context.isAr ? 0 : null,
+                right: context.isAr ? null : 0,
 
-                child: Image.asset(
-                  AppAssets.shadows_1,
-                  fit: BoxFit.cover,
-                  color: context.colors.primary,
-                  width: height * 0.2,
-                  height: height * 0.23,
+                child: Transform.flip(
+                  flipX: context.isEn,
+                  child: Image.asset(
+                    AppAssets.shadows_1,
+                    fit: BoxFit.cover,
+                    color: context.colors.primary,
+                    width: height * 0.2,
+                    height: height * 0.23,
+                  ),
                 ),
               ),
 
               Positioned(
                 bottom: 0,
-
-                right: 0,
-                child: Image.asset(
-                  AppAssets.shadows_2,
-                  color: context.colors.primary,
-                  width: height * 0.18,
-                  height: height * 0.2,
+                right: context.isAr ? 0 : null,
+                left: context.isAr ? null : 0,
+                child: Transform.flip(
+                  flipX: context.isEn,
+                  child: Image.asset(
+                    AppAssets.shadows_2,
+                    color: context.colors.primary,
+                    width: height * 0.18,
+                    height: height * 0.2,
+                  ),
                 ),
               ),
               Padding(
@@ -127,11 +134,14 @@ class PackageCard extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text(
-                                packageModel.title,
-                                style: AppTextStyles.medium16,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                              FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  packageModel.title,
+                                  style: AppTextStyles.medium16,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
                               const SizedBox(height: 2),
                               SizedBox(

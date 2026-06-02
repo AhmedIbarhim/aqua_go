@@ -37,14 +37,18 @@ class ServiceCard extends StatelessWidget {
             children: [
               Positioned(
                 top: 0,
-                left: 0,
+                left: context.isAr ? 0 : null,
+                right: context.isAr ? null : 0,
 
-                child: Image.asset(
-                  AppAssets.shadows_3,
-                  fit: BoxFit.cover,
-                  color: context.colors.primary,
-                  width: width * 0.45,
-                  height: width * 0.45,
+                child: Transform.flip(
+                  flipX: context.isEn,
+                  child: Image.asset(
+                    AppAssets.shadows_3,
+                    fit: BoxFit.cover,
+                    color: context.colors.primary,
+                    width: width * 0.45,
+                    height: width * 0.45,
+                  ),
                 ),
               ),
 
@@ -104,9 +108,7 @@ class ServiceCard extends StatelessWidget {
                                   const SizedBox(width: 8),
                                 ],
                                 Text(
-                                  serviceModel.priceMinor != null
-                                      ? serviceModel.priceMinor.toString()
-                                      : serviceModel.price,
+                                  serviceModel.price,
                                   style: AppTextStyles.bold18,
                                 ),
                                 const SizedBox(width: 4),

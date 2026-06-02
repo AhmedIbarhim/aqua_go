@@ -2,7 +2,7 @@ import 'package:aqua_go/core/components/custom_bottom_sheet.dart';
 import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/core/route/routes.dart';
 import 'package:aqua_go/core/themes/app_text_styles.dart';
-import 'package:aqua_go/features/my_bookings/data/models/booking_response_model.dart';
+import 'package:aqua_go/features/my_bookings/data/models/booking_response_model/booking_response_model.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';

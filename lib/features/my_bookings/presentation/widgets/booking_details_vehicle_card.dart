@@ -7,7 +7,7 @@ import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:aqua_go/core/helpers/car_color_helper.dart';
 import 'package:aqua_go/features/my_cars/presentation/widgets/car_make_logo_network_svg.dart';
-import '../../data/models/booking_response_model.dart';
+import '../../data/models/booking_response_model/booking_response_model.dart';
 
 class BookingDetailsVehicleCard extends StatelessWidget {
   final BookingResponseModel booking;

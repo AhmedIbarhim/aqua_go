@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_text_styles.dart';
+import '../../../../core/helpers/shimmer_helper.dart';
 import '../../data/models/package_model.dart';
 import '../../controllers/packages_controller/packages_cubit.dart';
 import 'package_card.dart';
@@ -12,15 +13,9 @@ import '../views/packages_view.dart';
 
 import 'package:skeletonizer/skeletonizer.dart';
 
-class PackagesListView extends StatefulWidget {
-  final bool isLoading;
-  const PackagesListView({super.key, this.isLoading = false});
+class PackagesListView extends StatelessWidget {
+  const PackagesListView({super.key});
 
-  @override
-  State<PackagesListView> createState() => _PackagesListViewState();
-}
-
-class _PackagesListViewState extends State<PackagesListView> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -28,7 +23,7 @@ class _PackagesListViewState extends State<PackagesListView> {
 
     return BlocBuilder<PackagesCubit, PackagesState>(
       builder: (context, state) {
-        final isLoading = state is PackagesLoading || state is PackagesInitial || widget.isLoading;
+        final isLoading = state is PackagesLoading || state is PackagesInitial;
 
         if (state is PackagesError) {
           return Center(
@@ -47,56 +42,7 @@ class _PackagesListViewState extends State<PackagesListView> {
 
         final List<PackageModel> displayPackages;
         if (isLoading) {
-          displayPackages = [
-            PackageModel(
-              id: 'skeleton1',
-              nameAr: 'باقة اكوا كلاسيك',
-              nameEn: 'Aqua Classic Package',
-              descriptionAr: '5 غسلات . 5 مجاناً',
-              descriptionEn: '5 Washes . 5 Free',
-              numWashes: 10,
-              validityDays: 30,
-              priceMinor: 20000,
-              currency: 'SAR',
-              maxActivePerCustomer: 1,
-              allowScheduleLater: true,
-              active: true,
-              bundledServiceIds: [],
-              includedAddons: [],
-              optionalAddons: [],
-              createdAt: '',
-              updatedAt: '',
-              version: 1,
-              imageUrl: '',
-              isPopular: true,
-              carsPerWash: 1,
-              effectiveFromAt: '',
-            ),
-            PackageModel(
-              id: 'skeleton2',
-              nameAr: 'باقة اكوا سوبر',
-              nameEn: 'Aqua Super Package',
-              descriptionAr: '10 غسلات . 10 مجاناً',
-              descriptionEn: '10 Washes . 10 Free',
-              numWashes: 20,
-              validityDays: 30,
-              priceMinor: 30000,
-              currency: 'SAR',
-              maxActivePerCustomer: 1,
-              allowScheduleLater: true,
-              active: true,
-              bundledServiceIds: [],
-              includedAddons: [],
-              optionalAddons: [],
-              createdAt: '',
-              updatedAt: '',
-              version: 1,
-              imageUrl: '',
-              isPopular: true,
-              carsPerWash: 1,
-              effectiveFromAt: '',
-            ),
-          ];
+          displayPackages = ShimmerHelper.getDummyPackages();
         } else if (state is PackagesLoaded) {
           displayPackages = state.packages;
         } else {
@@ -129,7 +75,9 @@ class _PackagesListViewState extends State<PackagesListView> {
                           : () {
                               context.pushNamed(
                                 Routes.packages,
-                                arguments: PackagesArgs(packages: displayPackages),
+                                arguments: PackagesArgs(
+                                  packages: displayPackages,
+                                ),
                               );
                             },
                       child: Row(
@@ -175,7 +123,8 @@ class _PackagesListViewState extends State<PackagesListView> {
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   itemCount: displayPackages.length,
-                  separatorBuilder: (context, index) => const SizedBox(width: 16),
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(width: 16),
                   itemBuilder: (context, index) =>
                       PackageCard(packageModel: displayPackages[index]),
                 ),

@@ -53,7 +53,7 @@ class PackageSubscribtionDetailsContent extends StatelessWidget {
                     child: Text(
                       packageModel.title,
                       style: AppTextStyles.semiBold24,
-                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -72,8 +72,9 @@ class PackageSubscribtionDetailsContent extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          '${LocaleKeys.booking_package_duration.tr()} ${packageModel.duration}',
+                          packageModel.duration,
                           style: AppTextStyles.medium12,
+                          overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(width: 4),
                         const Icon(Icons.timer_outlined, size: 20),

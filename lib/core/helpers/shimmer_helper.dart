@@ -61,9 +61,8 @@ class ShimmerHelper extends StatelessWidget {
     );
   }
 
-  // 2. Shimmer list for packages in HomeView
-  static Widget packages({double? height}) {
-    final dummyPackages = List.generate(
+  static List<PackageModel> getDummyPackages() {
+    return List.generate(
       3,
       (index) => PackageModel(
         id: 'shimmer_pkg_$index',
@@ -90,6 +89,11 @@ class ShimmerHelper extends StatelessWidget {
         effectiveFromAt: '',
       ),
     );
+  }
+
+  // 2. Shimmer list for packages in HomeView
+  static Widget packages({double? height}) {
+    final dummyPackages = getDummyPackages();
 
     return Skeletonizer(
       enabled: true,

@@ -5,7 +5,7 @@ import '../../../home/data/models/service_model.dart';
 import '../../../../core/enums/payment_method_enum.dart';
 import '../data/models/quote_model.dart';
 import '../data/models/availability_response_model.dart';
-import '../../../my_bookings/data/models/booking_response_model.dart';
+import '../../../my_bookings/data/models/booking_response_model/booking_response_model.dart';
 
 enum BookingStatus { initial, loading, success, failure }
 

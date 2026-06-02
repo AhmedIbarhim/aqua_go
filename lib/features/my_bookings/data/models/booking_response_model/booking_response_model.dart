@@ -1,42 +1,20 @@
 import 'package:easy_localization/easy_localization.dart';
 
-import 'booking_status_enum.dart';
-import 'booking_type_enum.dart';
+import '../booking_status_enum.dart';
+import '../booking_type_enum.dart';
+import 'assigned_worker.dart';
+import 'cancellation_policy.dart';
+import 'invoice.dart';
+import 'package_name.dart';
+import 'photos.dart';
 
-class BookingsListResponseModel {
-  final List<BookingResponseModel> items;
-  final String? nextCursor;
-  final int? totalMatching;
+export 'assigned_worker.dart';
+export 'bookings_list_response_model.dart';
+export 'cancellation_policy.dart';
+export 'invoice.dart';
+export 'package_name.dart';
+export 'photos.dart';
 
-  BookingsListResponseModel({
-    required this.items,
-    this.nextCursor,
-    this.totalMatching,
-  });
-
-  factory BookingsListResponseModel.fromJson(Map<String, dynamic> json) {
-    return BookingsListResponseModel(
-      items:
-          (json['items'] as List?)
-              ?.map(
-                (item) =>
-                    BookingResponseModel.fromJson(item as Map<String, dynamic>),
-              )
-              .toList() ??
-          [],
-      nextCursor: json['nextCursor'] as String?,
-      totalMatching: json['totalMatching'] as int?,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'items': items.map((item) => item.toJson()).toList(),
-      'nextCursor': nextCursor,
-      'totalMatching': totalMatching,
-    };
-  }
-}
 
 class BookingResponseModel {
   String? id;
@@ -297,140 +275,5 @@ class BookingResponseModel {
     } catch (_) {
       return scheduledAt!;
     }
-  }
-}
-
-class CancellationPolicy {
-  bool? isFreeNow;
-  int? feeIfCancelledNowMinor;
-  String? freeUntil;
-  String? currency;
-
-  CancellationPolicy({
-    this.isFreeNow,
-    this.feeIfCancelledNowMinor,
-    this.freeUntil,
-    this.currency,
-  });
-
-  CancellationPolicy.fromJson(Map<String, dynamic> json) {
-    isFreeNow = json['isFreeNow'];
-    feeIfCancelledNowMinor = json['feeIfCancelledNowMinor'];
-    freeUntil = json['freeUntil'];
-    currency = json['currency'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['isFreeNow'] = isFreeNow;
-    data['feeIfCancelledNowMinor'] = feeIfCancelledNowMinor;
-    data['freeUntil'] = freeUntil;
-    data['currency'] = currency;
-    return data;
-  }
-}
-
-class Photos {
-  String? stage;
-  String? angle;
-  String? url;
-
-  Photos({this.stage, this.angle, this.url});
-
-  Photos.fromJson(Map<String, dynamic> json) {
-    stage = json['stage'];
-    angle = json['angle'];
-    url = json['url'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['stage'] = stage;
-    data['angle'] = angle;
-    data['url'] = url;
-    return data;
-  }
-}
-
-class AssignedWorker {
-  String? workerId;
-  String? displayName;
-  int? ratingAggregate;
-
-  AssignedWorker({this.workerId, this.displayName, this.ratingAggregate});
-
-  AssignedWorker.fromJson(Map<String, dynamic> json) {
-    workerId = json['workerId'];
-    displayName = json['displayName'];
-    ratingAggregate = json['ratingAggregate'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['workerId'] = workerId;
-    data['displayName'] = displayName;
-    data['ratingAggregate'] = ratingAggregate;
-    return data;
-  }
-}
-
-class Invoice {
-  String? invoiceUuid;
-  String? invoiceNumber;
-  String? qrTlvBase64;
-  String? reportStatus;
-  String? reportedAt;
-  String? pdfUrl;
-  String? pdfUrlExpiresAt;
-
-  Invoice({
-    this.invoiceUuid,
-    this.invoiceNumber,
-    this.qrTlvBase64,
-    this.reportStatus,
-    this.reportedAt,
-    this.pdfUrl,
-    this.pdfUrlExpiresAt,
-  });
-
-  Invoice.fromJson(Map<String, dynamic> json) {
-    invoiceUuid = json['invoiceUuid'];
-    invoiceNumber = json['invoiceNumber'];
-    qrTlvBase64 = json['qrTlvBase64'];
-    reportStatus = json['reportStatus'];
-    reportedAt = json['reportedAt'];
-    pdfUrl = json['pdfUrl'];
-    pdfUrlExpiresAt = json['pdfUrlExpiresAt'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['invoiceUuid'] = invoiceUuid;
-    data['invoiceNumber'] = invoiceNumber;
-    data['qrTlvBase64'] = qrTlvBase64;
-    data['reportStatus'] = reportStatus;
-    data['reportedAt'] = reportedAt;
-    data['pdfUrl'] = pdfUrl;
-    data['pdfUrlExpiresAt'] = pdfUrlExpiresAt;
-    return data;
-  }
-}
-
-class PackageName {
-  String? en;
-  String? ar;
-
-  PackageName({this.en, this.ar});
-
-  PackageName.fromJson(Map<String, dynamic> json) {
-    en = json['en'];
-    ar = json['ar_SA'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> json = <String, dynamic>{};
-    json['en'] = en;
-    json['ar_SA'] = ar;
-    return json;
   }
 }

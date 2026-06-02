@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../data/models/booking_response_model.dart';
+import '../../data/models/booking_response_model/booking_response_model.dart';
 import 'my_bookings_card.dart';
 
 class MyBookingsListView extends StatelessWidget {

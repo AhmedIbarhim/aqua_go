@@ -13,7 +13,7 @@ import 'package:aqua_go/generated/locale_keys.g.dart';
 
 import 'package:aqua_go/core/route/routes.dart';
 
-import '../../data/models/booking_response_model.dart';
+import '../../data/models/booking_response_model/booking_response_model.dart';
 import '../../controllers/my_booking_details_cubit.dart';
 import '../../controllers/my_booking_details_state.dart';
 import '../../../../core/components/bottom_action_sheet_container.dart';
