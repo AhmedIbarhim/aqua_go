@@ -14,10 +14,11 @@ import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:aqua_go/core/route/routes.dart';
 
 import '../../data/models/booking_response_model/booking_response_model.dart';
+import '../../data/models/booking_summary_model.dart';
 import '../../controllers/my_booking_details_cubit.dart';
 import '../../controllers/my_booking_details_state.dart';
 import '../../../../core/components/bottom_action_sheet_container.dart';
-import '../../data/models/booking_status_enum.dart';
+import '../../data/enums/booking_status_enum.dart';
 import '../widgets/my_booking_procedures_bottom_sheet.dart';
 import '../widgets/my_booking_photos_section.dart';
 import '../widgets/my_booking_location_section.dart';
@@ -27,13 +28,13 @@ import '../widgets/booking_details_biker_card.dart';
 import '../widgets/booking_details_summary_card.dart';
 
 class MyBookingDetailsArgs {
-  final BookingResponseModel booking;
+  final BookingSummaryModel booking;
   final bool isFromBookingFlow;
   MyBookingDetailsArgs({required this.booking, this.isFromBookingFlow = false});
 }
 
 class MyBookingDetailsView extends StatelessWidget {
-  final BookingResponseModel booking;
+  final BookingSummaryModel booking;
   final bool isFromBookingFlow;
 
   const MyBookingDetailsView({
@@ -48,7 +49,7 @@ class MyBookingDetailsView extends StatelessWidget {
       builder: (context, state) {
         final activeBooking = state is MyBookingDetailsSuccess
             ? state.booking
-            : booking;
+            : booking.toDetailsPlaceholder();
 
         return PopScope(
           canPop: !isFromBookingFlow,

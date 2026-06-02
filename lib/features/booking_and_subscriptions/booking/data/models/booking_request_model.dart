@@ -13,7 +13,7 @@ class BookingRequestModel {
   final DateTime? date;
   final String? time;
   final List<AddOnModel> additionalServices;
-  final List<String> bikerNotes;
+  final List<String> workerNotes;
   final PaymentMethod? paymentMethod;
   final QuoteModel? quote;
 
@@ -24,7 +24,7 @@ class BookingRequestModel {
     this.date,
     this.time,
     this.additionalServices = const [],
-    this.bikerNotes = const [],
+    this.workerNotes = const [],
     this.paymentMethod,
     this.quote,
   });
@@ -45,29 +45,38 @@ class BookingRequestModel {
       ).toScheduledAtString();
     }
 
+    final isSavedAddress =
+        address?.id != null &&
+        address?.id != 'current_gps' &&
+        address?.id != 'custom_map';
+
     return {
       if (quote?.quoteId != null) 'quoteId': quote!.quoteId,
-      if (address?.id != null &&
-          address?.id != 'current_gps' &&
-          address?.id != 'custom_map')
-        'savedAddressId': address?.id,
-      // 'addressLabel': address?.label,
-      // 'lat': address?.lat,
-      // 'lng': address?.lng,
-      // 'lat': 0,
-      // 'lng': 0,
-      // if (address?.arrivalNotes != null)
-      //   'addressArrivalNotes': address?.arrivalNotes,
-      // 'plateText': car?.plateNumber,
-      // 'vehicleMake': car?.carBrand?.vehicleBrandName.nameEn,
-      // 'vehicleModel': car?.carModel?.vehicleModelName.nameEn,
-      // 'vehicleColor': car?.color,
-      // 'vehicleYear': car?.modelYear,
-      // 'paymentMethod': 'creditCard',
+      if (isSavedAddress) 'savedAddressId': address?.id,
+      if (!isSavedAddress && address != null) ...{
+        'addressLabel': address?.label ?? '',
+        'lat': address?.lat ?? 0.0,
+        'lng': address?.lng ?? 0.0,
+        if (address?.arrivalNotes != null)
+          'addressArrivalNotes': address?.arrivalNotes,
+      },
+      'vehicles': [
+        {
+          if (car?.id != null) 'savedVehicleId': car?.id,
+          if (car?.id == null && car != null) ...{
+            'plateText': car?.plateNumber,
+            if (car?.carBrand?.vehicleBrandName.nameEn != null)
+              'vehicleMake': car?.carBrand?.vehicleBrandName.nameEn,
+            if (car?.carModel?.vehicleModelName.nameEn != null)
+              'vehicleModel': car?.carModel?.vehicleModelName.nameEn,
+            'vehicleColor': car?.color,
+            'vehicleYear': car?.modelYear,
+          },
+        },
+      ],
       'type': 'SCHEDULED',
-      'scheduledAt': scheduledAt,
-      if (car?.id != null) 'savedVehicleId': car?.id,
-      'workerNotes': bikerNotes,
+      if (scheduledAt != null) 'scheduledAt': scheduledAt,
+      if (workerNotes.isNotEmpty) 'workerNotes': workerNotes,
       if (paymentMethod != null) 'paymentMethod': paymentMethod!.name,
     };
   }

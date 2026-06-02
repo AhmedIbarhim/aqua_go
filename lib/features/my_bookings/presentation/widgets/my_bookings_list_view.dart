@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../data/models/booking_response_model/booking_response_model.dart';
+import '../../data/models/booking_summary_model.dart';
 import 'my_bookings_card.dart';
 
 class MyBookingsListView extends StatelessWidget {
   const MyBookingsListView({super.key, required this.bookings});
 
-  final List<BookingResponseModel> bookings;
+  final List<BookingSummaryModel> bookings;
   @override
   Widget build(BuildContext context) {
     return ListView.separated(

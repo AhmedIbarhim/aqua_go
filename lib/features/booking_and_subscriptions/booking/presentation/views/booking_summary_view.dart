@@ -19,6 +19,7 @@ import '../widgets/add_ons_grid.dart';
 
 import 'package:aqua_go/core/route/routes.dart';
 import 'package:aqua_go/features/my_bookings/presentation/views/my_booking_deatails_view.dart';
+import 'package:aqua_go/features/my_bookings/data/models/booking_summary_model.dart';
 
 class BookingSummaryView extends StatefulWidget {
   const BookingSummaryView({super.key});
@@ -51,7 +52,9 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
                 context,
                 Routes.myBookingDetails,
                 arguments: MyBookingDetailsArgs(
-                  booking: state.createdBooking!,
+                  booking: BookingSummaryModel.fromDetails(
+                    state.createdBooking!,
+                  ),
                   isFromBookingFlow: true,
                 ),
               );

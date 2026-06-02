@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 
-import '../booking_status_enum.dart';
-import '../booking_type_enum.dart';
+import '../../enums/booking_status_enum.dart';
+import '../../enums/booking_type_enum.dart';
 import 'assigned_worker.dart';
 import 'cancellation_policy.dart';
 import 'invoice.dart';
@@ -14,7 +14,6 @@ export 'cancellation_policy.dart';
 export 'invoice.dart';
 export 'package_name.dart';
 export 'photos.dart';
-
 
 class BookingResponseModel {
   String? id;
@@ -163,25 +162,43 @@ class BookingResponseModel {
         ? Invoice.fromJson(json['invoice'])
         : null;
     workerNotes = json['workerNotes'] != null
-        ? List<String>.from(json['workerNotes'])
+        ? (json['workerNotes'] is List
+              ? List<String>.from(json['workerNotes'])
+              : [json['workerNotes'].toString()])
         : null;
 
-    vehicleYear = json['vehicleYear'] != null
-        ? int.tryParse(json['vehicleYear'].toString())
-        : (json['vehicle_year'] != null
-              ? int.tryParse(json['vehicle_year'].toString())
-              : null);
-
     addressArrivalNotes = json['addressArrivalNotes'];
-    vehicleMake = json['vehicleMake'] ?? json['vehicle_make'];
-    vehicleModel = json['vehicleModel'] ?? json['vehicle_model'];
-    vehicleColor = json['vehicleColor'] ?? json['vehicle_color'];
+
+    // Extract details-specific nested vehicles array
+    if (json['vehicles'] != null &&
+        (json['vehicles'] is List) &&
+        (json['vehicles'] as List).isNotEmpty) {
+      final firstVehicle =
+          (json['vehicles'] as List).first as Map<String, dynamic>;
+      vehicleMake = firstVehicle['vehicleMake'] ?? firstVehicle['vehicle_make'];
+      vehicleModel =
+          firstVehicle['vehicleModel'] ?? firstVehicle['vehicle_model'];
+      vehicleColor =
+          firstVehicle['vehicleColor'] ?? firstVehicle['vehicle_color'];
+      vehicleYear = firstVehicle['vehicleYear'] != null
+          ? int.tryParse(firstVehicle['vehicleYear'].toString())
+          : (firstVehicle['vehicle_year'] != null
+                ? int.tryParse(firstVehicle['vehicle_year'].toString())
+                : null);
+      plateMasked =
+          firstVehicle['plateMasked'] ??
+          firstVehicle['plate_masked'] ??
+          firstVehicle['plateText'] ??
+          firstVehicle['plate_text'];
+      vehicleMakeLogoUrl =
+          firstVehicle['makeLogoUrl'] ??
+          firstVehicle['vehicleMakeLogoUrl'] ??
+          firstVehicle['vehicle_make_logo_url'];
+    }
 
     packageName = json['packageName'] != null
         ? PackageName.fromJson(json['packageName'])
         : null;
-    vehicleMakeLogoUrl =
-        json['vehicleMakeLogoUrl'] ?? json['vehicle_make_logo_url'];
   }
 
   Map<String, dynamic> toJson() {

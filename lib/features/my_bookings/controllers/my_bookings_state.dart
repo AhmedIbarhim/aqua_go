@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import '../data/models/booking_response_model/booking_response_model.dart';
+import '../data/models/booking_summary_model.dart';
 
 abstract class MyBookingsState extends Equatable {
   const MyBookingsState();
@@ -13,7 +13,7 @@ class MyBookingsInitial extends MyBookingsState {}
 class MyBookingsLoading extends MyBookingsState {}
 
 class MyBookingsSuccess extends MyBookingsState {
-  final List<BookingResponseModel> bookings;
+  final List<BookingSummaryModel> bookings;
   final String? nextCursor;
   final bool hasReachedMax;
 
@@ -24,7 +24,7 @@ class MyBookingsSuccess extends MyBookingsState {
   });
 
   MyBookingsSuccess copyWith({
-    List<BookingResponseModel>? bookings,
+    List<BookingSummaryModel>? bookings,
     String? nextCursor,
     bool? hasReachedMax,
   }) {

@@ -295,7 +295,7 @@ class BookingCubit extends Cubit<BookingState> {
       date: state.selectedDate,
       time: state.selectedTime,
       additionalServices: addonsList,
-      bikerNotes: notesList,
+      workerNotes: notesList,
       paymentMethod: state.paymentMethod,
       quote: quote,
     );

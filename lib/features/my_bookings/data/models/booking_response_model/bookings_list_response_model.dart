@@ -1,7 +1,7 @@
-import 'booking_response_model.dart';
+import '../booking_summary_model.dart';
 
 class BookingsListResponseModel {
-  final List<BookingResponseModel> items;
+  final List<BookingSummaryModel> items;
   final String? nextCursor;
   final int? totalMatching;
 
@@ -17,7 +17,7 @@ class BookingsListResponseModel {
           (json['items'] as List?)
               ?.map(
                 (item) =>
-                    BookingResponseModel.fromJson(item as Map<String, dynamic>),
+                    BookingSummaryModel.fromJson(item as Map<String, dynamic>),
               )
               .toList() ??
           [],

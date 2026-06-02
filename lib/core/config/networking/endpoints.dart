@@ -28,11 +28,13 @@ abstract class Endpoints {
       'catalog/vehicle-makes/$brandId/models';
   static String brandLogo(String brandId) =>
       'catalog/vehicle-makes/$brandId/logo';
+  static String catalogPackageImage(String packageId) =>
+      'catalog/packages/$packageId/image';
   static const String services = 'services';
+  static String addonDetail(String addonId) => 'add-ons/$addonId';
 
   //  Addresses Endpoints
   static const String myAddresses = 'me/addresses';
-
   static String myAddress(String addressId) => 'me/addresses/$addressId';
 
   //  Bookings & Quotes Endpoints
@@ -45,6 +47,11 @@ abstract class Endpoints {
   static String scheduleBooking(String bookingId) =>
       'bookings/$bookingId/schedule';
   static String rateBooking(String bookingId) => 'bookings/$bookingId/rating';
+  static String editBookingLogistics(String bookingId) =>
+      'bookings/$bookingId/edit';
+  static String tipBooking(String bookingId) => 'bookings/$bookingId/tip';
+  static String bookingTracking(String bookingId) =>
+      'bookings/$bookingId/tracking';
 
   //  Banners Endpoints
   static const String banners = 'banners';
@@ -64,6 +71,7 @@ abstract class Endpoints {
 
   //  Availability Endpoints
   static const String availability = 'availability';
+  static const String availabilityNow = 'availability/now';
 
   //  Notification Preferences Endpoints
   static const String notificationPreferences = 'me/notification-preferences';
@@ -90,6 +98,45 @@ abstract class Endpoints {
       'complaints/$complaintId';
   static String complaintPhotoPresign(String complaintId) =>
       'complaints/$complaintId/photos/presign';
+
+  // Wallet Endpoints
+  static const String wallet = 'me/wallet';
+  static const String walletAutoTopup = 'me/wallet/auto-topup';
+  static const String walletTopup = 'me/wallet/topup';
+  static const String walletLedger = 'me/wallet/ledger';
+
+  // Saved Cards Endpoints
+  static const String savedCards = 'me/saved-cards';
+  static String deleteSavedCard(String cardId) => 'me/saved-cards/$cardId';
+  static String setDefaultSavedCard(String cardId) =>
+      'me/saved-cards/$cardId/set-default';
+
+  // Gift Themes & Gifts Endpoints
+  static const String giftThemes = 'gift-themes';
+  static const String gifts = 'gifts';
+  static String giftDetail(String giftId) => 'gifts/$giftId';
+  static String cancelGift(String giftId) => 'gifts/$giftId/cancel';
+  static const String redeemGift = 'gifts/redeem';
+
+  // Promos Endpoints
+  static const String validatePromo = 'promos/validate';
+  static String promoDetail(String code) => 'promos/$code';
+
+  // FAQs Endpoints
+  static const String faqs = 'faqs';
+  static const String searchFaqs = 'faqs/search';
+  static String voteFaqHelpful(String faqId) => 'faqs/$faqId/helpful';
+
+  // Chat Endpoints
+  static const String chatThreads = 'chat/threads';
+  static String readChatThread(String threadId) =>
+      'chat/threads/$threadId/read';
+  static String chatMessages(String threadId) =>
+      'chat/threads/$threadId/messages';
+  static String chatAttachmentPresign(String threadId) =>
+      'chat/threads/$threadId/messages/attachment/presign';
+  static String reportChatMessage(String messageId) =>
+      'chat/messages/$messageId/report';
 
   // External Google Maps Endpoints (Legacy Direct Calls)
   static const String googleMapsAutocompleteUrl =
