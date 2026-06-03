@@ -7,6 +7,7 @@ import '../../../../../core/utils/app_assets.dart';
 import '../../../../../generated/locale_keys.g.dart';
 
 class PaymentSummaryCard extends StatelessWidget {
+  final String serviceName;
   final double servicePrice;
   final List<Map<String, dynamic>> additionalItems;
   final double subtotal;
@@ -15,6 +16,7 @@ class PaymentSummaryCard extends StatelessWidget {
 
   const PaymentSummaryCard({
     super.key,
+    required this.serviceName,
     required this.servicePrice,
     required this.additionalItems,
     required this.subtotal,
@@ -28,8 +30,7 @@ class PaymentSummaryCard extends StatelessWidget {
       children: [
         _buildPaymentRow(
           context,
-          label:
-              'غسلة داخلي و خارجي', // This should be dynamic based on selected service
+          label: serviceName,
           value: servicePrice,
         ),
         ...additionalItems.map(

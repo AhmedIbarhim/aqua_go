@@ -1,3 +1,4 @@
+import 'package:aqua_go/core/helpers/fetch_user_data_helper.dart';
 import 'package:dartz/dartz.dart';
 import 'package:aqua_go/core/config/networking/exceptions/failure.dart';
 import '../models/subscribed_package_model.dart';
@@ -8,30 +9,32 @@ class SubscriptionsRepository {
 
   SubscriptionsRepository(this._subscriptionsDataSource);
 
-  Future<Either<Failure, List<SubscribedPackageModel>>> fetchActiveSubscriptions() async {
+  Future<Either<Failure, List<SubscribedPackageModel>>>
+  fetchActiveSubscriptions() async {
     final result = await _subscriptionsDataSource.getSubscriptions();
-    return result.fold(
-      (failure) => Left(failure),
-      (data) {
-        if (data != null) {
-          try {
-            List<dynamic> list = [];
-            if (data is Map<String, dynamic>) {
-              list = data['items'] as List<dynamic>? ?? [];
-            } else if (data is List<dynamic>) {
-              list = data;
-            }
-            final parsed = list
-                .map((json) => SubscribedPackageModel.fromJson(json as Map<String, dynamic>))
-                .toList();
-            return Right(parsed);
-          } catch (e) {
-            return Left(ServerFailure('Parsing error: $e'));
+    return result.fold((failure) => Left(failure), (data) {
+      if (data != null) {
+        try {
+          List<dynamic> list = [];
+          if (data is Map<String, dynamic>) {
+            list = data['items'] as List<dynamic>? ?? [];
+          } else if (data is List<dynamic>) {
+            list = data;
           }
+          final parsed = list
+              .map(
+                (json) => SubscribedPackageModel.fromJson(
+                  json as Map<String, dynamic>,
+                ),
+              )
+              .toList();
+          return Right(parsed);
+        } catch (e) {
+          return Left(ServerFailure('Parsing error: $e'));
         }
-        return const Left(ServerFailure('Failed to load subscriptions'));
-      },
-    );
+      }
+      return const Left(ServerFailure('Failed to load subscriptions'));
+    });
   }
 
   Future<Either<Failure, SubscribedPackageModel>> createSubscription({
@@ -40,31 +43,34 @@ class SubscriptionsRepository {
     required String addressId,
     String? nonce,
   }) async {
-    final cleanNonce = nonce ?? DateTime.now().millisecondsSinceEpoch.toString();
+    final cleanNonce = nonce ?? DateTime.now().minute.toString();
     final body = {
       'packageId': packageId,
       'vehicleId': vehicleId,
       'addressId': addressId,
-      'initialSchedule': const [], // default scheduling later
+      'initialSchedule': [], // default scheduling later
       'idempotencyNonce': cleanNonce,
     };
-    final idempotencyKey = 'subscription-subscribe:$packageId-$cleanNonce';
+    final idempotencyKey =
+        '${FetchUserData.getUserId()}-$packageId-$cleanNonce';
 
-    final result = await _subscriptionsDataSource.subscribe(body, idempotencyKey);
-    return result.fold(
-      (failure) => Left(failure),
-      (data) {
-        if (data != null) {
-          try {
-            final subscription = SubscribedPackageModel.fromJson(data as Map<String, dynamic>);
-            return Right(subscription);
-          } catch (e) {
-            return Left(ServerFailure('Parsing error: $e'));
-          }
-        }
-        return const Left(ServerFailure('Failed to create subscription'));
-      },
+    final result = await _subscriptionsDataSource.subscribe(
+      body,
+      idempotencyKey,
     );
+    return result.fold((failure) => Left(failure), (data) {
+      if (data != null) {
+        try {
+          final subscription = SubscribedPackageModel.fromJson(
+            data as Map<String, dynamic>,
+          );
+          return Right(subscription);
+        } catch (e) {
+          return Left(ServerFailure('Parsing error: $e'));
+        }
+      }
+      return const Left(ServerFailure('Failed to create subscription'));
+    });
   }
 
   Future<Either<Failure, SubscribedPackageModel>> cancelActiveSubscription({
@@ -72,9 +78,7 @@ class SubscriptionsRepository {
     required String reasonCode,
     String? note,
   }) async {
-    final body = <String, dynamic>{
-      'reasonCode': reasonCode,
-    };
+    final body = <String, dynamic>{'reasonCode': reasonCode};
     if (note != null) {
       body['note'] = note;
     }
@@ -85,19 +89,18 @@ class SubscriptionsRepository {
       body,
       idempotencyKey,
     );
-    return result.fold(
-      (failure) => Left(failure),
-      (data) {
-        if (data != null) {
-          try {
-            final subscription = SubscribedPackageModel.fromJson(data as Map<String, dynamic>);
-            return Right(subscription);
-          } catch (e) {
-            return Left(ServerFailure('Parsing error: $e'));
-          }
+    return result.fold((failure) => Left(failure), (data) {
+      if (data != null) {
+        try {
+          final subscription = SubscribedPackageModel.fromJson(
+            data as Map<String, dynamic>,
+          );
+          return Right(subscription);
+        } catch (e) {
+          return Left(ServerFailure('Parsing error: $e'));
         }
-        return const Left(ServerFailure('Failed to cancel subscription'));
-      },
-    );
+      }
+      return const Left(ServerFailure('Failed to cancel subscription'));
+    });
   }
 }

@@ -1,20 +1,17 @@
-import 'package:aqua_go/core/config/networking/api_client.dart';
-import 'package:aqua_go/core/config/networking/endpoints.dart';
 import 'package:aqua_go/core/helpers/fetch_user_data_helper.dart';
 import 'package:dartz/dartz.dart';
-import 'package:dio/dio.dart';
 
 import '../../../../../core/config/networking/exceptions/failure.dart';
 import 'package:aqua_go/features/my_bookings/data/models/booking_response_model/booking_response_model.dart';
 import '../models/booking_request_model.dart';
 import '../models/quote_model.dart';
-
 import '../models/availability_response_model.dart';
+import '../data_sources/bookings_remote_data_source.dart';
 
 class BookingRepo {
-  final APIClient apiClient;
+  final BookingsRemoteDataSource bookingsRemoteDataSource;
 
-  BookingRepo({required this.apiClient});
+  BookingRepo({required this.bookingsRemoteDataSource});
 
   Future<Either<Failure, QuoteModel>> getQuote({
     required String packageId,
@@ -23,14 +20,11 @@ class BookingRepo {
     String? promoCode,
   }) async {
     try {
-      final response = await apiClient.post<dynamic>(
-        Endpoints.quotes,
-        data: {
-          'packageId': packageId,
-          'lat': lat,
-          'lng': lng,
-          if (promoCode != null && promoCode.isNotEmpty) 'promoCode': promoCode,
-        },
+      final response = await bookingsRemoteDataSource.getQuote(
+        packageId: packageId,
+        lat: lat,
+        lng: lng,
+        promoCode: promoCode,
       );
       return response.fold((failure) => left(failure), (data) {
         if (data != null) {
@@ -53,9 +47,9 @@ class BookingRepo {
     double lng,
   ) async {
     try {
-      final response = await apiClient.post<dynamic>(
-        Endpoints.zoneCheck,
-        data: {'lat': lat, 'lng': lng},
+      final response = await bookingsRemoteDataSource.checkZoneAvailability(
+        lat: lat,
+        lng: lng,
       );
       return response.fold(
         (failure) => left(failure),
@@ -72,15 +66,24 @@ class BookingRepo {
     required String packageId,
   }) async {
     try {
-      return await apiClient.get<AvailabilityResponse>(
-        Endpoints.availability,
-        queryParameters: {
-          'zoneId': zoneId,
-          'date': date,
-          'packageId': packageId,
-        },
-        parser: (data) => AvailabilityResponse.fromJson(data as Map<String, dynamic>),
+      final response = await bookingsRemoteDataSource.getAvailability(
+        zoneId: zoneId,
+        date: date,
+        packageId: packageId,
       );
+      return response.fold((failure) => left(failure), (data) {
+        if (data != null) {
+          try {
+            final availability = AvailabilityResponse.fromJson(
+              data as Map<String, dynamic>,
+            );
+            return right(availability);
+          } catch (e) {
+            return left(ServerFailure('Parsing error: $e'));
+          }
+        }
+        return left(ServerFailure('Failed to load availability details'));
+      });
     } catch (error) {
       return left(ServerFailure(error.toString()));
     }
@@ -94,25 +97,23 @@ class BookingRepo {
       final nowToMinutes = DateTime.now().toIso8601String().substring(0, 16);
       final idempotencyKey = '${userId}_$nowToMinutes';
 
-      final response = await apiClient.post<dynamic>(
-        Endpoints.bookings,
-        data: booking.toJson(),
-        options: Options(headers: {'Idempotency-Key': idempotencyKey}),
+      final response = await bookingsRemoteDataSource.createBooking(
+        bookingData: booking.toJson(),
+        idempotencyKey: idempotencyKey,
       );
-      return response.fold(
-        (failure) => left(failure),
-        (data) {
-          if (data != null) {
-            try {
-              final bookingResponse = BookingResponseModel.fromJson(data as Map<String, dynamic>);
-              return right(bookingResponse);
-            } catch (e) {
-              return left(ServerFailure('Parsing error: $e'));
-            }
+      return response.fold((failure) => left(failure), (data) {
+        if (data != null) {
+          try {
+            final bookingResponse = BookingResponseModel.fromJson(
+              data as Map<String, dynamic>,
+            );
+            return right(bookingResponse);
+          } catch (e) {
+            return left(ServerFailure('Parsing error: $e'));
           }
-          return left(ServerFailure('Failed to load created booking details'));
-        },
-      );
+        }
+        return left(ServerFailure('Failed to load created booking details'));
+      });
     } catch (error) {
       return left(ServerFailure(error.toString()));
     }

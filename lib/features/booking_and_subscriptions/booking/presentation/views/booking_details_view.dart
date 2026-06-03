@@ -49,7 +49,12 @@ class BookingDetailsView extends StatelessWidget {
                     child: _buildContent(context, bookingState, width, height),
                   ),
                 ),
-                _buildBottomActionSheet(context, bookingState, width, height),
+                _buildBottomActionSheet(
+                  context,
+                  bookingState,
+                  width,
+                  height * 0.2,
+                ),
               ],
             ),
           );
@@ -116,15 +121,18 @@ class BookingDetailsView extends StatelessWidget {
               );
             },
           ),
-          SizedBox(height: height * 0.03),
-          _buildSectionTitle(LocaleKeys.bookings_additional_services.tr()),
-          SizedBox(height: height * 0.02),
-          AddOnsGrid(
-            selectedIndices: bookingState.selectedServiceIndices,
-            onServiceToggled: (index) {
-              context.read<BookingCubit>().toggleService(index);
-            },
-          ),
+          if (bookingState.selectedService!.addons.isNotEmpty) ...[
+            SizedBox(height: height * 0.03),
+            _buildSectionTitle(LocaleKeys.bookings_additional_services.tr()),
+            SizedBox(height: height * 0.02),
+            AddOnsGrid(
+              addons: bookingState.selectedService?.addons ?? [],
+              selectedIndices: bookingState.selectedServiceIndices,
+              onServiceToggled: (index) {
+                context.read<BookingCubit>().toggleService(index);
+              },
+            ),
+          ],
           SizedBox(height: height * 0.02),
           BookingDateTimePicker(
             initialDate: bookingState.selectedDate,
@@ -172,6 +180,21 @@ class BookingDetailsView extends StatelessWidget {
         bookingState.selectedDate != null &&
         bookingState.selectedTime != null;
 
+    double addonsTotal = 0.0;
+    final availableAddons = bookingState.selectedService?.addons ?? [];
+    for (final idx in bookingState.selectedServiceIndices) {
+      if (idx < availableAddons.length) {
+        addonsTotal += availableAddons[idx].price;
+      }
+    }
+
+    final basePrice = bookingState.selectedService?.basePriceDouble ?? 0.0;
+    final subtotal = basePrice + addonsTotal;
+    final vat =
+        (bookingState.selectedService?.vatDouble ?? (basePrice * 0.15)) +
+        (addonsTotal * 0.15);
+    final total = subtotal + vat;
+
     return BottomActionSheetContainer(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -186,9 +209,7 @@ class BookingDetailsView extends StatelessWidget {
               ),
               const Spacer(),
               Text(
-                bookingState.selectedService?.price.isNotEmpty == true
-                    ? bookingState.selectedService!.price
-                    : (bookingState.selectedService?.priceDouble.toStringAsFixed(2) ?? '0.00'),
+                total.toStringAsFixed(2),
                 style: AppTextStyles.medium24,
               ),
               const SizedBox(width: 4),

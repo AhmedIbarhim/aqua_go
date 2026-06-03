@@ -3,27 +3,27 @@ import 'package:svg_flutter/svg.dart';
 import '../../../../../core/extentions/context_extentions.dart';
 import '../../../../../core/themes/app_text_styles.dart';
 import '../../../../../core/utils/app_assets.dart';
+import '../../../../../core/components/custom_network_image.dart';
+import '../../../shared/add_on_model.dart';
 
 class AddOnsGrid extends StatelessWidget {
+  final List<AddOnModel> addons;
   final Set<int> selectedIndices;
   final Function(int index) onServiceToggled;
 
   const AddOnsGrid({
     super.key,
+    required this.addons,
     required this.selectedIndices,
     required this.onServiceToggled,
   });
 
-  static final List<Map<String, String>> additionalServices = [
-    {'title': 'فواحة', 'price': '8.00', 'icon': AppAssets.fragant},
-    {'title': 'مناديل', 'price': '8.00', 'icon': AppAssets.tissues},
-    {'title': 'دعاسة (قطعتين)', 'price': '8.00', 'icon': AppAssets.pedals},
-    {'title': 'مناديل مبللة', 'price': '8.00', 'icon': AppAssets.wibes},
-  ];
-
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
+    if (addons.isEmpty) {
+      return const SizedBox.shrink();
+    }
     return GridView.builder(
       shrinkWrap: true,
       padding: EdgeInsets.zero,
@@ -34,17 +34,23 @@ class AddOnsGrid extends StatelessWidget {
         crossAxisSpacing: width * 0.02,
         childAspectRatio: 2.1,
       ),
-      itemCount: additionalServices.length,
+      itemCount: addons.length,
       itemBuilder: (context, index) {
-        final service = additionalServices[index];
+        final addon = addons[index];
         final isSelected = selectedIndices.contains(index);
+        final title = context.isAr
+            ? (addon.nameAr ?? addon.nameEn ?? '')
+            : (addon.nameEn ?? addon.nameAr ?? '');
+        final priceStr = addon.price.toStringAsFixed(2);
+        final iconUrl = addon.imageUrl ?? '';
+
         return GestureDetector(
           onTap: () => onServiceToggled(index),
           child: _buildServiceCard(
             context,
-            service['title']!,
-            service['price']!,
-            service['icon']!,
+            title,
+            priceStr,
+            iconUrl,
             width,
             isSelected: isSelected,
           ),
@@ -77,7 +83,7 @@ class AddOnsGrid extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          SvgPicture.asset(icon, width: width * 0.09),
+          _buildIcon(icon, width * 0.09),
           SizedBox(width: width * 0.015),
           Expanded(
             child: Column(
@@ -115,6 +121,20 @@ class AddOnsGrid extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildIcon(String url, double width) {
+    if (url.isEmpty) {
+      return SvgPicture.asset(AppAssets.fragant, width: width);
+    }
+    if (url.endsWith('.svg')) {
+      return SvgPicture.network(url, width: width);
+    }
+    return SizedBox(
+      width: width,
+      height: width,
+      child: CustomNetworkImage(url, fit: BoxFit.contain),
     );
   }
 }

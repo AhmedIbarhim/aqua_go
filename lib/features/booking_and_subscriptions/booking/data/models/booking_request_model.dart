@@ -1,7 +1,7 @@
 import '../../../../address/data/models/address_model.dart';
 import '../../../../my_cars/data/models/my_car_model.dart';
 import '../../../../home/data/models/service_model.dart';
-import 'add_on_model.dart';
+import '../../../shared/add_on_model.dart';
 import 'day_time_model.dart';
 import '../../../../../core/enums/payment_method_enum.dart';
 import 'quote_model.dart';
@@ -12,7 +12,7 @@ class BookingRequestModel {
   final AddressModel? address;
   final DateTime? date;
   final String? time;
-  final List<AddOnModel> additionalServices;
+  final List<AddOnModel> serviceAddOns;
   final List<String> workerNotes;
   final PaymentMethod? paymentMethod;
   final QuoteModel? quote;
@@ -23,7 +23,7 @@ class BookingRequestModel {
     this.address,
     this.date,
     this.time,
-    this.additionalServices = const [],
+    this.serviceAddOns = const [],
     this.workerNotes = const [],
     this.paymentMethod,
     this.quote,
@@ -75,7 +75,7 @@ class BookingRequestModel {
         },
       ],
       'type': 'SCHEDULED',
-      if (scheduledAt != null) 'scheduledAt': scheduledAt,
+      'scheduledAt': ?scheduledAt,
       if (workerNotes.isNotEmpty) 'workerNotes': workerNotes,
       if (paymentMethod != null) 'paymentMethod': paymentMethod!.name,
     };

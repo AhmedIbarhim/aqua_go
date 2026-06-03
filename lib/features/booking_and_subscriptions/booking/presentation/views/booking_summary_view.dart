@@ -15,8 +15,6 @@ import '../widgets/payment_method_selection.dart';
 
 import '../../controllers/booking_cubit.dart';
 import '../../controllers/booking_state.dart';
-import '../widgets/add_ons_grid.dart';
-
 import 'package:aqua_go/core/route/routes.dart';
 import 'package:aqua_go/features/my_bookings/presentation/views/my_booking_deatails_view.dart';
 import 'package:aqua_go/features/my_bookings/data/models/booking_summary_model.dart';
@@ -95,16 +93,19 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
   ) {
     final List<Map<String, dynamic>> selectedAddons = [];
     double addonsTotal = 0.0;
+    final availableAddons = bookingState.selectedService?.addons ?? [];
     for (final idx in bookingState.selectedServiceIndices) {
-      if (idx < AddOnsGrid.additionalServices.length) {
-        final item = AddOnsGrid.additionalServices[idx];
-        final price = double.tryParse(item['price'] ?? '0.00') ?? 0.00;
-        selectedAddons.add({'name': item['title'] ?? '', 'price': price});
-        addonsTotal += price;
+      if (idx < availableAddons.length) {
+        final addon = availableAddons[idx];
+        final title = context.isAr
+            ? (addon.nameAr ?? addon.nameEn ?? '')
+            : (addon.nameEn ?? addon.nameAr ?? '');
+        selectedAddons.add({'name': title, 'price': addon.price});
+        addonsTotal += addon.price;
       }
     }
 
-    final basePrice = bookingState.selectedService?.basePriceDouble ?? 94.99;
+    final basePrice = bookingState.selectedService?.basePriceDouble ?? 0.0;
     final subtotal = basePrice + addonsTotal;
     final vat =
         (bookingState.selectedService?.vatDouble ?? (basePrice * 0.15)) +
@@ -156,6 +157,9 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
           _buildSectionTitle(LocaleKeys.bookings_payment_summary.tr()),
           const SizedBox(height: 16),
           PaymentSummaryCard(
+            serviceName: context.isAr
+                ? (bookingState.selectedService?.rawName.nameAr ?? '')
+                : (bookingState.selectedService?.rawName.nameEn ?? ''),
             servicePrice: basePrice,
             additionalItems: selectedAddons,
             subtotal: subtotal,

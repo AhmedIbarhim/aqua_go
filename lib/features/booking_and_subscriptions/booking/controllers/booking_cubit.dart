@@ -7,12 +7,11 @@ import '../../../address/data/models/address_model.dart';
 import '../../../my_cars/data/models/my_car_model.dart';
 import '../../../home/data/models/service_model.dart';
 import '../data/models/booking_request_model.dart';
-import '../data/models/add_on_model.dart';
+import '../../shared/add_on_model.dart';
 import '../data/models/biker_note.dart';
 import '../data/models/quote_model.dart';
 import '../data/repos/booking_repo.dart';
 import '../../../../core/enums/payment_method_enum.dart';
-import '../presentation/widgets/add_ons_grid.dart';
 import 'booking_state.dart';
 
 class BookingCubit extends Cubit<BookingState> {
@@ -257,17 +256,10 @@ class BookingCubit extends Cubit<BookingState> {
     }
 
     final List<AddOnModel> addonsList = [];
+    final availableAddons = state.selectedService?.addons ?? [];
     for (final idx in state.selectedServiceIndices) {
-      if (idx < AddOnsGrid.additionalServices.length) {
-        final item = AddOnsGrid.additionalServices[idx];
-        addonsList.add(
-          AddOnModel(
-            id: item['id'] ?? idx.toString(),
-            name: item['title'] ?? '',
-            price: double.tryParse(item['price'] ?? '0.00') ?? 0.0,
-            image: item['icon'] ?? '',
-          ),
-        );
+      if (idx < availableAddons.length) {
+        addonsList.add(availableAddons[idx]);
       }
     }
 
@@ -294,7 +286,7 @@ class BookingCubit extends Cubit<BookingState> {
       address: state.selectedAddress,
       date: state.selectedDate,
       time: state.selectedTime,
-      additionalServices: addonsList,
+      serviceAddOns: addonsList,
       workerNotes: notesList,
       paymentMethod: state.paymentMethod,
       quote: quote,

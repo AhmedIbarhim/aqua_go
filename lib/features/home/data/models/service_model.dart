@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'service_addon_model.dart';
+import '../../../booking_and_subscriptions/shared/add_on_model.dart';
 import '../../../../core/utils/app_assets.dart';
 
 class ServiceModel extends Equatable {
@@ -8,7 +8,7 @@ class ServiceModel extends Equatable {
   final ServiceName rawName;
   final ServiceDescription rawDescription;
   final bool active;
-  final List<ServiceAddonModel> addons;
+  final List<AddOnModel> addons;
   final int? priceMinor;
   final int? vatMinor;
   final String? currency;
@@ -40,15 +40,13 @@ class ServiceModel extends Equatable {
   String get oldPrice => oldPriceOverride ?? '';
   String get image => imageOverride ?? AppAssets.carDemo;
 
-  double get priceDouble => (priceMinor != null && priceMinor! > 0)
+  double get basePriceDouble => (priceMinor != null && priceMinor! > 0)
       ? priceMinor! / 100
-      : (double.tryParse(priceOverride ?? '90.00') ?? 90.00);
+      : (double.tryParse(priceOverride ?? '') ?? 0.0);
   double get vatDouble => (priceMinor != null && priceMinor! > 0)
       ? (vatMinor ?? 0) / 100
-      : priceDouble * 0.15;
-  double get basePriceDouble => (priceMinor != null && priceMinor! > 0)
-      ? priceDouble - vatDouble
-      : priceDouble;
+      : basePriceDouble * 0.15;
+  // double get basePriceDouble => priceDouble - vatDouble;
 
   factory ServiceModel.fromJson(Map<String, dynamic> json) {
     return ServiceModel(
@@ -57,8 +55,9 @@ class ServiceModel extends Equatable {
       rawName: ServiceName.fromJson(json['name']),
       rawDescription: ServiceDescription.fromJson(json['description']),
       active: json['active'] as bool? ?? true,
-      addons: (json['addons'] as List<dynamic>?)
-              ?.map((e) => ServiceAddonModel.fromJson(e as Map<String, dynamic>))
+      addons:
+          (json['addons'] as List<dynamic>?)
+              ?.map((e) => AddOnModel.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
       priceMinor: (json['priceMinor'] as num?)?.toInt(),
