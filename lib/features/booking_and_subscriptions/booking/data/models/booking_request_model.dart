@@ -65,8 +65,8 @@ class BookingRequestModel {
           if (car?.id != null) 'savedVehicleId': car?.id,
           if (car?.id == null && car != null) ...{
             'plateText': car?.plateNumber,
-            if (car?.carBrand?.vehicleBrandName.nameEn != null)
-              'vehicleMake': car?.carBrand?.vehicleBrandName.nameEn,
+            if (car?.carMake?.vehicleMakeName.nameEn != null)
+              'vehicleMake': car?.carMake?.vehicleMakeName.nameEn,
             if (car?.carModel?.vehicleModelName.nameEn != null)
               'vehicleModel': car?.carModel?.vehicleModelName.nameEn,
             'vehicleColor': car?.color,

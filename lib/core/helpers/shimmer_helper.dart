@@ -8,7 +8,7 @@ import '../../features/home/data/models/package_model.dart';
 import '../../features/home/data/models/service_model.dart';
 import '../../features/home/data/models/offer_model.dart';
 import '../../features/my_cars/data/models/my_car_model.dart';
-import '../../features/my_cars/data/models/vehicle_brand_model.dart';
+import '../../features/my_cars/data/models/vehicle_make_model.dart';
 import '../../features/my_cars/data/models/vehicle_model_model.dart';
 import '../../features/address/data/models/address_model.dart';
 
@@ -68,8 +68,10 @@ class ShimmerHelper extends StatelessWidget {
         id: 'shimmer_pkg_$index',
         nameAr: 'باقة اكوا بريميوم النموذجية',
         nameEn: 'Model Aqua Premium Package',
-        descriptionAr: 'هذا الوصف تجريبي لتجربة التحميل الشيمر لباقات أكوا غو المميزة',
-        descriptionEn: 'This description is for testing packages shimmer loading',
+        descriptionAr:
+            'هذا الوصف تجريبي لتجربة التحميل الشيمر لباقات أكوا غو المميزة',
+        descriptionEn:
+            'This description is for testing packages shimmer loading',
         numWashes: 10,
         validityDays: 30,
         priceMinor: 99999,
@@ -178,9 +180,9 @@ class ShimmerHelper extends StatelessWidget {
         modelYear: DateTime.now().year,
         color: '#CCCCCC',
         plateNumber: 'أ ب ج ١٢٣٤',
-        carBrand: const VehicleBrandModel(
+        carMake: const VehicleMakeModel(
           id: 'brand',
-          vehicleBrandName: BrandName(
+          vehicleMakeName: MakeName(
             nameAr: 'تويوتا نموذج',
             nameEn: 'Toyota Dummy',
           ),
@@ -257,9 +259,9 @@ class ShimmerHelper extends StatelessWidget {
         color: '#CCCCCC',
         modelYear: DateTime.now().year,
         plateNumber: '١٢٣٤',
-        carBrand: const VehicleBrandModel(
+        carMake: const VehicleMakeModel(
           id: 'brand',
-          vehicleBrandName: BrandName(
+          vehicleMakeName: MakeName(
             nameAr: 'تويوتا نموذج',
             nameEn: 'Toyota Dummy',
           ),

@@ -72,9 +72,9 @@ class PackageModel {
   String get image =>
       imageUrl.isNotEmpty ? imageUrl : 'assets/images/gift_demo.png';
 
-  String get total =>
-      (num.parse(price) + (num.parse(price) * .14)).toStringAsFixed(2);
-  String get vat => (num.parse(price) * .14).toStringAsFixed(2);
+  String get total => (num.parse(price) + num.parse(vat)).toStringAsFixed(2);
+  String get vat => "0.0";
+  // (num.parse(price) * .14).toStringAsFixed(2);
 
   factory PackageModel.fromJson(Map<String, dynamic> json) {
     return PackageModel(
@@ -87,7 +87,8 @@ class PackageModel {
       validityDays: (json['validityDays'] as num?)?.toInt() ?? 0,
       priceMinor: (json['priceMinor'] as num?)?.toInt() ?? 0,
       currency: json['currency'] as String? ?? '',
-      maxActivePerCustomer: (json['maxActivePerCustomer'] as num?)?.toInt() ?? 0,
+      maxActivePerCustomer:
+          (json['maxActivePerCustomer'] as num?)?.toInt() ?? 0,
       allowScheduleLater: json['allowScheduleLater'] as bool? ?? true,
       active: json['active'] as bool? ?? true,
       bundledServiceIds:

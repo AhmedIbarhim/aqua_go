@@ -89,8 +89,8 @@ class CarSelectionList extends StatelessWidget {
             fit: BoxFit.scaleDown,
             child: Text(
               context.isEn
-                  ? '${car.carBrand?.vehicleBrandName.nameEn} ${car.carModel?.vehicleModelName.nameEn}'
-                  : '${car.carBrand?.vehicleBrandName.nameAr} ${car.carModel?.vehicleModelName.nameAr}',
+                  ? '${car.carMake?.vehicleMakeName.nameEn} ${car.carModel?.vehicleModelName.nameEn}'
+                  : '${car.carMake?.vehicleMakeName.nameAr} ${car.carModel?.vehicleModelName.nameAr}',
               style: AppTextStyles.regular12.copyWith(
                 color: isSelected
                     ? context.colors.textPrimary

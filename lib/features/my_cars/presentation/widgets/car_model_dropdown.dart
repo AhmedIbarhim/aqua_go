@@ -7,12 +7,12 @@ import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/components/custom_bottom_sheet.dart';
 import '../../../../core/components/custom_loading_indicator.dart';
 import '../../../../generated/locale_keys.g.dart';
-import '../../data/models/vehicle_brand_model.dart';
+import '../../data/models/vehicle_make_model.dart';
 import '../../data/models/vehicle_model_model.dart';
 import '../../controllers/my_cars_cubit.dart';
 
 class CarModelDropdown extends StatefulWidget {
-  final VehicleBrandModel? selectedBrand;
+  final VehicleMakeModel? selectedBrand;
   final VehicleModelModel? initialValue;
   final ValueChanged<VehicleModelModel?> onChanged;
 

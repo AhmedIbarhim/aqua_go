@@ -7,26 +7,26 @@ import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/components/custom_bottom_sheet.dart';
 import '../../../../core/components/custom_loading_indicator.dart';
 import '../../../../generated/locale_keys.g.dart';
-import '../../data/models/vehicle_brand_model.dart';
+import '../../data/models/vehicle_make_model.dart';
 import '../../controllers/my_cars_cubit.dart';
 
-class CarBrandDropdown extends StatefulWidget {
-  final VehicleBrandModel? initialValue;
-  final ValueChanged<VehicleBrandModel?> onChanged;
+class CarMakeDropdown extends StatefulWidget {
+  final VehicleMakeModel? initialValue;
+  final ValueChanged<VehicleMakeModel?> onChanged;
 
-  const CarBrandDropdown({
+  const CarMakeDropdown({
     super.key,
     this.initialValue,
     required this.onChanged,
   });
 
   @override
-  State<CarBrandDropdown> createState() => _CarBrandDropdownState();
+  State<CarMakeDropdown> createState() => _CarMakeDropdownState();
 }
 
-class _CarBrandDropdownState extends State<CarBrandDropdown> {
-  VehicleBrandModel? _selectedValue;
-  List<VehicleBrandModel> _brands = [];
+class _CarMakeDropdownState extends State<CarMakeDropdown> {
+  VehicleMakeModel? _selectedValue;
+  List<VehicleMakeModel> _brands = [];
 
   @override
   void initState() {
@@ -38,7 +38,7 @@ class _CarBrandDropdownState extends State<CarBrandDropdown> {
   }
 
   @override
-  void didUpdateWidget(covariant CarBrandDropdown oldWidget) {
+  void didUpdateWidget(covariant CarMakeDropdown oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.initialValue != oldWidget.initialValue) {
       setState(() {
@@ -62,8 +62,8 @@ class _CarBrandDropdownState extends State<CarBrandDropdown> {
         final isArabic = context.locale.languageCode == 'ar';
         final currentDisplayValue = _selectedValue != null
             ? (isArabic
-                  ? _selectedValue!.vehicleBrandName.nameAr
-                  : _selectedValue!.vehicleBrandName.nameEn)
+                  ? _selectedValue!.vehicleMakeName.nameAr
+                  : _selectedValue!.vehicleMakeName.nameEn)
             : null;
 
         return Column(
@@ -79,7 +79,7 @@ class _CarBrandDropdownState extends State<CarBrandDropdown> {
                   ),
                 ),
                 Text(
-                  LocaleKeys.my_cars_car_brand.tr(),
+                  LocaleKeys.my_cars_car_make.tr(),
                   style: AppTextStyles.medium14.copyWith(
                     color: context.colors.textPrimary,
                   ),
@@ -92,7 +92,7 @@ class _CarBrandDropdownState extends State<CarBrandDropdown> {
                 final myCarsCubit = context.read<MyCarsCubit>();
                 CustomBottomSheet.show(
                   context: context,
-                  title: LocaleKeys.my_cars_car_brand.tr(),
+                  title: LocaleKeys.my_cars_car_make.tr(),
                   child: BlocProvider<MyCarsCubit>.value(
                     value: myCarsCubit,
                     child: ConstrainedBox(
@@ -120,8 +120,8 @@ class _CarBrandDropdownState extends State<CarBrandDropdown> {
                               mainAxisSize: MainAxisSize.min,
                               children: currentBrands.map((item) {
                                 final displayName = isArabic
-                                    ? item.vehicleBrandName.nameAr
-                                    : item.vehicleBrandName.nameEn;
+                                    ? item.vehicleMakeName.nameAr
+                                    : item.vehicleMakeName.nameEn;
                                 final isSelected =
                                     item.id == _selectedValue?.id;
                                 return InkWell(

@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../data/models/my_car_model.dart';
-import '../data/models/vehicle_brand_model.dart';
+import '../data/models/vehicle_make_model.dart';
 import '../data/models/vehicle_model_model.dart';
 import '../data/repos/cars_repository.dart';
 import 'package:easy_localization/easy_localization.dart';

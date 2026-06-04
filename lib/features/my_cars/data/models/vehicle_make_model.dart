@@ -1,22 +1,22 @@
 import 'package:equatable/equatable.dart';
 
-class VehicleBrandModel extends Equatable {
+class VehicleMakeModel extends Equatable {
   final String id;
-  final BrandName vehicleBrandName;
+  final MakeName vehicleMakeName;
   final bool active;
   final int version;
 
-  const VehicleBrandModel({
+  const VehicleMakeModel({
     required this.id,
-    required this.vehicleBrandName,
+    required this.vehicleMakeName,
     required this.active,
     required this.version,
   });
 
-  factory VehicleBrandModel.fromJson(Map<String, dynamic> json) {
-    return VehicleBrandModel(
+  factory VehicleMakeModel.fromJson(Map<String, dynamic> json) {
+    return VehicleMakeModel(
       id: json['id'] as String,
-      vehicleBrandName: BrandName.fromJson(json['name']),
+      vehicleMakeName: MakeName.fromJson(json['name']),
       active: json['active'] as bool? ?? true,
       version: json['version'] as int? ?? 1,
     );
@@ -25,24 +25,24 @@ class VehicleBrandModel extends Equatable {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'name': vehicleBrandName.toJson(),
+      'name': vehicleMakeName.toJson(),
       'active': active,
       'version': version,
     };
   }
 
   @override
-  List<Object?> get props => [id, vehicleBrandName, active, version];
+  List<Object?> get props => [id, vehicleMakeName, active, version];
 }
 
-class BrandName extends Equatable {
+class MakeName extends Equatable {
   final String nameAr;
   final String nameEn;
 
-  const BrandName({required this.nameAr, required this.nameEn});
+  const MakeName({required this.nameAr, required this.nameEn});
 
-  factory BrandName.fromJson(dynamic json) {
-    return BrandName(
+  factory MakeName.fromJson(dynamic json) {
+    return MakeName(
       nameAr: json['ar_SA']?.toString() ?? '',
       nameEn: json['en']?.toString() ?? '',
     );

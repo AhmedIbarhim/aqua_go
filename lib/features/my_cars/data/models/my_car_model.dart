@@ -1,7 +1,10 @@
+import 'package:aqua_go/core/constants.dart';
+
+import '../../../../core/config/local_storage/shared_prefs.dart';
 import '../../../../core/config/networking/endpoints.dart';
 import '../../../../core/helpers/car_color_helper.dart';
 import '../../../../core/utils/app_assets.dart';
-import 'vehicle_brand_model.dart';
+import 'vehicle_make_model.dart';
 import 'vehicle_model_model.dart';
 
 class MyCarModel {
@@ -12,7 +15,7 @@ class MyCarModel {
   final int modelYear;
   final String plateNumber;
   final DateTime? createdAt;
-  final VehicleBrandModel? carBrand;
+  final VehicleMakeModel? carMake;
   final VehicleModelModel? carModel;
 
   MyCarModel({
@@ -23,23 +26,27 @@ class MyCarModel {
     required this.modelYear,
     required this.plateNumber,
     this.createdAt,
-    this.carBrand,
+    this.carMake,
     this.carModel,
   });
 
-  // // Getter for brand / make name
-  // String get name {
-  //   if (carBrand == null) return '';
-  //   final isArabic = Intl.defaultLocale?.startsWith('ar') ?? false;
-  //   return isArabic ? carBrand!.brandName.nameAr : carBrand!.brandName.nameEn;
-  // }
+  // Getter for make name
+  String get make {
+    if (carMake == null) return '';
+    final isArabic = CacheClient.getString(kLanguage) == kArabicLang;
+    return isArabic
+        ? carMake!.vehicleMakeName.nameAr
+        : carMake!.vehicleMakeName.nameEn;
+  }
 
-  // // Getter for model name
-  // String get model {
-  //   if (carModel == null) return '';
-  //   final isArabic = Intl.defaultLocale?.startsWith('ar') ?? false;
-  //   return isArabic ? carModel!.name.nameAr : carModel!.name.nameEn;
-  // }
+  // Getter for model name
+  String get model {
+    if (carModel == null) return '';
+    final isArabic = CacheClient.getString(kLanguage) == kArabicLang;
+    return isArabic
+        ? carModel!.vehicleModelName.nameAr
+        : carModel!.vehicleModelName.nameEn;
+  }
 
   // Getter for year (API does not have year; return default placeholder or fallback)
   // String get modelYear => '2024';
@@ -50,9 +57,9 @@ class MyCarModel {
   // Generic car asset
   String get image => AppAssets.myCar;
 
-  // Make brand logo
+  // Make logo
   String get typeImage {
-    return '${Endpoints.baseUrl}${Endpoints.brandLogo(makeId)}';
+    return '${Endpoints.baseUrl}${Endpoints.makeLogo(makeId)}';
   }
 
   // Color code integer getter parsed from hex string color (e.g. "0xFFFFFF" or "#FFFFFF")
@@ -76,7 +83,7 @@ class MyCarModel {
 
   factory MyCarModel.fromJson(
     Map<String, dynamic> json, {
-    VehicleBrandModel? make,
+    VehicleMakeModel? make,
     VehicleModelModel? modelRelation,
   }) {
     return MyCarModel(
@@ -93,7 +100,7 @@ class MyCarModel {
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt'].toString())
           : null,
-      carBrand: make,
+      carMake: make,
       carModel: modelRelation,
     );
   }
@@ -128,7 +135,7 @@ class MyCarModel {
     int? modelYear,
     String? plateNumber,
     DateTime? createdAt,
-    VehicleBrandModel? make,
+    VehicleMakeModel? make,
     VehicleModelModel? modelRelation,
   }) {
     return MyCarModel(
@@ -139,7 +146,7 @@ class MyCarModel {
       modelYear: modelYear ?? this.modelYear,
       plateNumber: plateNumber ?? this.plateNumber,
       createdAt: createdAt ?? this.createdAt,
-      carBrand: make ?? carBrand,
+      carMake: make ?? carMake,
       carModel: modelRelation ?? carModel,
     );
   }

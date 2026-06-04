@@ -12,19 +12,41 @@ class SubscriptionsCubit extends Cubit<SubscriptionsState> {
     : _subscriptionsRepository = subscriptionsRepository,
       super(SubscriptionsInitial());
 
-  Future<void> getActiveSubscriptions() async {
+  Future<void> getActiveSubscriptions({
+    int? limit,
+    String? cursor,
+    String? status,
+  }) async {
     emit(SubscriptionsLoading());
-    final result = await _subscriptionsRepository.fetchActiveSubscriptions();
+    final result = await _subscriptionsRepository.fetchActiveSubscriptions(
+      limit: limit,
+      cursor: cursor,
+      status: status,
+    );
     result.fold(
       (failure) => emit(SubscriptionsError(failure.message)),
       (subscriptions) => emit(SubscriptionsLoaded(subscriptions)),
     );
   }
 
+  Future<void> getSubscriptionDetail({required String subscriptionId}) async {
+    emit(SubscriptionsLoading());
+    final result = await _subscriptionsRepository.fetchSubscriptionDetail(
+      subscriptionId: subscriptionId,
+    );
+    result.fold(
+      (failure) => emit(SubscriptionsError(failure.message)),
+      (subscription) => emit(
+        SubscriptionCreated(subscription),
+      ), // Re-using SubscriptionCreated/Loaded state or single subscription loaded state
+    );
+  }
+
   Future<void> subscribeToPackage({
     required String packageId,
-    required String vehicleId,
-    required String addressId,
+    String? vehicleId,
+    String? addressId,
+    List<ScheduleEntry>? initialSchedule,
     String? nonce,
   }) async {
     emit(SubscriptionsLoading());
@@ -32,6 +54,7 @@ class SubscriptionsCubit extends Cubit<SubscriptionsState> {
       packageId: packageId,
       vehicleId: vehicleId,
       addressId: addressId,
+      initialSchedule: initialSchedule,
       nonce: nonce,
     );
     result.fold(

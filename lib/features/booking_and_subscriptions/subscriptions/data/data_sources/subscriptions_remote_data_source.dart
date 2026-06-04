@@ -9,8 +9,26 @@ class SubscriptionsRemoteDataSource {
 
   SubscriptionsRemoteDataSource(this._apiClient);
 
-  Future<Either<Failure, dynamic>> getSubscriptions() {
-    return _apiClient.get(Endpoints.subscriptions);
+  Future<Either<Failure, dynamic>> getSubscriptions({
+    int? limit,
+    String? cursor,
+    String? status,
+  }) {
+    final queryParameters = <String, dynamic>{};
+    if (limit != null) queryParameters['limit'] = limit;
+    if (cursor != null) queryParameters['cursor'] = cursor;
+    if (status != null) queryParameters['status'] = status;
+
+    return _apiClient.get(
+      Endpoints.subscriptions,
+      queryParameters: queryParameters,
+    );
+  }
+
+  Future<Either<Failure, dynamic>> getSubscriptionDetail(String subscriptionId) {
+    return _apiClient.get(
+      Endpoints.subscriptionDetail(subscriptionId),
+    );
   }
 
   Future<Either<Failure, dynamic>> subscribe(

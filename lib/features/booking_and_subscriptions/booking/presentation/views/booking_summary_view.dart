@@ -125,8 +125,8 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
                 ? (bookingState.selectedService?.rawName.nameAr ?? '')
                 : (bookingState.selectedService?.rawName.nameEn ?? ''),
             carName: context.isAr
-                ? '${bookingState.selectedCar!.carBrand!.vehicleBrandName.nameAr} ${bookingState.selectedCar!.carModel!.vehicleModelName.nameAr}'
-                : '${bookingState.selectedCar!.carBrand!.vehicleBrandName.nameEn} ${bookingState.selectedCar!.carModel!.vehicleModelName.nameEn}',
+                ? '${bookingState.selectedCar!.carMake!.vehicleMakeName.nameAr} ${bookingState.selectedCar!.carModel!.vehicleModelName.nameAr}'
+                : '${bookingState.selectedCar!.carMake!.vehicleMakeName.nameEn} ${bookingState.selectedCar!.carModel!.vehicleModelName.nameEn}',
             location: bookingState.selectedAddress?.details ?? '',
             dateTime: bookingState.selectedDate != null
                 ? '${bookingState.selectedDate!.month}/${bookingState.selectedDate!.day}/${bookingState.selectedDate!.year} - ${bookingState.selectedTime ?? ""}'

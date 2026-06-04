@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:dartz/dartz.dart';
 import '../../../../core/config/networking/exceptions/failure.dart';
 import '../models/my_car_model.dart';
-import '../models/vehicle_brand_model.dart';
+import '../models/vehicle_make_model.dart';
 import '../models/vehicle_model_model.dart';
 import '../data_sources/cars_remote_data_source.dart';
 
@@ -11,7 +11,7 @@ class CarsRepository {
 
   CarsRepository(this._carsService);
 
-  Future<Either<Failure, List<VehicleBrandModel>>> getBrands() async {
+  Future<Either<Failure, List<VehicleMakeModel>>> getBrands() async {
     final result = await _carsService.getVehicleMakes();
     return result.fold((failure) => Left(failure), (data) {
       if (data != null) {
@@ -20,7 +20,7 @@ class CarsRepository {
           final brands = list
               .map(
                 (json) =>
-                    VehicleBrandModel.fromJson(json as Map<String, dynamic>),
+                    VehicleMakeModel.fromJson(json as Map<String, dynamic>),
               )
               .toList();
           return Right(brands);

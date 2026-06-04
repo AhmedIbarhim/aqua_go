@@ -63,7 +63,7 @@ final class MyCarsActionError extends MyCarsState {
 final class BrandsLoading extends MyCarsState {}
 
 final class BrandsLoaded extends MyCarsState {
-  final List<VehicleBrandModel> makes;
+  final List<VehicleMakeModel> makes;
   const BrandsLoaded(this.makes);
 
   @override

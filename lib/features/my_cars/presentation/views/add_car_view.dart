@@ -4,7 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../widgets/vehicle_color_picker.dart';
-import '../widgets/car_brand_dropdown.dart';
+import '../widgets/car_make_dropdown.dart';
 import '../widgets/car_model_dropdown.dart';
 import '../../../../core/components/bottom_action_sheet_container.dart';
 import '../../../../core/extentions/context_extentions.dart';
@@ -12,7 +12,7 @@ import '../../../../core/components/custom_dropdown_field.dart';
 import '../../../../core/components/custom_text_field.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../data/models/my_car_model.dart';
-import '../../data/models/vehicle_brand_model.dart';
+import '../../data/models/vehicle_make_model.dart';
 import '../../data/models/vehicle_model_model.dart';
 import '../../controllers/my_cars_cubit.dart';
 
@@ -26,7 +26,7 @@ class AddCarView extends StatefulWidget {
 
 class _AddCarViewState extends State<AddCarView> {
   final TextEditingController _plateNumberController = TextEditingController();
-  VehicleBrandModel? _selectedBrandModel;
+  VehicleMakeModel? _selectedBrandModel;
   VehicleModelModel? _selectedModelModel;
   String? _selectedYear;
   Color? _selectedColor;
@@ -36,7 +36,7 @@ class _AddCarViewState extends State<AddCarView> {
   void initState() {
     super.initState();
     if (widget.car != null) {
-      _selectedBrandModel = widget.car!.carBrand;
+      _selectedBrandModel = widget.car!.carMake;
       _selectedModelModel = widget.car!.carModel;
       _selectedYear = widget.car!.modelYear.toString();
       _selectedColor = Color(widget.car!.colorCode);
@@ -118,7 +118,7 @@ class _AddCarViewState extends State<AddCarView> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          CarBrandDropdown(
+                          CarMakeDropdown(
                             initialValue: _selectedBrandModel,
                             onChanged: (brand) {
                               setState(() {

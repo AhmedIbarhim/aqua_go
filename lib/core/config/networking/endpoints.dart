@@ -23,11 +23,10 @@ abstract class Endpoints {
   static String myVehicle(String vehicleId) => 'me/vehicles/$vehicleId';
 
   // Catalog / Services Endpoints
-  static const String vehicleBrands = 'catalog/vehicle-makes';
-  static String vehicleModels(String brandId) =>
-      'catalog/vehicle-makes/$brandId/models';
-  static String brandLogo(String brandId) =>
-      'catalog/vehicle-makes/$brandId/logo';
+  static const String vehicleMakes = 'catalog/vehicle-makes';
+  static String vehicleModels(String makeId) =>
+      'catalog/vehicle-makes/$makeId/models';
+  static String makeLogo(String makeId) => 'catalog/vehicle-makes/$makeId/logo';
   static String catalogPackageImage(String packageId) =>
       'catalog/packages/$packageId/image';
   static const String services = 'services';
