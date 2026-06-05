@@ -55,11 +55,7 @@ class MyBookingDetailsView extends StatelessWidget {
           canPop: !isFromBookingFlow,
           onPopInvokedWithResult: (bool didPop, Object? result) {
             if (didPop) return;
-            Navigator.pushNamedAndRemoveUntil(
-              context,
-              Routes.layout,
-              (route) => false,
-            );
+            context.pushNamedAndRemoveUntil(Routes.layout);
           },
           child: Scaffold(
             backgroundColor: context.colors.screenBG,
@@ -71,11 +67,7 @@ class MyBookingDetailsView extends StatelessWidget {
                   IconButton(
                     icon: const Icon(Icons.close),
                     onPressed: () {
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        Routes.layout,
-                        (route) => false,
-                      );
+                      context.pushNamedAndRemoveUntil(Routes.layout);
                     },
                   )
                 else if (!activeBooking.isUpcoming)

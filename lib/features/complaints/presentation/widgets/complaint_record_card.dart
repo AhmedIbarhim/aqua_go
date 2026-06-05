@@ -19,8 +19,8 @@ class ComplaintRecordCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double sw(double width) => (width / 414) * context.screenWidth;
-    double sh(double height) => (height / 896) * context.screenHeight;
+    double sw(double width) => context.sw(width);
+    double sh(double height) => context.sh(height);
 
     return GestureDetector(
       onTap: onTap,

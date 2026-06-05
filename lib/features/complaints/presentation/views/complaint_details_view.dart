@@ -33,9 +33,8 @@ class ComplaintDetailsView extends StatelessWidget {
   });
 
   Widget _buildStatusBadge(BuildContext context, ComplaintStatus status) {
-    double sw(double width) => (width / 414) * MediaQuery.sizeOf(context).width;
-    double sh(double height) =>
-        (height / 896) * MediaQuery.sizeOf(context).height;
+    double sw(double width) => context.sw(width);
+    double sh(double height) => context.sh(height);
 
     return Container(
       padding: EdgeInsets.symmetric(horizontal: sw(8), vertical: sh(4)),
@@ -55,11 +54,8 @@ class ComplaintDetailsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.sizeOf(context).width;
-    final double screenHeight = MediaQuery.sizeOf(context).height;
-
-    double sw(double width) => (width / 414) * screenWidth;
-    double sh(double height) => (height / 896) * screenHeight;
+    double sw(double width) => context.sw(width);
+    double sh(double height) => context.sh(height);
 
     return BlocBuilder<ComplaintDetailsCubit, ComplaintDetailsState>(
       builder: (context, state) {

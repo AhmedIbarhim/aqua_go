@@ -22,12 +22,8 @@ class ComplaintsRecordView extends StatefulWidget {
 class _ComplaintsRecordViewState extends State<ComplaintsRecordView> {
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.sizeOf(context).width;
-    final double screenHeight = MediaQuery.sizeOf(context).height;
-
-    // Responsive scaling helpers matching support_view
-    double sw(double width) => (width / 414) * screenWidth;
-    double sh(double height) => (height / 896) * screenHeight;
+    double sw(double width) => context.sw(width);
+    double sh(double height) => context.sh(height);
 
     return Scaffold(
       backgroundColor: context.colors.screenBG,

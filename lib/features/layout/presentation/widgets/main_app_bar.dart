@@ -18,13 +18,9 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.sizeOf(context);
-    final double screenWidth = size.width;
-    final double screenHeight = size.height;
     final userName = FetchUserData.getUserName();
-
-    double sw(double width) => (width / 414) * screenWidth;
-    double sh(double height) => (height / 896) * screenHeight;
+    double sw(double width) => context.sw(width);
+    double sh(double height) => context.sh(height);
 
     return SafeArea(
       child: Padding(

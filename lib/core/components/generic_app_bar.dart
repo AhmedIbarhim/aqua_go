@@ -40,10 +40,7 @@ class GenericAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.sizeOf(context);
-    final double screenWidth = size.width;
-
-    double sw(double width) => (width / 414) * screenWidth;
+    double sw(double width) => context.sw(width);
 
     return AppBar(
       backgroundColor: context.colors.screenBG,

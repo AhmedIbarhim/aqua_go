@@ -14,13 +14,8 @@ class SupportView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.sizeOf(context);
-    final double screenWidth = size.width;
-    final double screenHeight = size.height;
-
-    // Scaling helpers
-    double sw(double width) => (width / 414) * screenWidth;
-    double sh(double height) => (height / 896) * screenHeight;
+    double sw(double width) => context.sw(width);
+    double sh(double height) => context.sh(height);
 
     return Scaffold(
       backgroundColor: context.colors.screenBG,

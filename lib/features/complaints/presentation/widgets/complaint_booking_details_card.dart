@@ -20,7 +20,7 @@ class ComplaintBookingDetailsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double sw(double width) => (width / 414) * MediaQuery.sizeOf(context).width;
+    double sw(double width) => context.sw(width);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

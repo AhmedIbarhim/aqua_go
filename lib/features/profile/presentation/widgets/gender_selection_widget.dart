@@ -21,11 +21,8 @@ class GenderSelectionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.sizeOf(context).width;
     final spacing = 12.0;
-    // Calculate adaptive height and icon size based on screen width
-    // Base width 414px
-    final scaleFactor = (screenWidth / 414.0).clamp(0.8, 1.2);
+    final scaleFactor = context.sw(1.0).clamp(0.8, 1.2);
     final cardHeight = 80.0 * scaleFactor;
     final iconSize = 48.0 * scaleFactor;
 
