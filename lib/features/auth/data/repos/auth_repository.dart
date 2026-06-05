@@ -76,6 +76,7 @@ class AuthRepository {
         'birthdate': user.birthdate!.toIso8601String().split(
           'T',
         )[0], // yyyy-MM-dd
+      if (user.locale != null) 'locale': user.locale,
     };
 
     final result = await _authService.updateProfile(updateData);

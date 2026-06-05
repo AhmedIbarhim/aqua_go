@@ -369,10 +369,14 @@ class ProfileView extends StatelessWidget {
                   ),
                   Row(
                     children: [
-                      RatingWidget(rating: 4.5),
+                      RatingWidget(rating: FetchUserData.getUserRating()),
                       SizedBox(width: sw(4)),
                       Text(
-                        '(4.5)',
+                        FetchUserData.isGuest()
+                            ? ""
+                            : FetchUserData.getUserRating() == 0
+                            ? ""
+                            : '(${FetchUserData.getUserRating()})',
                         style: AppTextStyles.regular12.copyWith(
                           color: context.colors.textSecondary,
                         ),

@@ -8,6 +8,7 @@ class UserModel extends Equatable {
   final String? phone;
   final String? imageUrl;
   final String? gender;
+  final String? locale;
   final DateTime? birthdate;
 
   const UserModel({
@@ -17,6 +18,7 @@ class UserModel extends Equatable {
     this.phone,
     this.imageUrl,
     this.gender,
+    this.locale,
     this.birthdate,
   });
 
@@ -28,6 +30,7 @@ class UserModel extends Equatable {
       phone: map['phone'],
       imageUrl: map['imageUrl'],
       gender: map['gender'],
+      locale: map['locale'],
       birthdate: map['birthdate'] != null
           ? DateTime.tryParse(map['birthdate'].toString())
           : null,
@@ -42,6 +45,7 @@ class UserModel extends Equatable {
       'phone': phone,
       'imageUrl': imageUrl,
       'gender': gender,
+      'locale': locale,
       'birthdate': birthdate?.toIso8601String(),
     };
   }
@@ -58,6 +62,7 @@ class UserModel extends Equatable {
     String? email,
     String? imageUrl,
     String? gender,
+    String? locale,
     DateTime? birthdate,
   }) {
     return UserModel(
@@ -67,6 +72,7 @@ class UserModel extends Equatable {
       email: email ?? this.email,
       imageUrl: imageUrl ?? this.imageUrl,
       gender: gender ?? this.gender,
+      locale: locale ?? this.locale,
       birthdate: birthdate ?? this.birthdate,
     );
   }
@@ -79,6 +85,7 @@ class UserModel extends Equatable {
     phone,
     imageUrl,
     gender,
+    locale,
     birthdate,
   ];
 }

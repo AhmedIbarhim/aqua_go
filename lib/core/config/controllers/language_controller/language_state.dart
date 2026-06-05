@@ -15,3 +15,15 @@ final class LanguageInitial extends LanguageState {
 final class LanguageChanged extends LanguageState {
   const LanguageChanged(super.locale);
 }
+
+final class LanguageLoading extends LanguageState {
+  const LanguageLoading(super.locale);
+}
+
+final class LanguageError extends LanguageState {
+  final String message;
+  const LanguageError(super.locale, this.message);
+
+  @override
+  List<Object> get props => [locale, message];
+}

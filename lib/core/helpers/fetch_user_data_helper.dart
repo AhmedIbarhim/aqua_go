@@ -53,6 +53,11 @@ class FetchUserData {
     return getUser() != null;
   }
 
+  static double getUserRating() {
+    // return getUser()?.rating ?? 0.0;
+    return 0.0;
+  }
+
   static bool isGuest() {
     return getUser() == null;
   }

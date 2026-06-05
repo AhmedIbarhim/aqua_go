@@ -221,6 +221,7 @@ class _ProfileDataViewState extends State<ProfileDataView> {
                     name: _nameController.text,
                     gender: _gender.name,
                     birthdate: _birthDate,
+                    locale: context.isAr ? 'ar_SA' : 'en',
                   );
                   context.read<AuthCubit>().updateProfile(updatedUser);
                 } else {
@@ -246,6 +247,7 @@ class _ProfileDataViewState extends State<ProfileDataView> {
                           name: _nameController.text,
                           gender: _gender.name,
                           birthdate: _birthDate,
+                          locale: context.isAr ? 'ar_SA' : 'en',
                         );
                         context.read<AuthCubit>().updateProfile(updatedUser);
                       } else {
