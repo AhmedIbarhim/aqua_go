@@ -29,5 +29,6 @@ abstract class Routes {
   static const String newAddressMap = '/new_address_map_view';
   static const String profileData = '/profile_data_view';
   static const String myAddresses = '/my_addresses_view';
+  static const String complaintDetails = '/complaint_details_view';
 }
 

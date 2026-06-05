@@ -34,6 +34,10 @@ import 'package:aqua_go/features/my_bookings/data/data_sources/my_bookings_remot
 import 'package:aqua_go/features/my_bookings/data/repos/my_bookings_repository.dart';
 import 'package:aqua_go/features/my_bookings/controllers/my_bookings_cubit.dart';
 import 'package:aqua_go/features/my_bookings/controllers/my_booking_details_cubit.dart';
+import 'package:aqua_go/features/complaints/data/data_sources/complaints_remote_data_source.dart';
+import 'package:aqua_go/features/complaints/data/repos/complaints_repository.dart';
+import 'package:aqua_go/features/complaints/controllers/complaints_cubit/complaints_cubit.dart';
+import 'package:aqua_go/features/complaints/controllers/complaint_details_cubit/complaint_details_cubit.dart';
 import 'package:get_it/get_it.dart';
 
 import '../../../features/address/data/services/location_service.dart';
@@ -85,6 +89,9 @@ Future<void> initServiceLocator() async {
   locator.registerLazySingleton<BookingsRemoteDataSource>(
     () => BookingsRemoteDataSource(locator()),
   );
+  locator.registerLazySingleton<ComplaintsRemoteDataSource>(
+    () => ComplaintsRemoteDataSource(locator()),
+  );
 
   // Repositories
 
@@ -131,6 +138,9 @@ Future<void> initServiceLocator() async {
 
   locator.registerLazySingleton<BookingRepo>(
     () => BookingRepo(bookingsRemoteDataSource: locator()),
+  );
+  locator.registerLazySingleton<ComplaintsRepository>(
+    () => ComplaintsRepository(locator()),
   );
 
   // Cubits
@@ -180,5 +190,11 @@ Future<void> initServiceLocator() async {
   locator.registerFactory<MyBookingsCubit>(() => MyBookingsCubit(locator()));
   locator.registerFactory<MyBookingDetailsCubit>(
     () => MyBookingDetailsCubit(locator()),
+  );
+  locator.registerFactory<ComplaintsCubit>(
+    () => ComplaintsCubit(locator()),
+  );
+  locator.registerFactory<ComplaintDetailsCubit>(
+    () => ComplaintDetailsCubit(locator(), locator()),
   );
 }

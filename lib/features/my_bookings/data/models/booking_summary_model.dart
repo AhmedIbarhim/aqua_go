@@ -1,4 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
+import '../../../../core/config/local_storage/shared_prefs.dart';
+import '../../../../core/constants.dart';
 import '../enums/booking_status_enum.dart';
 import '../enums/booking_type_enum.dart';
 import 'booking_response_model/booking_response_model.dart';
@@ -178,9 +180,9 @@ class BookingSummaryModel {
   }
 
   // --- UI Compatibility Helpers ---
-  String get title => (vehicleMake != null || vehicleModel != null)
-      ? '${vehicleMake ?? ''} ${vehicleModel ?? ''}'.trim()
-      : (type == BookingType.ON_DEMAND ? 'غسلة (على الطلب)' : 'غسلة جدولة');
+  String get title => CacheClient.getString(kLanguage) == kArabicLang
+      ? (serviceNameAr ?? '')
+      : (serviceNameEn ?? '');
 
   String get location => addressLabel ?? '';
 

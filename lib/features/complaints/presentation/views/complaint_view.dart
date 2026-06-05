@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:aqua_go/core/components/custom_bottom_sheet.dart';
 import 'package:aqua_go/core/components/custom_button.dart';
 import 'package:aqua_go/core/components/custom_text_field.dart';
@@ -9,10 +11,14 @@ import 'package:aqua_go/features/my_bookings/data/models/booking_response_model/
 import 'package:aqua_go/features/complaints/presentation/widgets/complaint_types.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:svg_flutter/svg.dart';
 
 import '../../../../core/components/bottom_action_sheet_container.dart';
 import '../../../../generated/locale_keys.g.dart';
+import '../../data/models/complaint_model.dart';
+import '../../controllers/complaints_cubit/complaints_cubit.dart';
+import '../../controllers/complaints_cubit/complaints_state.dart';
 import '../widgets/complaint_images_section.dart';
 
 class ComplaintArgs {
@@ -32,6 +38,7 @@ class ComplaintView extends StatefulWidget {
 class _ComplaintViewState extends State<ComplaintView> {
   final TextEditingController _typeController = TextEditingController();
   final TextEditingController _detailsController = TextEditingController();
+  List<File> _selectedImages = [];
 
   @override
   void dispose() {
@@ -59,45 +66,68 @@ class _ComplaintViewState extends State<ComplaintView> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    return Scaffold(
-      backgroundColor: context.colors.screenBG,
-      appBar: GenericAppBar(
-        title: LocaleKeys.bookings_submit_complaint.tr(),
-        centerTitle: true,
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.all(width * 0.06),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _buildBookingDetailsSection(),
-                  const SizedBox(height: 24),
-                  GestureDetector(
-                    onTap: _showComplainTypes,
-                    child: AbsorbPointer(
-                      child: CustomTextField(
-                        label: LocaleKeys.bookings_complaint_type.tr(),
-                        hint: LocaleKeys.select_here.tr(),
-                        controller: _typeController,
-                        isRequired: true,
+    return BlocListener<ComplaintsCubit, ComplaintsState>(
+      listener: (context, state) {
+        if (state is ComplaintSubmitLoading) {
+          context.showLoadingOverlay();
+        } else {
+          context.hideLoadingOverlay();
+        }
+
+        if (state is ComplaintSubmitSuccess) {
+          context.showSuccessSnackBar(
+            LocaleKeys.bookings_complaint_submitted.tr(),
+          );
+          Navigator.pop(context, true);
+        } else if (state is ComplaintSubmitFailure) {
+          context.showErrorSnackBar(state.message);
+        }
+      },
+      child: Scaffold(
+        backgroundColor: context.colors.screenBG,
+        appBar: GenericAppBar(
+          title: LocaleKeys.bookings_submit_complaint.tr(),
+          centerTitle: true,
+        ),
+        body: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.all(width * 0.06),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _buildBookingDetailsSection(),
+                    const SizedBox(height: 24),
+                    GestureDetector(
+                      onTap: _showComplainTypes,
+                      child: AbsorbPointer(
+                        child: CustomTextField(
+                          label: LocaleKeys.bookings_complaint_type.tr(),
+                          hint: LocaleKeys.select_here.tr(),
+                          controller: _typeController,
+                          isRequired: true,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 24),
-                  _buildDetailsInput(),
-                  const SizedBox(height: 24),
+                    const SizedBox(height: 24),
+                    _buildDetailsInput(),
+                    const SizedBox(height: 24),
 
-                  ComplaintImagesSection(),
-                  // _buildImageUploadSection(),
-                ],
+                    ComplaintImagesSection(
+                      onImagesChanged: (images) {
+                        setState(() {
+                          _selectedImages = images;
+                        });
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-          _buildActionButtons(),
-        ],
+            _buildActionButtons(),
+          ],
+        ),
       ),
     );
   }
@@ -133,7 +163,7 @@ class _ComplaintViewState extends State<ComplaintView> {
               const SizedBox(height: 12),
               _buildDetailRow(
                 title: LocaleKeys.bookings_car_plate.tr(),
-                value: '1234-JTC', // Placeholder as not in model
+                value: widget.booking.plateMasked ?? '',
                 icon: AppAssets.boardNum,
               ),
               const SizedBox(height: 12),
@@ -145,7 +175,7 @@ class _ComplaintViewState extends State<ComplaintView> {
               const SizedBox(height: 12),
               _buildDetailRow(
                 title: LocaleKeys.bookings_worker_name.tr(),
-                value: 'محمد محمود جابر', // Placeholder as not in model
+                value: widget.booking.assignedWorker?.displayName ?? '',
                 icon: AppAssets.personDisabled,
               ),
             ],
@@ -175,9 +205,7 @@ class _ComplaintViewState extends State<ComplaintView> {
                 BlendMode.srcIn,
               ),
             ),
-
             const SizedBox(width: 8),
-
             Text(
               title,
               style: AppTextStyles.regular12.copyWith(
@@ -247,16 +275,17 @@ class _ComplaintViewState extends State<ComplaintView> {
               text: LocaleKeys.submit.tr(),
               enabled: _typeController.text.isNotEmpty,
               onPressed: () {
-                // Handle submission
-                context.showSuccessAlert(
-                  title: LocaleKeys.bookings_complaint_submitted.tr(),
+                final category = ComplaintCategory.categoryFromTranslation(_typeController.text).apiValue;
+                context.read<ComplaintsCubit>().submitComplaint(
+                  bookingId: widget.booking.id ?? '',
+                  category: category,
+                  description: _detailsController.text,
+                  photos: _selectedImages,
                 );
               },
             ),
           ),
-
           const SizedBox(width: 8),
-
           Expanded(
             flex: 1,
             child: CustomButton(

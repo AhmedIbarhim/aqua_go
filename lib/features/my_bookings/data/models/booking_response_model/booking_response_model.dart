@@ -1,3 +1,5 @@
+import 'package:aqua_go/core/config/local_storage/shared_prefs.dart';
+import 'package:aqua_go/core/constants.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 import '../../enums/booking_status_enum.dart';
@@ -256,9 +258,9 @@ class BookingResponseModel {
   }
 
   // --- UI Compatibility Helpers ---
-  String get title => (vehicleMake != null || vehicleModel != null)
-      ? '${vehicleMake ?? ''} ${vehicleModel ?? ''}'.trim()
-      : (type == BookingType.ON_DEMAND ? 'غسلة (على الطلب)' : 'غسلة جدولة');
+  String get title => CacheClient.getString(kLanguage) == kArabicLang
+      ? (packageName?.ar ?? '')
+      : (packageName?.en ?? '');
 
   String get location => addressLabel ?? '';
 

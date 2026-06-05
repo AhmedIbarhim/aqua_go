@@ -163,6 +163,11 @@ abstract class  LocaleKeys {
   static const bookings_rate_service = 'bookings.rate_service';
   static const bookings_submit_complaint = 'bookings.submit_complaint';
   static const bookings_complaint = 'bookings.complaint';
+  static const bookings_complaint_type = 'bookings.complaint_type';
+  static const bookings_select_complaint_type = 'bookings.select_complaint_type';
+  static const bookings_complaint_details = 'bookings.complaint_details';
+  static const bookings_complaint_submitted = 'bookings.complaint_submitted';
+  static const bookings_upload_images = 'bookings.upload_images';
   static const bookings_booking_number = 'bookings.booking_number';
   static const bookings_car = 'bookings.car';
   static const bookings_your_biker = 'bookings.your_biker';
@@ -172,11 +177,6 @@ abstract class  LocaleKeys {
   static const bookings_go_to_invoice_list = 'bookings.go_to_invoice_list';
   static const bookings_edit_booking = 'bookings.edit_booking';
   static const bookings_worker_name = 'bookings.worker_name';
-  static const bookings_complaint_type = 'bookings.complaint_type';
-  static const bookings_select_complaint_type = 'bookings.select_complaint_type';
-  static const bookings_complaint_details = 'bookings.complaint_details';
-  static const bookings_upload_images = 'bookings.upload_images';
-  static const bookings_complaint_submitted = 'bookings.complaint_submitted';
   static const bookings_add_image = 'bookings.add_image';
   static const bookings_share_opinion = 'bookings.share_opinion';
   static const bookings_rating_reason = 'bookings.rating_reason';

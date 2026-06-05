@@ -16,6 +16,9 @@ import '../../features/home/presentation/views/packages_view.dart';
 import '../../features/layout/presentation/views/main_layout.dart';
 import '../../features/complaints/presentation/views/complaint_view.dart';
 import '../../features/complaints/presentation/views/complaints_record_view.dart';
+import '../../features/complaints/presentation/views/complaint_details_view.dart';
+import '../../features/complaints/controllers/complaints_cubit/complaints_cubit.dart';
+import '../../features/complaints/controllers/complaint_details_cubit/complaint_details_cubit.dart';
 import '../../features/my_bookings/presentation/views/gallery_view.dart';
 import '../../features/my_bookings/presentation/views/my_booking_deatails_view.dart';
 import '../../features/my_cars/data/models/my_car_model.dart';
@@ -139,11 +142,19 @@ abstract class AppRouter {
       case Routes.complain:
         final args = settings.arguments as ComplaintArgs;
         return MaterialPageRoute(
-          builder: (_) => ComplaintView(booking: args.booking),
+          builder: (_) => BlocProvider(
+            create: (_) => locator<ComplaintsCubit>(),
+            child: ComplaintView(booking: args.booking),
+          ),
         );
 
       case Routes.complainsRecord:
-        return MaterialPageRoute(builder: (_) => const ComplaintsRecordView());
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => locator<ComplaintsCubit>()..fetchComplaints(),
+            child: const ComplaintsRecordView(),
+          ),
+        );
 
       case Routes.myBookingDetails:
         final args = settings.arguments as MyBookingDetailsArgs;
@@ -184,6 +195,19 @@ abstract class AppRouter {
 
       case Routes.myAddresses:
         return MaterialPageRoute(builder: (_) => const MyAddressesView());
+
+      case Routes.complaintDetails:
+        final args = settings.arguments as ComplaintDetailsArgs;
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => locator<ComplaintDetailsCubit>()
+              ..fetchComplaintDetails(args.complaintId),
+            child: ComplaintDetailsView(
+              complaintId: args.complaintId,
+              initialComplaint: args.initialComplaint,
+            ),
+          ),
+        );
 
       default:
         return MaterialPageRoute(builder: (_) => const Placeholder());

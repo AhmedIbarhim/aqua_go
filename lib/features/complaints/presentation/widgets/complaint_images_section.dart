@@ -13,7 +13,9 @@ import '../../../../generated/locale_keys.g.dart';
 import 'complaint_image_field.dart';
 
 class ComplaintImagesSection extends StatefulWidget {
-  const ComplaintImagesSection({super.key});
+  final ValueChanged<List<File>> onImagesChanged;
+
+  const ComplaintImagesSection({super.key, required this.onImagesChanged});
 
   @override
   State<ComplaintImagesSection> createState() => _ComplaintImagesSectionState();
@@ -25,6 +27,11 @@ class _ComplaintImagesSectionState extends State<ComplaintImagesSection>
   bool get wantKeepAlive => true;
 
   List<File?> images = [];
+
+  void _notifyParent() {
+    final nonNullImages = images.whereType<File>().toList();
+    widget.onImagesChanged(nonNullImages);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +64,7 @@ class _ComplaintImagesSectionState extends State<ComplaintImagesSection>
                       setState(() {
                         images.add(pickedFile);
                       });
+                      _notifyParent();
                     }
                   },
                   child: Container(
@@ -83,7 +91,6 @@ class _ComplaintImagesSectionState extends State<ComplaintImagesSection>
                   scrollDirection: Axis.horizontal,
                   clipBehavior: Clip.none,
                   itemCount: images.length < 4 ? images.length + 1 : 4,
-
                   itemBuilder: (context, index) {
                     return ComplaintImageField(
                       initialImage: index < images.length
@@ -102,6 +109,7 @@ class _ComplaintImagesSectionState extends State<ComplaintImagesSection>
                           }
                         }
                         setState(() {});
+                        _notifyParent();
                       },
                     );
                   },
