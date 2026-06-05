@@ -4,9 +4,7 @@ import 'package:aqua_go/features/my_cars/presentation/widgets/car_make_logo_netw
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg_flutter.dart';
-
 import '../../../../core/extentions/context_extentions.dart';
-import '../../../../core/themes/app_colors.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../generated/locale_keys.g.dart';
 
@@ -59,54 +57,55 @@ class MyCarCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                // Brand Logo
                 Positioned(
-                  right: width * 0.01,
                   top: 0,
-                  child: SizedBox(
-                    height: height * 0.05,
-                    width: height * 0.05,
-                    child: CarMakeNetworkLogo(logoUrl: car.typeImage),
-                  ),
-                ),
-                // Edit and Delete Icons
-                Positioned(
-                  left: width * 0.03,
-                  top: height * 0.015,
+                  left: 5,
+                  right: 5,
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      GestureDetector(
-                        onTap: onEdit,
-                        child: SvgPicture.asset(
-                          AppAssets.edit,
-                          width: width * 0.05,
-                          colorFilter: ColorFilter.mode(
-                            context.colors.themeOpositeColor,
-                            BlendMode.srcIn,
-                          ),
-                        ),
+                      SizedBox(
+                        height: height * 0.05,
+                        width: height * 0.05,
+                        child: CarMakeNetworkLogo(logoUrl: car.typeImage),
                       ),
-                      SizedBox(width: width * 0.04),
-                      GestureDetector(
-                        onTap: () {
-                          context.showWarningAlert(
-                            primaryButtonText: LocaleKeys.delete_confirm.tr(),
-                            title: LocaleKeys.delete_confirm.tr(),
-                            message: LocaleKeys.my_cars_delete_message.tr(),
-                            onPrimaryPressed: () {
-                              Navigator.pop(context);
-                              onDelete?.call();
-                            },
-                          );
-                        },
-                        child: SvgPicture.asset(
-                          AppAssets.remove,
-                          width: width * 0.05,
-                          colorFilter: ColorFilter.mode(
-                            lightAppColors.error,
-                            BlendMode.srcIn,
+                      Row(
+                        children: [
+                          GestureDetector(
+                            onTap: onEdit,
+                            child: SvgPicture.asset(
+                              AppAssets.edit,
+                              width: width * 0.05,
+                              colorFilter: ColorFilter.mode(
+                                context.colors.themeOpositeColor,
+                                BlendMode.srcIn,
+                              ),
+                            ),
                           ),
-                        ),
+                          SizedBox(width: width * 0.04),
+                          GestureDetector(
+                            onTap: () {
+                              context.showWarningAlert(
+                                primaryButtonText: LocaleKeys.delete_confirm
+                                    .tr(),
+                                title: LocaleKeys.delete_confirm.tr(),
+                                message: LocaleKeys.my_cars_delete_message.tr(),
+                                onPrimaryPressed: () {
+                                  Navigator.pop(context);
+                                  onDelete?.call();
+                                },
+                              );
+                            },
+                            child: SvgPicture.asset(
+                              AppAssets.remove,
+                              width: width * 0.05,
+                              colorFilter: ColorFilter.mode(
+                                context.colors.error,
+                                BlendMode.srcIn,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

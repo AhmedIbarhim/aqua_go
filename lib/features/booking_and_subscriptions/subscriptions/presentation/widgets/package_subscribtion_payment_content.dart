@@ -81,14 +81,18 @@ class _PackageSubscribtionPaymentContentState
         CustomButton(
           enabled: !widget.isLoading && _selectedMethod != null,
           onPressed: () => widget.onConfirm(context),
-          text: LocaleKeys.bookings_confirm_payment.tr(),
+          text: widget.isLoading
+              ? ''
+              : LocaleKeys.bookings_confirm_payment.tr(),
           preWidget: widget.isLoading
-              ? const SizedBox(
+              ? SizedBox(
                   width: 20,
                   height: 20,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      context.colors.primary,
+                    ),
                   ),
                 )
               : null,

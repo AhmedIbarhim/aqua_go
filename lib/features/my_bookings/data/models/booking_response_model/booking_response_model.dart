@@ -5,17 +5,21 @@ import 'package:easy_localization/easy_localization.dart';
 import '../../enums/booking_status_enum.dart';
 import '../../enums/booking_type_enum.dart';
 import 'assigned_worker.dart';
+import 'booking_vehicle.dart';
 import 'cancellation_policy.dart';
 import 'invoice.dart';
 import 'package_name.dart';
 import 'photos.dart';
+import 'reschedule_policy_view.dart';
 
 export 'assigned_worker.dart';
+export 'booking_vehicle.dart';
 export 'bookings_list_response_model.dart';
 export 'cancellation_policy.dart';
 export 'invoice.dart';
 export 'package_name.dart';
 export 'photos.dart';
+export 'reschedule_policy_view.dart';
 
 class BookingResponseModel {
   String? id;
@@ -57,6 +61,10 @@ class BookingResponseModel {
   String? vehicleColor;
   PackageName? packageName;
   String? vehicleMakeLogoUrl;
+  String? customerName;
+  String? customerPhoneMasked;
+  ReschedulePolicyView? reschedulePolicyView;
+  List<BookingVehicle>? vehicles;
 
   BookingResponseModel({
     this.id,
@@ -98,6 +106,10 @@ class BookingResponseModel {
     this.vehicleColor,
     this.packageName,
     this.vehicleMakeLogoUrl,
+    this.customerName,
+    this.customerPhoneMasked,
+    this.reschedulePolicyView,
+    this.vehicles,
   });
 
   BookingResponseModel.fromJson(Map<String, dynamic> json) {
@@ -172,34 +184,30 @@ class BookingResponseModel {
     addressArrivalNotes = json['addressArrivalNotes'];
 
     // Extract details-specific nested vehicles array
-    if (json['vehicles'] != null &&
-        (json['vehicles'] is List) &&
-        (json['vehicles'] as List).isNotEmpty) {
-      final firstVehicle =
-          (json['vehicles'] as List).first as Map<String, dynamic>;
-      vehicleMake = firstVehicle['vehicleMake'] ?? firstVehicle['vehicle_make'];
-      vehicleModel =
-          firstVehicle['vehicleModel'] ?? firstVehicle['vehicle_model'];
-      vehicleColor =
-          firstVehicle['vehicleColor'] ?? firstVehicle['vehicle_color'];
-      vehicleYear = firstVehicle['vehicleYear'] != null
-          ? int.tryParse(firstVehicle['vehicleYear'].toString())
-          : (firstVehicle['vehicle_year'] != null
-                ? int.tryParse(firstVehicle['vehicle_year'].toString())
-                : null);
-      plateMasked =
-          firstVehicle['plateMasked'] ??
-          firstVehicle['plate_masked'] ??
-          firstVehicle['plateText'] ??
-          firstVehicle['plate_text'];
-      vehicleMakeLogoUrl =
-          firstVehicle['makeLogoUrl'] ??
-          firstVehicle['vehicleMakeLogoUrl'] ??
-          firstVehicle['vehicle_make_logo_url'];
+    if (json['vehicles'] != null && json['vehicles'] is List) {
+      vehicles = <BookingVehicle>[];
+      json['vehicles'].forEach((v) {
+        vehicles!.add(BookingVehicle.fromJson(v));
+      });
+      if (vehicles!.isNotEmpty) {
+        final firstVehicle = vehicles!.first;
+        vehicleMake = firstVehicle.vehicleMake;
+        vehicleModel = firstVehicle.vehicleModel;
+        vehicleColor = firstVehicle.vehicleColor;
+        vehicleYear = firstVehicle.vehicleYear;
+        plateMasked = firstVehicle.plateMasked;
+        vehicleMakeLogoUrl = firstVehicle.makeLogoUrl;
+      }
     }
 
     packageName = json['packageName'] != null
         ? PackageName.fromJson(json['packageName'])
+        : null;
+
+    customerName = json['customerName'];
+    customerPhoneMasked = json['customerPhoneMasked'];
+    reschedulePolicyView = json['reschedulePolicyView'] != null
+        ? ReschedulePolicyView.fromJson(json['reschedulePolicyView'])
         : null;
   }
 
@@ -254,6 +262,14 @@ class BookingResponseModel {
       data['packageName'] = packageName!.toJson();
     }
     data['vehicleMakeLogoUrl'] = vehicleMakeLogoUrl;
+    data['customerName'] = customerName;
+    data['customerPhoneMasked'] = customerPhoneMasked;
+    if (reschedulePolicyView != null) {
+      data['reschedulePolicyView'] = reschedulePolicyView!.toJson();
+    }
+    if (vehicles != null) {
+      data['vehicles'] = vehicles!.map((v) => v.toJson()).toList();
+    }
     return data;
   }
 
