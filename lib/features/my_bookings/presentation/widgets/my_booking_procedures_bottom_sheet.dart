@@ -8,7 +8,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../../../complaints/presentation/views/complaint_view.dart';
 
-import 'rating_bottom_sheet.dart';
+import '../../../rating/presentation/widgets/rating_bottom_sheet.dart';
 
 class MyBookingProceduresBottomSheet extends StatelessWidget {
   final BookingResponseModel booking;
@@ -33,7 +33,7 @@ class MyBookingProceduresBottomSheet extends StatelessWidget {
           title: LocaleKeys.bookings_rate_service.tr(),
           onTap: () {
             Navigator.pop(context);
-            RatingBottomSheet.show(context);
+            RatingBottomSheet.show(context, booking);
           },
         ),
         SizedBox(height: height * 0.015),

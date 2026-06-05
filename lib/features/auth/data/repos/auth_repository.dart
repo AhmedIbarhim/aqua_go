@@ -5,6 +5,7 @@ import 'package:aqua_go/core/constants.dart';
 import 'package:aqua_go/core/config/networking/exceptions/failure.dart';
 import 'package:aqua_go/features/auth/data/models/user_model.dart';
 import 'package:aqua_go/features/auth/data/services/auth_service.dart';
+import 'package:aqua_go/core/helpers/idempotency_key_helper.dart';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 
@@ -201,7 +202,9 @@ class AuthRepository {
           return Left(ServerFailure('Failed to upload image binary: $e'));
         }
 
-        final String idempotencyKey = DateTime.now().millisecondsSinceEpoch.toString();
+        final String idempotencyKey = IdempotencyKeyHelper.generate(
+          prefix: 'profile-image-confirm',
+        );
         final confirmResult = await _authService.confirmProfileImage(
           contentType: contentType,
           sizeBytes: sizeBytes,

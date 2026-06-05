@@ -152,7 +152,6 @@ class BookingDetailsView extends StatelessWidget {
               );
             },
           ),
-          SizedBox(height: height * 0.04),
         ],
       ),
     );
@@ -208,10 +207,7 @@ class BookingDetailsView extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              Text(
-                total.toStringAsFixed(2),
-                style: AppTextStyles.medium24,
-              ),
+              Text(total.toStringAsFixed(2), style: AppTextStyles.medium24),
               const SizedBox(width: 4),
               SvgPicture.asset(
                 AppAssets.currency,

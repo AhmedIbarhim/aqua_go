@@ -1,4 +1,5 @@
 import 'package:aqua_go/core/helpers/fetch_user_data_helper.dart';
+import 'package:aqua_go/core/helpers/idempotency_key_helper.dart';
 import 'package:dartz/dartz.dart';
 import 'package:aqua_go/core/config/networking/exceptions/failure.dart';
 import '../models/subscribed_package_model.dart';
@@ -89,8 +90,12 @@ class SubscriptionsRepository {
       if (finalSchedule != null)
         'initialSchedule': finalSchedule.map((e) => e.toJson()).toList(),
     };
-    final idempotencyKey =
-        'subscription-subscribe:${FetchUserData.getUserId()}:$packageId:$cleanNonce';
+    final idempotencyKey = IdempotencyKeyHelper.generate(
+      prefix: 'subscription-subscribe',
+      userId: FetchUserData.getUserId() ?? '',
+      requestId: packageId,
+      index: cleanNonce,
+    );
 
     final result = await _subscriptionsDataSource.subscribe(
       body,
@@ -120,7 +125,10 @@ class SubscriptionsRepository {
     if (note != null) {
       body['note'] = note;
     }
-    final idempotencyKey = 'subscription-cancel:$subscriptionId';
+    final idempotencyKey = IdempotencyKeyHelper.generate(
+      prefix: 'subscription-cancel',
+      requestId: subscriptionId,
+    );
 
     final result = await _subscriptionsDataSource.cancelSubscription(
       subscriptionId,

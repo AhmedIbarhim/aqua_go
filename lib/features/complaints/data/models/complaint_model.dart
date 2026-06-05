@@ -210,6 +210,8 @@ class ComplaintModel {
   final String? updatedAt;
   final String? priority;
   final List<String>? photoObjectKeys;
+  final String? desiredOutcome;
+  final String? preferredContactChannel;
 
   const ComplaintModel({
     required this.id,
@@ -228,6 +230,8 @@ class ComplaintModel {
     this.updatedAt,
     this.priority,
     this.photoObjectKeys,
+    this.desiredOutcome,
+    this.preferredContactChannel,
   });
 
   factory ComplaintModel.fromJson(Map<String, dynamic> json) {
@@ -244,21 +248,20 @@ class ComplaintModel {
       photoObjectKeys: json['photoObjectKeys'] != null
           ? List<String>.from(json['photoObjectKeys'])
           : null,
+      desiredOutcome: json['desiredOutcome'] as String?,
+      preferredContactChannel: json['preferredContactChannel'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
-      'customerId': customerId,
       'bookingId': bookingId,
-      'status': status.originalValue,
       'category': category,
       'description': description,
-      'raisedAt': raisedAt,
-      'updatedAt': updatedAt,
-      'priority': priority,
-      'photoObjectKeys': photoObjectKeys,
+      if (desiredOutcome?.isNotEmpty ?? false)
+        'desiredOutcome': desiredOutcome,
+      if (preferredContactChannel?.isNotEmpty ?? false)
+        'preferredContactChannel': preferredContactChannel,
     };
   }
 

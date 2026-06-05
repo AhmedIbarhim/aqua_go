@@ -4,7 +4,7 @@ import 'package:aqua_go/core/themes/app_text_styles.dart';
 import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
-import 'package:aqua_go/core/components/rating_widget.dart';
+import 'package:aqua_go/features/rating/presentation/widgets/rating_widget.dart';
 import '../../data/models/booking_response_model/booking_response_model.dart';
 
 class BookingDetailsBikerCard extends StatelessWidget {

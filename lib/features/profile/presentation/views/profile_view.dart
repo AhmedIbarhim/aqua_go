@@ -8,7 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:aqua_go/core/config/di/service_locator.dart';
 import 'package:aqua_go/features/auth/controllers/auth_cubit/auth_cubit.dart';
 
-import '../../../../core/components/rating_widget.dart';
+import '../../../rating/presentation/widgets/rating_widget.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/helpers/fetch_user_data_helper.dart';
 import '../../../../core/route/routes.dart';
@@ -45,7 +45,9 @@ class ProfileView extends StatelessWidget {
           if (state is LogoutSuccess) {
             context.pushNamedAndRemoveUntil(Routes.login);
           } else if (state is ProfileUpdateSuccess) {
-            context.showSuccessSnackBar(LocaleKeys.snackbar_profile_updated_success.tr());
+            context.showSuccessSnackBar(
+              LocaleKeys.snackbar_profile_updated_success.tr(),
+            );
           } else if (state is ProfileUpdateError) {
             context.showErrorSnackBar(state.message);
           } else if (state is LoginError) {
@@ -66,7 +68,10 @@ class ProfileView extends StatelessWidget {
                           if (FetchUserData.isGuest()) {
                             _promptGuestToLogin(context);
                           } else {
-                            final file = await ImagePickerHelper.showImageSourceDialog(context);
+                            final file =
+                                await ImagePickerHelper.showImageSourceDialog(
+                                  context,
+                                );
                             if (file != null && context.mounted) {
                               context.read<AuthCubit>().uploadAvatar(file.path);
                             }
@@ -81,21 +86,28 @@ class ProfileView extends StatelessWidget {
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: context.colors.primary,
-                                border: Border.all(color: context.colors.primary, width: 3),
+                                border: Border.all(
+                                  color: context.colors.primary,
+                                  width: 3,
+                                ),
                               ),
                               child: ClipOval(
                                 child: FetchUserData.getAvatarUrl() != null
                                     ? CachedNetworkImage(
                                         imageUrl: FetchUserData.getAvatarUrl()!,
                                         fit: BoxFit.cover,
-                                        placeholder: (context, url) => const Center(
-                                          child: CircularProgressIndicator(color: Colors.white),
-                                        ),
-                                        errorWidget: (context, url, error) => Icon(
-                                          Icons.person,
-                                          size: sw(80),
-                                          color: context.colors.background,
-                                        ),
+                                        placeholder: (context, url) =>
+                                            const Center(
+                                              child: CircularProgressIndicator(
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                        errorWidget: (context, url, error) =>
+                                            Icon(
+                                              Icons.person,
+                                              size: sw(80),
+                                              color: context.colors.background,
+                                            ),
                                       )
                                     : Icon(
                                         Icons.person,
@@ -113,7 +125,10 @@ class ProfileView extends StatelessWidget {
                                   decoration: BoxDecoration(
                                     color: context.colors.primary,
                                     shape: BoxShape.circle,
-                                    border: Border.all(color: context.colors.background, width: 2),
+                                    border: Border.all(
+                                      color: context.colors.background,
+                                      width: 2,
+                                    ),
                                   ),
                                   child: Icon(
                                     Icons.camera_alt,

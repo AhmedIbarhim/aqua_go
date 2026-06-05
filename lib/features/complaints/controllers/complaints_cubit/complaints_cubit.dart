@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../data/models/complaint_model.dart';
 import '../../data/repos/complaints_repository.dart';
 import 'complaints_state.dart';
 
@@ -18,20 +19,12 @@ class ComplaintsCubit extends Cubit<ComplaintsState> {
   }
 
   Future<void> submitComplaint({
-    required String bookingId,
-    required String category,
-    required String description,
-    String? desiredOutcome,
-    String? preferredContactChannel,
+    required ComplaintModel complaint,
     List<File> photos = const [],
   }) async {
     emit(ComplaintSubmitLoading());
     final result = await _repository.raiseComplaint(
-      bookingId: bookingId,
-      category: category,
-      description: description,
-      desiredOutcome: desiredOutcome,
-      preferredContactChannel: preferredContactChannel,
+      complaint: complaint,
       photos: photos,
     );
     result.fold(

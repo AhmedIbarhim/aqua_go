@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../extentions/context_extentions.dart';
+import '../../../../core/extentions/context_extentions.dart';
 
 class RatingWidget extends StatelessWidget {
   final double rating;

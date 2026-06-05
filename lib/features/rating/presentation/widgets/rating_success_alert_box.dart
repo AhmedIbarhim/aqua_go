@@ -13,9 +13,7 @@ class RatingSuccessAlertBox extends StatelessWidget {
   const RatingSuccessAlertBox({super.key});
 
   static Future<T?> show<T>(BuildContext context) {
-    return context.showCustomAlert<T>(
-      child: const RatingSuccessAlertBox(),
-    );
+    return context.showCustomAlert<T>(child: const RatingSuccessAlertBox());
   }
 
   @override
@@ -25,7 +23,6 @@ class RatingSuccessAlertBox extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Success Icon
         SvgPicture.asset(
           AppAssets.successIcon,
           width: width * 0.28,
@@ -33,7 +30,6 @@ class RatingSuccessAlertBox extends StatelessWidget {
         ),
         SizedBox(height: height * 0.02),
 
-        // Title
         Text(
           LocaleKeys.bookings_rating_submitted.tr(),
           style: AppTextStyles.medium16,

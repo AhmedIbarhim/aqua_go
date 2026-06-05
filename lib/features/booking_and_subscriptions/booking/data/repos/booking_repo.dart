@@ -1,4 +1,5 @@
 import 'package:aqua_go/core/helpers/fetch_user_data_helper.dart';
+import 'package:aqua_go/core/helpers/idempotency_key_helper.dart';
 import 'package:dartz/dartz.dart';
 
 import '../../../../../core/config/networking/exceptions/failure.dart';
@@ -93,9 +94,9 @@ class BookingRepo {
     BookingRequestModel booking,
   ) async {
     try {
-      final userId = FetchUserData.getUserId();
-      final nowToMinutes = DateTime.now().toIso8601String().substring(0, 16);
-      final idempotencyKey = '${userId}_$nowToMinutes';
+      final idempotencyKey = IdempotencyKeyHelper.generate(
+        userId: FetchUserData.getUserId() ?? '',
+      );
 
       final response = await bookingsRemoteDataSource.createBooking(
         bookingData: booking.toJson(),

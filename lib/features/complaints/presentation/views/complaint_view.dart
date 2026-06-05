@@ -277,9 +277,13 @@ class _ComplaintViewState extends State<ComplaintView> {
               onPressed: () {
                 final category = ComplaintCategory.categoryFromTranslation(_typeController.text).apiValue;
                 context.read<ComplaintsCubit>().submitComplaint(
-                  bookingId: widget.booking.id ?? '',
-                  category: category,
-                  description: _detailsController.text,
+                  complaint: ComplaintModel(
+                    id: '',
+                    status: ComplaintStatus.open,
+                    bookingId: widget.booking.id ?? '',
+                    category: category,
+                    description: _detailsController.text,
+                  ),
                   photos: _selectedImages,
                 );
               },

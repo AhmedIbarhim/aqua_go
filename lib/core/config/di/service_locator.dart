@@ -38,6 +38,9 @@ import 'package:aqua_go/features/complaints/data/data_sources/complaints_remote_
 import 'package:aqua_go/features/complaints/data/repos/complaints_repository.dart';
 import 'package:aqua_go/features/complaints/controllers/complaints_cubit/complaints_cubit.dart';
 import 'package:aqua_go/features/complaints/controllers/complaint_details_cubit/complaint_details_cubit.dart';
+import 'package:aqua_go/features/rating/data/data_sources/rating_remote_data_source.dart';
+import 'package:aqua_go/features/rating/data/repos/rating_repository.dart';
+import 'package:aqua_go/features/rating/controllers/rating_cubit/rating_cubit.dart';
 import 'package:get_it/get_it.dart';
 
 import '../../../features/address/data/services/location_service.dart';
@@ -92,6 +95,9 @@ Future<void> initServiceLocator() async {
   locator.registerLazySingleton<ComplaintsRemoteDataSource>(
     () => ComplaintsRemoteDataSource(locator()),
   );
+  locator.registerLazySingleton<RatingRemoteDataSource>(
+    () => RatingRemoteDataSource(locator()),
+  );
 
   // Repositories
 
@@ -141,6 +147,9 @@ Future<void> initServiceLocator() async {
   );
   locator.registerLazySingleton<ComplaintsRepository>(
     () => ComplaintsRepository(locator()),
+  );
+  locator.registerLazySingleton<RatingRepository>(
+    () => RatingRepository(locator()),
   );
 
   // Cubits
@@ -196,5 +205,8 @@ Future<void> initServiceLocator() async {
   );
   locator.registerFactory<ComplaintDetailsCubit>(
     () => ComplaintDetailsCubit(locator(), locator()),
+  );
+  locator.registerFactory<RatingCubit>(
+    () => RatingCubit(locator()),
   );
 }
