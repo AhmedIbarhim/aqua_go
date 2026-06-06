@@ -1,6 +1,10 @@
 enum NotificationType {
-  bookingAssigned('booking.assigned'),
   bookingCompleted('booking.completed'),
+  bookingOnTheWay('booking.on_the_way'),
+  bookingArrived('booking.arrived'),
+  bookingStarted('booking.started'),
+  bookingReminder30m('booking.reminder_30m'),
+  bookingReminder3h('booking.reminder_3h'),
   bookingCancellationMadaPending('booking.cancellation_mada_pending'),
   complaintResolved('complaint.resolved'),
   subscriptionExpiring('subscription.expiring'),

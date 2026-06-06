@@ -9,11 +9,13 @@ import '../../../../../core/utils/app_assets.dart';
 import '../../../../../generated/locale_keys.g.dart';
 
 class PackageSubscribtionSuccessAlert extends StatelessWidget {
-  const PackageSubscribtionSuccessAlert({super.key});
+  final String? referenceNumber;
 
-  static Future<T?> show<T>(BuildContext context) {
+  const PackageSubscribtionSuccessAlert({super.key, this.referenceNumber});
+
+  static Future<T?> show<T>(BuildContext context, {String? referenceNumber}) {
     return context.showCustomAlert<T>(
-      child: const PackageSubscribtionSuccessAlert(),
+      child: PackageSubscribtionSuccessAlert(referenceNumber: referenceNumber),
     );
   }
 
@@ -34,7 +36,17 @@ class PackageSubscribtionSuccessAlert extends StatelessWidget {
 
         // Title
         Text(LocaleKeys.success.tr(), style: AppTextStyles.medium16),
-        const SizedBox(height: 4),
+        if (referenceNumber != null) ...[
+          const SizedBox(height: 4),
+          Text(
+            referenceNumber!,
+            style: AppTextStyles.medium14.copyWith(
+              color: context.colors.primary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+        const SizedBox(height: 8),
 
         // Description
         Text(

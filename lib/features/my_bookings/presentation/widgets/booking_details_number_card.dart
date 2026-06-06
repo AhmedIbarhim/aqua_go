@@ -39,7 +39,7 @@ class BookingDetailsNumberCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '#${booking.id!.substring(0, 5)}',
+                '#${booking.referenceNumber}',
                 style: AppTextStyles.regular14.copyWith(
                   color: context.colors.contentSecondaryLight,
                 ),

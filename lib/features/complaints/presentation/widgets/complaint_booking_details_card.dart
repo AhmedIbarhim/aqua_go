@@ -11,11 +11,13 @@ import '../../../my_bookings/data/models/booking_response_model/booking_response
 class ComplaintBookingDetailsCard extends StatelessWidget {
   final String bookingId;
   final BookingResponseModel? booking;
+  final String? bookingReferenceNumber;
 
   const ComplaintBookingDetailsCard({
     super.key,
     required this.bookingId,
     this.booking,
+    this.bookingReferenceNumber,
   });
 
   @override
@@ -41,7 +43,7 @@ class ComplaintBookingDetailsCard extends StatelessWidget {
               _buildDetailRow(
                 context: context,
                 title: LocaleKeys.bookings_booking_number.tr(),
-                value: '#${booking?.id ?? bookingId}',
+                value: booking?.referenceNumber ?? bookingReferenceNumber ?? '#$bookingId',
                 icon: AppAssets.note,
               ),
               const SizedBox(height: 12),

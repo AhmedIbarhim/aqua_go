@@ -203,6 +203,7 @@ class ComplaintModel {
   final String? detailsAr;
   final String? detailsEn;
   final String bookingId;
+  final String? bookingReferenceNumber;
   final String? customerId;
   final String? category;
   final String? description;
@@ -223,6 +224,7 @@ class ComplaintModel {
     this.detailsAr,
     this.detailsEn,
     required this.bookingId,
+    this.bookingReferenceNumber,
     this.customerId,
     this.category,
     this.description,
@@ -239,6 +241,7 @@ class ComplaintModel {
       id: json['id'] as String? ?? '',
       customerId: json['customerId'] as String?,
       bookingId: json['bookingId'] as String? ?? '',
+      bookingReferenceNumber: json['bookingReferenceNumber'] as String? ?? json['booking_reference_number'] as String?,
       status: ComplaintStatus.fromString(json['status'] as String?),
       category: json['category'] as String?,
       description: json['description'] as String?,
@@ -256,6 +259,7 @@ class ComplaintModel {
   Map<String, dynamic> toJson() {
     return {
       'bookingId': bookingId,
+      if (bookingReferenceNumber != null) 'bookingReferenceNumber': bookingReferenceNumber,
       'category': category,
       'description': description,
       if (desiredOutcome?.isNotEmpty ?? false)

@@ -19,6 +19,7 @@ class SubscribedPackageModel {
   final num? refundedMinor;
   final String? refundStatus;
   final PackageSnapshot packageSnapshot;
+  final String? referenceNumber;
 
   SubscribedPackageModel({
     required this.id,
@@ -37,6 +38,7 @@ class SubscribedPackageModel {
     this.refundedMinor,
     this.refundStatus,
     required this.packageSnapshot,
+    this.referenceNumber,
   });
 
   // Dynamic getters for compatibility with UI
@@ -79,6 +81,7 @@ class SubscribedPackageModel {
       packageSnapshot: PackageSnapshot.fromJson(
         json['packageSnapshot'] as Map<String, dynamic>? ?? {},
       ),
+      referenceNumber: json['referenceNumber'] as String?,
     );
   }
 
@@ -100,6 +103,7 @@ class SubscribedPackageModel {
       'refundedMinor': refundedMinor,
       'refundStatus': refundStatus,
       'packageSnapshot': packageSnapshot.toJson(),
+      if (referenceNumber != null) 'referenceNumber': referenceNumber,
     };
   }
 }

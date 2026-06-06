@@ -151,7 +151,7 @@ class _ComplaintViewState extends State<ComplaintView> {
             children: [
               _buildDetailRow(
                 title: LocaleKeys.bookings_booking_number.tr(),
-                value: '#${widget.booking.id}',
+                value: widget.booking.referenceNumber ?? '#${widget.booking.id}',
                 icon: AppAssets.note,
               ),
               const SizedBox(height: 12),
@@ -283,6 +283,7 @@ class _ComplaintViewState extends State<ComplaintView> {
                     id: '',
                     status: ComplaintStatus.open,
                     bookingId: widget.booking.id ?? '',
+                    bookingReferenceNumber: widget.booking.referenceNumber,
                     category: category,
                     description: _detailsController.text,
                   ),

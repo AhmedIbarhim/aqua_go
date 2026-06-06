@@ -49,7 +49,10 @@ class _PackageSubscribtionBottomSheetState
         if (state is SubscriptionCreated) {
           context.read<SubscriptionsCubit>().getActiveSubscriptions();
           Navigator.pop(context);
-          PackageSubscribtionSuccessAlert.show(context);
+          PackageSubscribtionSuccessAlert.show(
+            context,
+            referenceNumber: state.subscription.referenceNumber,
+          );
         } else if (state is SubscriptionsError) {
           context.showErrorSnackBar(state.message);
         }

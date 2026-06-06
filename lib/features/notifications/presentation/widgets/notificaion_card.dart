@@ -6,6 +6,9 @@ import 'package:svg_flutter/svg.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
+import '../../../../core/route/routes.dart';
+import '../../../my_bookings/data/models/booking_summary_model.dart';
+import '../../../my_bookings/presentation/views/my_booking_deatails_view.dart';
 import '../../controllers/notifications_cubit/notifications_cubit.dart';
 import '../../data/models/notification_model.dart';
 
@@ -20,6 +23,16 @@ class NotificationCard extends StatelessWidget {
       onTap: () {
         if (!notification.isRead) {
           context.read<NotificationsCubit>().markAsRead(notification.id);
+        }
+        if (notification.targetId != null &&
+            notification.type == NotificationType.bookingCompleted) {
+          Navigator.pushNamed(
+            context,
+            Routes.myBookingDetails,
+            arguments: MyBookingDetailsArgs(
+              booking: BookingSummaryModel(id: notification.targetId),
+            ),
+          );
         }
       },
       borderRadius: BorderRadius.circular(16),
@@ -71,7 +84,9 @@ class NotificationCard extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          notification.getLocalizedTitle(context.locale.languageCode),
+                          notification.getLocalizedTitle(
+                            context.locale.languageCode,
+                          ),
                           style: AppTextStyles.medium16.copyWith(
                             color: context.colors.contentSecondaryLight,
                           ),
