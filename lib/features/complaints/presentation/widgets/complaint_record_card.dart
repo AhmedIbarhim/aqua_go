@@ -58,7 +58,7 @@ class ComplaintRecordCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '#${complaint.bookingReferenceNumber}',
+                      '#${complaint.referenceNumber}',
                       style: AppTextStyles.medium14.copyWith(
                         color: context.colors.contentSecondaryLight,
                       ),

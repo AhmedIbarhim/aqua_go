@@ -151,7 +151,8 @@ class _ComplaintViewState extends State<ComplaintView> {
             children: [
               _buildDetailRow(
                 title: LocaleKeys.bookings_booking_number.tr(),
-                value: widget.booking.referenceNumber ?? '#${widget.booking.id}',
+                value:
+                    widget.booking.referenceNumber ?? '#${widget.booking.id}',
                 icon: AppAssets.note,
               ),
               const SizedBox(height: 12),
@@ -228,15 +229,27 @@ class _ComplaintViewState extends State<ComplaintView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          LocaleKeys.bookings_complaint_details.tr(),
-          style: AppTextStyles.medium14,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              "* ",
+              style: AppTextStyles.regular14.copyWith(
+                color: context.colors.error,
+              ),
+            ),
+            Text(
+              LocaleKeys.bookings_complaint_details.tr(),
+              style: AppTextStyles.medium14,
+            ),
+          ],
         ),
         const SizedBox(height: 8),
         TextFormField(
           controller: _detailsController,
           maxLines: 5,
-          textAlign: TextAlign.right,
+          textAlign: TextAlign.start,
+          onChanged: (value) => setState(() {}),
           style: AppTextStyles.regular14.copyWith(
             color: context.colors.textPrimary,
           ),
@@ -273,7 +286,9 @@ class _ComplaintViewState extends State<ComplaintView> {
             flex: 2,
             child: CustomButton(
               text: LocaleKeys.submit.tr(),
-              enabled: _typeController.text.isNotEmpty,
+              enabled:
+                  _typeController.text.trim().isNotEmpty &&
+                  _detailsController.text.trim().isNotEmpty,
               onPressed: () {
                 final category = ComplaintCategory.categoryFromTranslation(
                   _typeController.text,
@@ -283,7 +298,7 @@ class _ComplaintViewState extends State<ComplaintView> {
                     id: '',
                     status: ComplaintStatus.open,
                     bookingId: widget.booking.id ?? '',
-                    bookingReferenceNumber: widget.booking.referenceNumber,
+                    referenceNumber: widget.booking.referenceNumber,
                     category: category,
                     description: _detailsController.text,
                   ),

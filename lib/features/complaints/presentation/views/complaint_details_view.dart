@@ -136,8 +136,7 @@ class ComplaintDetailsView extends StatelessWidget {
                           ComplaintBookingDetailsCard(
                             bookingId: complaint.bookingId,
                             booking: booking,
-                            bookingReferenceNumber:
-                                complaint.bookingReferenceNumber,
+                            bookingReferenceNumber: complaint.referenceNumber,
                           ),
                           SizedBox(height: sh(24)),
                           ComplaintDetailsTypeCard(

@@ -1,3 +1,4 @@
+import 'package:aqua_go/core/components/custom_loading_indicator.dart';
 import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -53,6 +54,7 @@ class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
     }
     if (widget.initialDate != oldWidget.initialDate) {
       selectedDate = widget.initialDate;
+      selectedTime = null;
     }
   }
 
@@ -158,6 +160,7 @@ class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
             onTap: () {
               setState(() {
                 selectedDate = date;
+                selectedTime = null;
               });
               widget.onDateChanged(date);
             },
@@ -229,10 +232,11 @@ class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
           Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 20),
-              child: CircularProgressIndicator(color: context.colors.primary),
+              child: CustomLoadingIndicator(size: 70),
             ),
           )
-        else if (widget.availabilitySlots.isEmpty)
+        else if (widget.availabilitySlots.isEmpty ||
+            widget.availabilitySlots.every((slot) => !slot.available))
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 20),

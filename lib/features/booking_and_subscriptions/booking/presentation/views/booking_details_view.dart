@@ -35,7 +35,7 @@ class BookingDetailsView extends StatelessWidget {
       child: BlocBuilder<BookingCubit, BookingState>(
         builder: (context, bookingState) {
           return Scaffold(
-            backgroundColor: context.colors.screenBG,
+            backgroundColor: context.colors.background,
             appBar: GenericAppBar(
               title: LocaleKeys.bookings_booking_details.tr(),
               hasBackground: true,
