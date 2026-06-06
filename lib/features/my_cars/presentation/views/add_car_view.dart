@@ -62,13 +62,32 @@ class _AddCarViewState extends State<AddCarView> {
     super.dispose();
   }
 
-  bool get _isFormValid =>
-      _selectedBrandModel != null &&
-      _selectedModelModel != null &&
-      _plateNumberController.text.trim().isNotEmpty &&
-      _plateNumberController.text.trim().length >= 7 &&
-      _plateNumberController.text.trim().length <= 8 &&
-      _selectedColor != null;
+  bool get _isFormValid {
+    final plate = _plateNumberController.text.trim();
+    if (plate.isEmpty) return false;
+
+    final startsWithCapital = RegExp(r'^[A-Z]').hasMatch(plate);
+    final endsWithNumber = RegExp(r'[0-9]$').hasMatch(plate);
+    final upToEightChars = plate.length <= 8;
+
+    final lettersCount = RegExp(r'[a-zA-Z]').allMatches(plate).length;
+    final numbersCount = RegExp(r'[0-9]').allMatches(plate).length;
+
+    final hasAtLeastOneLetterAndNumber = lettersCount >= 1 && numbersCount >= 1;
+    final maxFourLettersAndNumbers = lettersCount <= 4 && numbersCount <= 4;
+
+    final isPlateValid =
+        startsWithCapital &&
+        endsWithNumber &&
+        upToEightChars &&
+        hasAtLeastOneLetterAndNumber &&
+        maxFourLettersAndNumbers;
+
+    return _selectedBrandModel != null &&
+        _selectedModelModel != null &&
+        isPlateValid &&
+        _selectedColor != null;
+  }
 
   @override
   Widget build(BuildContext context) {
