@@ -145,30 +145,45 @@ class MyBookingDetailsView extends StatelessWidget {
     BuildContext context,
     BookingResponseModel booking,
   ) {
-    if (booking.invoice?.pdfUrl == null) {
+    if (booking.invoice == null) {
       return const SizedBox.shrink();
     }
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: context.colors.themeColor,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            LocaleKeys.bookings_go_to_invoice_list.tr(),
-            style: AppTextStyles.medium14.copyWith(
-              color: context.colors.primary,
+    return InkWell(
+      onTap: () {
+        if (booking.invoice?.pdfUrl != null) {
+          // TODO: Open the PDF URL (requires url_launcher package or similar)
+          context.showSuccessSnackBar(booking.invoice!.pdfUrl!);
+        } else {
+          context.showWarningSnackBar(
+            context.isAr
+                ? "رابط الفاتورة غير متوفر حالياً"
+                : "Invoice PDF URL is not available yet.",
+          );
+        }
+      },
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: context.colors.themeColor,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              LocaleKeys.bookings_go_to_invoice_list.tr(),
+              style: AppTextStyles.medium14.copyWith(
+                color: context.colors.primary,
+              ),
             ),
-          ),
-          Icon(
-            Icons.arrow_forward_ios,
-            color: context.colors.primary,
-            size: 16,
-          ),
-        ],
+            Icon(
+              Icons.arrow_forward_ios,
+              color: context.colors.primary,
+              size: 16,
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -275,7 +275,9 @@ class _ComplaintViewState extends State<ComplaintView> {
               text: LocaleKeys.submit.tr(),
               enabled: _typeController.text.isNotEmpty,
               onPressed: () {
-                final category = ComplaintCategory.categoryFromTranslation(_typeController.text).apiValue;
+                final category = ComplaintCategory.categoryFromTranslation(
+                  _typeController.text,
+                ).apiValue;
                 context.read<ComplaintsCubit>().submitComplaint(
                   complaint: ComplaintModel(
                     id: '',
