@@ -198,12 +198,14 @@ class BookingResponseModel {
     vehicleYear = json['vehicleYear'] != null
         ? int.tryParse(json['vehicleYear'].toString())
         : (json['vehicle_year'] != null
-            ? int.tryParse(json['vehicle_year'].toString())
-            : null);
-    vehicleMakeLogoUrl = json['vehicleMakeLogoUrl'] ??
+              ? int.tryParse(json['vehicle_year'].toString())
+              : null);
+    vehicleMakeLogoUrl =
+        json['vehicleMakeLogoUrl'] ??
         json['vehicle_make_logo_url'] ??
         json['makeLogoUrl'];
-    plate = json['plate'] ??
+    plate =
+        json['plate'] ??
         json['plateMasked'] ??
         json['plate_masked'] ??
         json['plateText'] ??
@@ -231,18 +233,20 @@ class BookingResponseModel {
         : null;
 
     customerName = json['customerName'];
-    customerPhoneMasked = json['customerPhoneMasked'] ??
+    customerPhoneMasked =
+        json['customerPhoneMasked'] ??
         json['customerPhone'] ??
         json['customer_phone'];
-    customerPhone = json['customerPhone'] ??
+    customerPhone =
+        json['customerPhone'] ??
         json['customer_phone'] ??
         json['customerPhoneMasked'] ??
         json['customer_phone_masked'];
     reschedulePolicy = json['reschedulePolicyView'] != null
         ? ReschedulePolicy.fromJson(json['reschedulePolicyView'])
         : (json['reschedulePolicy'] != null
-            ? ReschedulePolicy.fromJson(json['reschedulePolicy'])
-            : null);
+              ? ReschedulePolicy.fromJson(json['reschedulePolicy'])
+              : null);
     if (json['addOns'] != null && json['addOns'] is List) {
       addOns = <BookingAddon>[];
       json['addOns'].forEach((v) {

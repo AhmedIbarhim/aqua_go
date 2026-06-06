@@ -51,6 +51,6 @@ class DayTimeModel {
   String toScheduledAtString() {
     final String formattedMonth = date.month.toString().padLeft(2, '0');
     final String formattedDay = date.day.toString().padLeft(2, '0');
-    return '${date.year}-$formattedMonth-${formattedDay}T$formattedTime:00Z';
+    return '${date.year}-$formattedMonth-${formattedDay}T$formattedTime:00';
   }
 }

@@ -189,7 +189,7 @@ class ScheduleEntry {
 
   Map<String, dynamic> toJson() {
     return {
-      'scheduledAt': scheduledAt.toUtc().toIso8601String(),
+      'scheduledAt': scheduledAt.toIso8601String(),
       'addressId': addressId,
       'vehicleIds': vehicleIds,
     };
@@ -199,8 +199,11 @@ class ScheduleEntry {
     return ScheduleEntry(
       scheduledAt: DateTime.parse(json['scheduledAt'] as String),
       addressId: json['addressId'] as String? ?? '',
-      vehicleIds: (json['vehicleIds'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
+      vehicleIds:
+          (json['vehicleIds'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [],
     );
   }
 }
-
