@@ -20,7 +20,7 @@ class BookingDetailsVehicleCard extends StatelessWidget {
     String brandModelText =
         '${booking.vehicleMake ?? ""} ${booking.vehicleModel ?? ""}'.trim();
     if (brandModelText.isEmpty) {
-      brandModelText = context.isAr ? 'مركبة غير محددة' : 'Unspecified Vehicle';
+      brandModelText = '...';
     }
 
     // Resolve Vehicle Color
@@ -49,7 +49,7 @@ class BookingDetailsVehicleCard extends StatelessWidget {
     }
 
     // Resolve Plate Number
-    final String plateText = booking.plateMasked ?? '';
+    final String plateText = booking.plate ?? '';
 
     // Resolve Year
     final String yearText = booking.vehicleYear != null

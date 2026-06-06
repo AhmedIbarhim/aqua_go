@@ -28,7 +28,7 @@ class BookingSummaryModel {
   final String? vehicleMake;
   final String? vehicleModel;
   final String? vehicleColor;
-  final String? plateMasked;
+  final String? plate;
   final String? vehicleMakeLogoUrl;
 
   BookingSummaryModel({
@@ -54,7 +54,7 @@ class BookingSummaryModel {
     this.vehicleMake,
     this.vehicleModel,
     this.vehicleColor,
-    this.plateMasked,
+    this.plate,
     this.vehicleMakeLogoUrl,
   });
 
@@ -88,8 +88,11 @@ class BookingSummaryModel {
       vehicleMake: json['vehicleMake'] as String?,
       vehicleModel: json['vehicleModel'] as String?,
       vehicleColor: json['vehicleColor'] as String?,
-      plateMasked:
-          json['plateMasked'] ?? json['plateText'] ?? json['plate_masked'],
+      plate: json['plate'] ??
+          json['plateMasked'] ??
+          json['plateText'] ??
+          json['plate_masked'] ??
+          json['plate_text'],
       vehicleMakeLogoUrl: json['vehicleMakeLogoUrl'] as String?,
     );
   }
@@ -115,7 +118,7 @@ class BookingSummaryModel {
       vehicleMake: details.vehicleMake,
       vehicleModel: details.vehicleModel,
       vehicleColor: details.vehicleColor,
-      plateMasked: details.plateMasked,
+      plate: details.plate,
       vehicleMakeLogoUrl: details.vehicleMakeLogoUrl,
       serviceNameEn: details.packageName?.en,
       serviceNameAr: details.packageName?.ar,
@@ -146,7 +149,7 @@ class BookingSummaryModel {
       'vehicleMake': vehicleMake,
       'vehicleModel': vehicleModel,
       'vehicleColor': vehicleColor,
-      'plateMasked': plateMasked,
+      'plate': plate,
       'vehicleMakeLogoUrl': vehicleMakeLogoUrl,
     };
   }
@@ -173,7 +176,7 @@ class BookingSummaryModel {
       vehicleMake: vehicleMake,
       vehicleModel: vehicleModel,
       vehicleColor: vehicleColor,
-      plateMasked: plateMasked,
+      plate: plate,
       vehicleMakeLogoUrl: vehicleMakeLogoUrl,
       packageName: PackageName(en: serviceNameEn, ar: serviceNameAr),
     );

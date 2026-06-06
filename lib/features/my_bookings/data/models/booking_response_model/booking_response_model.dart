@@ -5,7 +5,9 @@ import 'package:easy_localization/easy_localization.dart';
 import '../../enums/booking_status_enum.dart';
 import '../../enums/booking_type_enum.dart';
 import 'assigned_worker.dart';
+import 'booking_addon.dart';
 import 'booking_vehicle.dart';
+import 'breakdown.dart';
 import 'cancellation_policy.dart';
 import 'invoice.dart';
 import 'package_name.dart';
@@ -13,8 +15,10 @@ import 'photos.dart';
 import 'reschedule_policy.dart';
 
 export 'assigned_worker.dart';
+export 'booking_addon.dart';
 export 'booking_vehicle.dart';
 export 'bookings_list_response_model.dart';
+export 'breakdown.dart';
 export 'cancellation_policy.dart';
 export 'invoice.dart';
 export 'package_name.dart';
@@ -23,6 +27,7 @@ export 'reschedule_policy.dart';
 
 class BookingResponseModel {
   String? id;
+  String? referenceNumber;
   String? customerId;
   String? workerId;
   String? addressLabel;
@@ -51,7 +56,7 @@ class BookingResponseModel {
   String? pspRedirectUrl;
   List<Photos>? photos;
   AssignedWorker? assignedWorker;
-  String? plateMasked;
+  String? plate;
   Invoice? invoice;
   List<String>? workerNotes;
   int? vehicleYear;
@@ -63,11 +68,15 @@ class BookingResponseModel {
   String? vehicleMakeLogoUrl;
   String? customerName;
   String? customerPhoneMasked;
+  String? customerPhone;
   ReschedulePolicy? reschedulePolicy;
   List<BookingVehicle>? vehicles;
+  List<BookingAddon>? addOns;
+  Breakdown? breakdown;
 
   BookingResponseModel({
     this.id,
+    this.referenceNumber,
     this.customerId,
     this.workerId,
     this.addressLabel,
@@ -96,7 +105,7 @@ class BookingResponseModel {
     this.pspRedirectUrl,
     this.photos,
     this.assignedWorker,
-    this.plateMasked,
+    this.plate,
     this.invoice,
     this.workerNotes,
     this.vehicleYear,
@@ -108,12 +117,16 @@ class BookingResponseModel {
     this.vehicleMakeLogoUrl,
     this.customerName,
     this.customerPhoneMasked,
+    this.customerPhone,
     this.reschedulePolicy,
     this.vehicles,
+    this.addOns,
+    this.breakdown,
   });
 
   BookingResponseModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
+    referenceNumber = json['referenceNumber'] ?? json['reference_number'];
     customerId = json['customerId'];
     workerId = json['workerId'];
     addressLabel = json['addressLabel'];
@@ -167,11 +180,6 @@ class BookingResponseModel {
     assignedWorker = json['assignedWorker'] != null
         ? AssignedWorker.fromJson(json['assignedWorker'])
         : null;
-    plateMasked =
-        json['plateMasked'] ??
-        json['plate_masked'] ??
-        json['plateText'] ??
-        json['plate_text'];
     invoice = json['invoice'] != null
         ? Invoice.fromJson(json['invoice'])
         : null;
@@ -183,7 +191,25 @@ class BookingResponseModel {
 
     addressArrivalNotes = json['addressArrivalNotes'];
 
-    // Extract details-specific nested vehicles array
+    // Obtain vehicle data directly from the response root first
+    vehicleMake = json['vehicleMake'] ?? json['vehicle_make'];
+    vehicleModel = json['vehicleModel'] ?? json['vehicle_model'];
+    vehicleColor = json['vehicleColor'] ?? json['vehicle_color'];
+    vehicleYear = json['vehicleYear'] != null
+        ? int.tryParse(json['vehicleYear'].toString())
+        : (json['vehicle_year'] != null
+            ? int.tryParse(json['vehicle_year'].toString())
+            : null);
+    vehicleMakeLogoUrl = json['vehicleMakeLogoUrl'] ??
+        json['vehicle_make_logo_url'] ??
+        json['makeLogoUrl'];
+    plate = json['plate'] ??
+        json['plateMasked'] ??
+        json['plate_masked'] ??
+        json['plateText'] ??
+        json['plate_text'];
+
+    // Extract details-specific nested vehicles array, falling back to it if root properties are null
     if (json['vehicles'] != null && json['vehicles'] is List) {
       vehicles = <BookingVehicle>[];
       json['vehicles'].forEach((v) {
@@ -191,12 +217,12 @@ class BookingResponseModel {
       });
       if (vehicles!.isNotEmpty) {
         final firstVehicle = vehicles!.first;
-        vehicleMake = firstVehicle.vehicleMake;
-        vehicleModel = firstVehicle.vehicleModel;
-        vehicleColor = firstVehicle.vehicleColor;
-        vehicleYear = firstVehicle.vehicleYear;
-        plateMasked = firstVehicle.plateMasked;
-        vehicleMakeLogoUrl = firstVehicle.makeLogoUrl;
+        vehicleMake ??= firstVehicle.vehicleMake;
+        vehicleModel ??= firstVehicle.vehicleModel;
+        vehicleColor ??= firstVehicle.vehicleColor;
+        vehicleYear ??= firstVehicle.vehicleYear;
+        plate ??= firstVehicle.plate;
+        vehicleMakeLogoUrl ??= firstVehicle.makeLogoUrl;
       }
     }
 
@@ -205,15 +231,33 @@ class BookingResponseModel {
         : null;
 
     customerName = json['customerName'];
-    customerPhoneMasked = json['customerPhoneMasked'];
+    customerPhoneMasked = json['customerPhoneMasked'] ??
+        json['customerPhone'] ??
+        json['customer_phone'];
+    customerPhone = json['customerPhone'] ??
+        json['customer_phone'] ??
+        json['customerPhoneMasked'] ??
+        json['customer_phone_masked'];
     reschedulePolicy = json['reschedulePolicyView'] != null
         ? ReschedulePolicy.fromJson(json['reschedulePolicyView'])
+        : (json['reschedulePolicy'] != null
+            ? ReschedulePolicy.fromJson(json['reschedulePolicy'])
+            : null);
+    if (json['addOns'] != null && json['addOns'] is List) {
+      addOns = <BookingAddon>[];
+      json['addOns'].forEach((v) {
+        addOns!.add(BookingAddon.fromJson(v));
+      });
+    }
+    breakdown = json['breakdown'] != null
+        ? Breakdown.fromJson(json['breakdown'])
         : null;
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
+    data['referenceNumber'] = referenceNumber;
     data['customerId'] = customerId;
     data['workerId'] = workerId;
     data['addressLabel'] = addressLabel;
@@ -248,7 +292,7 @@ class BookingResponseModel {
     if (assignedWorker != null) {
       data['assignedWorker'] = assignedWorker!.toJson();
     }
-    data['plateMasked'] = plateMasked;
+    data['plate'] = plate;
     if (invoice != null) {
       data['invoice'] = invoice!.toJson();
     }
@@ -264,11 +308,18 @@ class BookingResponseModel {
     data['vehicleMakeLogoUrl'] = vehicleMakeLogoUrl;
     data['customerName'] = customerName;
     data['customerPhoneMasked'] = customerPhoneMasked;
+    data['customerPhone'] = customerPhone;
     if (reschedulePolicy != null) {
       data['reschedulePolicyView'] = reschedulePolicy!.toJson();
     }
     if (vehicles != null) {
       data['vehicles'] = vehicles!.map((v) => v.toJson()).toList();
+    }
+    if (addOns != null) {
+      data['addOns'] = addOns!.map((v) => v.toJson()).toList();
+    }
+    if (breakdown != null) {
+      data['breakdown'] = breakdown!.toJson();
     }
     return data;
   }

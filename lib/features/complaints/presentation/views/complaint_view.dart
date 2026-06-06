@@ -163,7 +163,7 @@ class _ComplaintViewState extends State<ComplaintView> {
               const SizedBox(height: 12),
               _buildDetailRow(
                 title: LocaleKeys.bookings_car_plate.tr(),
-                value: widget.booking.plateMasked ?? '',
+                value: widget.booking.plate ?? '',
                 icon: AppAssets.boardNum,
               ),
               const SizedBox(height: 12),

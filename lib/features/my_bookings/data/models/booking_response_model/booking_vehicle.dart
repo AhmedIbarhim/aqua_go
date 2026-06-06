@@ -4,7 +4,7 @@ class BookingVehicle {
   String? vehicleModel;
   String? vehicleColor;
   int? vehicleYear;
-  String? plateMasked;
+  String? plate;
   String? makeLogoUrl;
 
   BookingVehicle({
@@ -13,7 +13,7 @@ class BookingVehicle {
     this.vehicleModel,
     this.vehicleColor,
     this.vehicleYear,
-    this.plateMasked,
+    this.plate,
     this.makeLogoUrl,
   });
 
@@ -27,7 +27,8 @@ class BookingVehicle {
         : (json['vehicle_year'] != null
             ? int.tryParse(json['vehicle_year'].toString())
             : null);
-    plateMasked = json['plateMasked'] ??
+    plate = json['plate'] ??
+        json['plateMasked'] ??
         json['plate_masked'] ??
         json['plateText'] ??
         json['plate_text'];
@@ -43,7 +44,7 @@ class BookingVehicle {
     data['vehicleModel'] = vehicleModel;
     data['vehicleColor'] = vehicleColor;
     data['vehicleYear'] = vehicleYear;
-    data['plateMasked'] = plateMasked;
+    data['plate'] = plate;
     data['makeLogoUrl'] = makeLogoUrl;
     return data;
   }

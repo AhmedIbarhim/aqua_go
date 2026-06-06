@@ -55,7 +55,7 @@ class ComplaintBookingDetailsCard extends StatelessWidget {
               _buildDetailRow(
                 context: context,
                 title: LocaleKeys.bookings_car_plate.tr(),
-                value: booking?.plateMasked ?? '',
+                value: booking?.plate ?? '',
                 icon: AppAssets.boardNum,
               ),
               const SizedBox(height: 12),
