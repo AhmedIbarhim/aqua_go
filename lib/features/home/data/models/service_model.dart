@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import '../../../booking_and_subscriptions/shared/add_on_model.dart';
 import '../../../../core/utils/app_assets.dart';
+import '../../../my_bookings/data/models/booking_response_model/breakdown.dart';
 
 class ServiceModel extends Equatable {
   final String id;
@@ -12,6 +13,7 @@ class ServiceModel extends Equatable {
   final int? priceMinor;
   final int? vatMinor;
   final String? currency;
+  final Breakdown? breakdown;
 
   // Optionals for override values
   final String? priceOverride;
@@ -28,21 +30,27 @@ class ServiceModel extends Equatable {
     this.priceMinor,
     this.vatMinor,
     this.currency,
+    this.breakdown,
     this.priceOverride,
     this.oldPriceOverride,
     this.imageOverride,
   });
 
   // Fallback getters for UI compatibility
-  String get price => (priceMinor != null && priceMinor! > 0)
-      ? (priceMinor! / 100).toStringAsFixed(2)
-      : (priceOverride ?? '');
+  String get price => breakdown != null
+      ? breakdown!.gross.toStringAsFixed(2)
+      : ((priceMinor != null && priceMinor! > 0)
+            ? (priceMinor! / 100).toStringAsFixed(2)
+            : (priceOverride ?? ''));
   String get oldPrice => oldPriceOverride ?? '';
   String get image => imageOverride ?? AppAssets.carDemo;
 
-  double get basePriceDouble => priceDouble - vatDouble;
-  double get vatDouble => (vatMinor ?? 0) / 100;
-  double get priceDouble => (priceMinor ?? 0) / 100;
+  double get basePriceDouble =>
+      breakdown != null ? breakdown!.net : (priceDouble - vatDouble);
+  double get vatDouble =>
+      breakdown != null ? breakdown!.vat : ((vatMinor ?? 0) / 100);
+  double get priceDouble =>
+      breakdown != null ? breakdown!.gross : ((priceMinor ?? 0) / 100);
 
   factory ServiceModel.fromJson(Map<String, dynamic> json) {
     return ServiceModel(
@@ -59,6 +67,9 @@ class ServiceModel extends Equatable {
       priceMinor: (json['priceMinor'] as num?)?.toInt(),
       vatMinor: (json['vatMinor'] as num?)?.toInt(),
       currency: json['currency'] as String?,
+      breakdown: json['breakdown'] != null
+          ? Breakdown.fromJson(json['breakdown'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -73,6 +84,7 @@ class ServiceModel extends Equatable {
       'priceMinor': priceMinor,
       'vatMinor': vatMinor,
       'currency': currency,
+      if (breakdown != null) 'breakdown': breakdown!.toJson(),
     };
   }
 
@@ -87,6 +99,7 @@ class ServiceModel extends Equatable {
     priceMinor,
     vatMinor,
     currency,
+    breakdown,
   ];
 }
 

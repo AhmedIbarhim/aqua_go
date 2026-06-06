@@ -4,12 +4,7 @@ class Breakdown {
   int? vatMinor;
   String? currency;
 
-  Breakdown({
-    this.grossMinor,
-    this.netMinor,
-    this.vatMinor,
-    this.currency,
-  });
+  Breakdown({this.grossMinor, this.netMinor, this.vatMinor, this.currency});
 
   Breakdown.fromJson(Map<String, dynamic> json) {
     grossMinor = json['grossMinor'] != null

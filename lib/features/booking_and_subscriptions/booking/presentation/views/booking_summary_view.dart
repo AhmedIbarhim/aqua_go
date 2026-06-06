@@ -30,6 +30,14 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
   final Set<String> selectedNotes = {};
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<BookingCubit>().fetchQuote();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
     return BlocConsumer<BookingCubit, BookingState>(
@@ -92,7 +100,10 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
     double width,
   ) {
     final List<Map<String, dynamic>> selectedAddons = [];
-    double addonsTotal = 0.0;
+    double addonsGross = 0.0;
+    double addonsNet = 0.0;
+    double addonsVat = 0.0;
+
     final availableAddons = bookingState.selectedService?.addons ?? [];
     for (final idx in bookingState.selectedServiceIndices) {
       if (idx < availableAddons.length) {
@@ -101,14 +112,30 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
             ? (addon.nameAr ?? addon.nameEn ?? '')
             : (addon.nameEn ?? addon.nameAr ?? '');
         selectedAddons.add({'name': title, 'price': addon.price});
-        addonsTotal += addon.price;
+        addonsGross += addon.price;
+        addonsNet += addon.breakdown?.net ?? (addon.price / 1.15);
+        addonsVat += addon.breakdown?.vat ?? (addon.price - (addon.price / 1.15));
       }
     }
 
-    final basePrice = bookingState.selectedService?.basePriceDouble ?? 0.0;
-    final subtotal = basePrice + addonsTotal;
-    final vat = bookingState.selectedService?.vatDouble;
-    final total = subtotal + (vat ?? 0.0);
+    final quoteBreakdown = bookingState.quote?.breakdown;
+
+    final double basePrice;
+    final double subtotal;
+    final double vat;
+    final double total;
+
+    if (quoteBreakdown != null) {
+      basePrice = quoteBreakdown.net;
+      subtotal = quoteBreakdown.net + addonsNet;
+      vat = quoteBreakdown.vat + addonsVat;
+      total = quoteBreakdown.gross + addonsGross;
+    } else {
+      basePrice = bookingState.selectedService?.basePriceDouble ?? 0.0;
+      subtotal = basePrice + addonsNet;
+      vat = (bookingState.selectedService?.vatDouble ?? 0.0) + addonsVat;
+      total = (bookingState.selectedService?.priceDouble ?? 0.0) + addonsGross;
+    }
 
     return Container(
       padding: EdgeInsets.all(width * 0.06),
@@ -161,7 +188,7 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
             servicePrice: basePrice,
             additionalItems: selectedAddons,
             subtotal: subtotal,
-            vat: vat ?? 0.0,
+            vat: vat,
             total: total,
           ),
           const SizedBox(height: 30),

@@ -49,8 +49,7 @@ abstract class Endpoints {
   static String editBookingLogistics(String bookingId) =>
       'bookings/$bookingId/edit';
   static String tipBooking(String bookingId) => 'bookings/$bookingId/tip';
-  static String bookingTracking(String bookingId) =>
-      'bookings/$bookingId/tracking';
+
 
   //  Banners Endpoints
   static const String banners = 'banners';
