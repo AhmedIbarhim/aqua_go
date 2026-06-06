@@ -31,8 +31,7 @@ class AvailabilitySlot {
     return AvailabilitySlot(
       start: DateTime.parse(json['start']),
       end: DateTime.parse(json['end']),
-      available: DateTime.parse(json['end']).isAfter(DateTime.now()),
-      // available: json['available'] as bool? ?? false,
+      available: json['available'] as bool? ?? false,
       reason: json['reason'] as String?,
     );
   }

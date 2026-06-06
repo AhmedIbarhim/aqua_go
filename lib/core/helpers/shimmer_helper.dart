@@ -180,6 +180,7 @@ class ShimmerHelper extends StatelessWidget {
         modelYear: DateTime.now().year,
         color: '#CCCCCC',
         plateNumber: 'أ ب ج ١٢٣٤',
+        logoUrl: "assets/images/logo_demo.png",
         carMake: const VehicleMakeModel(
           id: 'brand',
           vehicleMakeName: MakeName(
@@ -256,6 +257,8 @@ class ShimmerHelper extends StatelessWidget {
         id: 'shimmer_car_$index',
         makeId: 'shimmer_brand',
         modelId: 'shimmer_model',
+        logoUrl: "assets/images/logo_demo.png",
+
         color: '#CCCCCC',
         modelYear: DateTime.now().year,
         plateNumber: '١٢٣٤',

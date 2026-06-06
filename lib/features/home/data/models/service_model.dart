@@ -40,13 +40,9 @@ class ServiceModel extends Equatable {
   String get oldPrice => oldPriceOverride ?? '';
   String get image => imageOverride ?? AppAssets.carDemo;
 
-  double get basePriceDouble => (priceMinor != null && priceMinor! > 0)
-      ? priceMinor! / 100
-      : (double.tryParse(priceOverride ?? '') ?? 0.0);
-  double get vatDouble => (priceMinor != null && priceMinor! > 0)
-      ? (vatMinor ?? 0) / 100
-      : basePriceDouble * 0.15;
-  // double get basePriceDouble => priceDouble - vatDouble;
+  double get basePriceDouble => priceDouble - vatDouble;
+  double get vatDouble => (vatMinor ?? 0) / 100;
+  double get priceDouble => (priceMinor ?? 0) / 100;
 
   factory ServiceModel.fromJson(Map<String, dynamic> json) {
     return ServiceModel(

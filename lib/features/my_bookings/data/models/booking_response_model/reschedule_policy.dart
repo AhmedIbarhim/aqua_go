@@ -1,17 +1,17 @@
-class ReschedulePolicyView {
+class ReschedulePolicy {
   int? minHoursBeforeStart;
   int? maxReschedulesPerBooking;
   int? reschedulesUsed;
   bool? canRescheduleNow;
 
-  ReschedulePolicyView({
+  ReschedulePolicy({
     this.minHoursBeforeStart,
     this.maxReschedulesPerBooking,
     this.reschedulesUsed,
     this.canRescheduleNow,
   });
 
-  ReschedulePolicyView.fromJson(Map<String, dynamic> json) {
+  ReschedulePolicy.fromJson(Map<String, dynamic> json) {
     minHoursBeforeStart = json['minHoursBeforeStart'];
     maxReschedulesPerBooking = json['maxReschedulesPerBooking'];
     reschedulesUsed = json['reschedulesUsed'];

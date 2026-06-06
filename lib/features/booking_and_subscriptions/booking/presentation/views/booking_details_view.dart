@@ -187,12 +187,7 @@ class BookingDetailsView extends StatelessWidget {
       }
     }
 
-    final basePrice = bookingState.selectedService?.basePriceDouble ?? 0.0;
-    final subtotal = basePrice + addonsTotal;
-    final vat =
-        (bookingState.selectedService?.vatDouble ?? (basePrice * 0.15)) +
-        (addonsTotal * 0.15);
-    final total = subtotal + vat;
+    final total = bookingState.selectedService!.priceDouble + addonsTotal;
 
     return BottomActionSheetContainer(
       child: Column(

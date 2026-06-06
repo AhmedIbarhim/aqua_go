@@ -3,7 +3,6 @@ import 'package:aqua_go/core/components/custom_bottom_sheet.dart';
 import 'package:aqua_go/core/components/custom_button.dart';
 import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/core/themes/app_text_styles.dart';
-import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -104,10 +103,10 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
                 child: CustomButton(
                   onPressed: () {
                     context.read<RatingCubit>().submitRating(
-                          bookingId: widget.booking.id ?? '',
-                          score: _rating,
-                          reasons: _rating < 5 ? _selectedReasons : null,
-                        );
+                      bookingId: widget.booking.id ?? '',
+                      score: _rating,
+                      reasons: _rating < 5 ? _selectedReasons : null,
+                    );
                   },
                   text: LocaleKeys.submit.tr(),
                 ),
@@ -204,15 +203,10 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
                   width: width * 0.1,
                   height: width * 0.1,
                   color: context.colors.borderSecondary,
-                  child: worker.avatarUrl != null && worker.avatarUrl!.isNotEmpty
-                      ? CustomNetworkImage(
-                          worker.avatarUrl!,
-                          fit: BoxFit.cover,
-                        )
-                      : Image.asset(
-                          AppAssets.wavingHand,
-                          fit: BoxFit.cover,
-                        ),
+                  child: CustomNetworkImage(
+                    worker.avatarUrl ?? "",
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
               SizedBox(width: width * 0.03),
@@ -220,7 +214,8 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    worker.displayName ?? (context.isEn ? "Service Provider" : "مقدم الخدمة"),
+                    worker.displayName ??
+                        (context.isEn ? "Service Provider" : "مقدم الخدمة"),
                     style: AppTextStyles.medium14.copyWith(
                       color: context.colors.textPrimary,
                     ),

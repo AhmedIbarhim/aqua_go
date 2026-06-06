@@ -67,7 +67,7 @@ class MyCarCard extends StatelessWidget {
                       SizedBox(
                         height: height * 0.05,
                         width: height * 0.05,
-                        child: CarMakeNetworkLogo(logoUrl: car.typeImage),
+                        child: CarMakeNetworkLogo(logoUrl: car.logoUrl),
                       ),
                       Row(
                         children: [
@@ -147,7 +147,7 @@ class MyCarCard extends StatelessWidget {
 
               _buildSpecItem(
                 context,
-                text: car.boardNumber,
+                text: car.plateNumber,
                 icon: AppAssets.note,
               ),
             ],

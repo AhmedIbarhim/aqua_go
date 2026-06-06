@@ -11,7 +11,6 @@ class ServiceAddonModel extends Equatable {
   final String descriptionEn;
   final bool active;
   final int priceMinor;
-  final int vatMinor;
   final String currency;
 
   const ServiceAddonModel({
@@ -23,7 +22,6 @@ class ServiceAddonModel extends Equatable {
     required this.descriptionEn,
     required this.active,
     required this.priceMinor,
-    required this.vatMinor,
     required this.currency,
   });
 
@@ -39,7 +37,7 @@ class ServiceAddonModel extends Equatable {
   }
 
   double get priceDouble => priceMinor / 100;
-  
+
   String get price => priceDouble.toStringAsFixed(2);
 
   factory ServiceAddonModel.fromJson(Map<String, dynamic> json) {
@@ -49,13 +47,20 @@ class ServiceAddonModel extends Equatable {
     return ServiceAddonModel(
       id: json['id'] as String? ?? '',
       code: json['code'] as String? ?? '',
-      nameAr: nameMap != null ? (nameMap['nameAr'] as String? ?? '') : (json['nameAr'] as String? ?? ''),
-      nameEn: nameMap != null ? (nameMap['nameEn'] as String? ?? '') : (json['nameEn'] as String? ?? ''),
-      descriptionAr: descMap != null ? (descMap['descriptionAr'] as String? ?? '') : (json['descriptionAr'] as String? ?? ''),
-      descriptionEn: descMap != null ? (descMap['descriptionEn'] as String? ?? '') : (json['descriptionEn'] as String? ?? ''),
+      nameAr: nameMap != null
+          ? (nameMap['nameAr'] as String? ?? '')
+          : (json['nameAr'] as String? ?? ''),
+      nameEn: nameMap != null
+          ? (nameMap['nameEn'] as String? ?? '')
+          : (json['nameEn'] as String? ?? ''),
+      descriptionAr: descMap != null
+          ? (descMap['descriptionAr'] as String? ?? '')
+          : (json['descriptionAr'] as String? ?? ''),
+      descriptionEn: descMap != null
+          ? (descMap['descriptionEn'] as String? ?? '')
+          : (json['descriptionEn'] as String? ?? ''),
       active: json['active'] as bool? ?? true,
       priceMinor: (json['priceMinor'] as num?)?.toInt() ?? 0,
-      vatMinor: (json['vatMinor'] as num?)?.toInt() ?? 0,
       currency: json['currency'] as String? ?? '',
     );
   }
@@ -64,32 +69,27 @@ class ServiceAddonModel extends Equatable {
     return {
       'id': id,
       'code': code,
-      'name': {
-        'nameAr': nameAr,
-        'nameEn': nameEn,
-      },
+      'name': {'nameAr': nameAr, 'nameEn': nameEn},
       'description': {
         'descriptionAr': descriptionAr,
         'descriptionEn': descriptionEn,
       },
       'active': active,
       'priceMinor': priceMinor,
-      'vatMinor': vatMinor,
       'currency': currency,
     };
   }
 
   @override
   List<Object?> get props => [
-        id,
-        code,
-        nameAr,
-        nameEn,
-        descriptionAr,
-        descriptionEn,
-        active,
-        priceMinor,
-        vatMinor,
-        currency,
-      ];
+    id,
+    code,
+    nameAr,
+    nameEn,
+    descriptionAr,
+    descriptionEn,
+    active,
+    priceMinor,
+    currency,
+  ];
 }

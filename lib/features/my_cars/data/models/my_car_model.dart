@@ -1,9 +1,7 @@
 import 'package:aqua_go/core/constants.dart';
 
 import '../../../../core/config/local_storage/shared_prefs.dart';
-import '../../../../core/config/networking/endpoints.dart';
 import '../../../../core/helpers/car_color_helper.dart';
-import '../../../../core/utils/app_assets.dart';
 import 'vehicle_make_model.dart';
 import 'vehicle_model_model.dart';
 
@@ -13,6 +11,7 @@ class MyCarModel {
   final String modelId;
   final String color;
   final int modelYear;
+  final String logoUrl;
   final String plateNumber;
   final DateTime? createdAt;
   final VehicleMakeModel? carMake;
@@ -24,6 +23,7 @@ class MyCarModel {
     required this.modelId,
     required this.color,
     required this.modelYear,
+    required this.logoUrl,
     required this.plateNumber,
     this.createdAt,
     this.carMake,
@@ -52,15 +52,6 @@ class MyCarModel {
   // String get modelYear => '2024';
 
   // Board number maps to plate number
-  String get boardNumber => plateNumber;
-
-  // Generic car asset
-  String get image => AppAssets.myCar;
-
-  // Make logo
-  String get typeImage {
-    return '${Endpoints.baseUrl}${Endpoints.makeLogo(makeId)}';
-  }
 
   // Color code integer getter parsed from hex string color (e.g. "0xFFFFFF" or "#FFFFFF")
   int get colorCode {
@@ -100,6 +91,7 @@ class MyCarModel {
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt'].toString())
           : null,
+      logoUrl: json['logoUrl'] as String? ?? '',
       carMake: make,
       carModel: modelRelation,
     );
@@ -137,6 +129,7 @@ class MyCarModel {
     DateTime? createdAt,
     VehicleMakeModel? make,
     VehicleModelModel? modelRelation,
+    String? logoUrl,
   }) {
     return MyCarModel(
       id: id ?? this.id,
@@ -148,6 +141,7 @@ class MyCarModel {
       createdAt: createdAt ?? this.createdAt,
       carMake: make ?? carMake,
       carModel: modelRelation ?? carModel,
+      logoUrl: logoUrl ?? this.logoUrl,
     );
   }
 }

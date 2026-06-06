@@ -10,7 +10,7 @@ import 'cancellation_policy.dart';
 import 'invoice.dart';
 import 'package_name.dart';
 import 'photos.dart';
-import 'reschedule_policy_view.dart';
+import 'reschedule_policy.dart';
 
 export 'assigned_worker.dart';
 export 'booking_vehicle.dart';
@@ -19,7 +19,7 @@ export 'cancellation_policy.dart';
 export 'invoice.dart';
 export 'package_name.dart';
 export 'photos.dart';
-export 'reschedule_policy_view.dart';
+export 'reschedule_policy.dart';
 
 class BookingResponseModel {
   String? id;
@@ -63,7 +63,7 @@ class BookingResponseModel {
   String? vehicleMakeLogoUrl;
   String? customerName;
   String? customerPhoneMasked;
-  ReschedulePolicyView? reschedulePolicyView;
+  ReschedulePolicy? reschedulePolicy;
   List<BookingVehicle>? vehicles;
 
   BookingResponseModel({
@@ -108,7 +108,7 @@ class BookingResponseModel {
     this.vehicleMakeLogoUrl,
     this.customerName,
     this.customerPhoneMasked,
-    this.reschedulePolicyView,
+    this.reschedulePolicy,
     this.vehicles,
   });
 
@@ -206,8 +206,8 @@ class BookingResponseModel {
 
     customerName = json['customerName'];
     customerPhoneMasked = json['customerPhoneMasked'];
-    reschedulePolicyView = json['reschedulePolicyView'] != null
-        ? ReschedulePolicyView.fromJson(json['reschedulePolicyView'])
+    reschedulePolicy = json['reschedulePolicyView'] != null
+        ? ReschedulePolicy.fromJson(json['reschedulePolicyView'])
         : null;
   }
 
@@ -264,8 +264,8 @@ class BookingResponseModel {
     data['vehicleMakeLogoUrl'] = vehicleMakeLogoUrl;
     data['customerName'] = customerName;
     data['customerPhoneMasked'] = customerPhoneMasked;
-    if (reschedulePolicyView != null) {
-      data['reschedulePolicyView'] = reschedulePolicyView!.toJson();
+    if (reschedulePolicy != null) {
+      data['reschedulePolicyView'] = reschedulePolicy!.toJson();
     }
     if (vehicles != null) {
       data['vehicles'] = vehicles!.map((v) => v.toJson()).toList();

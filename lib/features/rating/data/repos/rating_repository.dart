@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer' as developer;
 import 'package:aqua_go/core/config/networking/exceptions/failure.dart';
 import 'package:aqua_go/features/rating/data/data_sources/rating_remote_data_source.dart';
@@ -30,7 +31,24 @@ class RatingRepository {
       return result.fold((failure) => Left(failure), (data) {
         if (data != null) {
           try {
-            final rating = RatingModel.fromJson(data as Map<String, dynamic>);
+            Map<String, dynamic> jsonMap;
+            if (data is Map<String, dynamic>) {
+              jsonMap = data;
+            } else if (data is String) {
+              try {
+                final decoded = jsonDecode(data);
+                if (decoded is Map<String, dynamic>) {
+                  jsonMap = decoded;
+                } else {
+                  jsonMap = ratingData;
+                }
+              } catch (_) {
+                jsonMap = ratingData;
+              }
+            } else {
+              jsonMap = ratingData;
+            }
+            final rating = RatingModel.fromJson(jsonMap);
             return Right(rating);
           } catch (e, stackTrace) {
             developer.log(

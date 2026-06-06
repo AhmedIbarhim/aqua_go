@@ -107,10 +107,8 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
 
     final basePrice = bookingState.selectedService?.basePriceDouble ?? 0.0;
     final subtotal = basePrice + addonsTotal;
-    final vat =
-        (bookingState.selectedService?.vatDouble ?? (basePrice * 0.15)) +
-        (addonsTotal * 0.15);
-    final total = subtotal + vat;
+    final vat = bookingState.selectedService?.vatDouble;
+    final total = subtotal + (vat ?? 0.0);
 
     return Container(
       padding: EdgeInsets.all(width * 0.06),
@@ -163,7 +161,7 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
             servicePrice: basePrice,
             additionalItems: selectedAddons,
             subtotal: subtotal,
-            vat: vat,
+            vat: vat ?? 0.0,
             total: total,
           ),
           const SizedBox(height: 30),
