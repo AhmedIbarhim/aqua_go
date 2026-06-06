@@ -91,7 +91,7 @@ class MyCarModel {
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt'].toString())
           : null,
-      logoUrl: json['logoUrl'] as String? ?? '',
+      logoUrl: json['logoUrl'] as String? ?? make?.logoUrl ?? '',
       carMake: make,
       carModel: modelRelation,
     );

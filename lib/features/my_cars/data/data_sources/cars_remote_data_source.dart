@@ -34,4 +34,12 @@ class CarsRemoteDataSource {
   Future<Either<Failure, dynamic>> getVehicleModels(String makeId) {
     return _apiClient.get(Endpoints.vehicleModels(makeId));
   }
+
+  Future<Either<Failure, dynamic>> getVehicleMakeDetails(String makeId) {
+    return _apiClient.get(Endpoints.vehicleMakeDetails(makeId));
+  }
+
+  Future<Either<Failure, dynamic>> getVehicleModelDetails(String modelId) {
+    return _apiClient.get(Endpoints.vehicleModelDetails(modelId));
+  }
 }

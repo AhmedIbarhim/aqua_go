@@ -21,14 +21,17 @@ abstract class Endpoints {
   //  Vehicles Endpoints
   static const String myVehicles = 'me/vehicles';
   static String myVehicle(String vehicleId) => 'me/vehicles/$vehicleId';
-
-  // Catalog / Services Endpoints
   static const String vehicleMakes = 'catalog/vehicle-makes';
   static String vehicleModels(String makeId) =>
       'catalog/vehicle-makes/$makeId/models';
   static String makeLogo(String makeId) => 'catalog/vehicle-makes/$makeId/logo';
   static String catalogPackageImage(String packageId) =>
       'catalog/packages/$packageId/image';
+  static String vehicleMakeDetails(String makeId) =>
+      'catalog/vehicle-makes/$makeId';
+  static String vehicleModelDetails(String modelId) =>
+      'catalog/vehicle-models/$modelId';
+
   static const String services = 'services';
   static String addonDetail(String addonId) => 'add-ons/$addonId';
 
@@ -49,7 +52,6 @@ abstract class Endpoints {
   static String editBookingLogistics(String bookingId) =>
       'bookings/$bookingId/edit';
   static String tipBooking(String bookingId) => 'bookings/$bookingId/tip';
-
 
   //  Banners Endpoints
   static const String banners = 'banners';

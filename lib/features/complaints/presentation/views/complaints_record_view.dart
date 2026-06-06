@@ -1,3 +1,4 @@
+import 'package:aqua_go/core/components/custom_loading_indicator.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -52,7 +53,7 @@ class _ComplaintsRecordViewState extends State<ComplaintsRecordView> {
                 builder: (context, state) {
                   if (state is ComplaintsLoading) {
                     return const Center(
-                      child: CircularProgressIndicator(),
+                      child: CustomLoadingIndicator(size: 100),
                     );
                   } else if (state is ComplaintsFailure) {
                     return Center(
@@ -74,23 +75,28 @@ class _ComplaintsRecordViewState extends State<ComplaintsRecordView> {
                       child: ListView.separated(
                         physics: const BouncingScrollPhysics(),
                         itemCount: complaints.length,
-                        separatorBuilder: (context, index) => SizedBox(height: sh(12)),
+                        separatorBuilder: (context, index) =>
+                            SizedBox(height: sh(12)),
                         itemBuilder: (context, index) {
                           final complaint = complaints[index];
                           return ComplaintRecordCard(
                             complaint: complaint,
                             onTap: () {
-                              context.pushNamed(
-                                Routes.complaintDetails,
-                                arguments: ComplaintDetailsArgs(
-                                  complaintId: complaint.id,
-                                  initialComplaint: complaint,
-                                ),
-                              ).then((_) {
-                                if (context.mounted) {
-                                  context.read<ComplaintsCubit>().fetchComplaints();
-                                }
-                              });
+                              context
+                                  .pushNamed(
+                                    Routes.complaintDetails,
+                                    arguments: ComplaintDetailsArgs(
+                                      complaintId: complaint.id,
+                                      initialComplaint: complaint,
+                                    ),
+                                  )
+                                  .then((_) {
+                                    if (context.mounted) {
+                                      context
+                                          .read<ComplaintsCubit>()
+                                          .fetchComplaints();
+                                    }
+                                  });
                             },
                           );
                         },
@@ -119,7 +125,8 @@ class _ComplaintsRecordViewState extends State<ComplaintsRecordView> {
           ),
           const SizedBox(height: 16),
           Text(
-            LocaleKeys.notifications_no_notifications.tr(), // generic empty state
+            LocaleKeys.notifications_no_notifications
+                .tr(), // generic empty state
             style: AppTextStyles.medium16.copyWith(
               color: context.colors.textPrimary,
             ),

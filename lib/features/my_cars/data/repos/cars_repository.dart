@@ -8,8 +8,54 @@ import '../data_sources/cars_remote_data_source.dart';
 
 class CarsRepository {
   final CarsRemoteDataSource _carsService;
+  final Map<String, VehicleMakeModel> _makeCache = {};
+  final Map<String, VehicleModelModel> _modelCache = {};
 
   CarsRepository(this._carsService);
+
+  Future<Either<Failure, VehicleMakeModel>> getMakeDetails(String makeId) async {
+    if (_makeCache.containsKey(makeId)) {
+      return Right(_makeCache[makeId]!);
+    }
+    final result = await _carsService.getVehicleMakeDetails(makeId);
+    return result.fold(
+      (failure) => Left(failure),
+      (data) {
+        if (data != null) {
+          try {
+            final make = VehicleMakeModel.fromJson(data as Map<String, dynamic>);
+            _makeCache[makeId] = make;
+            return Right(make);
+          } catch (e) {
+            return Left(ServerFailure('Parsing error: $e'));
+          }
+        }
+        return const Left(ServerFailure('Failed to load vehicle make details'));
+      },
+    );
+  }
+
+  Future<Either<Failure, VehicleModelModel>> getModelDetails(String modelId) async {
+    if (_modelCache.containsKey(modelId)) {
+      return Right(_modelCache[modelId]!);
+    }
+    final result = await _carsService.getVehicleModelDetails(modelId);
+    return result.fold(
+      (failure) => Left(failure),
+      (data) {
+        if (data != null) {
+          try {
+            final model = VehicleModelModel.fromJson(data as Map<String, dynamic>);
+            _modelCache[modelId] = model;
+            return Right(model);
+          } catch (e) {
+            return Left(ServerFailure('Parsing error: $e'));
+          }
+        }
+        return const Left(ServerFailure('Failed to load vehicle model details'));
+      },
+    );
+  }
 
   Future<Either<Failure, List<VehicleMakeModel>>> getBrands() async {
     final result = await _carsService.getVehicleMakes();
@@ -23,6 +69,9 @@ class CarsRepository {
                     VehicleMakeModel.fromJson(json as Map<String, dynamic>),
               )
               .toList();
+          for (final brand in brands) {
+            _makeCache[brand.id] = brand;
+          }
           return Right(brands);
         } catch (e) {
           return Left(ServerFailure('Parsing error: $e'));
@@ -45,6 +94,9 @@ class CarsRepository {
                   VehicleModelModel.fromJson(json as Map<String, dynamic>),
             )
             .toList();
+        for (final model in models) {
+          _modelCache[model.id] = model;
+        }
         return Right(models);
       }
       return const Left(ServerFailure('Failed to load models for brand'));
@@ -52,19 +104,6 @@ class CarsRepository {
   }
 
   Future<Either<Failure, List<MyCarModel>>> fetchCars() async {
-    // 1. Ensure makes catalog is loaded first
-    final brandsResult = await getBrands();
-    if (brandsResult.isLeft()) {
-      return Left(
-        brandsResult.fold(
-          (f) => f,
-          (_) => const ServerFailure('Unknown error'),
-        ),
-      );
-    }
-    final brandsList = brandsResult.getOrElse(() => []);
-
-    // 2. Fetch customer vehicles
     final result = await _carsService.getVehicles();
     return result.fold((failure) => Left(failure), (data) async {
       if (data != null) {
@@ -76,16 +115,11 @@ class CarsRepository {
           final makeId = carJson['makeId'] as String;
           final modelId = carJson['modelId'] as String;
 
-          // Fetch/resolve models for this make (uses cache if already retrieved)
-          final modelsResult = await getModels(makeId);
-          List<VehicleModelModel> modelsList = [];
-          if (modelsResult.isRight()) {
-            modelsList = modelsResult.getOrElse(() => []);
-          }
+          final makeResult = await getMakeDetails(makeId);
+          final modelResult = await getModelDetails(modelId);
 
-          final makeModel = brandsList.firstWhere((m) => m.id == makeId);
-
-          final modelModel = modelsList.firstWhere((m) => m.id == modelId);
+          final makeModel = makeResult.fold((_) => null, (m) => m);
+          final modelModel = modelResult.fold((_) => null, (m) => m);
 
           parsedCars.add(
             MyCarModel.fromJson(
@@ -110,18 +144,11 @@ class CarsRepository {
       if (responseData != null) {
         final carJson = responseData as Map<String, dynamic>;
 
-        // Resolve make and model details for the newly created car
-        final makesResult = await getBrands();
-        final modelsResult = await getModels(car.makeId);
+        final makeResult = await getMakeDetails(car.makeId);
+        final modelResult = await getModelDetails(car.modelId);
 
-        final makeModel = makesResult.fold(
-          (_) => null,
-          (list) => list.firstWhere((m) => m.id == car.makeId),
-        );
-        final modelModel = modelsResult.fold(
-          (_) => null,
-          (list) => list.firstWhere((m) => m.id == car.modelId),
-        );
+        final makeModel = makeResult.fold((_) => null, (m) => m);
+        final modelModel = modelResult.fold((_) => null, (m) => m);
 
         final newCar = MyCarModel.fromJson(
           carJson,
@@ -145,17 +172,11 @@ class CarsRepository {
           ? responseData as Map<String, dynamic>
           : car.toJson();
 
-      final makesResult = await getBrands();
-      final modelsResult = await getModels(car.makeId);
+      final makeResult = await getMakeDetails(car.makeId);
+      final modelResult = await getModelDetails(car.modelId);
 
-      final makeModel = makesResult.fold(
-        (_) => null,
-        (list) => list.firstWhere((m) => m.id == car.makeId),
-      );
-      final modelModel = modelsResult.fold(
-        (_) => null,
-        (list) => list.firstWhere((m) => m.id == car.modelId),
-      );
+      final makeModel = makeResult.fold((_) => null, (m) => m);
+      final modelModel = modelResult.fold((_) => null, (m) => m);
 
       final updatedCar = MyCarModel.fromJson(
         carJson,

@@ -1,3 +1,4 @@
+import 'package:aqua_go/core/components/custom_loading_indicator.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -86,9 +87,7 @@ class ComplaintDetailsView extends StatelessWidget {
           body: Column(
             children: [
               if (isLoading && complaint == null)
-                const Expanded(
-                  child: Center(child: CircularProgressIndicator()),
-                )
+                const Expanded(child: Center(child: CustomLoadingIndicator()))
               else if (errorMessage != null && complaint == null)
                 Expanded(
                   child: Center(
@@ -137,7 +136,8 @@ class ComplaintDetailsView extends StatelessWidget {
                           ComplaintBookingDetailsCard(
                             bookingId: complaint.bookingId,
                             booking: booking,
-                            bookingReferenceNumber: complaint.bookingReferenceNumber,
+                            bookingReferenceNumber:
+                                complaint.bookingReferenceNumber,
                           ),
                           SizedBox(height: sh(24)),
                           ComplaintDetailsTypeCard(

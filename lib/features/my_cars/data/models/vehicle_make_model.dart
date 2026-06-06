@@ -5,12 +5,14 @@ class VehicleMakeModel extends Equatable {
   final MakeName vehicleMakeName;
   final bool active;
   final int version;
+  final String logoUrl;
 
   const VehicleMakeModel({
     required this.id,
     required this.vehicleMakeName,
     required this.active,
     required this.version,
+    this.logoUrl = '',
   });
 
   factory VehicleMakeModel.fromJson(Map<String, dynamic> json) {
@@ -19,6 +21,7 @@ class VehicleMakeModel extends Equatable {
       vehicleMakeName: MakeName.fromJson(json['name']),
       active: json['active'] as bool? ?? true,
       version: json['version'] as int? ?? 1,
+      logoUrl: json['logoUrl'] as String? ?? '',
     );
   }
 
@@ -28,11 +31,12 @@ class VehicleMakeModel extends Equatable {
       'name': vehicleMakeName.toJson(),
       'active': active,
       'version': version,
+      'logoUrl': logoUrl,
     };
   }
 
   @override
-  List<Object?> get props => [id, vehicleMakeName, active, version];
+  List<Object?> get props => [id, vehicleMakeName, active, version, logoUrl];
 }
 
 class MakeName extends Equatable {

@@ -43,7 +43,7 @@ class ComplaintBookingDetailsCard extends StatelessWidget {
               _buildDetailRow(
                 context: context,
                 title: LocaleKeys.bookings_booking_number.tr(),
-                value: booking?.referenceNumber ?? bookingReferenceNumber ?? '#$bookingId',
+                value: booking?.referenceNumber ?? bookingReferenceNumber ?? '',
                 icon: AppAssets.note,
               ),
               const SizedBox(height: 12),
