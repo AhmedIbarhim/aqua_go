@@ -27,8 +27,6 @@ class BookingSummaryView extends StatefulWidget {
 }
 
 class _BookingSummaryViewState extends State<BookingSummaryView> {
-  final Set<String> selectedNotes = {};
-
   @override
   void initState() {
     super.initState();
@@ -161,12 +159,10 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
           _buildSectionTitle(LocaleKeys.bookings_notes_for_biker.tr()),
           const SizedBox(height: 16),
           BikerNotesSelection(
+            initialNotes: bookingState.bikerNotes,
+            initialSpecialNoteText: bookingState.specialNoteText,
             onNotesChanged: (notes) {
-              setState(() {
-                selectedNotes.clear();
-                selectedNotes.addAll(notes);
-              });
-              context.read<BookingCubit>().updateNotes(selectedNotes);
+              context.read<BookingCubit>().updateNotes(notes);
             },
             onSpecialNoteTextChanged: (text) {
               context.read<BookingCubit>().updateSpecialNoteText(text);
@@ -174,6 +170,7 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
           ),
           const SizedBox(height: 24),
           PaymentMethodSelection(
+            initialMethod: bookingState.paymentMethod,
             onPaymentMethodChanged: (method) {
               context.read<BookingCubit>().updatePaymentMethod(method);
             },

@@ -77,7 +77,7 @@ class CustomTextField extends StatelessWidget {
                 : TextCapitalization.none,
             inputFormatters: mustCapitalize == true
                 ? [
-                    FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9-]')),
+                    FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')),
                     TextInputFormatter.withFunction((oldValue, newValue) {
                       return newValue.copyWith(
                         text: newValue.text.toUpperCase(),

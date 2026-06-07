@@ -150,6 +150,7 @@ abstract class  LocaleKeys {
   static const bookings_payment_summary = 'bookings.payment_summary';
   static const bookings_subtotal = 'bookings.subtotal';
   static const bookings_vat = 'bookings.vat';
+  static const bookings_no_available_times = 'bookings.no_available_times';
   static const bookings_confirm_booking = 'bookings.confirm_booking';
   static const bookings_confirm_payment = 'bookings.confirm_payment';
   static const bookings_package_name = 'bookings.package_name';

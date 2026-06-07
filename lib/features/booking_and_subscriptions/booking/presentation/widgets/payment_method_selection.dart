@@ -31,6 +31,16 @@ class _PaymentMethodSelectionState extends State<PaymentMethodSelection> {
   }
 
   @override
+  void didUpdateWidget(covariant PaymentMethodSelection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialMethod != oldWidget.initialMethod) {
+      setState(() {
+        _selectedMethod = widget.initialMethod;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

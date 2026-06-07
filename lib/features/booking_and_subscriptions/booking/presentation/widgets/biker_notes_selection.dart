@@ -7,11 +7,15 @@ import '../../../../../core/utils/app_assets.dart';
 import '../../../../../generated/locale_keys.g.dart';
 
 class BikerNotesSelection extends StatefulWidget {
+  final Set<String>? initialNotes;
+  final String? initialSpecialNoteText;
   final Function(Set<String>) onNotesChanged;
   final Function(String)? onSpecialNoteTextChanged;
 
   const BikerNotesSelection({
     super.key,
+    this.initialNotes,
+    this.initialSpecialNoteText,
     required this.onNotesChanged,
     this.onSpecialNoteTextChanged,
   });
@@ -27,7 +31,29 @@ class _BikerNotesSelectionState extends State<BikerNotesSelection> {
   @override
   void initState() {
     super.initState();
-    _noteController = TextEditingController();
+    if (widget.initialNotes != null) {
+      selectedNotes.addAll(widget.initialNotes!);
+    }
+    _noteController = TextEditingController(
+      text: widget.initialSpecialNoteText,
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant BikerNotesSelection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialNotes != oldWidget.initialNotes) {
+      setState(() {
+        selectedNotes.clear();
+        if (widget.initialNotes != null) {
+          selectedNotes.addAll(widget.initialNotes!);
+        }
+      });
+    }
+    if (widget.initialSpecialNoteText != oldWidget.initialSpecialNoteText &&
+        widget.initialSpecialNoteText != _noteController.text) {
+      _noteController.text = widget.initialSpecialNoteText ?? '';
+    }
   }
 
   @override

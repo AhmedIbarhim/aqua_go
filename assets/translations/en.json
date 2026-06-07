@@ -155,6 +155,7 @@
         "payment_summary": "Payment Summary",
         "subtotal": "Subtotal",
         "vat": "VAT",
+        "no_available_times": "No available times for this day in this zone",
         "confirm_booking": "Confirm Booking",
         "confirm_payment": "Confirm Payment",
         "package_name": "Package Name",

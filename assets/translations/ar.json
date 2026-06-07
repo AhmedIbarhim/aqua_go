@@ -155,6 +155,7 @@
         "payment_summary": "ملخص الدفع",
         "subtotal": "المبلغ قبل الضريبة",
         "vat": "ضريبة القيمة المضافة",
+        "no_available_times": "لا توجد أوقات متاحة لهذا اليوم في هذه المنطقة",
         "confirm_booking": "تأكيد الحجز",
         "confirm_payment": "تأكيد الدفع",
         "package_name": "اسم الباقة",

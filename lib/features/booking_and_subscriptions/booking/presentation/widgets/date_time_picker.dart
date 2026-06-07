@@ -244,9 +244,7 @@ class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
             child: Text(
               selectedDate == null
                   ? LocaleKeys.bookings_choose_day.tr()
-                  : (context.isAr
-                        ? 'لا توجد أوقات متاحة لهذا اليوم'
-                        : 'No available times for this day'),
+                  : LocaleKeys.bookings_no_available_times.tr(),
               style: AppTextStyles.regular14.copyWith(
                 color: context.colors.textSecondary,
               ),
