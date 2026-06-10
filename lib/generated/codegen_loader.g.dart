@@ -75,6 +75,7 @@ class CodegenLoader extends AssetLoader{
     "logout_confirmation": "هل أنت متأكد من تسجيل الخروج؟",
     "delete_account": "حذف الحساب",
     "delete_account_confirmation": "هل أنت متأكد من حذف الحساب؟",
+    "delete_account_success": "تم حذف الحساب بنجاح",
     "otp_expired_message": "انتهت صلاحية رمز التحقق، يرجى طلب رمز جديد",
     "otp_invalid_message": "رمز التحقق غير صحيح، حاول مرة أخرى",
     "otp_code_sent": "تم ارسال رمز التحقق"
@@ -182,6 +183,7 @@ class CodegenLoader extends AssetLoader{
     "apple_pay": "Apple Pay",
     "credit_card": "البطاقة الائتمانية",
     "booking_procedures": "إجراءات الحجز",
+    "booking_success_message": "تم إنشاء حجزك بنجاح.",
     "rate_service": "تقييم الخدمة",
     "submit_complaint": "تقديم شكوى",
     "complaint": "شكوى",
@@ -421,6 +423,7 @@ static const Map<String,dynamic> _en = {
     "logout_confirmation": "Are you sure you want to logout?",
     "delete_account": "Delete Account",
     "delete_account_confirmation": "Are you sure you want to delete your account?",
+    "delete_account_success": "Account deleted successfully",
     "otp_expired_message": "Your verification code has expired, please request a new one",
     "otp_invalid_message": "Invalid verification code, please try again",
     "otp_code_sent": "Verification code has been sent"
@@ -528,6 +531,7 @@ static const Map<String,dynamic> _en = {
     "apple_pay": "Apple Pay",
     "credit_card": "Credit Card",
     "booking_procedures": "Booking Procedures",
+    "booking_success_message": "Your booking has been created successfully.",
     "rate_service": "Rate Service",
     "submit_complaint": "Submit Complaint",
     "complaint": "Complaint",

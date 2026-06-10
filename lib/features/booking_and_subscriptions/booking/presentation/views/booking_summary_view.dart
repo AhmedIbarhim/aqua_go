@@ -48,22 +48,26 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
 
         if (state.status == BookingStatus.success) {
           context.showSuccessSnackBar(LocaleKeys.snackbar_booking_created.tr());
-          context.showSuccessAlert().then((_) {
-            if (!context.mounted) return;
-            Navigator.popUntil(context, (route) => route.isFirst);
-            if (state.createdBooking != null) {
-              Navigator.pushNamed(
-                context,
-                Routes.myBookingDetails,
-                arguments: MyBookingDetailsArgs(
-                  booking: BookingSummaryModel.fromDetails(
-                    state.createdBooking!,
-                  ),
-                  isFromBookingFlow: true,
-                ),
-              );
-            }
-          });
+          context
+              .showSuccessAlert(
+                message: LocaleKeys.bookings_booking_success_message.tr(),
+              )
+              .then((_) {
+                if (!context.mounted) return;
+                Navigator.popUntil(context, (route) => route.isFirst);
+                if (state.createdBooking != null) {
+                  Navigator.pushNamed(
+                    context,
+                    Routes.myBookingDetails,
+                    arguments: MyBookingDetailsArgs(
+                      booking: BookingSummaryModel.fromDetails(
+                        state.createdBooking!,
+                      ),
+                      isFromBookingFlow: true,
+                    ),
+                  );
+                }
+              });
         } else if (state.status == BookingStatus.failure) {
           context.showErrorSnackBar(state.errorMessage ?? '');
         }
@@ -100,7 +104,6 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
     final List<Map<String, dynamic>> selectedAddons = [];
     double addonsGross = 0.0;
     double addonsNet = 0.0;
-    double addonsVat = 0.0;
 
     final availableAddons = bookingState.selectedService?.addons ?? [];
     for (final idx in bookingState.selectedServiceIndices) {
@@ -111,8 +114,7 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
             : (addon.nameEn ?? addon.nameAr ?? '');
         selectedAddons.add({'name': title, 'price': addon.price});
         addonsGross += addon.price;
-        addonsNet += addon.breakdown?.net ?? (addon.price / 1.15);
-        addonsVat += addon.breakdown?.vat ?? (addon.price - (addon.price / 1.15));
+        addonsNet += (addon.priceMinor ?? 0) / 100;
       }
     }
 
@@ -126,12 +128,12 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
     if (quoteBreakdown != null) {
       basePrice = quoteBreakdown.net;
       subtotal = quoteBreakdown.net + addonsNet;
-      vat = quoteBreakdown.vat + addonsVat;
+      vat = quoteBreakdown.vat;
       total = quoteBreakdown.gross + addonsGross;
     } else {
       basePrice = bookingState.selectedService?.basePriceDouble ?? 0.0;
       subtotal = basePrice + addonsNet;
-      vat = (bookingState.selectedService?.vatDouble ?? 0.0) + addonsVat;
+      vat = (bookingState.selectedService?.vatDouble ?? 0.0);
       total = (bookingState.selectedService?.priceDouble ?? 0.0) + addonsGross;
     }
 
@@ -147,9 +149,8 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
             serviceName: context.isAr
                 ? (bookingState.selectedService?.rawName.nameAr ?? '')
                 : (bookingState.selectedService?.rawName.nameEn ?? ''),
-            carName: context.isAr
-                ? '${bookingState.selectedCar!.carMake!.vehicleMakeName.nameAr} ${bookingState.selectedCar!.carModel!.vehicleModelName.nameAr}'
-                : '${bookingState.selectedCar!.carMake!.vehicleMakeName.nameEn} ${bookingState.selectedCar!.carModel!.vehicleModelName.nameEn}',
+            carName:
+                '${bookingState.selectedCar!.carMake!.vehicleMakeName.localizedName} ${bookingState.selectedCar!.carModel!.vehicleModelName.localizedName}',
             location: bookingState.selectedAddress?.details ?? '',
             dateTime: bookingState.selectedDate != null
                 ? '${bookingState.selectedDate!.month}/${bookingState.selectedDate!.day}/${bookingState.selectedDate!.year} - ${bookingState.selectedTime ?? ""}'

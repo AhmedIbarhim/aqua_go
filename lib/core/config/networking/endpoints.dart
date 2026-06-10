@@ -9,7 +9,7 @@ abstract class Endpoints {
 
   //  Profile & Account Endpoints
   static const String customerMe = 'me';
-  static const String deletionRequest = 'me/deletion-request';
+  static const String deleteAccount = 'me/deletion-request';
   static const String dataExport = 'me/data-export';
   static const String profileImagePresign = 'me/profile-image/presign';
   static const String profileImageConfirm = 'me/profile-image/confirm';

@@ -59,6 +59,7 @@
         "logout_confirmation": "هل أنت متأكد من تسجيل الخروج؟",
         "delete_account": "حذف الحساب",
         "delete_account_confirmation": "هل أنت متأكد من حذف الحساب؟",
+        "delete_account_success": "تم حذف الحساب بنجاح",
         "otp_expired_message": "انتهت صلاحية رمز التحقق، يرجى طلب رمز جديد",
         "otp_invalid_message": "رمز التحقق غير صحيح، حاول مرة أخرى",
         "otp_code_sent": "تم ارسال رمز التحقق"
@@ -166,6 +167,7 @@
         "apple_pay": "Apple Pay",
         "credit_card": "البطاقة الائتمانية",
         "booking_procedures": "إجراءات الحجز",
+        "booking_success_message": "تم إنشاء حجزك بنجاح.",
         "rate_service": "تقييم الخدمة",
         "submit_complaint": "تقديم شكوى",
         "complaint": "شكوى",

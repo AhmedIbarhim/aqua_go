@@ -65,4 +65,14 @@ final class LogoutLoading extends AuthState {}
 
 final class LogoutSuccess extends AuthState {}
 
+final class DeleteAccountLoading extends AuthState {}
 
+final class DeleteAccountError extends AuthState {
+  final String message;
+  const DeleteAccountError(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
+final class DeleteAccountSuccess extends AuthState {}

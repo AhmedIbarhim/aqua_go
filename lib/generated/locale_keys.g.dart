@@ -60,6 +60,7 @@ abstract class  LocaleKeys {
   static const auth_logout_confirmation = 'auth.logout_confirmation';
   static const auth_delete_account = 'auth.delete_account';
   static const auth_delete_account_confirmation = 'auth.delete_account_confirmation';
+  static const auth_delete_account_success = 'auth.delete_account_success';
   static const auth_otp_expired_message = 'auth.otp_expired_message';
   static const auth_otp_invalid_message = 'auth.otp_invalid_message';
   static const auth_otp_code_sent = 'auth.otp_code_sent';
@@ -161,6 +162,7 @@ abstract class  LocaleKeys {
   static const bookings_apple_pay = 'bookings.apple_pay';
   static const bookings_credit_card = 'bookings.credit_card';
   static const bookings_booking_procedures = 'bookings.booking_procedures';
+  static const bookings_booking_success_message = 'bookings.booking_success_message';
   static const bookings_rate_service = 'bookings.rate_service';
   static const bookings_submit_complaint = 'bookings.submit_complaint';
   static const bookings_complaint = 'bookings.complaint';

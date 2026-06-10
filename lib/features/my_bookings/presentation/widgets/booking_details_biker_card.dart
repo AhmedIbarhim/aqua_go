@@ -18,7 +18,7 @@ class BookingDetailsBikerCard extends StatelessWidget {
     final String workerName =
         worker?.displayName ??
         (context.locale.languageCode == 'ar'
-            ? 'بانتظار تعيين السائق'
+            ? 'بانتظار تعيين العامل'
             : 'Awaiting Biker Assignment');
 
     final double rating = worker?.ratingAggregate != null
@@ -80,7 +80,10 @@ class BookingDetailsBikerCard extends StatelessWidget {
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          RatingWidget(rating: rating, starSize: context.sw(16)),
+                          RatingWidget(
+                            rating: rating,
+                            starSize: context.sw(16),
+                          ),
                           SizedBox(width: context.sw(4)),
                           Text(
                             '($rating)',

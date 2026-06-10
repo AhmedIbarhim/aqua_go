@@ -15,7 +15,7 @@ class LanguageWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final currentLocale = context.watch<LanguageCubit>().state.locale;
     final isArabic = currentLocale.languageCode == 'ar';
-    final targetLanguageName = isArabic ? 'الانجليزية' : 'Arabic';
+    final targetLanguageName = isArabic ? 'English' : 'العربية';
     final targetFlag = isArabic ? AppAssets.usFlag : AppAssets.ksaFlag;
 
     return GestureDetector(

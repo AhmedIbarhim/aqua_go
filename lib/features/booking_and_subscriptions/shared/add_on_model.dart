@@ -1,5 +1,3 @@
-import '../../my_bookings/data/models/booking_response_model/breakdown.dart';
-
 class AddOnModel {
   String? id;
   String? nameAr;
@@ -7,16 +5,15 @@ class AddOnModel {
   int? priceMinor;
   String? currency;
   String? imageUrl;
-  Breakdown? breakdown;
 
-  AddOnModel(
-      {this.id,
-      this.nameAr,
-      this.nameEn,
-      this.priceMinor,
-      this.currency,
-      this.imageUrl,
-      this.breakdown});
+  AddOnModel({
+    this.id,
+    this.nameAr,
+    this.nameEn,
+    this.priceMinor,
+    this.currency,
+    this.imageUrl,
+  });
 
   AddOnModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -25,9 +22,6 @@ class AddOnModel {
     priceMinor = json['priceMinor'];
     currency = json['currency'];
     imageUrl = json['imageUrl'];
-    breakdown = json['breakdown'] != null
-        ? Breakdown.fromJson(json['breakdown'] as Map<String, dynamic>)
-        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -38,12 +32,9 @@ class AddOnModel {
     data['priceMinor'] = priceMinor;
     data['currency'] = currency;
     data['imageUrl'] = imageUrl;
-    if (breakdown != null) {
-      data['breakdown'] = breakdown!.toJson();
-    }
+
     return data;
   }
 
-  double get price => breakdown != null ? breakdown!.gross : ((priceMinor ?? 0) / 100);
+  double get price => ((priceMinor ?? 0) / 100);
 }
-

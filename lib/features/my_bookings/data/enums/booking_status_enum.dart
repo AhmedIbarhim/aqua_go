@@ -32,11 +32,11 @@ enum BookingStatus {
       case BookingStatus.PENDING:
         return isAr ? 'قيد الانتظار' : 'Pending';
       case BookingStatus.ASSIGNED:
-        return isAr ? 'تم تعيين السائق' : 'Biker Assigned';
+        return isAr ? 'تم تعيين العامل' : 'Biker Assigned';
       case BookingStatus.ON_THE_WAY:
-        return isAr ? 'في الطريق' : 'On the Way';
+        return isAr ? 'العامل في الطريق' : 'On the Way';
       case BookingStatus.ARRIVED:
-        return isAr ? 'وصل السائق' : 'Biker Arrived';
+        return isAr ? 'وصل العامل' : 'Biker Arrived';
       case BookingStatus.STARTED:
         return isAr ? 'بدأ الغسيل' : 'Washing Started';
       case BookingStatus.COMPLETED:

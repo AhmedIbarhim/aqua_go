@@ -31,6 +31,7 @@ class BookingDetailsSummaryCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
+            spacing: 12,
             children: [
               _buildSummaryRow(
                 context,
@@ -42,14 +43,22 @@ class BookingDetailsSummaryCard extends StatelessWidget {
                           ''),
                 icon: AppAssets.document,
               ),
-              const SizedBox(height: 12),
               _buildSummaryRow(
                 context,
                 title: LocaleKeys.bookings_date_and_time.tr(),
                 value: booking.formattedDateTime,
                 icon: AppAssets.date,
               ),
-              const SizedBox(height: 12),
+              if (booking.addOns != null && booking.addOns!.isNotEmpty)
+                ...booking.addOns!.map(
+                  (addon) => _buildSummaryRow(
+                    context,
+                    title: addon.name,
+                    value:
+                        '${addon.charged.toStringAsFixed(2)} ${booking.currency ?? "SAR"}',
+                    icon: AppAssets.terms,
+                  ),
+                ),
               _buildSummaryRow(
                 context,
                 title: LocaleKeys.bookings_total_amount.tr(),

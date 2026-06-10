@@ -156,10 +156,24 @@ class AuthRepository {
       // Silently ignore logout network failures to guarantee clean local state
     } finally {
       _cachedUser = null;
-      await SecureStorage.deleteSecuredString(kAccessToken);
-      await SecureStorage.deleteSecuredString(kRefreshToken);
-      await CacheClient.removeString(kUserData);
+      await SecureStorage.clearSecuredData();
+      await CacheClient.clearCachedData();
     }
+  }
+
+  Future<Either<Failure, void>> deleteAccount() async {
+    final idempotencyKey = IdempotencyKeyHelper.generate(
+      prefix: 'auth-delete-account',
+    );
+    final result = await _authService.deleteAccount(
+      idempotencyKey: idempotencyKey,
+    );
+    return result.fold((failure) => Left(failure), (_) async {
+      _cachedUser = null;
+      await SecureStorage.clearSecuredData();
+      await CacheClient.clearCachedData();
+      return Right(null);
+    });
   }
 
   Future<Either<Failure, UserModel>> uploadProfileImage(String filePath) async {
@@ -170,68 +184,71 @@ class AuthRepository {
     final int sizeBytes = await file.length();
     final String contentType = _getFileContentType(filePath);
 
-    final presignResult = await _authService.getProfileImagePresignedUrl(contentType);
-    return presignResult.fold(
-      (failure) => Left(failure),
-      (data) async {
-        if (data == null) {
-          return const Left(ServerFailure('Failed to get presigned URL'));
-        }
-        final String? uploadUrl = data['url'];
-        if (uploadUrl == null || uploadUrl.isEmpty) {
-          return const Left(ServerFailure('Presigned URL is empty'));
-        }
-
-        try {
-          final dio = Dio();
-          final bytes = await file.readAsBytes();
-          final uploadResponse = await dio.put(
-            uploadUrl,
-            data: Stream.fromIterable([bytes]),
-            options: Options(
-              headers: {
-                Headers.contentTypeHeader: contentType,
-                Headers.contentLengthHeader: sizeBytes,
-              },
-            ),
-          );
-
-          if (uploadResponse.statusCode != 200 && uploadResponse.statusCode != 201 && uploadResponse.statusCode != 204) {
-            return const Left(ServerFailure('Failed to upload image file to storage'));
-          }
-        } catch (e) {
-          return Left(ServerFailure('Failed to upload image binary: $e'));
-        }
-
-        final String idempotencyKey = IdempotencyKeyHelper.generate(
-          prefix: 'profile-image-confirm',
-        );
-        final confirmResult = await _authService.confirmProfileImage(
-          contentType: contentType,
-          sizeBytes: sizeBytes,
-          idempotencyKey: idempotencyKey,
-        );
-
-        return confirmResult.fold(
-          (failure) => Left(failure),
-          (_) async {
-            final profileResult = await _authService.getProfile();
-            return profileResult.fold(
-              (failure) => Left(failure),
-              (profileData) async {
-                if (profileData != null) {
-                  final currentUser = getUser();
-                  final updatedUser = UserModel.fromJson(profileData).copyWith(phone: currentUser?.phone);
-                  await saveUser(updatedUser);
-                  return Right(updatedUser);
-                }
-                return const Left(ServerFailure('Failed to fetch updated profile details'));
-              },
-            );
-          },
-        );
-      },
+    final presignResult = await _authService.getProfileImagePresignedUrl(
+      contentType,
     );
+    return presignResult.fold((failure) => Left(failure), (data) async {
+      if (data == null) {
+        return const Left(ServerFailure('Failed to get presigned URL'));
+      }
+      final String? uploadUrl = data['url'];
+      if (uploadUrl == null || uploadUrl.isEmpty) {
+        return const Left(ServerFailure('Presigned URL is empty'));
+      }
+
+      try {
+        final dio = Dio();
+        final bytes = await file.readAsBytes();
+        final uploadResponse = await dio.put(
+          uploadUrl,
+          data: Stream.fromIterable([bytes]),
+          options: Options(
+            headers: {
+              Headers.contentTypeHeader: contentType,
+              Headers.contentLengthHeader: sizeBytes,
+            },
+          ),
+        );
+
+        if (uploadResponse.statusCode != 200 &&
+            uploadResponse.statusCode != 201 &&
+            uploadResponse.statusCode != 204) {
+          return const Left(
+            ServerFailure('Failed to upload image file to storage'),
+          );
+        }
+      } catch (e) {
+        return Left(ServerFailure('Failed to upload image binary: $e'));
+      }
+
+      final String idempotencyKey = IdempotencyKeyHelper.generate(
+        prefix: 'profile-image-confirm',
+      );
+      final confirmResult = await _authService.confirmProfileImage(
+        contentType: contentType,
+        sizeBytes: sizeBytes,
+        idempotencyKey: idempotencyKey,
+      );
+
+      return confirmResult.fold((failure) => Left(failure), (_) async {
+        final profileResult = await _authService.getProfile();
+        return profileResult.fold((failure) => Left(failure), (
+          profileData,
+        ) async {
+          if (profileData != null) {
+            final currentUser = getUser();
+            final updatedUser = UserModel.fromJson(
+              profileData,
+            ).copyWith(phone: currentUser?.phone);
+            await saveUser(updatedUser);
+            return Right(updatedUser);
+          }
+          return const Left(
+            ServerFailure('Failed to fetch updated profile details'),
+          );
+        });
+      });
+    });
   }
 
   String _getFileContentType(String filePath) {

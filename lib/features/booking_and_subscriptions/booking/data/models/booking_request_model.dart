@@ -77,6 +77,10 @@ class BookingRequestModel {
       'type': 'SCHEDULED',
       'scheduledAt': ?scheduledAt,
       if (workerNotes.isNotEmpty) 'workerNotes': workerNotes,
+      if (serviceAddOns.isNotEmpty)
+        'addOns': serviceAddOns
+            .map((e) => {'addonId': e.id, 'qty': 1})
+            .toList(),
       if (paymentMethod != null) 'paymentMethod': paymentMethod!.name,
     };
   }

@@ -1,5 +1,8 @@
 import 'package:equatable/equatable.dart';
 
+import '../../../../core/config/local_storage/shared_prefs.dart';
+import '../../../../core/constants.dart';
+
 class VehicleMakeModel extends Equatable {
   final String id;
   final MakeName vehicleMakeName;
@@ -54,6 +57,11 @@ class MakeName extends Equatable {
 
   Map<String, dynamic> toJson() {
     return {'ar_SA': nameAr, 'en': nameEn};
+  }
+
+  String get localizedName {
+    final isArabic = CacheClient.getString(kLanguage) == kArabicLang;
+    return isArabic ? nameAr : nameEn;
   }
 
   @override

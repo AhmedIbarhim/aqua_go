@@ -28,7 +28,9 @@ class AuthService {
     return _apiClient.patch(Endpoints.customerMe, data: data);
   }
 
-  Future<Either<Failure, dynamic>> getProfileImagePresignedUrl(String contentType) {
+  Future<Either<Failure, dynamic>> getProfileImagePresignedUrl(
+    String contentType,
+  ) {
     return _apiClient.post(
       Endpoints.profileImagePresign,
       data: {'contentType': contentType},
@@ -42,15 +44,8 @@ class AuthService {
   }) {
     return _apiClient.post(
       Endpoints.profileImageConfirm,
-      data: {
-        'contentType': contentType,
-        'sizeBytes': sizeBytes,
-      },
-      options: Options(
-        headers: {
-          'Idempotency-Key': idempotencyKey,
-        },
-      ),
+      data: {'contentType': contentType, 'sizeBytes': sizeBytes},
+      options: Options(headers: {'Idempotency-Key': idempotencyKey}),
     );
   }
 
@@ -72,6 +67,15 @@ class AuthService {
     return _apiClient.post(
       Endpoints.logout,
       data: {'refreshToken': refreshToken},
+    );
+  }
+
+  Future<Either<Failure, dynamic>> deleteAccount({
+    required String idempotencyKey,
+  }) {
+    return _apiClient.delete(
+      Endpoints.deleteAccount,
+      options: Options(headers: {'Idempotency-Key': idempotencyKey}),
     );
   }
 
