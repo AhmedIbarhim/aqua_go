@@ -21,7 +21,9 @@ class CustomNetworkImage extends StatelessWidget {
       placeholder: (context, url) => const CustomLoadingIndicator(),
       errorWidget: (context, url, error) {
         return SvgPicture.asset(
-          AppAssets.imageNotFound,
+          AppAssets.emptyImage,
+          width: 18,
+          height: 18,
           colorFilter: ColorFilter.mode(
             context.colors.contentDisabled,
             BlendMode.srcIn,

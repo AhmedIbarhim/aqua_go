@@ -6,7 +6,7 @@ abstract class AppAssets {
   static const String search = 'assets/svg/search.svg';
   static const String close = 'assets/svg/close.svg';
   static const String boardNum = 'assets/svg/board_num.svg';
-  static const String imageNotFound = 'assets/svg/image_not_found.svg';
+  static const String emptyImage = 'assets/svg/empty_image.svg';
   // Notifications
   static const String notification = 'assets/svg/notification.svg';
   static const String notificationActive = 'assets/svg/notification_active.svg';

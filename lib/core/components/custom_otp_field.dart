@@ -90,7 +90,6 @@ class _SingleOtpFieldState extends State<_SingleOtpField> {
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.sizeOf(context).height;
-    final colors = context.colors;
     final controller = widget.controllers[widget.index];
     final focusNode = widget.focusNodes[widget.index];
     final bool isFocusedOrNotEmpty =
@@ -102,10 +101,10 @@ class _SingleOtpFieldState extends State<_SingleOtpField> {
       borderColor = context.colors.error.withValues(alpha: 0.2);
       borderWidth = 1.5;
     } else if (isFocusedOrNotEmpty) {
-      borderColor = colors.primary;
+      borderColor = context.colors.primary;
       borderWidth = 1.5;
     } else {
-      borderColor = colors.borderSecondary;
+      borderColor = context.colors.borderSecondary;
       borderWidth = 1;
     }
 
@@ -114,7 +113,11 @@ class _SingleOtpFieldState extends State<_SingleOtpField> {
       height: screenHeight * 0.07,
       margin: const EdgeInsets.symmetric(horizontal: 6),
       decoration: BoxDecoration(
-        color: isFocusedOrNotEmpty ? colors.brandHover : Colors.transparent,
+        color: widget.hasError
+            ? context.colors.error.withValues(alpha: 0.01)
+            : isFocusedOrNotEmpty
+            ? context.colors.brandHover
+            : Colors.transparent,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: borderColor, width: borderWidth),
       ),
@@ -142,13 +145,13 @@ class _SingleOtpFieldState extends State<_SingleOtpField> {
         ],
         style: AppTextStyles.semiBold32.copyWith(
           color: controller.text.isNotEmpty
-              ? colors.textPrimary
-              : colors.contentDisabled,
+              ? context.colors.textPrimary
+              : context.colors.contentDisabled,
         ),
         decoration: InputDecoration(
           hintText: '_',
           hintStyle: AppTextStyles.regular32.copyWith(
-            color: colors.contentDisabled,
+            color: context.colors.contentDisabled,
           ),
           border: InputBorder.none,
           contentPadding: EdgeInsets.zero,

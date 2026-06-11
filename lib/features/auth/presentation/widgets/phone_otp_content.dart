@@ -112,7 +112,6 @@ class _PhoneOtpContentState extends State<PhoneOtpContent> {
           _otpSessionId = state.otpSessionId;
           context.showSuccessSnackBar(LocaleKeys.auth_otp_code_sent.tr());
         } else if (state is LoginSuccess) {
-          // Check if user has name (complete data)
           if (state.user.name == null || state.user.name!.isEmpty) {
             context.pushNamedAndRemoveUntil(
               Routes.profileData,
@@ -126,7 +125,9 @@ class _PhoneOtpContentState extends State<PhoneOtpContent> {
             );
           }
         } else if (state is LoginError) {
-          context.showErrorSnackBar(state.message);
+          if (!state.message.contains('OTP code mismatch')) {
+            context.showErrorSnackBar(state.message);
+          }
           setState(() {
             if (_isOtpValidationError(state.message)) {
               _errorMessage = state.message;
