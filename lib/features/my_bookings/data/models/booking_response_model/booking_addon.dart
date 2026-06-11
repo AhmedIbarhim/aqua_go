@@ -47,7 +47,7 @@ class BookingAddon {
   }
 
   // --- UI Helpers ---
-  String get name => CacheClient.getString(kLanguage) == kArabicLang
+  String get name => CacheClient.getString(kLanguage, defaultValue: kArabicLang) == kArabicLang
       ? (nameAr ?? '')
       : (nameEn ?? '');
 

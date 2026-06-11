@@ -15,11 +15,8 @@ class LanguageCubit extends Cubit<LanguageState> {
   LanguageCubit() : super(LanguageInitial(_getInitialLocale()));
 
   static Locale _getInitialLocale() {
-    final lang = CacheClient.getString(kLanguage);
-    if (lang.isEmpty) {
-      return const Locale('ar');
-    }
-    return Locale(lang);
+    final isArabic = CacheClient.getString(kLanguage, defaultValue: kArabicLang) == kArabicLang;
+    return isArabic ? const Locale('ar') : const Locale('en');
   }
 
   Future<void> toggleLanguage(BuildContext context) async {

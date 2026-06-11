@@ -18,7 +18,7 @@ class LocationService {
       queryParameters: {
         'input': query,
         'key': _apiKey,
-        'language': CacheClient.getString(kLanguage) == 'en' ? 'en' : 'ar',
+        'language': CacheClient.getString(kLanguage, defaultValue: kArabicLang) == kArabicLang ? 'ar' : 'en',
         'components': 'country:sa',
       },
     );

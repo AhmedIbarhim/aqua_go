@@ -18,8 +18,8 @@ class CacheClient {
     await _sharedPrefs.setString(key, value);
   }
 
-  static String getString(String key) {
-    return _sharedPrefs.getString(key) ?? '';
+  static String getString(String key, {String? defaultValue}) {
+    return _sharedPrefs.getString(key) ?? defaultValue ?? '';
   }
 
   static Future<void> removeString(String key) async {

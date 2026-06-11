@@ -40,6 +40,28 @@ class MyBookingPhotosSection extends StatelessWidget {
           : '',
     ];
 
+    final allPhotos =
+        photos?.where((p) => p.url != null && p.url!.isNotEmpty).toList() ?? [];
+    final allImageUrls = allPhotos.map((p) => p.url!).toList();
+    final allLabels = allPhotos.map((p) {
+      final stage = p.stage?.toUpperCase();
+      final angle = p.angle?.toUpperCase();
+
+      String stageLabel = '';
+      if (stage == 'BEFORE') {
+        stageLabel = LocaleKeys.bookings_before_washing.tr();
+      } else if (stage == 'AFTER') {
+        stageLabel = LocaleKeys.bookings_after_washing.tr();
+      } else {
+        stageLabel = p.stage ?? '';
+      }
+
+      if (angle != null && angle.isNotEmpty) {
+        return '$stageLabel ($angle)';
+      }
+      return stageLabel;
+    }).toList();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -79,11 +101,21 @@ class MyBookingPhotosSection extends StatelessWidget {
                   ),
                   child: GestureDetector(
                     onTap: () {
+                      final targetUrl = imageUrls[index];
+                      if (targetUrl.isEmpty) return;
+
+                      final galleryInitialIndex = allImageUrls.indexOf(
+                        targetUrl,
+                      );
+
                       context.pushNamed(
                         Routes.gallery,
                         arguments: GalleryArgs(
-                          images: imageUrls,
-                          initialIndex: index,
+                          images: allImageUrls,
+                          initialIndex: galleryInitialIndex != -1
+                              ? galleryInitialIndex
+                              : 0,
+                          labels: allLabels,
                         ),
                       );
                     },

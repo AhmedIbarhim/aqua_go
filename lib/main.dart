@@ -26,10 +26,10 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  final String savedLang = CacheClient.getString(kLanguage);
-  final Locale startLocale = savedLang.isEmpty
-      ? const Locale('ar')
-      : Locale(savedLang);
+  final isArabic =
+      CacheClient.getString(kLanguage, defaultValue: kArabicLang) ==
+      kArabicLang;
+  final Locale startLocale = isArabic ? const Locale('ar') : const Locale('en');
 
   Bloc.observer = AppBlocObserver();
 

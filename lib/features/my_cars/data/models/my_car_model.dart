@@ -33,7 +33,7 @@ class MyCarModel {
   // Getter for make name
   String get make {
     if (carMake == null) return '';
-    final isArabic = CacheClient.getString(kLanguage) == kArabicLang;
+    final isArabic = CacheClient.getString(kLanguage, defaultValue: kArabicLang) == kArabicLang;
     return isArabic
         ? carMake!.vehicleMakeName.nameAr
         : carMake!.vehicleMakeName.nameEn;
@@ -42,7 +42,7 @@ class MyCarModel {
   // Getter for model name
   String get model {
     if (carModel == null) return '';
-    final isArabic = CacheClient.getString(kLanguage) == kArabicLang;
+    final isArabic = CacheClient.getString(kLanguage, defaultValue: kArabicLang) == kArabicLang;
     return isArabic
         ? carModel!.vehicleModelName.nameAr
         : carModel!.vehicleModelName.nameEn;

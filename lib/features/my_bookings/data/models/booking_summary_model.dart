@@ -88,7 +88,8 @@ class BookingSummaryModel {
       vehicleMake: json['vehicleMake'] as String?,
       vehicleModel: json['vehicleModel'] as String?,
       vehicleColor: json['vehicleColor'] as String?,
-      plate: json['plate'] ??
+      plate:
+          json['plate'] ??
           json['plateMasked'] ??
           json['plateText'] ??
           json['plate_masked'] ??
@@ -183,7 +184,8 @@ class BookingSummaryModel {
   }
 
   // --- UI Compatibility Helpers ---
-  String get title => CacheClient.getString(kLanguage) == kArabicLang
+  String get title =>
+      CacheClient.getString(kLanguage, defaultValue: kArabicLang) == kArabicLang
       ? (serviceNameAr ?? '')
       : (serviceNameEn ?? '');
 

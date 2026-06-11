@@ -264,8 +264,7 @@ class BookingCubit extends Cubit<BookingState> {
     }
 
     final List<String> notesList = [];
-    final lang = CacheClient.getString(kLanguage);
-    final isArabic = lang.isEmpty || lang == 'ar';
+    final isArabic = CacheClient.getString(kLanguage, defaultValue: kArabicLang) == kArabicLang;
 
     for (final noteKey in state.bikerNotes) {
       if (noteKey == LocaleKeys.bookings_special_note) {

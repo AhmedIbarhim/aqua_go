@@ -60,7 +60,7 @@ class ModelName extends Equatable {
   }
 
   String get localizedName {
-    final isArabic = CacheClient.getString(kLanguage) == kArabicLang;
+    final isArabic = CacheClient.getString(kLanguage, defaultValue: kArabicLang) == kArabicLang;
     return isArabic ? nameAr : nameEn;
   }
 

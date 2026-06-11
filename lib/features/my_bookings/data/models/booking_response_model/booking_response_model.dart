@@ -329,7 +329,7 @@ class BookingResponseModel {
   }
 
   // --- UI Compatibility Helpers ---
-  String get title => CacheClient.getString(kLanguage) == kArabicLang
+  String get title => CacheClient.getString(kLanguage, defaultValue: kArabicLang) == kArabicLang
       ? (packageName?.ar ?? '')
       : (packageName?.en ?? '');
 

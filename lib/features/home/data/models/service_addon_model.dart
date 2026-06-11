@@ -27,13 +27,13 @@ class ServiceAddonModel extends Equatable {
 
   // Dynamic localization getters for the UI
   String get name {
-    final lang = CacheClient.getString(kLanguage);
-    return lang == 'en' ? nameEn : nameAr;
+    final isArabic = CacheClient.getString(kLanguage, defaultValue: kArabicLang) == kArabicLang;
+    return isArabic ? nameAr : nameEn;
   }
 
   String get description {
-    final lang = CacheClient.getString(kLanguage);
-    return lang == 'en' ? descriptionEn : descriptionAr;
+    final isArabic = CacheClient.getString(kLanguage, defaultValue: kArabicLang) == kArabicLang;
+    return isArabic ? descriptionAr : descriptionEn;
   }
 
   double get priceDouble => priceMinor / 100;

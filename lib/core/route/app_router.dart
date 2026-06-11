@@ -171,8 +171,11 @@ abstract class AppRouter {
       case Routes.gallery:
         final args = settings.arguments as GalleryArgs;
         return MaterialPageRoute(
-          builder: (_) =>
-              GalleryView(images: args.images, initialIndex: args.initialIndex),
+          builder: (_) => GalleryView(
+            images: args.images,
+            initialIndex: args.initialIndex,
+            labels: args.labels,
+          ),
         );
 
       case Routes.privacyPolicy:

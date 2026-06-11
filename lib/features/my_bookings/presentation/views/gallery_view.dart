@@ -11,14 +11,16 @@ import '../../../../generated/locale_keys.g.dart';
 class GalleryArgs {
   final List<String> images;
   final int initialIndex;
-  GalleryArgs({required this.images, this.initialIndex = 0});
+  final List<String>? labels;
+  GalleryArgs({required this.images, this.initialIndex = 0, this.labels});
 }
 
 class GalleryView extends StatefulWidget {
   final List<String> images;
   final int initialIndex;
+  final List<String>? labels;
 
-  const GalleryView({super.key, required this.images, this.initialIndex = 0});
+  const GalleryView({super.key, required this.images, this.initialIndex = 0, this.labels});
 
   @override
   State<GalleryView> createState() => _GalleryViewState();
@@ -43,6 +45,9 @@ class _GalleryViewState extends State<GalleryView> {
   }
 
   String _getImageLabel(int index) {
+    if (widget.labels != null && index < widget.labels!.length) {
+      return widget.labels![index];
+    }
     if (index == 0) {
       return LocaleKeys.bookings_before_washing.tr();
     } else {

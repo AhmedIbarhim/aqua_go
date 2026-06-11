@@ -43,15 +43,15 @@ class SubscribedPackageModel {
 
   // Dynamic getters for compatibility with UI
   String get title {
-    final lang = CacheClient.getString(kLanguage);
-    return lang == 'en' ? packageSnapshot.nameEn : packageSnapshot.nameAr;
+    final isArabic = CacheClient.getString(kLanguage, defaultValue: kArabicLang) == kArabicLang;
+    return isArabic ? packageSnapshot.nameAr : packageSnapshot.nameEn;
   }
 
   String get description {
-    final lang = CacheClient.getString(kLanguage);
-    return lang == 'en'
-        ? '${packageSnapshot.numWashes} washes left'
-        : '${packageSnapshot.numWashes} غسلة متبقية';
+    final isArabic = CacheClient.getString(kLanguage, defaultValue: kArabicLang) == kArabicLang;
+    return isArabic
+        ? '${packageSnapshot.numWashes} غسلة متبقية'
+        : '${packageSnapshot.numWashes} washes left';
   }
 
   String get image => 'assets/images/gift_demo.png';

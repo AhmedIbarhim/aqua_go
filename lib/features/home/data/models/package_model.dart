@@ -53,20 +53,20 @@ class PackageModel {
 
   // Dynamic getters for full backward compatibility
   String get title {
-    final lang = CacheClient.getString(kLanguage);
-    return lang == 'en' ? nameEn : nameAr;
+    final isArabic = CacheClient.getString(kLanguage, defaultValue: kArabicLang) == kArabicLang;
+    return isArabic ? nameAr : nameEn;
   }
 
   String get description {
-    final lang = CacheClient.getString(kLanguage);
-    return lang == 'en' ? descriptionEn : descriptionAr;
+    final isArabic = CacheClient.getString(kLanguage, defaultValue: kArabicLang) == kArabicLang;
+    return isArabic ? descriptionAr : descriptionEn;
   }
 
   String get price => (priceMinor / 100).toStringAsFixed(2);
 
   String get duration {
-    final lang = CacheClient.getString(kLanguage);
-    return lang == 'en' ? '$validityDays Days' : '$validityDays يوم';
+    final isArabic = CacheClient.getString(kLanguage, defaultValue: kArabicLang) == kArabicLang;
+    return isArabic ? '$validityDays يوم' : '$validityDays Days';
   }
 
   String get image =>
