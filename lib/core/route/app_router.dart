@@ -13,6 +13,7 @@ import '../../features/booking_and_subscriptions/booking/presentation/views/book
 import '../../features/booking_and_subscriptions/booking/presentation/views/booking_summary_view.dart';
 import '../../features/home/presentation/views/offers_view.dart';
 import '../../features/home/presentation/views/packages_view.dart';
+import '../../features/home/controllers/packages_controller/packages_cubit.dart';
 import '../../features/layout/presentation/views/main_layout.dart';
 import '../../features/complaints/presentation/views/complaint_view.dart';
 import '../../features/complaints/presentation/views/complaints_record_view.dart';
@@ -81,9 +82,11 @@ abstract class AppRouter {
         );
 
       case Routes.packages:
-        final args = settings.arguments as PackagesArgs;
         return MaterialPageRoute(
-          builder: (_) => PackagesView(packages: args.packages),
+          builder: (_) => BlocProvider(
+            create: (_) => locator<PackagesCubit>()..getPackages(),
+            child: const PackagesView(),
+          ),
         );
 
       case Routes.settings:

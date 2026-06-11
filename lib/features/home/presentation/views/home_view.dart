@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/config/di/service_locator.dart';
 import '../../data/models/banner_model.dart';
-import 'package:aqua_go/features/booking_and_subscriptions/subscriptions/data/models/subscribed_package_model.dart';
+import 'package:aqua_go/features/booking_and_subscriptions/subscriptions/data/models/subscription_response_model/subscription_response_model.dart';
 import '../../controllers/services_controller/services_cubit.dart';
 import '../../controllers/banners_controller/banners_cubit.dart';
 import '../../controllers/packages_controller/packages_cubit.dart';
@@ -15,7 +15,6 @@ import '../widgets/services_page_view.dart';
 import '../widgets/offers_list_view.dart';
 import '../widgets/current_package_section.dart';
 import '../../../../core/helpers/shimmer_helper.dart';
-import 'package:skeletonizer/skeletonizer.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -31,32 +30,6 @@ class _HomeViewState extends State<HomeView> {
   final BannersCubit _bannersCubit = locator<BannersCubit>();
   final PackagesCubit _packagesCubit = locator<PackagesCubit>();
   final SubscriptionsCubit _subscriptionsCubit = locator<SubscriptionsCubit>();
-
-  SubscribedPackageModel dummyPackage = SubscribedPackageModel(
-    id: 'demo_sub',
-    customerId: 'cust_demo',
-    packageId: 'pkg_demo',
-    status: 'ACTIVE',
-    totalWashes: 10,
-    consumedWashes: 2,
-    packagePriceMinor: 20000,
-    currency: 'SAR',
-    validityStartsAt: '2026-05-31T10:38:45.755Z',
-    validityEndsAt: '2026-09-18T10:38:45.755Z',
-    purchasedAt: '2026-05-31T10:38:45.755Z',
-    packageSnapshot: PackageSnapshot(
-      nameAr: 'باقة اكوا كلاسيك',
-      nameEn: 'Aqua Classic Package',
-      numWashes: 10,
-      validityDays: 120,
-      allowScheduleLater: true,
-      bundledServiceIds: const [],
-      includedAddons: const [],
-      optionalAddons: const [],
-      isPopular: true,
-      carsPerWash: 1,
-    ),
-  );
 
   @override
   void initState() {
@@ -104,24 +77,9 @@ class _HomeViewState extends State<HomeView> {
                   List<BannerModel> activeBanners = [];
                   if (state is BannersLoaded) {
                     activeBanners = state.banners;
-                  } else {
-                    // Loading / Initial / Error: Show placeholder static banner
-                    activeBanners = [
-                      BannerModel(
-                        id: 'demo1',
-                        locale: 'ar',
-                        imageUrl: 'assets/images/banner_demo.png',
-                        ctaType: 'NONE',
-                        sortOrder: 1,
-                      ),
-                      BannerModel(
-                        id: 'demo2',
-                        locale: 'ar',
-                        imageUrl: 'assets/images/banner_demo.png',
-                        ctaType: 'NONE',
-                        sortOrder: 2,
-                      ),
-                    ];
+                  }
+                  if (activeBanners.isEmpty) {
+                    return const SizedBox.shrink();
                   }
                   return ShimmerHelper(
                     enabled: isLoading,
@@ -145,48 +103,46 @@ class _HomeViewState extends State<HomeView> {
                   children: [
                     BlocBuilder<SubscriptionsCubit, SubscriptionsState>(
                       builder: (context, state) {
-                        final isLoading = state is SubscriptionsLoading || state is SubscriptionsInitial;
-
                         if (state is SubscriptionsError) {
-                          return const SizedBox.shrink();
+                          return Column(
+                            children: [
+                              SizedBox(height: context.screenHeight * 0.02),
+                              const PackagesListView(),
+                            ],
+                          );
                         }
 
-                        final List<SubscribedPackageModel> subscriptions;
-                        if (isLoading) {
-                          subscriptions = [dummyPackage];
-                        } else if (state is SubscriptionsLoaded) {
+                        final List<SubscriptionResponseModel> subscriptions;
+                        if (state is SubscriptionsLoaded) {
                           subscriptions = state.subscriptions;
                         } else {
                           subscriptions = [];
                         }
 
                         if (subscriptions.isEmpty) {
-                          return const SizedBox.shrink();
-                        }
-
-                        final activeSubscription = subscriptions.firstWhere(
-                          (sub) => sub.status == 'ACTIVE' || sub.status == 'PENDING_PAYMENT',
-                          orElse: () => subscriptions.first,
-                        );
-
-                        return Skeletonizer(
-                          enabled: isLoading,
-                          child: Column(
+                          return Column(
                             children: [
                               SizedBox(height: context.screenHeight * 0.02),
-                              CurrentPackageSection(
-                                currentPackage: activeSubscription,
-                                onUsePackage: () {
-                                  // Handle use package
-                                },
-                              ),
+                              const PackagesListView(),
                             ],
-                          ),
+                          );
+                        }
+
+                        final activeSubscription = subscriptions.first;
+
+                        return Column(
+                          children: [
+                            SizedBox(height: context.screenHeight * 0.02),
+                            CurrentPackageSection(
+                              currentPackage: activeSubscription,
+                              onUsePackage: () {
+                                // Handle use package
+                              },
+                            ),
+                          ],
                         );
                       },
                     ),
-                    SizedBox(height: context.screenHeight * 0.02),
-                    const PackagesListView(),
                     SizedBox(height: context.screenHeight * 0.02),
                     const ServicesPageView(),
                     SizedBox(height: context.screenHeight * 0.02),

@@ -1,6 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
-import '../../data/models/subscribed_package_model.dart';
+import '../../data/models/subscription_response_model/subscription_response_model.dart';
+
+import '../../data/models/subscription_request_model.dart';
 import '../../data/repos/subscriptions_repository.dart';
 
 part 'subscriptions_state.dart';
@@ -42,21 +44,9 @@ class SubscriptionsCubit extends Cubit<SubscriptionsState> {
     );
   }
 
-  Future<void> subscribeToPackage({
-    required String packageId,
-    String? vehicleId,
-    String? addressId,
-    List<ScheduleEntry>? initialSchedule,
-    String? nonce,
-  }) async {
+  Future<void> subscribeToPackage(SubscriptionRequestModel request) async {
     emit(SubscriptionsLoading());
-    final result = await _subscriptionsRepository.createSubscription(
-      packageId: packageId,
-      vehicleId: vehicleId,
-      addressId: addressId,
-      initialSchedule: initialSchedule,
-      nonce: nonce,
-    );
+    final result = await _subscriptionsRepository.createSubscription(request);
     result.fold(
       (failure) => emit(SubscriptionsError(failure.message)),
       (subscription) => emit(SubscriptionCreated(subscription)),

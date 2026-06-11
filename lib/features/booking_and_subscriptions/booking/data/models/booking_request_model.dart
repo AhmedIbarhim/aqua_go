@@ -84,22 +84,4 @@ class BookingRequestModel {
       if (paymentMethod != null) 'paymentMethod': paymentMethod!.name,
     };
   }
-
-  // factory BookingModel.fromJson(Map<String, dynamic> json) {
-  //   return BookingModel(
-  //     service: ServiceModel.fromJson(json['service']),
-  //     car: MyCarModel.fromJson(json['car']),
-  //     address: AddressModel.fromJson(json['address']),
-  //     date: DateTime.parse(json['date']),
-  //     time: json['time'],
-  //     additionalServices: (json['additionalServices'] as List)
-  //         .map((e) => AddOnModel.fromJson(e))
-  //         .toList(),
-  //     bikerNotes: json['bikerNotes'] as List<String>,
-  //     paymentMethod: PaymentMethodEnumExtension.fromString(
-  //       json['paymentMethod'],
-  //     ),
-  //     quote: json['quote'] != null ? QuoteModel.fromJson(json['quote']) : null,
-  //   );
-  // }
 }

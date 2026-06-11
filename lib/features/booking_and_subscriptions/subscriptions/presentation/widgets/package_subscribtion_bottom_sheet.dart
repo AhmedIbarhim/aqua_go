@@ -7,6 +7,7 @@ import '../../../../../core/extentions/context_extentions.dart';
 import '../../../../../generated/locale_keys.g.dart';
 import '../../../../home/data/models/package_model.dart';
 import '../../controllers/subscriptions_controller/subscriptions_cubit.dart';
+import '../../data/models/subscription_request_model.dart';
 import 'package_subscribtion_details_content.dart';
 import 'package_subscribtion_success_alert.dart';
 import 'package_subscribtion_payment_content.dart';
@@ -80,7 +81,9 @@ class _PackageSubscribtionBottomSheetState
                   isLoading: isLoading,
                   onConfirm: (validContext) {
                     context.read<SubscriptionsCubit>().subscribeToPackage(
-                          packageId: widget.packageModel.id,
+                          SubscriptionRequestModel(
+                            packageId: widget.packageModel.id,
+                          ),
                         );
                   },
                 ),

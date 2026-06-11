@@ -2,7 +2,8 @@ import 'package:aqua_go/core/helpers/fetch_user_data_helper.dart';
 import 'package:aqua_go/core/helpers/idempotency_key_helper.dart';
 import 'package:dartz/dartz.dart';
 import 'package:aqua_go/core/config/networking/exceptions/failure.dart';
-import '../models/subscribed_package_model.dart';
+import '../models/subscription_response_model/subscription_response_model.dart';
+import '../models/subscription_request_model.dart';
 import '../data_sources/subscriptions_remote_data_source.dart';
 
 class SubscriptionsRepository {
@@ -10,7 +11,7 @@ class SubscriptionsRepository {
 
   SubscriptionsRepository(this._subscriptionsDataSource);
 
-  Future<Either<Failure, List<SubscribedPackageModel>>>
+  Future<Either<Failure, List<SubscriptionResponseModel>>>
   fetchActiveSubscriptions({int? limit, String? cursor, String? status}) async {
     final result = await _subscriptionsDataSource.getSubscriptions(
       limit: limit,
@@ -28,7 +29,7 @@ class SubscriptionsRepository {
           }
           final parsed = list
               .map(
-                (json) => SubscribedPackageModel.fromJson(
+                (json) => SubscriptionResponseModel.fromJson(
                   json as Map<String, dynamic>,
                 ),
               )
@@ -42,7 +43,7 @@ class SubscriptionsRepository {
     });
   }
 
-  Future<Either<Failure, SubscribedPackageModel>> fetchSubscriptionDetail({
+  Future<Either<Failure, SubscriptionResponseModel>> fetchSubscriptionDetail({
     required String subscriptionId,
   }) async {
     final result = await _subscriptionsDataSource.getSubscriptionDetail(
@@ -51,7 +52,7 @@ class SubscriptionsRepository {
     return result.fold((failure) => Left(failure), (data) {
       if (data != null) {
         try {
-          final subscription = SubscribedPackageModel.fromJson(
+          final subscription = SubscriptionResponseModel.fromJson(
             data as Map<String, dynamic>,
           );
           return Right(subscription);
@@ -63,37 +64,17 @@ class SubscriptionsRepository {
     });
   }
 
-  Future<Either<Failure, SubscribedPackageModel>> createSubscription({
-    required String packageId,
-    String? vehicleId,
-    String? addressId,
-    List<ScheduleEntry>? initialSchedule,
-    String? nonce,
-  }) async {
+  Future<Either<Failure, SubscriptionResponseModel>> createSubscription(
+    SubscriptionRequestModel subscriptionRequest,
+  ) async {
     final cleanNonce =
-        nonce ?? DateTime.now().millisecondsSinceEpoch.toString();
+        subscriptionRequest.nonce ?? DateTime.now().millisecondsSinceEpoch.toString();
 
-    List<ScheduleEntry>? finalSchedule = initialSchedule;
-    if (finalSchedule == null && vehicleId != null && addressId != null) {
-      finalSchedule = [
-        ScheduleEntry(
-          scheduledAt: DateTime.now().add(const Duration(hours: 2)),
-          addressId: addressId,
-          vehicleIds: [vehicleId],
-        ),
-      ];
-    }
-
-    final body = {
-      'packageId': packageId,
-      'idempotencyNonce': cleanNonce,
-      if (finalSchedule != null)
-        'initialSchedule': finalSchedule.map((e) => e.toJson()).toList(),
-    };
+    final body = subscriptionRequest.toJson();
     final idempotencyKey = IdempotencyKeyHelper.generate(
       prefix: 'subscription-subscribe',
       userId: FetchUserData.getUserId() ?? '',
-      requestId: packageId,
+      requestId: subscriptionRequest.packageId,
       index: cleanNonce,
     );
 
@@ -104,7 +85,7 @@ class SubscriptionsRepository {
     return result.fold((failure) => Left(failure), (data) {
       if (data != null) {
         try {
-          final subscription = SubscribedPackageModel.fromJson(
+          final subscription = SubscriptionResponseModel.fromJson(
             data as Map<String, dynamic>,
           );
           return Right(subscription);
@@ -116,7 +97,7 @@ class SubscriptionsRepository {
     });
   }
 
-  Future<Either<Failure, SubscribedPackageModel>> cancelActiveSubscription({
+  Future<Either<Failure, SubscriptionResponseModel>> cancelActiveSubscription({
     required String subscriptionId,
     required String reasonCode,
     String? note,
@@ -138,7 +119,7 @@ class SubscriptionsRepository {
     return result.fold((failure) => Left(failure), (data) {
       if (data != null) {
         try {
-          final subscription = SubscribedPackageModel.fromJson(
+          final subscription = SubscriptionResponseModel.fromJson(
             data as Map<String, dynamic>,
           );
           return Right(subscription);

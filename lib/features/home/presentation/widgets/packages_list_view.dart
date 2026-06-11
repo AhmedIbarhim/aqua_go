@@ -9,7 +9,6 @@ import '../../../../core/helpers/shimmer_helper.dart';
 import '../../data/models/package_model.dart';
 import '../../controllers/packages_controller/packages_cubit.dart';
 import 'package_card.dart';
-import '../views/packages_view.dart';
 
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -73,12 +72,7 @@ class PackagesListView extends StatelessWidget {
                       onTap: isLoading
                           ? null
                           : () {
-                              context.pushNamed(
-                                Routes.packages,
-                                arguments: PackagesArgs(
-                                  packages: displayPackages,
-                                ),
-                              );
+                              context.pushNamed(Routes.packages);
                             },
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.end,

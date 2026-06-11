@@ -12,7 +12,7 @@ final class SubscriptionsInitial extends SubscriptionsState {}
 final class SubscriptionsLoading extends SubscriptionsState {}
 
 final class SubscriptionsLoaded extends SubscriptionsState {
-  final List<SubscribedPackageModel> subscriptions;
+  final List<SubscriptionResponseModel> subscriptions;
 
   const SubscriptionsLoaded(this.subscriptions);
 
@@ -21,7 +21,7 @@ final class SubscriptionsLoaded extends SubscriptionsState {
 }
 
 final class SubscriptionCreated extends SubscriptionsState {
-  final SubscribedPackageModel subscription;
+  final SubscriptionResponseModel subscription;
 
   const SubscriptionCreated(this.subscription);
 
@@ -30,7 +30,7 @@ final class SubscriptionCreated extends SubscriptionsState {
 }
 
 final class SubscriptionCancelled extends SubscriptionsState {
-  final SubscribedPackageModel subscription;
+  final SubscriptionResponseModel subscription;
 
   const SubscriptionCancelled(this.subscription);
 
