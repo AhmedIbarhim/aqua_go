@@ -209,7 +209,10 @@
         },
         "before_washing": "قبل الغسيل",
         "after_washing": "بعد الغسيل",
-        "photo_gallery": "معرض الصور"
+        "photo_gallery": "معرض الصور",
+        "reschedule_booking": "تعديل الحجز",
+        "confirm_reschedule": "تأكيد تعديل الحجز",
+        "reschedule_success": "تم تعديل الحجز بنجاح"
     },
     "address": {
         "map": "الخريطة",
@@ -343,6 +346,7 @@
         "error": "حدث خطأ",
         "no_internet": "لا يوجد اتصال بالإنترنت",
         "default_error": "عذرا، حدث خطأ ما. يرجى المحاولة مرة أخرى لاحقًا",
-        "booking_created": "تم إنشاء الحجز بنجاح"
+        "booking_created": "تم إنشاء الحجز بنجاح",
+        "booking_rescheduled": "تم تعديل الحجز بنجاح"
     }
 }

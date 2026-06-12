@@ -46,7 +46,7 @@ class AddOnsGrid extends StatelessWidget {
 
         return GestureDetector(
           onTap: () => onServiceToggled(index),
-          child: _buildServiceCard(
+          child: _buildAddOnCard(
             context,
             title,
             priceStr,
@@ -59,7 +59,7 @@ class AddOnsGrid extends StatelessWidget {
     );
   }
 
-  Widget _buildServiceCard(
+  Widget _buildAddOnCard(
     BuildContext context,
     String title,
     String price,
@@ -127,9 +127,6 @@ class AddOnsGrid extends StatelessWidget {
   Widget _buildIcon(String url, double width) {
     if (url.isEmpty) {
       return SvgPicture.asset(AppAssets.fragant, width: width);
-    }
-    if (url.endsWith('.svg')) {
-      return SvgPicture.network(url, width: width);
     }
     return SizedBox(
       width: width,

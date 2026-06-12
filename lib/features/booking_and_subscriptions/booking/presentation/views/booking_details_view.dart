@@ -2,6 +2,8 @@ import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/core/route/routes.dart';
 import 'package:aqua_go/features/my_cars/controllers/my_cars_cubit.dart';
 import 'package:aqua_go/features/my_cars/data/models/my_car_model.dart';
+import 'package:aqua_go/features/my_bookings/presentation/views/my_booking_deatails_view.dart';
+import 'package:aqua_go/features/my_bookings/data/models/booking_summary_model.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -32,12 +34,45 @@ class BookingDetailsView extends StatelessWidget {
       providers: [
         BlocProvider(create: (context) => locator<MyCarsCubit>()..getCars()),
       ],
-      child: BlocBuilder<BookingCubit, BookingState>(
+      child: BlocConsumer<BookingCubit, BookingState>(
+        listener: (context, state) {
+          // Only handle submit states for reschedule flow (submits from this view)
+          if (!state.flowConfig.showSummaryStep) {
+            if (state.status == BookingStatus.loading) {
+              context.showLoadingOverlay();
+            } else {
+              context.hideLoadingOverlay();
+            }
+
+            if (state.status == BookingStatus.success) {
+              context.showSuccessSnackBar(
+                LocaleKeys.bookings_reschedule_success.tr(),
+              );
+              Navigator.popUntil(context, (route) => route.isFirst);
+              if (state.createdBooking != null) {
+                Navigator.pushNamed(
+                  context,
+                  Routes.myBookingDetails,
+                  arguments: MyBookingDetailsArgs(
+                    booking: BookingSummaryModel.fromDetails(
+                      state.createdBooking!,
+                    ),
+                    isFromBookingFlow: true,
+                  ),
+                );
+              }
+            } else if (state.status == BookingStatus.failure) {
+              context.showErrorSnackBar(state.errorMessage ?? '');
+            }
+          }
+        },
         builder: (context, bookingState) {
           return Scaffold(
             backgroundColor: context.colors.background,
             appBar: GenericAppBar(
-              title: LocaleKeys.bookings_booking_details.tr(),
+              title: bookingState.flowConfig.isReschedule
+                  ? LocaleKeys.bookings_reschedule_booking.tr()
+                  : LocaleKeys.bookings_booking_details.tr(),
               hasBackground: true,
               backgroundImage: AppAssets.bookingHeaderImage,
               centerTitle: true,
@@ -69,6 +104,8 @@ class BookingDetailsView extends StatelessWidget {
     double width,
     double height,
   ) {
+    final config = bookingState.flowConfig;
+
     return Container(
       padding: EdgeInsets.all(width * 0.06),
       decoration: BoxDecoration(color: context.colors.themeColor),
@@ -102,7 +139,22 @@ class BookingDetailsView extends StatelessWidget {
                 selectedCarIndex = cars.indexWhere(
                   (c) => c.id == bookingState.selectedCar!.id,
                 );
-                if (selectedCarIndex == -1) selectedCarIndex = null;
+                if (selectedCarIndex == -1) {
+                  selectedCarIndex = cars.indexWhere(
+                    (c) =>
+                        c.plateNumber == bookingState.selectedCar!.plateNumber,
+                  );
+                  if (selectedCarIndex != -1) {
+                    final realCar = cars[selectedCarIndex];
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (context.mounted) {
+                        context.read<BookingCubit>().selectCar(realCar);
+                      }
+                    });
+                  } else {
+                    selectedCarIndex = null;
+                  }
+                }
               }
 
               return CarSelectionList(
@@ -121,7 +173,9 @@ class BookingDetailsView extends StatelessWidget {
               );
             },
           ),
-          if (bookingState.selectedService!.addons.isNotEmpty) ...[
+          if (config.showAddOns &&
+              bookingState.selectedService != null &&
+              bookingState.selectedService!.addons.isNotEmpty) ...[
             SizedBox(height: height * 0.03),
             _buildSectionTitle(LocaleKeys.bookings_additional_services.tr()),
             SizedBox(height: height * 0.02),
@@ -174,11 +228,28 @@ class BookingDetailsView extends StatelessWidget {
     double width,
     double height,
   ) {
+    final config = bookingState.flowConfig;
     final isComplete =
         bookingState.selectedCar != null &&
         bookingState.selectedDate != null &&
         bookingState.selectedTime != null;
 
+    // For reschedule flow: submit directly from details view
+    if (!config.showSummaryStep) {
+      return BottomActionSheetContainer(
+        child: CustomButton(
+          text: LocaleKeys.bookings_confirm_reschedule.tr(),
+          enabled: isComplete,
+          onPressed: isComplete
+              ? () {
+                  context.read<BookingCubit>().submitBooking();
+                }
+              : null,
+        ),
+      );
+    }
+
+    // For service/package flow: show pricing and navigate to summary
     double addonsTotal = 0.0;
     final availableAddons = bookingState.selectedService?.addons ?? [];
     for (final idx in bookingState.selectedServiceIndices) {
@@ -193,27 +264,28 @@ class BookingDetailsView extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              Text(
-                LocaleKeys.bookings_total.tr(),
-                style: AppTextStyles.regular14.copyWith(
-                  color: context.colors.textSecondary,
+          if (config.showPricingInDetails)
+            Row(
+              children: [
+                Text(
+                  LocaleKeys.bookings_total.tr(),
+                  style: AppTextStyles.regular14.copyWith(
+                    color: context.colors.textSecondary,
+                  ),
                 ),
-              ),
-              const Spacer(),
-              Text(total.toStringAsFixed(2), style: AppTextStyles.medium24),
-              const SizedBox(width: 4),
-              SvgPicture.asset(
-                AppAssets.currency,
-                width: width * 0.06,
-                colorFilter: ColorFilter.mode(
-                  context.colors.textPrimary,
-                  BlendMode.srcIn,
+                const Spacer(),
+                Text(total.toStringAsFixed(2), style: AppTextStyles.medium24),
+                const SizedBox(width: 4),
+                SvgPicture.asset(
+                  AppAssets.currency,
+                  width: width * 0.06,
+                  colorFilter: ColorFilter.mode(
+                    context.colors.textPrimary,
+                    BlendMode.srcIn,
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
           CustomButton(
             text: LocaleKeys.bookings_book_now.tr(),
             enabled: isComplete,

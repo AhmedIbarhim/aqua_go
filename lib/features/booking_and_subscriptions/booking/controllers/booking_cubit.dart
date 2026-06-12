@@ -1,28 +1,43 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:aqua_go/core/config/local_storage/shared_prefs.dart';
-import 'package:aqua_go/core/constants.dart';
-import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:intl/intl.dart';
 import '../../../address/data/models/address_model.dart';
 import '../../../my_cars/data/models/my_car_model.dart';
 import '../../../home/data/models/service_model.dart';
-import '../data/models/booking_request_model.dart';
-import '../../shared/add_on_model.dart';
-import '../data/models/biker_note.dart';
+import '../domain/configs/booking_flow_config.dart';
 import '../data/models/quote_model.dart';
-import '../data/repos/booking_repo.dart';
+import '../data/repos/booking_repository.dart';
 import '../../../../core/enums/payment_method_enum.dart';
+import '../domain/strategies/booking_submit_strategy.dart';
 import 'booking_state.dart';
 
 class BookingCubit extends Cubit<BookingState> {
-  final BookingRepo _bookingRepo;
+  final BookingRepository _bookingRepo;
+  final BookingFlowConfig _flowConfig;
+  final BookingSubmitStrategy _submitStrategy;
 
-  BookingCubit({required BookingRepo bookingRepo})
-    : _bookingRepo = bookingRepo,
-      super(const BookingState());
+  BookingCubit({
+    required BookingRepository bookingRepo,
+    BookingFlowConfig flowConfig = BookingFlowConfig.normal,
+    required BookingSubmitStrategy submitStrategy,
+  }) : _bookingRepo = bookingRepo,
+       _flowConfig = flowConfig,
+       _submitStrategy = submitStrategy,
+       super(BookingState(flowConfig: flowConfig));
 
-  void initBooking(ServiceModel? service) {
-    emit(BookingState(status: BookingStatus.initial, selectedService: service));
+  void initBooking(
+    ServiceModel? service, {
+    MyCarModel? existingCar,
+    AddressModel? existingAddress,
+  }) {
+    emit(
+      BookingState(
+        status: BookingStatus.initial,
+        selectedService: service,
+        selectedCar: existingCar,
+        selectedAddress: existingAddress,
+        flowConfig: _flowConfig,
+      ),
+    );
   }
 
   void selectAddress(AddressModel address) {
@@ -210,88 +225,67 @@ class BookingCubit extends Cubit<BookingState> {
   }
 
   Future<void> submitBooking({String? promoCode}) async {
-    if (state.selectedAddress == null ||
-        state.selectedCar == null ||
-        state.selectedDate == null ||
-        state.selectedTime == null ||
-        state.selectedService == null) {
-      emit(
-        state.copyWith(
-          status: BookingStatus.failure,
-          errorMessage: 'يرجى إكمال جميع بيانات الحجز المطلوبة',
-        ),
-      );
-      return;
-    }
+    // // Validate based on flow config
+    // if (state.selectedAddress == null ||
+    //     state.selectedCar == null ||
+    //     state.selectedDate == null ||
+    //     state.selectedTime == null) {
+    //   emit(
+    //     state.copyWith(
+    //       status: BookingStatus.failure,
+    //       errorMessage: 'يرجى إكمال جميع بيانات الحجز المطلوبة',
+    //     ),
+    //   );
+    //   return;
+    // }
 
-    emit(state.copyWith(status: BookingStatus.loading));
+    // // Only validate service for flows that require it
+    // if (!_flowConfig.isReschedule && state.selectedService == null) {
+    //   emit(
+    //     state.copyWith(
+    //       status: BookingStatus.failure,
+    //       errorMessage: 'يرجى إكمال جميع بيانات الحجز المطلوبة',
+    //     ),
+    //   );
+    //   return;
+    // }
 
-    QuoteModel? quote = state.quote;
-    if (quote == null) {
-      final quoteResult = await _bookingRepo.getQuote(
-        packageId: state.selectedService!.id,
-        lat: state.selectedAddress!.lat,
-        lng: state.selectedAddress!.lng,
-        promoCode: promoCode,
-      );
+    // emit(state.copyWith(status: BookingStatus.loading));
 
-      final hasError = quoteResult.fold(
-        (failure) {
-          emit(
-            state.copyWith(
-              status: BookingStatus.failure,
-              errorMessage: failure.message,
-            ),
-          );
-          return true;
-        },
-        (fetchedQuote) {
-          quote = fetchedQuote;
-          emit(state.copyWith(quote: fetchedQuote));
-          return false;
-        },
-      );
+    // // Only fetch quote for flows that require it
+    // if (_flowConfig.requiresQuote && state.quote == null) {
+    //   final quoteResult = await _bookingRepo.getQuote(
+    //     packageId: state.selectedService!.id,
+    //     lat: state.selectedAddress!.lat,
+    //     lng: state.selectedAddress!.lng,
+    //     promoCode: promoCode,
+    //   );
 
-      if (hasError || quote == null) return;
-    }
+    //   final hasError = quoteResult.fold(
+    //     (failure) {
+    //       emit(
+    //         state.copyWith(
+    //           status: BookingStatus.failure,
+    //           errorMessage: failure.message,
+    //         ),
+    //       );
+    //       return true;
+    //     },
+    //     (fetchedQuote) {
+    //       emit(state.copyWith(quote: fetchedQuote));
+    //       return false;
+    //     },
+    //   );
 
-    final List<AddOnModel> addonsList = [];
-    final availableAddons = state.selectedService?.addons ?? [];
-    for (final idx in state.selectedServiceIndices) {
-      if (idx < availableAddons.length) {
-        addonsList.add(availableAddons[idx]);
-      }
-    }
+    //   if (hasError) return;
+    // }
 
-    final List<String> notesList = [];
-    final isArabic = CacheClient.getString(kLanguage, defaultValue: kArabicLang) == kArabicLang;
-
-    for (final noteKey in state.bikerNotes) {
-      if (noteKey == LocaleKeys.bookings_special_note) {
-        if (state.specialNoteText.trim().isNotEmpty) {
-          notesList.add(state.specialNoteText.trim());
-        }
-      } else {
-        final enumVal = BikerNote.fromKey(noteKey);
-        if (enumVal != null) {
-          notesList.add(enumVal.getValue(isArabic));
-        }
-      }
-    }
-
-    final booking = BookingRequestModel(
-      service: state.selectedService,
-      car: state.selectedCar,
-      address: state.selectedAddress,
-      date: state.selectedDate,
-      time: state.selectedTime,
-      serviceAddOns: addonsList,
-      workerNotes: notesList,
-      paymentMethod: state.paymentMethod,
-      quote: quote,
+    // Delegate to the strategy
+    final result = await _submitStrategy.submit(
+      repo: _bookingRepo,
+      state: state,
     );
 
-    final result = await _bookingRepo.createBooking(booking);
     result.fold(
       (failure) => emit(
         state.copyWith(

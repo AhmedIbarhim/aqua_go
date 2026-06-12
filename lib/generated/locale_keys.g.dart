@@ -203,6 +203,9 @@ abstract class  LocaleKeys {
   static const bookings_before_washing = 'bookings.before_washing';
   static const bookings_after_washing = 'bookings.after_washing';
   static const bookings_photo_gallery = 'bookings.photo_gallery';
+  static const bookings_reschedule_booking = 'bookings.reschedule_booking';
+  static const bookings_confirm_reschedule = 'bookings.confirm_reschedule';
+  static const bookings_reschedule_success = 'bookings.reschedule_success';
   static const bookings = 'bookings';
   static const address_map = 'address.map';
   static const address_current_location = 'address.current_location';
@@ -325,6 +328,7 @@ abstract class  LocaleKeys {
   static const snackbar_no_internet = 'snackbar.no_internet';
   static const snackbar_default_error = 'snackbar.default_error';
   static const snackbar_booking_created = 'snackbar.booking_created';
+  static const snackbar_booking_rescheduled = 'snackbar.booking_rescheduled';
   static const snackbar = 'snackbar';
 
 }

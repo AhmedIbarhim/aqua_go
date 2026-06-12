@@ -7,26 +7,48 @@ import '../../../../core/route/routes.dart';
 import '../../../../generated/locale_keys.g.dart';
 import 'current_package_card.dart';
 
-class CurrentPackageSection extends StatelessWidget {
-  final SubscriptionResponseModel? currentPackage;
-  final VoidCallback? onUsePackage;
+class CurrentPackageSection extends StatefulWidget {
+  final List<SubscriptionResponseModel> subscribedPackages;
+  final Function(SubscriptionResponseModel package)? onUsePackage;
 
   const CurrentPackageSection({
     super.key,
-    this.currentPackage,
+    required this.subscribedPackages,
     this.onUsePackage,
   });
 
   @override
-  Widget build(BuildContext context) {
-    if (currentPackage == null) return const SizedBox.shrink();
+  State<CurrentPackageSection> createState() => _CurrentPackageSectionState();
+}
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+class _CurrentPackageSectionState extends State<CurrentPackageSection> {
+  late final PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(viewportFraction: 1.0);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.subscribedPackages.isEmpty) return const SizedBox.shrink();
+
+    final height = MediaQuery.sizeOf(context).height;
+    final cardHeight = context.isTablet ? height * 0.2 : 210.0;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -75,13 +97,30 @@ class CurrentPackageSection extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          CurrentPackageCard(
-            package: currentPackage!,
-            onUsePackage: onUsePackage,
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: cardHeight,
+          child: PageView.builder(
+            controller: _pageController,
+            itemCount: widget.subscribedPackages.length,
+
+            itemBuilder: (context, index) {
+              final package = widget.subscribedPackages[index];
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: CurrentPackageCard(
+                  package: package,
+                  onUsePackage: () => widget.onUsePackage?.call(package),
+                ),
+              );
+            },
           ),
+        ),
+        if (widget.subscribedPackages.length > 1) ...[
+          const SizedBox(height: 12),
         ],
-      ),
+      ],
     );
   }
 }

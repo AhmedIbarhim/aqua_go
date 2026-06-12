@@ -12,6 +12,12 @@ import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 
 import 'package:aqua_go/core/route/routes.dart';
+import 'package:aqua_go/core/route/app_router.dart';
+import 'package:aqua_go/features/booking_and_subscriptions/booking/domain/configs/booking_flow_config.dart';
+import 'package:aqua_go/features/booking_and_subscriptions/booking/domain/strategies/reschedule_booking_submit.dart';
+import 'package:aqua_go/features/my_cars/data/models/my_car_model.dart';
+import 'package:aqua_go/features/address/data/models/address_model.dart';
+import 'package:aqua_go/features/home/data/models/service_model.dart';
 
 import '../../data/models/booking_response_model/booking_response_model.dart';
 import '../../data/models/booking_summary_model.dart';
@@ -201,7 +207,54 @@ class MyBookingDetailsView extends StatelessWidget {
             BlendMode.srcIn,
           ),
         ),
-        onPressed: () {},
+        onPressed: () {
+          final existingAddress = AddressModel(
+            id: null,
+            label: booking.addressLabel ?? '',
+            details: booking.addressLabel ?? '',
+            lat: (booking.addressLat ?? 0.0).toDouble(),
+            lng: (booking.addressLng ?? 0.0).toDouble(),
+            arrivalNotes: booking.addressArrivalNotes,
+            zoneId: booking.zoneId,
+          );
+
+          final existingCar = MyCarModel(
+            id: '',
+            makeId: '',
+            modelId: '',
+            color: booking.vehicleColor ?? '',
+            modelYear: booking.vehicleYear ?? 2024,
+            logoUrl: booking.vehicleMakeLogoUrl ?? '',
+            plateNumber: booking.plate ?? '',
+          );
+
+          final service = ServiceModel(
+            id: booking.packageId ?? '',
+            code: '',
+            rawName: ServiceName(
+              nameAr: booking.packageName?.ar ?? '',
+              nameEn: booking.packageName?.en ?? '',
+            ),
+            rawDescription: const ServiceDescription(descAr: '', descEn: ''),
+            active: true,
+            addons: const [],
+          );
+
+          context.pushNamed(
+            Routes.bookingLocation,
+            arguments: BookingFlowStartArgs(
+              service: service,
+              existingCar: existingCar,
+              existingAddress: existingAddress,
+              flowConfig: const BookingFlowConfig(
+                flowType: BookingFlowType.reschedule,
+              ),
+              submitStrategy: RescheduleBookingSubmit(
+                existingBookingId: booking.id!,
+              ),
+            ),
+          );
+        },
       ),
     );
   }

@@ -31,7 +31,10 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<BookingCubit>().fetchQuote();
+      final config = context.read<BookingCubit>().state.flowConfig;
+      if (config.requiresQuote) {
+        context.read<BookingCubit>().fetchQuote();
+      }
     });
   }
 
@@ -101,6 +104,8 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
     BookingState bookingState,
     double width,
   ) {
+    final config = bookingState.flowConfig;
+
     final List<Map<String, dynamic>> selectedAddons = [];
     double addonsGross = 0.0;
     double addonsNet = 0.0;
@@ -143,52 +148,60 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionTitle(LocaleKeys.bookings_booking_summary.tr()),
-          const SizedBox(height: 16),
-          BookingSummaryCard(
-            serviceName: context.isAr
-                ? (bookingState.selectedService?.rawName.nameAr ?? '')
-                : (bookingState.selectedService?.rawName.nameEn ?? ''),
-            carName:
-                '${bookingState.selectedCar!.carMake!.vehicleMakeName.localizedName} ${bookingState.selectedCar!.carModel!.vehicleModelName.localizedName}',
-            location: bookingState.selectedAddress?.details ?? '',
-            dateTime: bookingState.selectedDate != null
-                ? '${bookingState.selectedDate!.month}/${bookingState.selectedDate!.day}/${bookingState.selectedDate!.year} - ${bookingState.selectedTime ?? ""}'
-                : '',
-          ),
-          const SizedBox(height: 24),
-          _buildSectionTitle(LocaleKeys.bookings_notes_for_biker.tr()),
-          const SizedBox(height: 16),
-          BikerNotesSelection(
-            initialNotes: bookingState.bikerNotes,
-            initialSpecialNoteText: bookingState.specialNoteText,
-            onNotesChanged: (notes) {
-              context.read<BookingCubit>().updateNotes(notes);
-            },
-            onSpecialNoteTextChanged: (text) {
-              context.read<BookingCubit>().updateSpecialNoteText(text);
-            },
-          ),
-          const SizedBox(height: 24),
-          PaymentMethodSelection(
-            initialMethod: bookingState.paymentMethod,
-            onPaymentMethodChanged: (method) {
-              context.read<BookingCubit>().updatePaymentMethod(method);
-            },
-          ),
-          const SizedBox(height: 24),
-          _buildSectionTitle(LocaleKeys.bookings_payment_summary.tr()),
-          const SizedBox(height: 16),
-          PaymentSummaryCard(
-            serviceName: context.isAr
-                ? (bookingState.selectedService?.rawName.nameAr ?? '')
-                : (bookingState.selectedService?.rawName.nameEn ?? ''),
-            servicePrice: basePrice,
-            additionalItems: selectedAddons,
-            subtotal: subtotal,
-            vat: vat,
-            total: total,
-          ),
+          if (config.showBookingSummaryCard) ...[
+            _buildSectionTitle(LocaleKeys.bookings_booking_summary.tr()),
+            const SizedBox(height: 16),
+            BookingSummaryCard(
+              serviceName: context.isAr
+                  ? (bookingState.selectedService?.rawName.nameAr ?? '')
+                  : (bookingState.selectedService?.rawName.nameEn ?? ''),
+              carName:
+                  '${bookingState.selectedCar!.carMake!.vehicleMakeName.localizedName} ${bookingState.selectedCar!.carModel!.vehicleModelName.localizedName}',
+              location: bookingState.selectedAddress?.details ?? '',
+              dateTime: bookingState.selectedDate != null
+                  ? '${bookingState.selectedDate!.month}/${bookingState.selectedDate!.day}/${bookingState.selectedDate!.year} - ${bookingState.selectedTime ?? ""}'
+                  : '',
+            ),
+            const SizedBox(height: 24),
+          ],
+          if (config.showBikerNotes) ...[
+            _buildSectionTitle(LocaleKeys.bookings_notes_for_biker.tr()),
+            const SizedBox(height: 16),
+            BikerNotesSelection(
+              initialNotes: bookingState.bikerNotes,
+              initialSpecialNoteText: bookingState.specialNoteText,
+              onNotesChanged: (notes) {
+                context.read<BookingCubit>().updateNotes(notes);
+              },
+              onSpecialNoteTextChanged: (text) {
+                context.read<BookingCubit>().updateSpecialNoteText(text);
+              },
+            ),
+            const SizedBox(height: 24),
+          ],
+          if (config.showPaymentMethod) ...[
+            PaymentMethodSelection(
+              initialMethod: bookingState.paymentMethod,
+              onPaymentMethodChanged: (method) {
+                context.read<BookingCubit>().updatePaymentMethod(method);
+              },
+            ),
+            const SizedBox(height: 24),
+          ],
+          if (config.showPaymentSummary) ...[
+            _buildSectionTitle(LocaleKeys.bookings_payment_summary.tr()),
+            const SizedBox(height: 16),
+            PaymentSummaryCard(
+              serviceName: context.isAr
+                  ? (bookingState.selectedService?.rawName.nameAr ?? '')
+                  : (bookingState.selectedService?.rawName.nameEn ?? ''),
+              servicePrice: basePrice,
+              additionalItems: selectedAddons,
+              subtotal: subtotal,
+              vat: vat,
+              total: total,
+            ),
+          ],
           const SizedBox(height: 30),
         ],
       ),
@@ -208,10 +221,15 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
     BuildContext context,
     BookingState bookingState,
   ) {
+    final config = bookingState.flowConfig;
+    final isEnabled = config.requiresPaymentMethod
+        ? bookingState.paymentMethod != null
+        : true;
+
     return BottomActionSheetContainer(
       child: CustomButton(
         text: LocaleKeys.bookings_confirm_booking.tr(),
-        enabled: bookingState.paymentMethod != null,
+        enabled: isEnabled,
         onPressed: () {
           context.read<BookingCubit>().submitBooking();
         },

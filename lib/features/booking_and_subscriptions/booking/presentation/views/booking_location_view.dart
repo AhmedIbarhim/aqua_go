@@ -83,31 +83,52 @@ class _BookingLocationViewState extends State<BookingLocationView> {
           backgroundImage: AppAssets.bookingHeaderImage,
           centerTitle: true,
         ),
-        body: BlocListener<MapsCubit, MapsState>(
-          listenWhen: (prev, curr) =>
-              prev.isLocationServiceEnabled != curr.isLocationServiceEnabled ||
-              prev.errorMessage != curr.errorMessage ||
-              prev.isLoading != curr.isLoading,
-          listener: (context, state) {
-            if (state.isLoading) {
-              context.showLoadingOverlay();
-            } else {
-              context.hideLoadingOverlay();
-            }
+        body: MultiBlocListener(
+          listeners: [
+            BlocListener<MapsCubit, MapsState>(
+              listenWhen: (prev, curr) =>
+                  prev.isLocationServiceEnabled != curr.isLocationServiceEnabled ||
+                  prev.errorMessage != curr.errorMessage ||
+                  prev.isLoading != curr.isLoading,
+              listener: (context, state) {
+                if (state.isLoading) {
+                  context.showLoadingOverlay();
+                } else {
+                  context.hideLoadingOverlay();
+                }
 
-            if (!state.isLocationServiceEnabled) {
-              context.showDialogBox(
-                message: LocaleKeys.address_location_disabled_message.tr(),
-                mainButtonText: LocaleKeys.address_go_to_settings.tr(),
-                onMainButtonPressed: () {
-                  Navigator.pop(context);
-                  _mapsCubit.openLocationSettings();
-                },
-              );
-            } else if (state.errorMessage != null) {
-              context.showErrorSnackBar(state.errorMessage!);
-            }
-          },
+                if (!state.isLocationServiceEnabled) {
+                  context.showDialogBox(
+                    message: LocaleKeys.address_location_disabled_message.tr(),
+                    mainButtonText: LocaleKeys.address_go_to_settings.tr(),
+                    onMainButtonPressed: () {
+                      Navigator.pop(context);
+                      _mapsCubit.openLocationSettings();
+                    },
+                  );
+                } else if (state.errorMessage != null) {
+                  context.showErrorSnackBar(state.errorMessage!);
+                }
+              },
+            ),
+            BlocListener<AddressesCubit, AddressesState>(
+              listener: (context, state) {
+                if (state is AddressesLoaded) {
+                  final selectedAddr = context.read<BookingCubit>().state.selectedAddress;
+                  if (selectedAddr != null &&
+                      selectedAddr.id != 'current_gps' &&
+                      selectedAddr.id != 'custom_map') {
+                    final idx = state.addresses.indexWhere((addr) => addr.id == selectedAddr.id);
+                    if (idx != -1) {
+                      setState(() {
+                        selectedLocationIndex = idx + 1;
+                      });
+                    }
+                  }
+                }
+              },
+            ),
+          ],
           child: Column(
             children: [
               Expanded(

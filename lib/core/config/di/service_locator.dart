@@ -9,9 +9,8 @@ import 'package:aqua_go/features/auth/data/services/auth_service.dart';
 import 'package:aqua_go/features/my_cars/data/data_sources/cars_remote_data_source.dart';
 import 'package:aqua_go/features/my_cars/data/repos/cars_repository.dart';
 import 'package:aqua_go/features/my_cars/controllers/my_cars_cubit.dart';
-import 'package:aqua_go/features/booking_and_subscriptions/booking/data/repos/booking_repo.dart';
+import 'package:aqua_go/features/booking_and_subscriptions/booking/data/repos/booking_repository.dart';
 import 'package:aqua_go/features/booking_and_subscriptions/booking/data/data_sources/bookings_remote_data_source.dart';
-import 'package:aqua_go/features/booking_and_subscriptions/booking/controllers/booking_cubit.dart';
 import 'package:aqua_go/features/home/data/data_source/services_remote_data_source.dart';
 import 'package:aqua_go/features/home/data/data_source/banners_remote_data_source.dart';
 import 'package:aqua_go/features/home/data/data_source/packages_remote_data_source.dart';
@@ -142,8 +141,8 @@ Future<void> initServiceLocator() async {
     () => MyBookingsRepository(locator()),
   );
 
-  locator.registerLazySingleton<BookingRepo>(
-    () => BookingRepo(bookingsRemoteDataSource: locator()),
+  locator.registerLazySingleton<BookingRepository>(
+    () => BookingRepository(bookingsRemoteDataSource: locator()),
   );
   locator.registerLazySingleton<ComplaintsRepository>(
     () => ComplaintsRepository(locator()),
@@ -184,10 +183,6 @@ Future<void> initServiceLocator() async {
 
   locator.registerFactory<AuthCubit>(() => AuthCubit(locator()));
 
-  locator.registerFactory<BookingCubit>(
-    () => BookingCubit(bookingRepo: locator()),
-  );
-
   locator.registerFactory<NotificationPreferencesCubit>(
     () => NotificationPreferencesCubit(locator()),
   );
@@ -200,13 +195,9 @@ Future<void> initServiceLocator() async {
   locator.registerFactory<MyBookingDetailsCubit>(
     () => MyBookingDetailsCubit(locator()),
   );
-  locator.registerFactory<ComplaintsCubit>(
-    () => ComplaintsCubit(locator()),
-  );
+  locator.registerFactory<ComplaintsCubit>(() => ComplaintsCubit(locator()));
   locator.registerFactory<ComplaintDetailsCubit>(
     () => ComplaintDetailsCubit(locator(), locator()),
   );
-  locator.registerFactory<RatingCubit>(
-    () => RatingCubit(locator()),
-  );
+  locator.registerFactory<RatingCubit>(() => RatingCubit(locator()));
 }

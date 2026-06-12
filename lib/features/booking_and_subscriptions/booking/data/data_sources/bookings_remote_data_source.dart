@@ -30,10 +30,7 @@ class BookingsRemoteDataSource {
     required double lat,
     required double lng,
   }) {
-    return _apiClient.post(
-      Endpoints.zoneCheck,
-      data: {'lat': lat, 'lng': lng},
-    );
+    return _apiClient.post(Endpoints.zoneCheck, data: {'lat': lat, 'lng': lng});
   }
 
   Future<Either<Failure, dynamic>> getAvailability({
@@ -43,11 +40,7 @@ class BookingsRemoteDataSource {
   }) {
     return _apiClient.get(
       Endpoints.availability,
-      queryParameters: {
-        'zoneId': zoneId,
-        'date': date,
-        'packageId': packageId,
-      },
+      queryParameters: {'zoneId': zoneId, 'date': date, 'packageId': packageId},
     );
   }
 
@@ -58,6 +51,18 @@ class BookingsRemoteDataSource {
     return _apiClient.post(
       Endpoints.bookings,
       data: bookingData,
+      options: Options(headers: {'Idempotency-Key': idempotencyKey}),
+    );
+  }
+
+  Future<Either<Failure, dynamic>> rescheduleBooking({
+    required String bookingId,
+    required Map<String, dynamic> rescheduleData,
+    required String idempotencyKey,
+  }) {
+    return _apiClient.post(
+      Endpoints.rescheduleBooking(bookingId),
+      data: rescheduleData,
       options: Options(headers: {'Idempotency-Key': idempotencyKey}),
     );
   }

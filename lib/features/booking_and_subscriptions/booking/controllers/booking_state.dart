@@ -5,12 +5,14 @@ import '../../../home/data/models/service_model.dart';
 import '../../../../core/enums/payment_method_enum.dart';
 import '../data/models/quote_model.dart';
 import '../data/models/availability_response_model.dart';
+import '../domain/configs/booking_flow_config.dart';
 import '../../../my_bookings/data/models/booking_response_model/booking_response_model.dart';
 
 enum BookingStatus { initial, loading, success, failure }
 
 class BookingState extends Equatable {
   final BookingStatus status;
+  final BookingFlowConfig flowConfig;
   final ServiceModel? selectedService;
   final AddressModel? selectedAddress;
   final MyCarModel? selectedCar;
@@ -28,6 +30,9 @@ class BookingState extends Equatable {
 
   const BookingState({
     this.status = BookingStatus.initial,
+    this.flowConfig = const BookingFlowConfig(
+      flowType: BookingFlowType.service,
+    ),
     this.selectedService,
     this.selectedAddress,
     this.selectedCar,
@@ -46,6 +51,7 @@ class BookingState extends Equatable {
 
   BookingState copyWith({
     BookingStatus? status,
+    BookingFlowConfig? flowConfig,
     ServiceModel? selectedService,
     AddressModel? selectedAddress,
     MyCarModel? selectedCar,
@@ -64,6 +70,7 @@ class BookingState extends Equatable {
   }) {
     return BookingState(
       status: status ?? (clearError ? BookingStatus.initial : this.status),
+      flowConfig: flowConfig ?? this.flowConfig,
       selectedService: selectedService ?? this.selectedService,
       selectedAddress: selectedAddress ?? this.selectedAddress,
       selectedCar: selectedCar ?? this.selectedCar,
@@ -86,6 +93,7 @@ class BookingState extends Equatable {
   @override
   List<Object?> get props => [
     status,
+    flowConfig,
     selectedService,
     selectedAddress,
     selectedCar,

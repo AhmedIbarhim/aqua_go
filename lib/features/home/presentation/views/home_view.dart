@@ -128,14 +128,12 @@ class _HomeViewState extends State<HomeView> {
                           );
                         }
 
-                        final activeSubscription = subscriptions.first;
-
                         return Column(
                           children: [
                             SizedBox(height: context.screenHeight * 0.02),
                             CurrentPackageSection(
-                              currentPackage: activeSubscription,
-                              onUsePackage: () {
+                              subscribedPackages: subscriptions,
+                              onUsePackage: (package) {
                                 // Handle use package
                               },
                             ),

@@ -209,7 +209,10 @@
         },
         "before_washing": "Before Washing",
         "after_washing": "After Washing",
-        "photo_gallery": "Photo Gallery"
+        "photo_gallery": "Photo Gallery",
+        "reschedule_booking": "Edit Booking",
+        "confirm_reschedule": "Confirm Booking Changes",
+        "reschedule_success": "Booking has been updated successfully"
     },
     "address": {
         "map": "Map",
@@ -343,6 +346,7 @@
         "error": "Error occurred",
         "no_internet": "No internet connection",
         "default_error": "Oops, something went wrong. Please try again later",
-        "booking_created": "Booking created successfully"
+        "booking_created": "Booking created successfully",
+        "booking_rescheduled": "Booking updated successfully"
     }
 }

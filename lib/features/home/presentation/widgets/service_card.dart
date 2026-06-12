@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/route/routes.dart';
+import '../../../../core/route/app_router.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../data/models/service_model.dart';
@@ -21,7 +22,10 @@ class ServiceCard extends StatelessWidget {
         if (FetchUserData.isGuest()) {
           FetchUserData.promptGuestToLogin(context);
         } else {
-          context.pushNamed(Routes.bookingLocation, arguments: serviceModel);
+          context.pushNamed(
+            Routes.bookingLocation,
+            arguments: BookingFlowStartArgs(service: serviceModel),
+          );
         }
       },
       child: Container(

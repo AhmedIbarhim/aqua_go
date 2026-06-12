@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../features/booking_and_subscriptions/booking/controllers/booking_cubit.dart';
+import '../../features/booking_and_subscriptions/booking/domain/configs/booking_flow_config.dart';
+import '../../features/booking_and_subscriptions/booking/domain/strategies/booking_submit_strategy.dart';
+import '../../features/booking_and_subscriptions/booking/domain/strategies/service_booking_submit.dart';
 import '../../../../core/config/di/service_locator.dart';
 import '../../features/address/presentation/views/my_addresses_view.dart';
 import '../../features/address/presentation/views/new_address_map_view.dart';
@@ -11,9 +14,9 @@ import '../../features/auth/presentation/views/phone_otp_view.dart';
 import '../../features/booking_and_subscriptions/booking/presentation/views/booking_details_view.dart';
 import '../../features/booking_and_subscriptions/booking/presentation/views/booking_location_view.dart';
 import '../../features/booking_and_subscriptions/booking/presentation/views/booking_summary_view.dart';
+import '../../features/home/controllers/packages_controller/packages_cubit.dart';
 import '../../features/home/presentation/views/offers_view.dart';
 import '../../features/home/presentation/views/packages_view.dart';
-import '../../features/home/controllers/packages_controller/packages_cubit.dart';
 import '../../features/layout/presentation/views/main_layout.dart';
 import '../../features/complaints/presentation/views/complaint_view.dart';
 import '../../features/complaints/presentation/views/complaints_record_view.dart';
@@ -24,6 +27,8 @@ import '../../features/my_bookings/presentation/views/gallery_view.dart';
 import '../../features/my_bookings/presentation/views/my_booking_deatails_view.dart';
 import '../../features/my_cars/data/models/my_car_model.dart';
 import '../../features/home/data/models/service_model.dart';
+import '../../features/address/data/models/address_model.dart';
+import '../../features/booking_and_subscriptions/booking/data/repos/booking_repository.dart';
 import '../../features/profile/presentation/views/language_select_view.dart';
 import '../../features/profile/presentation/views/profile_data_view.dart';
 import '../../features/startup/views/onboarding_view.dart';
@@ -117,10 +122,19 @@ abstract class AppRouter {
         );
 
       case Routes.bookingLocation:
-        final service = settings.arguments as ServiceModel?;
+        final args = settings.arguments as BookingFlowStartArgs;
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
-            create: (_) => locator<BookingCubit>()..initBooking(service),
+            create: (_) =>
+                BookingCubit(
+                  bookingRepo: locator<BookingRepository>(),
+                  flowConfig: args.flowConfig,
+                  submitStrategy: args.submitStrategy,
+                )..initBooking(
+                  args.service,
+                  existingCar: args.existingCar,
+                  existingAddress: args.existingAddress,
+                ),
             child: const BookingLocationView(),
           ),
         );
@@ -163,7 +177,9 @@ abstract class AppRouter {
         final args = settings.arguments as MyBookingDetailsArgs;
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
-            create: (_) => locator<MyBookingDetailsCubit>()..fetchBookingDetails(args.booking.id ?? ''),
+            create: (_) =>
+                locator<MyBookingDetailsCubit>()
+                  ..fetchBookingDetails(args.booking.id ?? ''),
             child: MyBookingDetailsView(
               booking: args.booking,
               isFromBookingFlow: args.isFromBookingFlow,
@@ -206,8 +222,9 @@ abstract class AppRouter {
         final args = settings.arguments as ComplaintDetailsArgs;
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
-            create: (_) => locator<ComplaintDetailsCubit>()
-              ..fetchComplaintDetails(args.complaintId),
+            create: (_) =>
+                locator<ComplaintDetailsCubit>()
+                  ..fetchComplaintDetails(args.complaintId),
             child: ComplaintDetailsView(
               complaintId: args.complaintId,
               initialComplaint: args.initialComplaint,
@@ -221,7 +238,25 @@ abstract class AppRouter {
   }
 }
 
+/// Args for passing an already-created BookingCubit between views in the flow.
 class BookingFlowArgs {
   final BookingCubit bookingCubit;
   BookingFlowArgs({required this.bookingCubit});
+}
+
+/// Args for starting a new booking flow (creates the cubit in the router).
+class BookingFlowStartArgs {
+  final ServiceModel? service;
+  final MyCarModel? existingCar;
+  final AddressModel? existingAddress;
+  final BookingFlowConfig flowConfig;
+  final BookingSubmitStrategy submitStrategy;
+
+  BookingFlowStartArgs({
+    this.service,
+    this.existingCar,
+    this.existingAddress,
+    this.flowConfig = BookingFlowConfig.normal,
+    BookingSubmitStrategy? submitStrategy,
+  }) : submitStrategy = submitStrategy ?? ServiceBookingSubmit();
 }
