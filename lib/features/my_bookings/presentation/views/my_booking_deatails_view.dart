@@ -13,8 +13,8 @@ import 'package:aqua_go/generated/locale_keys.g.dart';
 
 import 'package:aqua_go/core/route/routes.dart';
 import 'package:aqua_go/core/route/app_router.dart';
-import 'package:aqua_go/features/booking_and_subscriptions/booking/domain/configs/booking_flow_config.dart';
-import 'package:aqua_go/features/booking_and_subscriptions/booking/domain/strategies/reschedule_booking_submit.dart';
+import 'package:aqua_go/features/booking/domain/configs/booking_flow_config.dart';
+import 'package:aqua_go/features/booking/domain/strategies/reschedule_booking_submit.dart';
 import 'package:aqua_go/features/my_cars/data/models/my_car_model.dart';
 import 'package:aqua_go/features/address/data/models/address_model.dart';
 import 'package:aqua_go/features/home/data/models/service_model.dart';

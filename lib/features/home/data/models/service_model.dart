@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import '../../../booking_and_subscriptions/shared/add_on_model.dart';
+import 'add_on_model.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../my_bookings/data/models/booking_response_model/breakdown.dart';
 

@@ -1,6 +1,6 @@
+import 'add_on_model.dart';
 import '../../../../core/config/local_storage/shared_prefs.dart';
 import '../../../../core/constants.dart';
-import 'package_addon_model.dart';
 
 class PackageModel {
   final String id;
@@ -16,8 +16,8 @@ class PackageModel {
   final bool allowScheduleLater;
   final bool active;
   final List<String> bundledServiceIds;
-  final List<PackageAddonModel> includedAddons;
-  final List<PackageAddonModel> optionalAddons;
+  final List<AddOnModel> includedAddons;
+  final List<AddOnModel> optionalAddons;
   final String createdAt;
   final String updatedAt;
   final int version;
@@ -53,19 +53,25 @@ class PackageModel {
 
   // Dynamic getters for full backward compatibility
   String get title {
-    final isArabic = CacheClient.getString(kLanguage, defaultValue: kArabicLang) == kArabicLang;
+    final isArabic =
+        CacheClient.getString(kLanguage, defaultValue: kArabicLang) ==
+        kArabicLang;
     return isArabic ? nameAr : nameEn;
   }
 
   String get description {
-    final isArabic = CacheClient.getString(kLanguage, defaultValue: kArabicLang) == kArabicLang;
+    final isArabic =
+        CacheClient.getString(kLanguage, defaultValue: kArabicLang) ==
+        kArabicLang;
     return isArabic ? descriptionAr : descriptionEn;
   }
 
   String get price => (priceMinor / 100).toStringAsFixed(2);
 
   String get duration {
-    final isArabic = CacheClient.getString(kLanguage, defaultValue: kArabicLang) == kArabicLang;
+    final isArabic =
+        CacheClient.getString(kLanguage, defaultValue: kArabicLang) ==
+        kArabicLang;
     return isArabic ? '$validityDays يوم' : '$validityDays Days';
   }
 
@@ -97,17 +103,14 @@ class PackageModel {
               .toList() ??
           [],
       includedAddons:
-          (json['includedAddons'] as List<dynamic>?)
-              ?.map(
-                (e) => PackageAddonModel.fromJson(e as Map<String, dynamic>),
-              )
+          ((json['includedAddons'] ?? json['addOns']) as List<dynamic>?)
+              ?.map((e) => AddOnModel.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
       optionalAddons:
-          (json['optionalAddons'] as List<dynamic>?)
-              ?.map(
-                (e) => PackageAddonModel.fromJson(e as Map<String, dynamic>),
-              )
+          ((json['optionalAddons'] ?? json['availableOptionalAddons'])
+                  as List<dynamic>?)
+              ?.map((e) => AddOnModel.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
       createdAt: json['createdAt'] as String? ?? '',

@@ -19,8 +19,8 @@ import '../../features/home/presentation/widgets/service_card.dart';
 import '../../features/home/presentation/widgets/offer_card.dart';
 import '../../features/my_cars/presentation/widgets/my_car_card.dart';
 import '../../features/address/presentation/widgets/my_address_card.dart';
-import '../../features/booking_and_subscriptions/booking/presentation/widgets/car_selection_list.dart';
-import '../../features/booking_and_subscriptions/booking/presentation/widgets/location_selection_card.dart';
+import '../../features/booking/presentation/widgets/car_selection_list.dart';
+import '../../features/booking/presentation/widgets/location_selection_card.dart';
 import '../utils/app_assets.dart';
 
 class ShimmerHelper extends StatelessWidget {

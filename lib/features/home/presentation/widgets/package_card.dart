@@ -6,7 +6,7 @@ import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../../generated/locale_keys.g.dart';
-import '../../../booking_and_subscriptions/subscriptions/presentation/widgets/package_subscribtion_bottom_sheet.dart';
+import '../../../subscriptions/presentation/widgets/package_subscribtion_bottom_sheet.dart';
 import '../../data/models/package_model.dart';
 
 import '../../../../core/helpers/fetch_user_data_helper.dart';
