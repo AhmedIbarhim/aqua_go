@@ -153,4 +153,87 @@ class BookingRepository {
       return left(ServerFailure(error.toString()));
     }
   }
+
+  Future<Either<Failure, Map<String, dynamic>>> previewScheduleSubscriptionWash({
+    required String subscriptionId,
+    required String washId,
+    required Map<String, dynamic> scheduleData,
+  }) async {
+    try {
+      final response = await bookingsRemoteDataSource.previewScheduleSubscriptionWash(
+        subscriptionId: subscriptionId,
+        washId: washId,
+        scheduleData: scheduleData,
+      );
+      return response.fold(
+        (failure) => left(failure),
+        (data) => right(data as Map<String, dynamic>),
+      );
+    } catch (error) {
+      return left(ServerFailure(error.toString()));
+    }
+  }
+
+  Future<Either<Failure, BookingResponseModel>> scheduleSubscriptionWash({
+    required String subscriptionId,
+    required String washId,
+    required Map<String, dynamic> scheduleData,
+  }) async {
+    try {
+      final idempotencyKey = 'customer-booking-schedule:$washId';
+      final response = await bookingsRemoteDataSource.scheduleSubscriptionWash(
+        subscriptionId: subscriptionId,
+        washId: washId,
+        scheduleData: scheduleData,
+        idempotencyKey: idempotencyKey,
+      );
+      return response.fold((failure) => left(failure), (data) {
+        if (data != null) {
+          try {
+            final bookingResponse = BookingResponseModel.fromJson(
+              data as Map<String, dynamic>,
+            );
+            return right(bookingResponse);
+          } catch (e) {
+            return left(ServerFailure('Parsing error: $e'));
+          }
+        }
+        return left(ServerFailure('Failed to schedule subscription wash'));
+      });
+    } catch (error) {
+      return left(ServerFailure(error.toString()));
+    }
+  }
+
+  Future<Either<Failure, BookingResponseModel>> rescheduleSubscriptionWash({
+    required String subscriptionId,
+    required String washId,
+    required Map<String, dynamic> rescheduleData,
+    required String newScheduledAtIso,
+  }) async {
+    try {
+      final idempotencyKey = 'customer-reschedule:$washId:$newScheduledAtIso';
+      final response = await bookingsRemoteDataSource.rescheduleSubscriptionWash(
+        subscriptionId: subscriptionId,
+        washId: washId,
+        rescheduleData: rescheduleData,
+        idempotencyKey: idempotencyKey,
+      );
+      return response.fold((failure) => left(failure), (data) {
+        if (data != null) {
+          try {
+            final bookingResponse = BookingResponseModel.fromJson(
+              data as Map<String, dynamic>,
+            );
+            return right(bookingResponse);
+          } catch (e) {
+            return left(ServerFailure('Parsing error: $e'));
+          }
+        }
+        return left(ServerFailure('Failed to reschedule subscription wash'));
+      });
+    } catch (error) {
+      return left(ServerFailure(error.toString()));
+    }
+  }
 }

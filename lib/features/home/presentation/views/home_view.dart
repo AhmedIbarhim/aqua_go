@@ -9,6 +9,11 @@ import '../../controllers/services_controller/services_cubit.dart';
 import '../../controllers/banners_controller/banners_cubit.dart';
 import '../../controllers/packages_controller/packages_cubit.dart';
 import 'package:aqua_go/features/subscriptions/controllers/subscriptions_controller/subscriptions_cubit.dart';
+import 'package:aqua_go/core/route/routes.dart';
+import 'package:aqua_go/core/route/app_router.dart';
+import 'package:aqua_go/features/booking/domain/configs/booking_flow_config.dart';
+import 'package:aqua_go/features/booking/domain/strategies/package_booking_submit.dart';
+
 import '../widgets/home_banners_carosal.dart';
 import '../widgets/packages_list_view.dart';
 import '../widgets/services_page_view.dart';
@@ -134,7 +139,16 @@ class _HomeViewState extends State<HomeView> {
                             CurrentPackageSection(
                               subscribedPackages: subscriptions,
                               onUsePackage: (package) {
-                                // Handle use package
+                                context.pushNamed(
+                                  Routes.bookingLocation,
+                                  arguments: BookingFlowStartArgs(
+                                    flowConfig: const BookingFlowConfig(
+                                      flowType: BookingFlowType.package,
+                                    ),
+                                    submitStrategy: const PackageBookingSubmit(),
+                                    subscriptionId: package.id,
+                                  ),
+                                );
                               },
                             ),
                           ],

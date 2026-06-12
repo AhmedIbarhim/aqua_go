@@ -12,7 +12,6 @@ import '../widgets/booking_summary_card.dart';
 import '../widgets/biker_notes_selection.dart';
 import '../widgets/payment_summary_card.dart';
 import '../widgets/payment_method_selection.dart';
-
 import '../../controllers/booking_cubit.dart';
 import '../../controllers/booking_state.dart';
 import 'package:aqua_go/core/route/routes.dart';
@@ -77,7 +76,7 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
       },
       builder: (context, bookingState) {
         return Scaffold(
-          backgroundColor: context.colors.screenBG,
+          backgroundColor: context.colors.background,
           appBar: GenericAppBar(
             title: LocaleKeys.bookings_booking_summary.tr(),
             hasBackground: true,

@@ -5,6 +5,7 @@ import '../../features/booking/domain/configs/booking_flow_config.dart';
 import '../../features/booking/domain/strategies/booking_submit_strategy.dart';
 import '../../features/booking/domain/strategies/service_booking_submit.dart';
 import '../../../../core/config/di/service_locator.dart';
+import '../../features/subscriptions/data/repos/subscriptions_repository.dart';
 import '../../features/address/presentation/views/my_addresses_view.dart';
 import '../../features/address/presentation/views/new_address_map_view.dart';
 import '../../features/auth/presentation/views/add_email_view.dart';
@@ -128,12 +129,15 @@ abstract class AppRouter {
             create: (_) =>
                 BookingCubit(
                   bookingRepo: locator<BookingRepository>(),
+                  subscriptionsRepo: locator<SubscriptionsRepository>(),
                   flowConfig: args.flowConfig,
                   submitStrategy: args.submitStrategy,
                 )..initBooking(
                   args.service,
                   existingCar: args.existingCar,
                   existingAddress: args.existingAddress,
+                  subscriptionId: args.subscriptionId,
+                  washId: args.washId,
                 ),
             child: const BookingLocationView(),
           ),
@@ -251,6 +255,8 @@ class BookingFlowStartArgs {
   final AddressModel? existingAddress;
   final BookingFlowConfig flowConfig;
   final BookingSubmitStrategy submitStrategy;
+  final String? subscriptionId;
+  final String? washId;
 
   BookingFlowStartArgs({
     this.service,
@@ -258,5 +264,7 @@ class BookingFlowStartArgs {
     this.existingAddress,
     this.flowConfig = BookingFlowConfig.normal,
     BookingSubmitStrategy? submitStrategy,
+    this.subscriptionId,
+    this.washId,
   }) : submitStrategy = submitStrategy ?? ServiceBookingSubmit();
 }

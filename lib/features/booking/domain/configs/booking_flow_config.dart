@@ -25,20 +25,16 @@ class BookingFlowConfig {
 
   // ─── Summary View Sections ───
   bool get showBikerNotes => flowType != BookingFlowType.reschedule;
-  bool get showPaymentMethod => flowType != BookingFlowType.reschedule;
-  bool get showPaymentSummary => flowType != BookingFlowType.reschedule;
+  bool get showPaymentMethod => flowType == BookingFlowType.service;
+  bool get showPaymentSummary => flowType == BookingFlowType.service;
   bool get showBookingSummaryCard => flowType != BookingFlowType.reschedule;
 
   // ─── Pricing in Details bottom sheet ───
   bool get showPricingInDetails => flowType == BookingFlowType.service;
 
   // ─── Validation Rules ───
-  bool get requiresPaymentMethod =>
-      flowType == BookingFlowType.service ||
-      flowType == BookingFlowType.package;
-  bool get requiresQuote =>
-      flowType == BookingFlowType.service ||
-      flowType == BookingFlowType.package;
+  bool get requiresPaymentMethod => flowType == BookingFlowType.service;
+  bool get requiresQuote => flowType == BookingFlowType.service;
 
   // ─── Flow identity helpers ───
   bool get isReschedule => flowType == BookingFlowType.reschedule;

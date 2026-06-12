@@ -69,6 +69,18 @@ abstract class Endpoints {
   static String cancelSubscription(String subscriptionId) =>
       'subscriptions/$subscriptionId/cancel';
 
+  // Subscription Washes
+  static String subscriptionWashes(String subscriptionId) =>
+      'subscriptions/$subscriptionId/washes';
+  static String subscriptionWashDetail(String subscriptionId, String washId) =>
+      'subscriptions/$subscriptionId/washes/$washId';
+  static String previewScheduleSubscriptionWash(String subscriptionId, String washId) =>
+      'subscriptions/$subscriptionId/washes/$washId/schedule/preview';
+  static String scheduleSubscriptionWash(String subscriptionId, String washId) =>
+      'subscriptions/$subscriptionId/washes/$washId/schedule';
+  static String rescheduleSubscriptionWash(String subscriptionId, String washId) =>
+      'subscriptions/$subscriptionId/washes/$washId/reschedule';
+
   //  Availability Endpoints
   static const String availability = 'availability';
   static const String availabilityNow = 'availability/now';

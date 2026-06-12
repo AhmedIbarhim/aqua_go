@@ -9,17 +9,22 @@ import '../data/repos/booking_repository.dart';
 import '../../../core/enums/payment_method_enum.dart';
 import '../domain/strategies/booking_submit_strategy.dart';
 import 'booking_state.dart';
+import 'package:aqua_go/features/subscriptions/data/repos/subscriptions_repository.dart';
+import 'package:aqua_go/features/subscriptions/data/models/subscription_response_model/subscription_wash.dart';
 
 class BookingCubit extends Cubit<BookingState> {
   final BookingRepository _bookingRepo;
+  final SubscriptionsRepository _subscriptionsRepo;
   final BookingFlowConfig _flowConfig;
   final BookingSubmitStrategy _submitStrategy;
 
   BookingCubit({
     required BookingRepository bookingRepo,
+    required SubscriptionsRepository subscriptionsRepo,
     BookingFlowConfig flowConfig = BookingFlowConfig.normal,
     required BookingSubmitStrategy submitStrategy,
   }) : _bookingRepo = bookingRepo,
+       _subscriptionsRepo = subscriptionsRepo,
        _flowConfig = flowConfig,
        _submitStrategy = submitStrategy,
        super(BookingState(flowConfig: flowConfig));
@@ -28,6 +33,8 @@ class BookingCubit extends Cubit<BookingState> {
     ServiceModel? service, {
     MyCarModel? existingCar,
     AddressModel? existingAddress,
+    String? subscriptionId,
+    String? washId,
   }) {
     emit(
       BookingState(
@@ -36,7 +43,81 @@ class BookingCubit extends Cubit<BookingState> {
         selectedCar: existingCar,
         selectedAddress: existingAddress,
         flowConfig: _flowConfig,
+        subscriptionId: subscriptionId,
+        washId: washId,
       ),
+    );
+
+    if (subscriptionId != null) {
+      fetchSubscriptionDetails(subscriptionId);
+    }
+  }
+
+  Future<void> fetchSubscriptionDetails(String subscriptionId) async {
+    emit(state.copyWith(status: BookingStatus.loading));
+    final result = await _subscriptionsRepo.fetchSubscriptionDetail(
+      subscriptionId: subscriptionId,
+    );
+
+    result.fold(
+      (failure) {
+        emit(
+          state.copyWith(
+            status: BookingStatus.failure,
+            errorMessage: failure.message,
+          ),
+        );
+      },
+      (detailedPackage) {
+        SubscriptionWash? wash;
+        if (state.washId != null) {
+          for (final w in detailedPackage.washes) {
+            if (w.washId == state.washId) {
+              wash = w;
+              break;
+            }
+          }
+        }
+        if (wash == null) {
+          for (final w in detailedPackage.washes) {
+            if (w.canSchedule) {
+              wash = w;
+              break;
+            }
+          }
+        }
+
+        if (wash == null) {
+          emit(
+            state.copyWith(
+              status: BookingStatus.failure,
+              errorMessage: 'No washes available in this subscription',
+            ),
+          );
+          return;
+        }
+
+        final service = ServiceModel(
+          id: detailedPackage.packageId,
+          code: '',
+          rawName: ServiceName(
+            nameAr: detailedPackage.packageInfo.nameAr,
+            nameEn: detailedPackage.packageInfo.nameEn,
+          ),
+          rawDescription: const ServiceDescription(descAr: '', descEn: ''),
+          active: true,
+          addons: wash.availableOptionalAddons,
+        );
+
+        emit(
+          state.copyWith(
+            status: BookingStatus.initial,
+            selectedService: service,
+            washId: wash.washId,
+            subscriptionId: subscriptionId,
+          ),
+        );
+      },
     );
   }
 
@@ -225,61 +306,6 @@ class BookingCubit extends Cubit<BookingState> {
   }
 
   Future<void> submitBooking({String? promoCode}) async {
-    // // Validate based on flow config
-    // if (state.selectedAddress == null ||
-    //     state.selectedCar == null ||
-    //     state.selectedDate == null ||
-    //     state.selectedTime == null) {
-    //   emit(
-    //     state.copyWith(
-    //       status: BookingStatus.failure,
-    //       errorMessage: 'يرجى إكمال جميع بيانات الحجز المطلوبة',
-    //     ),
-    //   );
-    //   return;
-    // }
-
-    // // Only validate service for flows that require it
-    // if (!_flowConfig.isReschedule && state.selectedService == null) {
-    //   emit(
-    //     state.copyWith(
-    //       status: BookingStatus.failure,
-    //       errorMessage: 'يرجى إكمال جميع بيانات الحجز المطلوبة',
-    //     ),
-    //   );
-    //   return;
-    // }
-
-    // emit(state.copyWith(status: BookingStatus.loading));
-
-    // // Only fetch quote for flows that require it
-    // if (_flowConfig.requiresQuote && state.quote == null) {
-    //   final quoteResult = await _bookingRepo.getQuote(
-    //     packageId: state.selectedService!.id,
-    //     lat: state.selectedAddress!.lat,
-    //     lng: state.selectedAddress!.lng,
-    //     promoCode: promoCode,
-    //   );
-
-    //   final hasError = quoteResult.fold(
-    //     (failure) {
-    //       emit(
-    //         state.copyWith(
-    //           status: BookingStatus.failure,
-    //           errorMessage: failure.message,
-    //         ),
-    //       );
-    //       return true;
-    //     },
-    //     (fetchedQuote) {
-    //       emit(state.copyWith(quote: fetchedQuote));
-    //       return false;
-    //     },
-    //   );
-
-    //   if (hasError) return;
-    // }
-
     // Delegate to the strategy
     final result = await _submitStrategy.submit(
       repo: _bookingRepo,

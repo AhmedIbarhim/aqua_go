@@ -18,6 +18,7 @@ import '../widgets/gps_location_card.dart';
 import '../widgets/saved_locations_list.dart';
 import '../../../address/data/models/address_model.dart';
 import '../../controllers/booking_cubit.dart';
+import '../../controllers/booking_state.dart';
 import '../../../../core/route/app_router.dart';
 
 class BookingLocationView extends StatefulWidget {
@@ -131,6 +132,20 @@ class _BookingLocationViewState extends State<BookingLocationView> {
                       });
                     }
                   }
+                }
+              },
+            ),
+            BlocListener<BookingCubit, BookingState>(
+              listenWhen: (prev, curr) => prev.status != curr.status,
+              listener: (context, state) {
+                if (state.status == BookingStatus.loading) {
+                  context.showLoadingOverlay();
+                } else {
+                  context.hideLoadingOverlay();
+                }
+                if (state.status == BookingStatus.failure &&
+                    state.errorMessage != null) {
+                  context.showErrorSnackBar(state.errorMessage!);
                 }
               },
             ),

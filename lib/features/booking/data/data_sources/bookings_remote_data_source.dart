@@ -66,4 +66,41 @@ class BookingsRemoteDataSource {
       options: Options(headers: {'Idempotency-Key': idempotencyKey}),
     );
   }
+
+  Future<Either<Failure, dynamic>> previewScheduleSubscriptionWash({
+    required String subscriptionId,
+    required String washId,
+    required Map<String, dynamic> scheduleData,
+  }) {
+    return _apiClient.post(
+      Endpoints.previewScheduleSubscriptionWash(subscriptionId, washId),
+      data: scheduleData,
+    );
+  }
+
+  Future<Either<Failure, dynamic>> scheduleSubscriptionWash({
+    required String subscriptionId,
+    required String washId,
+    required Map<String, dynamic> scheduleData,
+    required String idempotencyKey,
+  }) {
+    return _apiClient.post(
+      Endpoints.scheduleSubscriptionWash(subscriptionId, washId),
+      data: scheduleData,
+      options: Options(headers: {'Idempotency-Key': idempotencyKey}),
+    );
+  }
+
+  Future<Either<Failure, dynamic>> rescheduleSubscriptionWash({
+    required String subscriptionId,
+    required String washId,
+    required Map<String, dynamic> rescheduleData,
+    required String idempotencyKey,
+  }) {
+    return _apiClient.post(
+      Endpoints.rescheduleSubscriptionWash(subscriptionId, washId),
+      data: rescheduleData,
+      options: Options(headers: {'Idempotency-Key': idempotencyKey}),
+    );
+  }
 }

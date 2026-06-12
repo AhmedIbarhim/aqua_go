@@ -35,6 +35,7 @@ class BookingResponseModel {
   num? addressLng;
   String? zoneId;
   String? packageId;
+  String? subscriptionId;
   BookingType? type;
   BookingStatus? status;
   String? scheduledAt;
@@ -84,6 +85,7 @@ class BookingResponseModel {
     this.addressLng,
     this.zoneId,
     this.packageId,
+    this.subscriptionId,
     this.type,
     this.status,
     this.scheduledAt,
@@ -125,10 +127,11 @@ class BookingResponseModel {
   });
 
   BookingResponseModel.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
+    id = json['id'] ?? json['washId'];
     referenceNumber = json['referenceNumber'] ?? json['reference_number'];
     customerId = json['customerId'];
     workerId = json['workerId'];
+    subscriptionId = json['subscriptionId'];
     addressLabel = json['addressLabel'];
 
     // safe coordinate parsing
@@ -230,7 +233,11 @@ class BookingResponseModel {
 
     packageName = json['packageName'] != null
         ? PackageName.fromJson(json['packageName'])
-        : null;
+        : (json['packageInfo'] != null
+            ? PackageName.fromJson(json['packageInfo'])
+            : (json['package'] != null
+                ? PackageName.fromJson(json['package'])
+                : null));
 
     customerName = json['customerName'];
     customerPhoneMasked =

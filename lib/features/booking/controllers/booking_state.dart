@@ -27,6 +27,8 @@ class BookingState extends Equatable {
   final List<AvailabilitySlot> availabilitySlots;
   final bool isAvailabilityLoading;
   final BookingResponseModel? createdBooking;
+  final String? subscriptionId;
+  final String? washId;
 
   const BookingState({
     this.status = BookingStatus.initial,
@@ -47,6 +49,8 @@ class BookingState extends Equatable {
     this.availabilitySlots = const [],
     this.isAvailabilityLoading = false,
     this.createdBooking,
+    this.subscriptionId,
+    this.washId,
   });
 
   BookingState copyWith({
@@ -66,6 +70,8 @@ class BookingState extends Equatable {
     List<AvailabilitySlot>? availabilitySlots,
     bool? isAvailabilityLoading,
     BookingResponseModel? createdBooking,
+    String? subscriptionId,
+    String? washId,
     bool clearError = false,
   }) {
     return BookingState(
@@ -87,6 +93,8 @@ class BookingState extends Equatable {
       isAvailabilityLoading:
           isAvailabilityLoading ?? this.isAvailabilityLoading,
       createdBooking: createdBooking ?? this.createdBooking,
+      subscriptionId: subscriptionId ?? this.subscriptionId,
+      washId: washId ?? this.washId,
     );
   }
 
@@ -108,5 +116,7 @@ class BookingState extends Equatable {
     availabilitySlots,
     isAvailabilityLoading,
     createdBooking,
+    subscriptionId,
+    washId,
   ];
 }
