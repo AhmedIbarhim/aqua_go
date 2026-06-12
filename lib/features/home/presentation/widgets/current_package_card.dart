@@ -148,7 +148,7 @@ class CurrentPackageCard extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            '${package.remainingWashes}/${package.totalWashes}',
+                            '${package.remainingWashes}/${package.washesTotal}',
                             style: AppTextStyles.bold18.copyWith(
                               color: context.colors.textPrimary,
                             ),

@@ -225,7 +225,10 @@ class CodegenLoader extends AssetLoader{
     },
     "before_washing": "قبل الغسيل",
     "after_washing": "بعد الغسيل",
-    "photo_gallery": "معرض الصور"
+    "photo_gallery": "معرض الصور",
+    "reschedule_booking": "تعديل الحجز",
+    "confirm_reschedule": "تأكيد تعديل الحجز",
+    "reschedule_success": "تم تعديل الحجز بنجاح"
   },
   "address": {
     "map": "الخريطة",
@@ -359,7 +362,8 @@ class CodegenLoader extends AssetLoader{
     "error": "حدث خطأ",
     "no_internet": "لا يوجد اتصال بالإنترنت",
     "default_error": "عذرا، حدث خطأ ما. يرجى المحاولة مرة أخرى لاحقًا",
-    "booking_created": "تم إنشاء الحجز بنجاح"
+    "booking_created": "تم إنشاء الحجز بنجاح",
+    "booking_rescheduled": "تم تعديل الحجز بنجاح"
   }
 };
 static const Map<String,dynamic> _en = {
@@ -573,7 +577,10 @@ static const Map<String,dynamic> _en = {
     },
     "before_washing": "Before Washing",
     "after_washing": "After Washing",
-    "photo_gallery": "Photo Gallery"
+    "photo_gallery": "Photo Gallery",
+    "reschedule_booking": "Edit Booking",
+    "confirm_reschedule": "Confirm Booking Changes",
+    "reschedule_success": "Booking has been updated successfully"
   },
   "address": {
     "map": "Map",
@@ -707,7 +714,8 @@ static const Map<String,dynamic> _en = {
     "error": "Error occurred",
     "no_internet": "No internet connection",
     "default_error": "Oops, something went wrong. Please try again later",
-    "booking_created": "Booking created successfully"
+    "booking_created": "Booking created successfully",
+    "booking_rescheduled": "Booking updated successfully"
   }
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"ar": _ar, "en": _en};

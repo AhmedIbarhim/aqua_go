@@ -72,8 +72,8 @@ class ServiceCard extends StatelessWidget {
                             children: [
                               Text(
                                 context.isEn
-                                    ? serviceModel.rawName.nameEn
-                                    : serviceModel.rawName.nameAr,
+                                    ? serviceModel.rawName?.nameEn ?? ''
+                                    : serviceModel.rawName?.nameAr ?? '',
                                 style: AppTextStyles.bold16,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -81,8 +81,8 @@ class ServiceCard extends StatelessWidget {
                               const SizedBox(height: 4),
                               Text(
                                 context.isEn
-                                    ? serviceModel.rawDescription.descEn
-                                    : serviceModel.rawDescription.descAr,
+                                    ? serviceModel.rawDescription?.descEn ?? ''
+                                    : serviceModel.rawDescription?.descAr ?? '',
                                 style: AppTextStyles.regular12.copyWith(
                                   color: context.colors.textSecondary,
                                 ),

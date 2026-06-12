@@ -1,5 +1,5 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 import '../../address/data/models/address_model.dart';
 import '../../my_cars/data/models/my_car_model.dart';
 import '../../home/data/models/service_model.dart';
@@ -170,7 +170,7 @@ class BookingCubit extends Cubit<BookingState> {
     final result = await _bookingRepo.getAvailability(
       zoneId: zoneId,
       date: dateStr,
-      packageId: service.id,
+      packageId: service.id!,
     );
 
     result.fold(
@@ -201,7 +201,7 @@ class BookingCubit extends Cubit<BookingState> {
     emit(state.copyWith(status: BookingStatus.loading));
 
     final result = await _bookingRepo.getQuote(
-      packageId: state.selectedService!.id,
+      packageId: state.selectedService!.id!,
       lat: state.selectedAddress!.lat,
       lng: state.selectedAddress!.lng,
       promoCode: promoCode,

@@ -118,6 +118,7 @@ class ShimmerHelper extends StatelessWidget {
     final dummyService = ServiceModel(
       id: 'shimmer_service',
       code: 'SHIMMER',
+      refNumber: 'SHIMMER',
       rawName: const ServiceName(
         nameAr: 'غسيل واش سوبر تجريبي شيمر',
         nameEn: 'Shimmer Dummy Service Super Wash',

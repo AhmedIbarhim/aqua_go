@@ -4,11 +4,12 @@ import '../../../../core/utils/app_assets.dart';
 import '../../../my_bookings/data/models/booking_response_model/breakdown.dart';
 
 class ServiceModel extends Equatable {
-  final String id;
-  final String code;
-  final ServiceName rawName;
-  final ServiceDescription rawDescription;
-  final bool active;
+  final String? id;
+  final String? code;
+  final String? refNumber;
+  final ServiceName? rawName;
+  final ServiceDescription? rawDescription;
+  final bool? active;
   final List<AddOnModel> addons;
   final int? priceMinor;
   final int? vatMinor;
@@ -21,12 +22,13 @@ class ServiceModel extends Equatable {
   final String? imageOverride;
 
   const ServiceModel({
-    required this.id,
-    required this.code,
-    required this.rawName,
-    required this.rawDescription,
-    required this.active,
-    required this.addons,
+    this.id,
+    this.code,
+    this.refNumber,
+    this.rawName,
+    this.rawDescription,
+    this.active,
+    this.addons = const [],
     this.priceMinor,
     this.vatMinor,
     this.currency,
@@ -56,6 +58,7 @@ class ServiceModel extends Equatable {
     return ServiceModel(
       id: json['id'] as String? ?? '',
       code: json['code'] as String? ?? '',
+      refNumber: json['referenceNumber'] as String? ?? '',
       rawName: ServiceName.fromJson(json['name']),
       rawDescription: ServiceDescription.fromJson(json['description']),
       active: json['active'] as bool? ?? true,
@@ -73,25 +76,11 @@ class ServiceModel extends Equatable {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'code': code,
-      'name': rawName.toJson(),
-      'description': rawDescription.toJson(),
-      'active': active,
-      'addons': addons.map((e) => e.toJson()).toList(),
-      'priceMinor': priceMinor,
-      'vatMinor': vatMinor,
-      'currency': currency,
-      if (breakdown != null) 'breakdown': breakdown!.toJson(),
-    };
-  }
-
   @override
   List<Object?> get props => [
     id,
     code,
+    refNumber,
     rawName,
     rawDescription,
     active,
@@ -107,7 +96,7 @@ class ServiceName extends Equatable {
   final String nameAr;
   final String nameEn;
 
-  const ServiceName({required this.nameAr, required this.nameEn});
+  const ServiceName({this.nameAr = '', this.nameEn = ''});
 
   factory ServiceName.fromJson(dynamic json) {
     if (json is Map<String, dynamic>) {
@@ -131,7 +120,7 @@ class ServiceDescription extends Equatable {
   final String descAr;
   final String descEn;
 
-  const ServiceDescription({required this.descAr, required this.descEn});
+  const ServiceDescription({this.descAr = '', this.descEn = ''});
 
   factory ServiceDescription.fromJson(dynamic json) {
     if (json is Map<String, dynamic>) {

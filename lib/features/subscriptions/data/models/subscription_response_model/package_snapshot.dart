@@ -1,6 +1,6 @@
 import 'package:aqua_go/features/home/data/models/add_on_model.dart';
 
-class PackageSnapshot {
+class PackageInfo {
   final String nameAr;
   final String nameEn;
   final int numWashes;
@@ -13,7 +13,7 @@ class PackageSnapshot {
   final int carsPerWash;
   final List<AddOnModel> addons;
 
-  PackageSnapshot({
+  PackageInfo({
     required this.nameAr,
     required this.nameEn,
     required this.numWashes,
@@ -27,7 +27,7 @@ class PackageSnapshot {
     this.addons = const [],
   });
 
-  factory PackageSnapshot.fromJson(Map<String, dynamic> json) {
+  factory PackageInfo.fromJson(Map<String, dynamic> json) {
     final List<AddOnModel> parsedAddons =
         (json['addons'] as List<dynamic>?)
             ?.map((e) => AddOnModel.fromJson(e as Map<String, dynamic>))
@@ -60,7 +60,7 @@ class PackageSnapshot {
       parsedOptional = parsedAddons.where((e) => e.kind == 'OPTIONAL').toList();
     }
 
-    return PackageSnapshot(
+    return PackageInfo(
       nameAr: json['nameAr'] as String? ?? '',
       nameEn: json['nameEn'] as String? ?? '',
       numWashes: (json['numWashes'] as num?)?.toInt() ?? 0,
@@ -95,3 +95,5 @@ class PackageSnapshot {
     };
   }
 }
+
+typedef PackageSnapshot = PackageInfo;

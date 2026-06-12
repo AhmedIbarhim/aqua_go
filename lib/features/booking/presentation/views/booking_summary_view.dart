@@ -153,8 +153,8 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
             const SizedBox(height: 16),
             BookingSummaryCard(
               serviceName: context.isAr
-                  ? (bookingState.selectedService?.rawName.nameAr ?? '')
-                  : (bookingState.selectedService?.rawName.nameEn ?? ''),
+                  ? (bookingState.selectedService?.rawName?.nameAr ?? '')
+                  : (bookingState.selectedService?.rawName?.nameEn ?? ''),
               carName:
                   '${bookingState.selectedCar!.carMake!.vehicleMakeName.localizedName} ${bookingState.selectedCar!.carModel!.vehicleModelName.localizedName}',
               location: bookingState.selectedAddress?.details ?? '',
@@ -193,8 +193,8 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
             const SizedBox(height: 16),
             PaymentSummaryCard(
               serviceName: context.isAr
-                  ? (bookingState.selectedService?.rawName.nameAr ?? '')
-                  : (bookingState.selectedService?.rawName.nameEn ?? ''),
+                  ? (bookingState.selectedService?.rawName?.nameAr ?? '')
+                  : (bookingState.selectedService?.rawName?.nameEn ?? ''),
               servicePrice: basePrice,
               additionalItems: selectedAddons,
               subtotal: subtotal,

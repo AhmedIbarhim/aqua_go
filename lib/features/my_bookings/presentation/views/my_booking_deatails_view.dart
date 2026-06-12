@@ -219,25 +219,20 @@ class MyBookingDetailsView extends StatelessWidget {
           );
 
           final existingCar = MyCarModel(
-            id: '',
-            makeId: '',
-            modelId: '',
             color: booking.vehicleColor ?? '',
-            modelYear: booking.vehicleYear ?? 2024,
+            modelYear: booking.vehicleYear!,
             logoUrl: booking.vehicleMakeLogoUrl ?? '',
             plateNumber: booking.plate ?? '',
           );
 
           final service = ServiceModel(
             id: booking.packageId ?? '',
-            code: '',
+            code: booking.referenceNumber ?? '',
+            refNumber: booking.referenceNumber ?? '',
             rawName: ServiceName(
               nameAr: booking.packageName?.ar ?? '',
               nameEn: booking.packageName?.en ?? '',
             ),
-            rawDescription: const ServiceDescription(descAr: '', descEn: ''),
-            active: true,
-            addons: const [],
           );
 
           context.pushNamed(

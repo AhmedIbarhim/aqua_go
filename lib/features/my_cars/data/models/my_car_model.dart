@@ -18,13 +18,13 @@ class MyCarModel {
   final VehicleModelModel? carModel;
 
   MyCarModel({
-    required this.id,
-    required this.makeId,
-    required this.modelId,
-    required this.color,
-    required this.modelYear,
-    required this.logoUrl,
-    required this.plateNumber,
+    this.id = '',
+    this.makeId = '',
+    this.modelId = '',
+    this.color = '',
+    this.modelYear = 2024,
+    this.logoUrl = '',
+    this.plateNumber = '',
     this.createdAt,
     this.carMake,
     this.carModel,

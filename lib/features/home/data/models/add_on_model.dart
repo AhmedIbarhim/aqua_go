@@ -10,8 +10,8 @@ class AddOnModel {
   // Package-specific properties (null for standard Service bookings)
   int? freeQty;
   int? maxQtyPerWash;
-  int? qty; // represents quantity selected/purchased/applied
-  String? kind; // e.g. INCLUDED or OPTIONAL
+  int? qty;
+  String? kind;
 
   AddOnModel({
     this.id,
@@ -32,7 +32,8 @@ class AddOnModel {
     code = json['code'];
     nameAr = json['nameAr'];
     nameEn = json['nameEn'];
-    priceMinor = json['priceMinor'] ?? json['unitPriceMinor'] ?? json['priceMinor'];
+    priceMinor =
+        json['priceMinor'] ?? json['unitPriceMinor'] ?? json['priceMinor'];
     currency = json['currency'];
     imageUrl = json['imageUrl'];
     freeQty = json['freeQty'];

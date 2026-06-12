@@ -1,4 +1,7 @@
 import 'package:aqua_go/features/home/data/models/add_on_model.dart';
+import 'package:aqua_go/features/my_bookings/data/models/booking_response_model/booking_vehicle.dart';
+import 'package:aqua_go/features/my_bookings/data/models/booking_response_model/assigned_worker.dart';
+import 'package:aqua_go/features/my_bookings/data/models/booking_response_model/booking_addon.dart';
 
 class SubscriptionWash {
   final String washId;
@@ -11,14 +14,14 @@ class SubscriptionWash {
   final String? addressLabel;
   final num? addressLat;
   final num? addressLng;
-  final List<dynamic> vehicles;
-  final dynamic worker;
+  final List<BookingVehicle> vehicles;
+  final AssignedWorker? worker;
   final String? completedAt;
   final String? cancelledAt;
   final bool canSchedule;
   final bool canReschedule;
   final bool canCancel;
-  final List<dynamic> addOns;
+  final List<BookingAddon> addOns;
   final List<AddOnModel> availableOptionalAddons;
 
   SubscriptionWash({
@@ -55,14 +58,22 @@ class SubscriptionWash {
       addressLabel: json['addressLabel'] as String?,
       addressLat: json['addressLat'] as num?,
       addressLng: json['addressLng'] as num?,
-      vehicles: json['vehicles'] as List<dynamic>? ?? [],
-      worker: json['worker'],
+      vehicles: (json['vehicles'] as List<dynamic>?)
+              ?.map((e) => BookingVehicle.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      worker: json['worker'] != null
+          ? AssignedWorker.fromJson(json['worker'] as Map<String, dynamic>)
+          : null,
       completedAt: json['completedAt'] as String?,
       cancelledAt: json['cancelledAt'] as String?,
       canSchedule: json['canSchedule'] as bool? ?? false,
       canReschedule: json['canReschedule'] as bool? ?? false,
       canCancel: json['canCancel'] as bool? ?? false,
-      addOns: json['addOns'] as List<dynamic>? ?? [],
+      addOns: (json['addOns'] as List<dynamic>?)
+              ?.map((e) => BookingAddon.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
       availableOptionalAddons:
           (json['availableOptionalAddons'] as List<dynamic>?)
               ?.map((e) => AddOnModel.fromJson(e as Map<String, dynamic>))
@@ -83,14 +94,14 @@ class SubscriptionWash {
       if (addressLabel != null) 'addressLabel': addressLabel,
       if (addressLat != null) 'addressLat': addressLat,
       if (addressLng != null) 'addressLng': addressLng,
-      'vehicles': vehicles,
-      if (worker != null) 'worker': worker,
+      'vehicles': vehicles.map((e) => e.toJson()).toList(),
+      if (worker != null) 'worker': worker!.toJson(),
       if (completedAt != null) 'completedAt': completedAt,
       if (cancelledAt != null) 'cancelledAt': cancelledAt,
       'canSchedule': canSchedule,
       'canReschedule': canReschedule,
       'canCancel': canCancel,
-      'addOns': addOns,
+      'addOns': addOns.map((e) => e.toJson()).toList(),
       'availableOptionalAddons': availableOptionalAddons
           .map((e) => e.toJson())
           .toList(),

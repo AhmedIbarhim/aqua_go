@@ -25,6 +25,7 @@ class PackageModel {
   final bool isPopular;
   final int carsPerWash;
   final String effectiveFromAt;
+  final List<AddOnModel> addons;
 
   PackageModel({
     required this.id,
@@ -49,6 +50,7 @@ class PackageModel {
     required this.isPopular,
     required this.carsPerWash,
     required this.effectiveFromAt,
+    this.addons = const [],
   });
 
   // Dynamic getters for full backward compatibility
@@ -83,6 +85,38 @@ class PackageModel {
   // (num.parse(price) * .14).toStringAsFixed(2);
 
   factory PackageModel.fromJson(Map<String, dynamic> json) {
+    final List<AddOnModel> parsedAddons =
+        (json['addons'] as List<dynamic>?)
+            ?.map((e) => AddOnModel.fromJson(e as Map<String, dynamic>))
+            .toList() ??
+        [];
+
+    List<AddOnModel> parsedIncluded = [];
+    List<AddOnModel> parsedOptional = [];
+    if (json['includedAddons'] != null) {
+      parsedIncluded = (json['includedAddons'] as List<dynamic>)
+          .map((e) => AddOnModel.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } else if (json['addOns'] != null) {
+      parsedIncluded = (json['addOns'] as List<dynamic>)
+          .map((e) => AddOnModel.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } else {
+      parsedIncluded = parsedAddons.where((e) => e.kind == 'INCLUDED').toList();
+    }
+
+    if (json['optionalAddons'] != null) {
+      parsedOptional = (json['optionalAddons'] as List<dynamic>)
+          .map((e) => AddOnModel.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } else if (json['availableOptionalAddons'] != null) {
+      parsedOptional = (json['availableOptionalAddons'] as List<dynamic>)
+          .map((e) => AddOnModel.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } else {
+      parsedOptional = parsedAddons.where((e) => e.kind == 'OPTIONAL').toList();
+    }
+
     return PackageModel(
       id: json['id'] as String? ?? '',
       nameAr: json['nameAr'] as String? ?? '',
@@ -102,17 +136,8 @@ class PackageModel {
               ?.map((e) => e.toString())
               .toList() ??
           [],
-      includedAddons:
-          ((json['includedAddons'] ?? json['addOns']) as List<dynamic>?)
-              ?.map((e) => AddOnModel.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          [],
-      optionalAddons:
-          ((json['optionalAddons'] ?? json['availableOptionalAddons'])
-                  as List<dynamic>?)
-              ?.map((e) => AddOnModel.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          [],
+      includedAddons: parsedIncluded,
+      optionalAddons: parsedOptional,
       createdAt: json['createdAt'] as String? ?? '',
       updatedAt: json['updatedAt'] as String? ?? '',
       version: (json['version'] as num?)?.toInt() ?? 0,
@@ -120,6 +145,7 @@ class PackageModel {
       isPopular: json['isPopular'] as bool? ?? false,
       carsPerWash: (json['carsPerWash'] as num?)?.toInt() ?? 0,
       effectiveFromAt: json['effectiveFromAt'] as String? ?? '',
+      addons: parsedAddons,
     );
   }
 
@@ -147,6 +173,7 @@ class PackageModel {
       'isPopular': isPopular,
       'carsPerWash': carsPerWash,
       'effectiveFromAt': effectiveFromAt,
+      'addons': addons.map((e) => e.toJson()).toList(),
     };
   }
 }

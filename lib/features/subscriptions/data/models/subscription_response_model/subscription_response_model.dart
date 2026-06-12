@@ -10,8 +10,8 @@ class SubscriptionResponseModel {
   final String customerId;
   final String packageId;
   final String status;
-  final int totalWashes;
-  final int consumedWashes;
+  final int washesTotal;
+  final int washesConsumed;
   final int? washesRemaining;
   final int packagePriceMinor;
   final String currency;
@@ -22,7 +22,7 @@ class SubscriptionResponseModel {
   final String? cancelReason;
   final int? refundedMinor;
   final String? refundStatus;
-  final PackageSnapshot packageSnapshot;
+  final PackageInfo packageInfo;
   final String? referenceNumber;
   final SubscriptionBreakdown? breakdown;
   final List<SubscriptionIncludedAllowance> includedAllowances;
@@ -33,8 +33,8 @@ class SubscriptionResponseModel {
     required this.customerId,
     required this.packageId,
     required this.status,
-    required this.totalWashes,
-    required this.consumedWashes,
+    required this.washesTotal,
+    required this.washesConsumed,
     this.washesRemaining,
     required this.packagePriceMinor,
     required this.currency,
@@ -45,7 +45,7 @@ class SubscriptionResponseModel {
     this.cancelReason,
     this.refundedMinor,
     this.refundStatus,
-    required this.packageSnapshot,
+    required this.packageInfo,
     this.referenceNumber,
     this.breakdown,
     this.includedAllowances = const [],
@@ -57,7 +57,7 @@ class SubscriptionResponseModel {
     final isArabic =
         CacheClient.getString(kLanguage, defaultValue: kArabicLang) ==
         kArabicLang;
-    return isArabic ? packageSnapshot.nameAr : packageSnapshot.nameEn;
+    return isArabic ? packageInfo.nameAr : packageInfo.nameEn;
   }
 
   String get description {
@@ -71,10 +71,15 @@ class SubscriptionResponseModel {
 
   String get image => 'assets/images/gift_demo.png';
 
-  int get remainingWashes => washesRemaining ?? (totalWashes - consumedWashes);
+  int get remainingWashes => washesRemaining ?? (washesTotal - washesConsumed);
 
   DateTime get expiryDate =>
       DateTime.tryParse(validityEndsAt) ?? DateTime.now();
+
+  // Backward compatibility getters
+  int get totalWashes => washesTotal;
+  int get consumedWashes => washesConsumed;
+  PackageInfo get packageSnapshot => packageInfo;
 
   factory SubscriptionResponseModel.fromJson(Map<String, dynamic> json) {
     return SubscriptionResponseModel(
@@ -82,9 +87,9 @@ class SubscriptionResponseModel {
       customerId: json['customerId'] as String? ?? '',
       packageId: json['packageId'] as String? ?? '',
       status: json['status'] as String? ?? '',
-      totalWashes:
+      washesTotal:
           (json['washesTotal'] ?? json['totalWashes'] as num?)?.toInt() ?? 0,
-      consumedWashes:
+      washesConsumed:
           (json['washesConsumed'] ?? json['consumedWashes'] as num?)?.toInt() ??
           0,
       washesRemaining: (json['washesRemaining'] as num?)?.toInt(),
@@ -97,7 +102,7 @@ class SubscriptionResponseModel {
       cancelReason: json['cancelReason'] as String?,
       refundedMinor: (json['refundedMinor'] as num?)?.toInt(),
       refundStatus: json['refundStatus'] as String?,
-      packageSnapshot: PackageSnapshot.fromJson(
+      packageInfo: PackageInfo.fromJson(
         (json['packageInfo'] ?? json['packageSnapshot'] ?? {})
             as Map<String, dynamic>,
       ),
@@ -130,8 +135,8 @@ class SubscriptionResponseModel {
       'customerId': customerId,
       'packageId': packageId,
       'status': status,
-      'washesTotal': totalWashes,
-      'washesConsumed': consumedWashes,
+      'washesTotal': washesTotal,
+      'washesConsumed': washesConsumed,
       if (washesRemaining != null) 'washesRemaining': washesRemaining,
       'packagePriceMinor': packagePriceMinor,
       'currency': currency,
@@ -142,7 +147,7 @@ class SubscriptionResponseModel {
       'cancelReason': cancelReason,
       'refundedMinor': refundedMinor,
       'refundStatus': refundStatus,
-      'packageInfo': packageSnapshot.toJson(),
+      'packageInfo': packageInfo.toJson(),
       if (referenceNumber != null) 'referenceNumber': referenceNumber,
       if (breakdown != null) 'breakdown': breakdown!.toJson(),
       'includedAllowances': includedAllowances.map((e) => e.toJson()).toList(),
