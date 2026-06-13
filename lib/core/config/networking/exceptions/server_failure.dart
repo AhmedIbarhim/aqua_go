@@ -43,8 +43,8 @@ class ServerFailure extends Failure {
         );
 
       case DioExceptionType.connectionError:
-        return const ServerFailure(
-          'No internet connection',
+        return ServerFailure(
+          LocaleKeys.snackbar_no_internet.tr(),
           type: FailureType.network,
         );
 
@@ -56,8 +56,8 @@ class ServerFailure extends Failure {
 
       case DioExceptionType.unknown:
         if (dioException.error is SocketException) {
-          return const ServerFailure(
-            'No internet connection',
+          return ServerFailure(
+            LocaleKeys.snackbar_no_internet.tr(),
             type: FailureType.network,
           );
         }

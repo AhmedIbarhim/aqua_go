@@ -1,5 +1,6 @@
 import 'package:aqua_go/core/components/custom_button.dart';
 import 'package:aqua_go/core/components/generic_app_bar.dart';
+import 'package:aqua_go/core/components/error_retry_widget.dart';
 import 'package:aqua_go/features/address/data/models/address_model.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -80,26 +81,9 @@ class _MyAddressesViewState extends State<MyAddressesView> {
             }
 
             if (state is AddressesError) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      state.message,
-                      style: TextStyle(
-                        color: context.colors.error,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 12),
-                    ElevatedButton(
-                      onPressed: () => _addressesCubit.getAddresses(),
-                      child: const Text('Retry'),
-                    ),
-                  ],
-                ),
+              return ErrorRetryWidget(
+                errorMessage: state.message,
+                onRetry: () => _addressesCubit.getAddresses(),
               );
             }
 

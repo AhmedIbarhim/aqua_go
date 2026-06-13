@@ -25,18 +25,7 @@ class PackagesListView extends StatelessWidget {
         final isLoading = state is PackagesLoading || state is PackagesInitial;
 
         if (state is PackagesError) {
-          return Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Text(
-                state.message,
-                style: AppTextStyles.regular12.copyWith(
-                  color: context.colors.error,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          );
+          return const SizedBox.shrink();
         }
 
         final List<PackageModel> displayPackages;

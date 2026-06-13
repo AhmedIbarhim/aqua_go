@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/components/error_retry_widget.dart';
 import '../../../../core/components/custom_loading_indicator.dart';
 import '../../../../core/config/di/service_locator.dart';
 import '../../../../core/extentions/context_extentions.dart';
@@ -102,26 +103,9 @@ class _MyCarsViewState extends State<MyCarsView> {
               );
             }
             if (state is MyCarsError) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      state.message,
-                      style: TextStyle(
-                        color: context.colors.error,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 12),
-                    ElevatedButton(
-                      onPressed: () => _myCarsCubit.getCars(),
-                      child: const Text('Retry'),
-                    ),
-                  ],
-                ),
+              return ErrorRetryWidget(
+                errorMessage: state.message,
+                onRetry: () => _myCarsCubit.getCars(),
               );
             }
             final List<MyCarModel> cars = state is MyCarsLoaded

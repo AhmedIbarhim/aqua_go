@@ -20,6 +20,7 @@ import '../widgets/services_page_view.dart';
 import '../widgets/offers_list_view.dart';
 import '../widgets/current_package_section.dart';
 import '../../../../core/helpers/shimmer_helper.dart';
+import '../../../../core/components/error_retry_widget.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -63,110 +64,154 @@ class _HomeViewState extends State<HomeView> {
         BlocProvider.value(value: _packagesCubit),
         BlocProvider.value(value: _subscriptionsCubit),
       ],
-      child: RefreshIndicator(
-        onRefresh: () async {
-          await Future.wait([
-            _servicesCubit.getServices(),
-            _bannersCubit.getBanners(),
-            _packagesCubit.getPackages(),
-            _subscriptionsCubit.getActiveSubscriptions(),
-          ]);
-        },
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              BlocBuilder<BannersCubit, BannersState>(
-                builder: (context, state) {
-                  final isLoading =
-                      state is BannersLoading || state is BannersInitial;
-                  List<BannerModel> activeBanners = [];
-                  if (state is BannersLoaded) {
-                    activeBanners = state.banners;
-                  }
-                  if (activeBanners.isEmpty) {
-                    return const SizedBox.shrink();
-                  }
-                  return ShimmerHelper(
-                    enabled: isLoading,
-                    child: HomeBannersCarosal(
-                      carouselController: _carouselController,
-                      banners: activeBanners,
-                    ),
-                  );
-                },
-              ),
-              SizedBox(height: context.screenHeight * 0.01),
-              Container(
-                decoration: BoxDecoration(
+      child: BlocBuilder<ServicesCubit, ServicesState>(
+        builder: (context, servicesState) {
+          return BlocBuilder<PackagesCubit, PackagesState>(
+            builder: (context, packagesState) {
+              final isServicesError = servicesState is ServicesError;
+              final isPackagesError = packagesState is PackagesError;
+
+              if (isServicesError || isPackagesError) {
+                final String errorMessage = isServicesError
+                    ? servicesState.message
+                    : (packagesState as PackagesError).message;
+
+                return Container(
+                  height: double.infinity,
+                  width: double.infinity,
                   color: context.colors.background,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
+                  child: Center(
+                    child: ErrorRetryWidget(
+                      errorMessage: errorMessage,
+                      onRetry: () async {
+                        await Future.wait([
+                          _servicesCubit.getServices(),
+                          _bannersCubit.getBanners(),
+                          _packagesCubit.getPackages(),
+                          _subscriptionsCubit.getActiveSubscriptions(),
+                        ]);
+                      },
+                    ),
                   ),
-                ),
-                child: Column(
-                  children: [
-                    BlocBuilder<SubscriptionsCubit, SubscriptionsState>(
-                      builder: (context, state) {
-                        if (state is SubscriptionsError) {
-                          return Column(
-                            children: [
-                              SizedBox(height: context.screenHeight * 0.02),
-                              const PackagesListView(),
-                            ],
+                );
+              }
+
+              return RefreshIndicator(
+                onRefresh: () async {
+                  await Future.wait([
+                    _servicesCubit.getServices(),
+                    _bannersCubit.getBanners(),
+                    _packagesCubit.getPackages(),
+                    _subscriptionsCubit.getActiveSubscriptions(),
+                  ]);
+                },
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      BlocBuilder<BannersCubit, BannersState>(
+                        builder: (context, state) {
+                          final isLoading =
+                              state is BannersLoading ||
+                              state is BannersInitial;
+                          List<BannerModel> activeBanners = [];
+                          if (state is BannersLoaded) {
+                            activeBanners = state.banners;
+                          }
+                          if (activeBanners.isEmpty) {
+                            return const SizedBox.shrink();
+                          }
+                          return ShimmerHelper(
+                            enabled: isLoading,
+                            child: HomeBannersCarosal(
+                              carouselController: _carouselController,
+                              banners: activeBanners,
+                            ),
                           );
-                        }
-
-                        final List<SubscriptionResponseModel> subscriptions;
-                        if (state is SubscriptionsLoaded) {
-                          subscriptions = state.subscriptions;
-                        } else {
-                          subscriptions = [];
-                        }
-
-                        if (subscriptions.isEmpty) {
-                          return Column(
-                            children: [
-                              SizedBox(height: context.screenHeight * 0.02),
-                              const PackagesListView(),
-                            ],
-                          );
-                        }
-
-                        return Column(
+                        },
+                      ),
+                      SizedBox(height: context.screenHeight * 0.01),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: context.colors.background,
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(20),
+                            topRight: Radius.circular(20),
+                          ),
+                        ),
+                        child: Column(
                           children: [
-                            SizedBox(height: context.screenHeight * 0.02),
-                            CurrentPackageSection(
-                              subscribedPackages: subscriptions,
-                              onUsePackage: (package) {
-                                context.pushNamed(
-                                  Routes.bookingLocation,
-                                  arguments: BookingFlowStartArgs(
-                                    flowConfig: const BookingFlowConfig(
-                                      flowType: BookingFlowType.package,
+                            BlocBuilder<SubscriptionsCubit, SubscriptionsState>(
+                              builder: (context, state) {
+                                if (state is SubscriptionsError) {
+                                  return Column(
+                                    children: [
+                                      SizedBox(
+                                        height: context.screenHeight * 0.02,
+                                      ),
+                                      const PackagesListView(),
+                                    ],
+                                  );
+                                }
+
+                                final List<SubscriptionResponseModel>
+                                subscriptions;
+                                if (state is SubscriptionsLoaded) {
+                                  subscriptions = state.subscriptions;
+                                } else {
+                                  subscriptions = [];
+                                }
+
+                                if (subscriptions.isEmpty) {
+                                  return Column(
+                                    children: [
+                                      SizedBox(
+                                        height: context.screenHeight * 0.02,
+                                      ),
+                                      const PackagesListView(),
+                                    ],
+                                  );
+                                }
+
+                                return Column(
+                                  children: [
+                                    SizedBox(
+                                      height: context.screenHeight * 0.02,
                                     ),
-                                    submitStrategy:
-                                        const PackageBookingSubmit(),
-                                    subscriptionId: package.id,
-                                  ),
+                                    CurrentPackageSection(
+                                      subscribedPackages: subscriptions,
+                                      onUsePackage: (package) {
+                                        context.pushNamed(
+                                          Routes.bookingLocation,
+                                          arguments: BookingFlowStartArgs(
+                                            flowConfig: const BookingFlowConfig(
+                                              flowType: BookingFlowType.package,
+                                            ),
+                                            submitStrategy:
+                                                const PackageBookingSubmit(),
+                                            subscriptionId: package.id,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ],
                                 );
                               },
                             ),
+                            SizedBox(height: context.screenHeight * 0.02),
+                            const ServicesPageView(),
+                            SizedBox(height: context.screenHeight * 0.02),
+                            const OffersListView(),
+                            SizedBox(height: context.screenHeight * 0.15),
                           ],
-                        );
-                      },
-                    ),
-                    SizedBox(height: context.screenHeight * 0.02),
-                    const ServicesPageView(),
-                    SizedBox(height: context.screenHeight * 0.02),
-                    const OffersListView(),
-                    SizedBox(height: context.screenHeight * 0.15),
-                  ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ),
+              );
+            },
+          );
+        },
       ),
     );
   }

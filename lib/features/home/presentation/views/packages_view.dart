@@ -8,6 +8,7 @@ import '../../../../core/components/generic_app_bar.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/helpers/shimmer_helper.dart';
+import '../../../../core/components/error_retry_widget.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../widgets/package_card.dart';
 import '../controllers/packages_controller/packages_cubit.dart';
@@ -33,17 +34,9 @@ class PackagesView extends StatelessWidget {
                 state is PackagesLoading || state is PackagesInitial;
 
             if (state is PackagesError) {
-              return Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Text(
-                    state.message,
-                    style: AppTextStyles.regular12.copyWith(
-                      color: context.colors.error,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
+              return ErrorRetryWidget(
+                errorMessage: state.message,
+                onRetry: () => context.read<PackagesCubit>().getPackages(),
               );
             }
 

@@ -1,4 +1,5 @@
 import 'package:aqua_go/core/components/custom_loading_indicator.dart';
+import 'package:aqua_go/core/components/error_retry_widget.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -58,13 +59,10 @@ class _ComplaintsRecordViewState extends State<ComplaintsRecordView> {
                       child: CustomLoadingIndicator(size: 100),
                     );
                   } else if (state is ComplaintsFailure) {
-                    return Center(
-                      child: Text(
-                        state.message,
-                        style: AppTextStyles.medium16.copyWith(
-                          color: context.colors.errorLight,
-                        ),
-                      ),
+                    return ErrorRetryWidget(
+                      errorMessage: state.message,
+                      onRetry: () =>
+                          context.read<ComplaintsCubit>().fetchComplaints(),
                     );
                   } else if (state is ComplaintsSuccess) {
                     final complaints = state.complaints;

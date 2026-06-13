@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/components/custom_loading_indicator.dart';
+import '../../../../core/components/error_retry_widget.dart';
 import '../../../../core/components/generic_app_bar.dart';
 import '../../../../core/extentions/context_extentions.dart';
-import '../../../../core/themes/app_text_styles.dart';
 import '../controllers/faqs_cubit.dart';
 import '../controllers/faqs_state.dart';
 import '../widgets/faq_tile.dart';
@@ -53,36 +53,9 @@ class _FaqsViewState extends State<FaqsView> {
                       child: CustomLoadingIndicator(size: 100),
                     );
                   } else if (state is FaqsFailure) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            state.message,
-                            style: AppTextStyles.medium16.copyWith(
-                              color: context.colors.errorLight,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          SizedBox(height: sh(16)),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: context.colors.primary,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(sw(8)),
-                              ),
-                            ),
-                            onPressed: () =>
-                                context.read<FaqsCubit>().fetchFaqs(),
-                            child: Text(
-                              LocaleKeys.retry.tr(),
-                              style: AppTextStyles.bold13.copyWith(
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                    return ErrorRetryWidget(
+                      errorMessage: state.message,
+                      onRetry: () => context.read<FaqsCubit>().fetchFaqs(),
                     );
                   } else if (state is FaqsSuccess) {
                     final faqs = state.faqs;

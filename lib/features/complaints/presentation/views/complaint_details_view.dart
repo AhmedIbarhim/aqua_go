@@ -1,4 +1,5 @@
 import 'package:aqua_go/core/components/custom_loading_indicator.dart';
+import 'package:aqua_go/core/components/error_retry_widget.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -90,27 +91,13 @@ class ComplaintDetailsView extends StatelessWidget {
                 const Expanded(child: Center(child: CustomLoadingIndicator()))
               else if (errorMessage != null && complaint == null)
                 Expanded(
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          errorMessage,
-                          style: AppTextStyles.medium16.copyWith(
-                            color: context.colors.errorLight,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        ElevatedButton(
-                          onPressed: () {
-                            context
-                                .read<ComplaintDetailsCubit>()
-                                .fetchComplaintDetails(complaintId);
-                          },
-                          child: Text(LocaleKeys.retry.tr()),
-                        ),
-                      ],
-                    ),
+                  child: ErrorRetryWidget(
+                    errorMessage: errorMessage,
+                    onRetry: () {
+                      context
+                          .read<ComplaintDetailsCubit>()
+                          .fetchComplaintDetails(complaintId);
+                    },
                   ),
                 )
               else if (complaint != null)

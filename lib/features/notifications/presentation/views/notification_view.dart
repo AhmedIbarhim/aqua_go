@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/config/di/service_locator.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/components/custom_loading_indicator.dart';
-import '../../../../core/themes/app_text_styles.dart';
+import '../../../../core/components/error_retry_widget.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../controllers/notifications_cubit/notifications_cubit.dart';
 import '../controllers/notifications_cubit/notifications_state.dart';
@@ -69,34 +69,10 @@ class NotificationViewBody extends StatelessWidget {
             if (state is NotificationsLoading) {
               return const Center(child: CustomLoadingIndicator(size: 100));
             } else if (state is NotificationsFailure) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      state.errMessage,
-                      style: AppTextStyles.medium16.copyWith(
-                        color: context.colors.error,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: context.colors.primary,
-                      ),
-                      onPressed: () {
-                        context.read<NotificationsCubit>().fetchNotifications();
-                      },
-                      child: Text(
-                        'Retry',
-                        style: AppTextStyles.medium14.copyWith(
-                          color: context.colors.themeColor,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+              return ErrorRetryWidget(
+                errorMessage: state.errMessage,
+                onRetry: () =>
+                    context.read<NotificationsCubit>().fetchNotifications(),
               );
             } else if (state is NotificationsSuccess) {
               final notifications = state.notifications;

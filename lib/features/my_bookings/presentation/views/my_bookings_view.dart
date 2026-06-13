@@ -1,9 +1,8 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/components/custom_loading_indicator.dart';
-import '../../../../core/themes/app_text_styles.dart';
+import '../../../../core/components/error_retry_widget.dart';
 import '../../../../core/config/di/service_locator.dart';
 import '../widgets/my_bookings_list_view.dart';
 import '../widgets/my_bookings_tabs.dart';
@@ -84,36 +83,10 @@ class _MyBookingsViewState extends State<MyBookingsView> {
                         child: CustomLoadingIndicator(size: 80),
                       );
                     } else if (state is MyBookingsFailure) {
-                      return Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              state.errMessage,
-                              style: AppTextStyles.medium16.copyWith(
-                                color: context.colors.error,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 16),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: context.colors.primary,
-                              ),
-                              onPressed: () {
-                                context.read<MyBookingsCubit>().fetchBookings();
-                              },
-                              child: Text(
-                                context.locale.languageCode == 'ar'
-                                    ? 'إعادة المحاولة'
-                                    : 'Retry',
-                                style: AppTextStyles.medium14.copyWith(
-                                  color: context.colors.themeColor,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                      return ErrorRetryWidget(
+                        errorMessage: state.errMessage,
+                        onRetry: () =>
+                            context.read<MyBookingsCubit>().fetchBookings(),
                       );
                     } else if (state is MyBookingsSuccess) {
                       final filteredBookings = state.bookings
