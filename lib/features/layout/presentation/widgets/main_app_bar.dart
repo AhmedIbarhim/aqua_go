@@ -10,8 +10,8 @@ import '../../../../core/config/di/service_locator.dart';
 import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
-import '../../../notifications/controllers/notifications_cubit/notifications_cubit.dart';
-import '../../../notifications/controllers/notifications_cubit/notifications_state.dart';
+import '../../../notifications/presentation/controllers/notifications_cubit/notifications_cubit.dart';
+import '../../../notifications/presentation/controllers/notifications_cubit/notifications_state.dart';
 
 class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   const MainAppBar({super.key});

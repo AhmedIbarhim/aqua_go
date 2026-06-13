@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'my_address_card.dart';
 import 'add_address_bottom_sheet.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../controllers/addresses_controller/addresses_cubit.dart';
+import '../controllers/addresses_controller/addresses_cubit.dart';
 
 class MyAddressesList extends StatelessWidget {
   const MyAddressesList({super.key, required this.myAddresses});

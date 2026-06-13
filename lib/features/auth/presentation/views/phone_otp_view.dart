@@ -1,6 +1,6 @@
 import 'package:aqua_go/core/config/di/service_locator.dart';
 import 'package:aqua_go/core/extentions/context_extentions.dart';
-import 'package:aqua_go/features/auth/controllers/auth_cubit/auth_cubit.dart';
+import 'package:aqua_go/features/auth/presentation/controllers/auth_cubit/auth_cubit.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

@@ -10,8 +10,8 @@ import '../widgets/my_bookings_tabs.dart';
 import '../widgets/empty_bookings_widget.dart';
 import '../../../../core/helpers/fetch_user_data_helper.dart';
 import '../../../../core/components/guest_placeholder_widget.dart';
-import '../../controllers/my_bookings_cubit.dart';
-import '../../controllers/my_bookings_state.dart';
+import '../controllers/my_bookings_cubit.dart';
+import '../controllers/my_bookings_state.dart';
 
 class MyBookingsView extends StatefulWidget {
   const MyBookingsView({super.key});

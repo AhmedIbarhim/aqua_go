@@ -17,8 +17,8 @@ import 'package:svg_flutter/svg.dart';
 import '../../../../core/components/bottom_action_sheet_container.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../../data/models/complaint_model.dart';
-import '../../controllers/complaints_cubit/complaints_cubit.dart';
-import '../../controllers/complaints_cubit/complaints_state.dart';
+import '../controllers/complaints_cubit/complaints_cubit.dart';
+import '../controllers/complaints_cubit/complaints_state.dart';
 import '../widgets/complaint_images_section.dart';
 
 class ComplaintArgs {

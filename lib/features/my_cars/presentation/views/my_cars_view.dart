@@ -6,7 +6,7 @@ import '../../../../core/extentions/context_extentions.dart';
 import '../widgets/empty_cars_widget.dart';
 import '../widgets/my_cars_list_view.dart';
 import '../../data/models/my_car_model.dart';
-import '../../controllers/my_cars_cubit.dart';
+import '../controllers/my_cars_cubit.dart';
 import '../../../../core/helpers/shimmer_helper.dart';
 import '../../../../core/helpers/fetch_user_data_helper.dart';
 import '../../../../core/components/guest_placeholder_widget.dart';

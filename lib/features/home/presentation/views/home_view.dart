@@ -5,10 +5,10 @@ import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/config/di/service_locator.dart';
 import '../../data/models/banner_model.dart';
 import 'package:aqua_go/features/subscriptions/data/models/subscription_response_model/subscription_response_model.dart';
-import '../../controllers/services_controller/services_cubit.dart';
-import '../../controllers/banners_controller/banners_cubit.dart';
-import '../../controllers/packages_controller/packages_cubit.dart';
-import 'package:aqua_go/features/subscriptions/controllers/subscriptions_controller/subscriptions_cubit.dart';
+import '../controllers/services_controller/services_cubit.dart';
+import '../controllers/banners_controller/banners_cubit.dart';
+import '../controllers/packages_controller/packages_cubit.dart';
+import 'package:aqua_go/features/subscriptions/presentation/controllers/subscriptions_controller/subscriptions_cubit.dart';
 import 'package:aqua_go/core/route/routes.dart';
 import 'package:aqua_go/core/route/app_router.dart';
 import 'package:aqua_go/features/booking/domain/configs/booking_flow_config.dart';
@@ -145,7 +145,8 @@ class _HomeViewState extends State<HomeView> {
                                     flowConfig: const BookingFlowConfig(
                                       flowType: BookingFlowType.package,
                                     ),
-                                    submitStrategy: const PackageBookingSubmit(),
+                                    submitStrategy:
+                                        const PackageBookingSubmit(),
                                     subscriptionId: package.id,
                                   ),
                                 );

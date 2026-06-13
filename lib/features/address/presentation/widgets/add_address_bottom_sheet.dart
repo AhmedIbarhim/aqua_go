@@ -13,7 +13,7 @@ import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/route/routes.dart';
 import '../../data/models/address_model.dart';
 import '../../../../core/config/di/service_locator.dart';
-import '../../controllers/addresses_controller/addresses_cubit.dart';
+import '../controllers/addresses_controller/addresses_cubit.dart';
 import '../views/new_address_map_view.dart';
 
 class AddAddressBottomSheet extends StatefulWidget {

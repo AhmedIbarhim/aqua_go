@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:aqua_go/core/components/custom_loading_indicator.dart';
 import 'package:aqua_go/core/config/di/service_locator.dart';
 import 'package:aqua_go/core/themes/app_colors.dart';
-import 'package:aqua_go/features/address/controllers/maps_controller/maps_cubit.dart';
+import 'package:aqua_go/features/address/presentation/controllers/maps_controller/maps_cubit.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -116,7 +116,9 @@ class _NewAddressMapViewState extends State<NewAddressMapView> {
                           height: 48,
                           margin: const EdgeInsetsDirectional.only(end: 8),
                           decoration: BoxDecoration(
-                            color: darkAppColors.themeColor.withValues(alpha: 0.5),
+                            color: darkAppColors.themeColor.withValues(
+                              alpha: 0.5,
+                            ),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
                               color: darkAppColors.textSecondary,

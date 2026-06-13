@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../features/booking/controllers/booking_cubit.dart';
+import '../../features/booking/presentation/controllers/booking_cubit.dart';
 import '../../features/booking/domain/configs/booking_flow_config.dart';
 import '../../features/booking/domain/strategies/booking_submit_strategy.dart';
 import '../../features/booking/domain/strategies/service_booking_submit.dart';
@@ -15,15 +15,15 @@ import '../../features/auth/presentation/views/phone_otp_view.dart';
 import '../../features/booking/presentation/views/booking_details_view.dart';
 import '../../features/booking/presentation/views/booking_location_view.dart';
 import '../../features/booking/presentation/views/booking_summary_view.dart';
-import '../../features/home/controllers/packages_controller/packages_cubit.dart';
+import '../../features/home/presentation/controllers/packages_controller/packages_cubit.dart';
 import '../../features/home/presentation/views/offers_view.dart';
 import '../../features/home/presentation/views/packages_view.dart';
 import '../../features/layout/presentation/views/main_layout.dart';
 import '../../features/complaints/presentation/views/complaint_view.dart';
 import '../../features/complaints/presentation/views/complaints_record_view.dart';
 import '../../features/complaints/presentation/views/complaint_details_view.dart';
-import '../../features/complaints/controllers/complaints_cubit/complaints_cubit.dart';
-import '../../features/complaints/controllers/complaint_details_cubit/complaint_details_cubit.dart';
+import '../../features/complaints/presentation/controllers/complaints_cubit/complaints_cubit.dart';
+import '../../features/complaints/presentation/controllers/complaint_details_cubit/complaint_details_cubit.dart';
 import '../../features/my_bookings/presentation/views/gallery_view.dart';
 import '../../features/my_bookings/presentation/views/my_booking_deatails_view.dart';
 import '../../features/my_cars/data/models/my_car_model.dart';
@@ -36,14 +36,14 @@ import '../../features/startup/views/onboarding_view.dart';
 import '../../features/startup/views/splash_view.dart';
 import '../../features/notifications/presentation/views/notification_view.dart';
 import '../../features/profile/presentation/views/settings_view.dart';
-import '../../features/my_cars/controllers/my_cars_cubit.dart';
+import '../../features/my_cars/presentation/controllers/my_cars_cubit.dart';
 import '../../features/my_cars/presentation/views/add_car_view.dart';
 import '../../features/profile/presentation/views/privacy_policy_view.dart';
 import '../../features/profile/presentation/views/about_us_view.dart';
 import '../../features/profile/presentation/views/terms_view.dart';
 import '../../features/profile/presentation/views/support_view.dart';
 
-import '../../features/my_bookings/controllers/my_booking_details_cubit.dart';
+import '../../features/my_bookings/presentation/controllers/my_booking_details_cubit.dart';
 
 import 'routes.dart';
 

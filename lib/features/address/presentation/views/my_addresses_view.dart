@@ -13,7 +13,7 @@ import 'new_address_map_view.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/config/di/service_locator.dart';
-import '../../controllers/addresses_controller/addresses_cubit.dart';
+import '../controllers/addresses_controller/addresses_cubit.dart';
 import '../../../../core/helpers/shimmer_helper.dart';
 
 class MyAddressesView extends StatefulWidget {
@@ -141,14 +141,16 @@ class _MyAddressesViewState extends State<MyAddressesView> {
         text: LocaleKeys.address_add_new_location.tr(),
         preWidget: const Icon(Icons.add, size: 24),
         onPressed: () {
-          context.pushNamed(
-            Routes.newAddressMap,
-            arguments: NewAddressMapArgs(forAddingAddress: true),
-          ).then((_) {
-            if (context.mounted) {
-              _addressesCubit.getAddresses();
-            }
-          });
+          context
+              .pushNamed(
+                Routes.newAddressMap,
+                arguments: NewAddressMapArgs(forAddingAddress: true),
+              )
+              .then((_) {
+                if (context.mounted) {
+                  _addressesCubit.getAddresses();
+                }
+              });
         },
       ),
     );

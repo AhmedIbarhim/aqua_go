@@ -3,7 +3,7 @@ import '../../../../core/config/networking/exceptions/failure.dart';
 import '../../../my_bookings/data/models/booking_response_model/booking_response_model.dart';
 import '../../data/models/day_time_model.dart';
 import '../../data/repos/booking_repository.dart';
-import '../../controllers/booking_state.dart';
+import '../../presentation/controllers/booking_state.dart';
 import 'booking_submit_strategy.dart';
 
 class PackageBookingSubmit implements BookingSubmitStrategy {

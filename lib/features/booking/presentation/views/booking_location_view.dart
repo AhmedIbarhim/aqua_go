@@ -10,15 +10,15 @@ import '../../../../core/components/bottom_action_sheet_container.dart';
 import '../../../../generated/locale_keys.g.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/config/di/service_locator.dart';
-import '../../../address/controllers/addresses_controller/addresses_cubit.dart';
-import '../../../address/controllers/maps_controller/maps_cubit.dart';
+import '../../../address/presentation/controllers/addresses_controller/addresses_cubit.dart';
+import '../../../address/presentation/controllers/maps_controller/maps_cubit.dart';
 import '../../../address/presentation/views/new_address_map_view.dart';
 import '../widgets/address_select_on_map_card.dart';
 import '../widgets/gps_location_card.dart';
 import '../widgets/saved_locations_list.dart';
 import '../../../address/data/models/address_model.dart';
-import '../../controllers/booking_cubit.dart';
-import '../../controllers/booking_state.dart';
+import '../controllers/booking_cubit.dart';
+import '../controllers/booking_state.dart';
 import '../../../../core/route/app_router.dart';
 
 class BookingLocationView extends StatefulWidget {

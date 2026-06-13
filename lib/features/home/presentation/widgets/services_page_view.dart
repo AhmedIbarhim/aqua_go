@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../data/models/service_model.dart';
-import '../../controllers/services_controller/services_cubit.dart';
+import '../controllers/services_controller/services_cubit.dart';
 import 'service_card.dart';
 import '../../../../core/helpers/shimmer_helper.dart';
 

@@ -21,8 +21,8 @@ import 'package:aqua_go/features/home/data/models/service_model.dart';
 
 import '../../data/models/booking_response_model/booking_response_model.dart';
 import '../../data/models/booking_summary_model.dart';
-import '../../controllers/my_booking_details_cubit.dart';
-import '../../controllers/my_booking_details_state.dart';
+import '../controllers/my_booking_details_cubit.dart';
+import '../controllers/my_booking_details_state.dart';
 import '../../../../core/components/bottom_action_sheet_container.dart';
 import '../../data/enums/booking_status_enum.dart';
 import '../widgets/my_booking_procedures_bottom_sheet.dart';

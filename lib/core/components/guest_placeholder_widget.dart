@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:svg_flutter/svg.dart';
-import '../../features/auth/controllers/auth_cubit/auth_cubit.dart';
+import '../../features/auth/presentation/controllers/auth_cubit/auth_cubit.dart';
 import '../config/di/service_locator.dart';
 import '../extentions/context_extentions.dart';
 import '../helpers/fetch_user_data_helper.dart';

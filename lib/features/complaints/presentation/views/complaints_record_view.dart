@@ -8,8 +8,8 @@ import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../../../../core/route/routes.dart';
-import '../../controllers/complaints_cubit/complaints_cubit.dart';
-import '../../controllers/complaints_cubit/complaints_state.dart';
+import '../controllers/complaints_cubit/complaints_cubit.dart';
+import '../controllers/complaints_cubit/complaints_state.dart';
 import '../widgets/complaint_record_card.dart';
 import 'complaint_details_view.dart';
 

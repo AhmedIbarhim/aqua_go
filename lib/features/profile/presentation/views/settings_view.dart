@@ -10,7 +10,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/config/di/service_locator.dart';
 import '../../../../core/route/routes.dart';
 import '../../data/models/notification_preferences_model.dart';
-import '../../controllers/notification_preferences_cubit/notification_preferences_cubit.dart';
+import '../controllers/notification_preferences_cubit/notification_preferences_cubit.dart';
 
 import '../widgets/profile_tile.dart';
 

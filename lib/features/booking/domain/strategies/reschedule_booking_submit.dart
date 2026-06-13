@@ -4,7 +4,7 @@ import '../../../../core/config/networking/exceptions/failure.dart';
 import '../../../my_bookings/data/models/booking_response_model/booking_response_model.dart';
 import '../../data/models/reschedule_request_model.dart';
 import '../../data/repos/booking_repository.dart';
-import '../../controllers/booking_state.dart';
+import '../../presentation/controllers/booking_state.dart';
 import 'booking_submit_strategy.dart';
 
 /// Strategy for rescheduling an existing booking.

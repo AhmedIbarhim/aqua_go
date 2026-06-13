@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/helpers/shimmer_helper.dart';
 import '../../../../core/utils/app_assets.dart';
-import '../../../address/controllers/addresses_controller/addresses_cubit.dart';
+import '../../../address/presentation/controllers/addresses_controller/addresses_cubit.dart';
 import '../../../address/presentation/widgets/add_address_bottom_sheet.dart';
-import '../../controllers/booking_cubit.dart';
+import '../controllers/booking_cubit.dart';
 import 'location_selection_card.dart';
 
 class SavedLocationsList extends StatefulWidget {

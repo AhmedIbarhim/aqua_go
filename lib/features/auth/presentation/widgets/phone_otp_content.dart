@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:ui' as ui;
-import 'package:aqua_go/features/auth/controllers/auth_cubit/auth_cubit.dart';
+import 'package:aqua_go/features/auth/presentation/controllers/auth_cubit/auth_cubit.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';

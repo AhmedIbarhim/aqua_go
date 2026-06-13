@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../../generated/locale_keys.g.dart';
-import '../../../address/controllers/maps_controller/maps_cubit.dart';
+import '../../../address/presentation/controllers/maps_controller/maps_cubit.dart';
 import 'location_selection_card.dart';
 
 class GpsLocationCard extends StatelessWidget {

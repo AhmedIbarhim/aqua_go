@@ -10,7 +10,7 @@ import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/helpers/shimmer_helper.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../widgets/package_card.dart';
-import '../../controllers/packages_controller/packages_cubit.dart';
+import '../controllers/packages_controller/packages_cubit.dart';
 
 class PackagesView extends StatelessWidget {
   const PackagesView({super.key});
@@ -29,7 +29,8 @@ class PackagesView extends StatelessWidget {
         ),
         child: BlocBuilder<PackagesCubit, PackagesState>(
           builder: (context, state) {
-            final isLoading = state is PackagesLoading || state is PackagesInitial;
+            final isLoading =
+                state is PackagesLoading || state is PackagesInitial;
 
             if (state is PackagesError) {
               return Center(
@@ -69,9 +70,12 @@ class PackagesView extends StatelessWidget {
               child: ListView.separated(
                 padding: const EdgeInsets.all(16),
                 itemCount: displayPackages.length,
-                separatorBuilder: (context, index) => const SizedBox(height: 24),
-                itemBuilder: (context, index) =>
-                    PackageCard(packageModel: displayPackages[index], atHome: false),
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: 24),
+                itemBuilder: (context, index) => PackageCard(
+                  packageModel: displayPackages[index],
+                  atHome: false,
+                ),
               ),
             );
           },

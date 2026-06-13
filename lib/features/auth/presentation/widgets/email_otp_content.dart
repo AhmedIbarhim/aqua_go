@@ -10,7 +10,7 @@ import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_colors.dart';
 import '../../../../core/themes/app_text_styles.dart';
-import '../../controllers/auth_cubit/auth_cubit.dart';
+import '../controllers/auth_cubit/auth_cubit.dart';
 
 class EmailOtpContent extends StatefulWidget {
   const EmailOtpContent({

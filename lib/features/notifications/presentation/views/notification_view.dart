@@ -7,8 +7,8 @@ import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/components/custom_loading_indicator.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../generated/locale_keys.g.dart';
-import '../../controllers/notifications_cubit/notifications_cubit.dart';
-import '../../controllers/notifications_cubit/notifications_state.dart';
+import '../controllers/notifications_cubit/notifications_cubit.dart';
+import '../controllers/notifications_cubit/notifications_state.dart';
 import '../widgets/empty_notifications_widget.dart';
 import '../widgets/notifications_list_view.dart';
 

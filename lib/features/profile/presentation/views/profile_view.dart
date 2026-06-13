@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:aqua_go/core/config/di/service_locator.dart';
-import 'package:aqua_go/features/auth/controllers/auth_cubit/auth_cubit.dart';
+import 'package:aqua_go/features/auth/presentation/controllers/auth_cubit/auth_cubit.dart';
 
 import '../../../rating/presentation/widgets/rating_widget.dart';
 import '../../../../core/extentions/context_extentions.dart';

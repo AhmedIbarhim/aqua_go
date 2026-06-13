@@ -7,7 +7,7 @@ import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/helpers/shimmer_helper.dart';
 import '../../data/models/package_model.dart';
-import '../../controllers/packages_controller/packages_cubit.dart';
+import '../controllers/packages_controller/packages_cubit.dart';
 import 'package_card.dart';
 
 import 'package:skeletonizer/skeletonizer.dart';

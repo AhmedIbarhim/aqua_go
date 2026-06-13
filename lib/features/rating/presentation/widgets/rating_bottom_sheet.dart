@@ -9,8 +9,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../../../my_bookings/data/models/booking_response_model/booking_response_model.dart';
 import '../../../../core/config/di/service_locator.dart';
-import '../../controllers/rating_cubit/rating_cubit.dart';
-import '../../controllers/rating_cubit/rating_state.dart';
+import '../controllers/rating_cubit/rating_cubit.dart';
+import '../controllers/rating_cubit/rating_state.dart';
 import '../../../../core/components/custom_network_image.dart';
 import 'rating_success_alert_box.dart';
 

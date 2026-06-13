@@ -11,7 +11,7 @@ import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../../generated/locale_keys.g.dart';
-import '../../controllers/auth_cubit/auth_cubit.dart';
+import '../controllers/auth_cubit/auth_cubit.dart';
 import '../views/email_otp_view.dart';
 
 class EmailContent extends StatefulWidget {
@@ -78,7 +78,10 @@ class _EmailContentState extends State<EmailContent> {
             ),
           ),
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24, vertical: height * 0.02),
+            padding: EdgeInsets.symmetric(
+              horizontal: 24,
+              vertical: height * 0.02,
+            ),
             child: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -110,7 +113,9 @@ class _EmailContentState extends State<EmailContent> {
                   CustomButton(
                     onPressed: _isEmailValid
                         ? () {
-                            context.read<AuthCubit>().requestEmailVerify(_emailController.text);
+                            context.read<AuthCubit>().requestEmailVerify(
+                              _emailController.text,
+                            );
                           }
                         : null,
                     text: LocaleKeys.proceed.tr(),

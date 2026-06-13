@@ -10,7 +10,7 @@ import '../../../../core/config/di/service_locator.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_text_styles.dart';
-import '../../../auth/controllers/auth_cubit/auth_cubit.dart';
+import '../../../auth/presentation/controllers/auth_cubit/auth_cubit.dart';
 
 class PrivacyPolicyView extends StatelessWidget {
   const PrivacyPolicyView({super.key});

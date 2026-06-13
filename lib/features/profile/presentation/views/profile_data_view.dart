@@ -15,7 +15,7 @@ import '../../../../core/route/routes.dart';
 import '../widgets/gender_selection_widget.dart';
 
 import 'package:aqua_go/features/auth/data/repos/auth_repository.dart';
-import 'package:aqua_go/features/auth/controllers/auth_cubit/auth_cubit.dart';
+import 'package:aqua_go/features/auth/presentation/controllers/auth_cubit/auth_cubit.dart';
 import 'package:aqua_go/core/config/di/service_locator.dart';
 
 class ProfileDataView extends StatefulWidget {

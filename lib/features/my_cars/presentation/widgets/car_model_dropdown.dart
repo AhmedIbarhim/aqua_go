@@ -9,7 +9,7 @@ import '../../../../core/components/custom_loading_indicator.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../../data/models/vehicle_make_model.dart';
 import '../../data/models/vehicle_model_model.dart';
-import '../../controllers/my_cars_cubit.dart';
+import '../controllers/my_cars_cubit.dart';
 
 class CarModelDropdown extends StatefulWidget {
   final VehicleMakeModel? selectedBrand;

@@ -6,7 +6,7 @@ import '../../../../core/route/routes.dart';
 import '../../data/models/my_car_model.dart';
 import 'my_car_card.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../controllers/my_cars_cubit.dart';
+import '../controllers/my_cars_cubit.dart';
 import '../../../../core/extentions/context_extentions.dart';
 
 class MyCarsListView extends StatelessWidget {
