@@ -5,8 +5,8 @@ class PackageName {
   PackageName({this.en, this.ar});
 
   PackageName.fromJson(Map<String, dynamic> json) {
-    en = json['en'] ?? json['nameEn'] ?? json['name'];
-    ar = json['ar_SA'] ?? json['ar'] ?? json['nameAr'] ?? json['name_ar'] ?? json['name_sa'];
+    en = json['en'];
+    ar = json['ar_SA'];
   }
 
   Map<String, dynamic> toJson() {

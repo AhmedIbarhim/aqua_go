@@ -16,9 +16,13 @@ class BookingDetailsVehicleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final vehicle = booking.vehicles?.isNotEmpty == true
+        ? booking.vehicles!.first
+        : null;
+
     // Resolve Vehicle Make and Model
     String brandModelText =
-        '${booking.vehicleMake ?? ""} ${booking.vehicleModel ?? ""}'.trim();
+        '${vehicle?.vehicleMake ?? ""} ${vehicle?.vehicleModel ?? ""}'.trim();
     if (brandModelText.isEmpty) {
       brandModelText = '...';
     }
@@ -26,8 +30,9 @@ class BookingDetailsVehicleCard extends StatelessWidget {
     // Resolve Vehicle Color
     String colorName = '';
     Color? colorVisual;
-    if (booking.vehicleColor != null && booking.vehicleColor!.isNotEmpty) {
-      final colorStr = booking.vehicleColor!;
+    final vehicleColor = vehicle?.vehicleColor;
+    if (vehicleColor != null && vehicleColor.isNotEmpty) {
+      final colorStr = vehicleColor;
       if (colorStr.startsWith('#') || colorStr.toLowerCase().startsWith('0x')) {
         try {
           String cleanColor = colorStr
@@ -49,11 +54,11 @@ class BookingDetailsVehicleCard extends StatelessWidget {
     }
 
     // Resolve Plate Number
-    final String plateText = booking.plate ?? '';
+    final String plateText = vehicle?.plate ?? booking.plate ?? '';
 
     // Resolve Year
-    final String yearText = booking.vehicleYear != null
-        ? booking.vehicleYear.toString()
+    final String yearText = vehicle?.vehicleYear != null
+        ? vehicle!.vehicleYear.toString()
         : '';
 
     return Column(
@@ -79,10 +84,10 @@ class BookingDetailsVehicleCard extends StatelessWidget {
                 width: 48,
                 height: 48,
                 child:
-                    (booking.vehicleMakeLogoUrl != null &&
-                        booking.vehicleMakeLogoUrl!.isNotEmpty)
+                    (vehicle?.makeLogoUrl != null &&
+                        vehicle!.makeLogoUrl!.isNotEmpty)
                     ? CarMakeNetworkLogo(
-                        logoUrl: booking.vehicleMakeLogoUrl!,
+                        logoUrl: vehicle.makeLogoUrl!,
                         width: 48,
                         height: 48,
                         fit: BoxFit.contain,

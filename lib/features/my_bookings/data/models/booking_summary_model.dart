@@ -99,6 +99,7 @@ class BookingSummaryModel {
   }
 
   factory BookingSummaryModel.fromDetails(BookingResponseModel details) {
+    final vehicle = details.vehicles?.isNotEmpty == true ? details.vehicles!.first : null;
     return BookingSummaryModel(
       id: details.id,
       customerId: details.customerId,
@@ -115,12 +116,12 @@ class BookingSummaryModel {
       updatedAt: details.updatedAt,
       totalAmountMinor: details.totalAmountMinor,
       currency: details.currency,
-      vehicleYear: details.vehicleYear,
-      vehicleMake: details.vehicleMake,
-      vehicleModel: details.vehicleModel,
-      vehicleColor: details.vehicleColor,
-      plate: details.plate,
-      vehicleMakeLogoUrl: details.vehicleMakeLogoUrl,
+      vehicleYear: vehicle?.vehicleYear,
+      vehicleMake: vehicle?.vehicleMake,
+      vehicleModel: vehicle?.vehicleModel,
+      vehicleColor: vehicle?.vehicleColor,
+      plate: vehicle?.plate ?? details.plate,
+      vehicleMakeLogoUrl: vehicle?.makeLogoUrl,
       serviceNameEn: details.packageName?.en,
       serviceNameAr: details.packageName?.ar,
     );
@@ -173,12 +174,17 @@ class BookingSummaryModel {
       updatedAt: updatedAt,
       totalAmountMinor: totalAmountMinor,
       currency: currency,
-      vehicleYear: vehicleYear,
-      vehicleMake: vehicleMake,
-      vehicleModel: vehicleModel,
-      vehicleColor: vehicleColor,
       plate: plate,
-      vehicleMakeLogoUrl: vehicleMakeLogoUrl,
+      vehicles: [
+        BookingVehicle(
+          vehicleYear: vehicleYear,
+          vehicleMake: vehicleMake,
+          vehicleModel: vehicleModel,
+          vehicleColor: vehicleColor,
+          plate: plate,
+          makeLogoUrl: vehicleMakeLogoUrl,
+        ),
+      ],
       packageName: PackageName(en: serviceNameEn, ar: serviceNameAr),
     );
   }

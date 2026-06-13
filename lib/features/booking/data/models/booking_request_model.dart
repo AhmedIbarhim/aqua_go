@@ -79,7 +79,7 @@ class BookingRequestModel {
       if (workerNotes.isNotEmpty) 'workerNotes': workerNotes,
       if (serviceAddOns.isNotEmpty)
         'addOns': serviceAddOns
-            .map((e) => {'addonId': e.id, 'qty': 1})
+            .map((e) => {'addonId': e.id})
             .toList(),
       if (paymentMethod != null) 'paymentMethod': paymentMethod!.name,
     };

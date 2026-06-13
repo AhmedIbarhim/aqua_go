@@ -219,10 +219,10 @@ class MyBookingDetailsView extends StatelessWidget {
           );
 
           final existingCar = MyCarModel(
-            color: booking.vehicleColor ?? '',
-            modelYear: booking.vehicleYear!,
-            logoUrl: booking.vehicleMakeLogoUrl ?? '',
-            plateNumber: booking.plate ?? '',
+            color: booking.vehicles?.firstOrNull?.vehicleColor ?? '',
+            modelYear: booking.vehicles?.firstOrNull?.vehicleYear ?? 0,
+            logoUrl: booking.vehicles?.firstOrNull?.makeLogoUrl ?? '',
+            plateNumber: booking.plate ?? booking.vehicles?.firstOrNull?.plate ?? '',
           );
 
           final service = ServiceModel(

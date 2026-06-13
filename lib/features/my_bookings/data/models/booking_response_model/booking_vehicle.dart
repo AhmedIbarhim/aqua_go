@@ -19,22 +19,14 @@ class BookingVehicle {
 
   BookingVehicle.fromJson(Map<String, dynamic> json) {
     vehicleSeq = json['vehicleSeq'];
-    vehicleMake = json['vehicleMake'] ?? json['vehicle_make'];
-    vehicleModel = json['vehicleModel'] ?? json['vehicle_model'];
-    vehicleColor = json['vehicleColor'] ?? json['vehicle_color'];
+    vehicleMake = json['vehicleMake'];
+    vehicleModel = json['vehicleModel'];
+    vehicleColor = json['vehicleColor'];
     vehicleYear = json['vehicleYear'] != null
         ? int.tryParse(json['vehicleYear'].toString())
-        : (json['vehicle_year'] != null
-            ? int.tryParse(json['vehicle_year'].toString())
-            : null);
-    plate = json['plate'] ??
-        json['plateMasked'] ??
-        json['plate_masked'] ??
-        json['plateText'] ??
-        json['plate_text'];
-    makeLogoUrl = json['makeLogoUrl'] ??
-        json['vehicleMakeLogoUrl'] ??
-        json['vehicle_make_logo_url'];
+        : null;
+    plate = json['plate'];
+    makeLogoUrl = json['makeLogoUrl'];
   }
 
   Map<String, dynamic> toJson() {

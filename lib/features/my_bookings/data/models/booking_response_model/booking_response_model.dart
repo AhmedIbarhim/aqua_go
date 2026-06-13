@@ -13,7 +13,6 @@ import 'invoice.dart';
 import 'package_name.dart';
 import 'photos.dart';
 import 'reschedule_policy.dart';
-
 export 'assigned_worker.dart';
 export 'booking_addon.dart';
 export 'booking_vehicle.dart';
@@ -35,7 +34,6 @@ class BookingResponseModel {
   num? addressLng;
   String? zoneId;
   String? packageId;
-  String? subscriptionId;
   BookingType? type;
   BookingStatus? status;
   String? scheduledAt;
@@ -60,18 +58,12 @@ class BookingResponseModel {
   String? plate;
   Invoice? invoice;
   List<String>? workerNotes;
-  int? vehicleYear;
   String? addressArrivalNotes;
-  String? vehicleMake;
-  String? vehicleModel;
-  String? vehicleColor;
-  PackageName? packageName;
-  String? vehicleMakeLogoUrl;
-  String? customerName;
-  String? customerPhoneMasked;
-  String? customerPhone;
-  ReschedulePolicy? reschedulePolicy;
   List<BookingVehicle>? vehicles;
+  PackageName? packageName;
+  ReschedulePolicy? reschedulePolicy;
+  String? customerName;
+  String? customerPhone;
   List<BookingAddon>? addOns;
   Breakdown? breakdown;
 
@@ -85,7 +77,6 @@ class BookingResponseModel {
     this.addressLng,
     this.zoneId,
     this.packageId,
-    this.subscriptionId,
     this.type,
     this.status,
     this.scheduledAt,
@@ -110,47 +101,28 @@ class BookingResponseModel {
     this.plate,
     this.invoice,
     this.workerNotes,
-    this.vehicleYear,
     this.addressArrivalNotes,
-    this.vehicleMake,
-    this.vehicleModel,
-    this.vehicleColor,
-    this.packageName,
-    this.vehicleMakeLogoUrl,
-    this.customerName,
-    this.customerPhoneMasked,
-    this.customerPhone,
-    this.reschedulePolicy,
     this.vehicles,
+    this.packageName,
+    this.reschedulePolicy,
+    this.customerName,
+    this.customerPhone,
     this.addOns,
     this.breakdown,
   });
 
   BookingResponseModel.fromJson(Map<String, dynamic> json) {
-    id = json['id'] ?? json['washId'];
-    referenceNumber = json['referenceNumber'] ?? json['reference_number'];
+    id = json['id'];
+    referenceNumber = json['referenceNumber'];
     customerId = json['customerId'];
     workerId = json['workerId'];
-    subscriptionId = json['subscriptionId'];
     addressLabel = json['addressLabel'];
-
-    // safe coordinate parsing
     addressLat = json['addressLat'] != null
         ? num.tryParse(json['addressLat'].toString())
-        : (json['address_lat'] != null
-              ? num.tryParse(json['address_lat'].toString())
-              : (json['lat'] != null
-                    ? num.tryParse(json['lat'].toString())
-                    : null));
-
+        : null;
     addressLng = json['addressLng'] != null
         ? num.tryParse(json['addressLng'].toString())
-        : (json['address_lng'] != null
-              ? num.tryParse(json['address_lng'].toString())
-              : (json['lng'] != null
-                    ? num.tryParse(json['lng'].toString())
-                    : null));
-
+        : null;
     zoneId = json['zoneId'];
     packageId = json['packageId'];
     type = BookingType.fromString(json['type']);
@@ -183,77 +155,28 @@ class BookingResponseModel {
     assignedWorker = json['assignedWorker'] != null
         ? AssignedWorker.fromJson(json['assignedWorker'])
         : null;
+    plate = json['plate'];
     invoice = json['invoice'] != null
         ? Invoice.fromJson(json['invoice'])
         : null;
     workerNotes = json['workerNotes'] != null
-        ? (json['workerNotes'] is List
-              ? List<String>.from(json['workerNotes'])
-              : [json['workerNotes'].toString()])
+        ? List<String>.from(json['workerNotes'])
         : null;
-
     addressArrivalNotes = json['addressArrivalNotes'];
-
-    // Obtain vehicle data directly from the response root first
-    vehicleMake = json['vehicleMake'] ?? json['vehicle_make'];
-    vehicleModel = json['vehicleModel'] ?? json['vehicle_model'];
-    vehicleColor = json['vehicleColor'] ?? json['vehicle_color'];
-    vehicleYear = json['vehicleYear'] != null
-        ? int.tryParse(json['vehicleYear'].toString())
-        : (json['vehicle_year'] != null
-              ? int.tryParse(json['vehicle_year'].toString())
-              : null);
-    vehicleMakeLogoUrl =
-        json['vehicleMakeLogoUrl'] ??
-        json['vehicle_make_logo_url'] ??
-        json['makeLogoUrl'];
-    plate =
-        json['plate'] ??
-        json['plateMasked'] ??
-        json['plate_masked'] ??
-        json['plateText'] ??
-        json['plate_text'];
-
-    // Extract details-specific nested vehicles array, falling back to it if root properties are null
     if (json['vehicles'] != null && json['vehicles'] is List) {
       vehicles = <BookingVehicle>[];
       json['vehicles'].forEach((v) {
         vehicles!.add(BookingVehicle.fromJson(v));
       });
-      if (vehicles!.isNotEmpty) {
-        final firstVehicle = vehicles!.first;
-        vehicleMake ??= firstVehicle.vehicleMake;
-        vehicleModel ??= firstVehicle.vehicleModel;
-        vehicleColor ??= firstVehicle.vehicleColor;
-        vehicleYear ??= firstVehicle.vehicleYear;
-        plate ??= firstVehicle.plate;
-        vehicleMakeLogoUrl ??= firstVehicle.makeLogoUrl;
-      }
     }
-
     packageName = json['packageName'] != null
         ? PackageName.fromJson(json['packageName'])
-        : (json['packageInfo'] != null
-            ? PackageName.fromJson(json['packageInfo'])
-            : (json['package'] != null
-                ? PackageName.fromJson(json['package'])
-                : null));
-
-    customerName = json['customerName'];
-    customerPhoneMasked =
-        json['customerPhoneMasked'] ??
-        json['customerPhone'] ??
-        json['customer_phone'];
-    customerPhone =
-        json['customerPhone'] ??
-        json['customer_phone'] ??
-        json['customerPhoneMasked'] ??
-        json['customer_phone_masked'];
+        : null;
     reschedulePolicy = json['reschedulePolicyView'] != null
         ? ReschedulePolicy.fromJson(json['reschedulePolicyView'])
-        : (json['reschedulePolicy'] != null
-              ? ReschedulePolicy.fromJson(json['reschedulePolicy'])
-              : null);
+        : null;
+    customerName = json['customerName'];
+    customerPhone = json['customerPhone'];
     if (json['addOns'] != null && json['addOns'] is List) {
       addOns = <BookingAddon>[];
       json['addOns'].forEach((v) {
@@ -308,24 +231,18 @@ class BookingResponseModel {
       data['invoice'] = invoice!.toJson();
     }
     data['workerNotes'] = workerNotes;
-    data['vehicleYear'] = vehicleYear;
     data['addressArrivalNotes'] = addressArrivalNotes;
-    data['vehicleMake'] = vehicleMake;
-    data['vehicleModel'] = vehicleModel;
-    data['vehicleColor'] = vehicleColor;
-    if (packageName != null) {
-      data['packageName'] = packageName!.toJson();
-    }
-    data['vehicleMakeLogoUrl'] = vehicleMakeLogoUrl;
-    data['customerName'] = customerName;
-    data['customerPhoneMasked'] = customerPhoneMasked;
-    data['customerPhone'] = customerPhone;
-    if (reschedulePolicy != null) {
-      data['reschedulePolicyView'] = reschedulePolicy!.toJson();
-    }
     if (vehicles != null) {
       data['vehicles'] = vehicles!.map((v) => v.toJson()).toList();
     }
+    if (packageName != null) {
+      data['packageName'] = packageName!.toJson();
+    }
+    if (reschedulePolicy != null) {
+      data['reschedulePolicyView'] = reschedulePolicy!.toJson();
+    }
+    data['customerName'] = customerName;
+    data['customerPhone'] = customerPhone;
     if (addOns != null) {
       data['addOns'] = addOns!.map((v) => v.toJson()).toList();
     }
@@ -336,7 +253,8 @@ class BookingResponseModel {
   }
 
   // --- UI Compatibility Helpers ---
-  String get title => CacheClient.getString(kLanguage, defaultValue: kArabicLang) == kArabicLang
+  String get title =>
+      CacheClient.getString(kLanguage, defaultValue: kArabicLang) == kArabicLang
       ? (packageName?.ar ?? '')
       : (packageName?.en ?? '');
 

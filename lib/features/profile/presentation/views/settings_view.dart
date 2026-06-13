@@ -124,10 +124,10 @@ class _SettingsViewState extends State<SettingsView> {
                           builder: (context, state) {
                             if (state is NotificationPreferencesLoading ||
                                 state is NotificationPreferencesInitial) {
-                              return const Padding(
-                                padding: EdgeInsets.symmetric(vertical: 80),
+                              return SizedBox(
+                                height: sh(300),
                                 child: Center(
-                                  child: CustomLoadingIndicator(size: 100),
+                                  child: CustomLoadingIndicator(size: 70),
                                 ),
                               );
                             }

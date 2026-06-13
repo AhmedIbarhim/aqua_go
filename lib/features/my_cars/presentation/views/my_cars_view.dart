@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/components/custom_loading_indicator.dart';
 import '../../../../core/config/di/service_locator.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../widgets/empty_cars_widget.dart';
 import '../widgets/my_cars_list_view.dart';
 import '../../data/models/my_car_model.dart';
 import '../controllers/my_cars_cubit.dart';
-import '../../../../core/helpers/shimmer_helper.dart';
 import '../../../../core/helpers/fetch_user_data_helper.dart';
 import '../../../../core/components/guest_placeholder_widget.dart';
 
@@ -95,7 +95,11 @@ class _MyCarsViewState extends State<MyCarsView> {
               current is MyCarsInitial,
           builder: (context, state) {
             if (state is MyCarsLoading || state is MyCarsInitial) {
-              return ShimmerHelper.cars();
+              return Expanded(
+                child: SizedBox(
+                  child: Center(child: CustomLoadingIndicator(size: 80)),
+                ),
+              );
             }
             if (state is MyCarsError) {
               return Center(
