@@ -43,7 +43,7 @@ class SupportView extends StatelessWidget {
                     title: LocaleKeys.support_faq.tr(),
                     icon: AppAssets.question,
                     onTap: () {
-                      // TODO: Navigate to FAQ
+                      context.pushNamed(Routes.faqs);
                     },
                   ),
                   SizedBox(height: sh(12)),

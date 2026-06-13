@@ -349,7 +349,8 @@ class CodegenLoader extends AssetLoader{
     "status_open": "مفتوحة",
     "status_closed": "مغلقة",
     "status_resolved": "تم حلها",
-    "status_pending": "معلقة"
+    "status_pending": "معلقة",
+    "no_complaints": "لا توجد شكاوى مقدمة حالياً"
   },
   "snackbar": {
     "login_success": "تم تسجيل الدخول بنجاح",
@@ -701,7 +702,8 @@ static const Map<String,dynamic> _en = {
     "status_open": "Open",
     "status_closed": "Closed",
     "status_resolved": "Resolved",
-    "status_pending": "Pending"
+    "status_pending": "Pending",
+    "no_complaints": "No submitted complaints yet"
   },
   "snackbar": {
     "login_success": "Logged in successfully",

@@ -42,6 +42,8 @@ import '../../features/profile/presentation/views/privacy_policy_view.dart';
 import '../../features/profile/presentation/views/about_us_view.dart';
 import '../../features/profile/presentation/views/terms_view.dart';
 import '../../features/profile/presentation/views/support_view.dart';
+import '../../features/support/presentation/views/faqs_view.dart';
+import '../../features/support/presentation/controllers/faqs_cubit.dart';
 
 import '../../features/my_bookings/presentation/controllers/my_booking_details_cubit.dart';
 
@@ -212,6 +214,14 @@ abstract class AppRouter {
 
       case Routes.support:
         return MaterialPageRoute(builder: (_) => const SupportView());
+
+      case Routes.faqs:
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => locator<FaqsCubit>()..fetchFaqs(),
+            child: const FaqsView(),
+          ),
+        );
 
       case Routes.profileData:
         final isFirstTime = settings.arguments as bool? ?? false;

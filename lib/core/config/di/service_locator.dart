@@ -40,6 +40,9 @@ import 'package:aqua_go/features/complaints/presentation/controllers/complaint_d
 import 'package:aqua_go/features/rating/data/data_sources/rating_remote_data_source.dart';
 import 'package:aqua_go/features/rating/data/repos/rating_repository.dart';
 import 'package:aqua_go/features/rating/presentation/controllers/rating_cubit/rating_cubit.dart';
+import 'package:aqua_go/features/support/data/data_sources/faqs_remote_data_source.dart';
+import 'package:aqua_go/features/support/data/repos/faqs_repository.dart';
+import 'package:aqua_go/features/support/presentation/controllers/faqs_cubit.dart';
 import 'package:get_it/get_it.dart';
 
 import '../../../features/address/data/services/location_service.dart';
@@ -97,6 +100,9 @@ Future<void> initServiceLocator() async {
   locator.registerLazySingleton<RatingRemoteDataSource>(
     () => RatingRemoteDataSource(locator()),
   );
+  locator.registerLazySingleton<FaqsRemoteDataSource>(
+    () => FaqsRemoteDataSource(locator()),
+  );
 
   // Repositories
 
@@ -150,6 +156,9 @@ Future<void> initServiceLocator() async {
   locator.registerLazySingleton<RatingRepository>(
     () => RatingRepository(locator()),
   );
+  locator.registerLazySingleton<FaqsRepository>(
+    () => FaqsRepository(locator()),
+  );
 
   // Cubits
 
@@ -200,4 +209,5 @@ Future<void> initServiceLocator() async {
     () => ComplaintDetailsCubit(locator(), locator()),
   );
   locator.registerFactory<RatingCubit>(() => RatingCubit(locator()));
+  locator.registerFactory<FaqsCubit>(() => FaqsCubit(locator()));
 }

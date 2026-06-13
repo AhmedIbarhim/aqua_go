@@ -333,7 +333,8 @@
         "status_open": "مفتوحة",
         "status_closed": "مغلقة",
         "status_resolved": "تم حلها",
-        "status_pending": "معلقة"
+        "status_pending": "معلقة",
+        "no_complaints": "لا توجد شكاوى مقدمة حالياً"
     },
     "snackbar": {
         "login_success": "تم تسجيل الدخول بنجاح",

@@ -18,6 +18,7 @@ abstract class AppAssets {
   // Empty Screens
   static const String emptyCars = 'assets/svg/empty_folder.svg';
   static const String emptyBookings = 'assets/svg/empty_bookings.svg';
+  static const String emptyComplaints = 'assets/svg/no_complaints.svg';
 
   // Auth
   static const String logo = 'assets/images/app_logo.png';

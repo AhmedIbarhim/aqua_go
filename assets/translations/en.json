@@ -333,7 +333,8 @@
         "status_open": "Open",
         "status_closed": "Closed",
         "status_resolved": "Resolved",
-        "status_pending": "Pending"
+        "status_pending": "Pending",
+        "no_complaints": "No submitted complaints yet"
     },
     "snackbar": {
         "login_success": "Logged in successfully",
