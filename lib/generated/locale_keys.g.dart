@@ -25,6 +25,7 @@ abstract class  LocaleKeys {
   static const duration = 'duration';
   static const retry = 'retry';
   static const all = 'all';
+  static const expiry_date = 'expiry_date';
   static const onboarding_title1 = 'onboarding.title1';
   static const onboarding_title2 = 'onboarding.title2';
   static const onboarding_title3 = 'onboarding.title3';

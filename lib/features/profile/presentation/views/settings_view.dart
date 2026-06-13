@@ -175,19 +175,19 @@ class _SettingsViewState extends State<SettingsView> {
                                         .updateNotificationPreferences(updated);
                                   },
                                 ),
-                                SizedBox(height: sh(8)),
-                                ProfileTile(
-                                  title: LocaleKeys.settings_whatsapp_messages
-                                      .tr(),
-                                  icon: AppAssets.whatsppOutlined,
-                                  hasToggle: true,
-                                  toggleValue: isWhatsapp,
-                                  onToggleChanged: (val) {
-                                    setState(() {
-                                      isWhatsapp = val;
-                                    });
-                                  },
-                                ),
+                                // SizedBox(height: sh(8)),
+                                // ProfileTile(
+                                //   title: LocaleKeys.settings_whatsapp_messages
+                                //       .tr(),
+                                //   icon: AppAssets.whatsppOutlined,
+                                //   hasToggle: true,
+                                //   toggleValue: isWhatsapp,
+                                //   onToggleChanged: (val) {
+                                //     setState(() {
+                                //       isWhatsapp = val;
+                                //     });
+                                //   },
+                                // ),
                                 SizedBox(height: sh(8)),
                                 ProfileTile(
                                   title: LocaleKeys.settings_sms_messages.tr(),

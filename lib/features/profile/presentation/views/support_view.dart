@@ -55,16 +55,16 @@ class SupportView extends StatelessWidget {
                     },
                   ),
                   SizedBox(height: sh(12)),
-                  ProfileTile(
-                    title: LocaleKeys.support_whatsapp_contact.tr(),
-                    icon: AppAssets.whatsapp,
-                    alreadyColoredIcon: true,
-                    onTap: () {
-                      // TODO: Open WhatsApp link
-                    },
-                    textColor: context.colors.success,
-                    borderColor: context.colors.success,
-                  ),
+                  // ProfileTile(
+                  //   title: LocaleKeys.support_whatsapp_contact.tr(),
+                  //   icon: AppAssets.whatsapp,
+                  //   alreadyColoredIcon: true,
+                  //   onTap: () {
+                  //     // TODO: Open WhatsApp link
+                  //   },
+                  //   textColor: context.colors.success,
+                  //   borderColor: context.colors.success,
+                  // ),
                 ],
               ),
             ),

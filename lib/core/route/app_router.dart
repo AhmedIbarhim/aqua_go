@@ -46,6 +46,8 @@ import '../../features/support/presentation/views/faqs_view.dart';
 import '../../features/support/presentation/controllers/faqs_cubit.dart';
 
 import '../../features/my_bookings/presentation/controllers/my_booking_details_cubit.dart';
+import '../../features/subscriptions/presentation/controllers/subscriptions_controller/subscriptions_cubit.dart';
+import '../../features/profile/presentation/views/my_subscribed_packages_view.dart';
 
 import 'routes.dart';
 
@@ -91,9 +93,32 @@ abstract class AppRouter {
 
       case Routes.packages:
         return MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (_) => locator<PackagesCubit>()..getPackages(),
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (_) => locator<PackagesCubit>()..getPackages(),
+              ),
+              BlocProvider(
+                create: (_) => locator<SubscriptionsCubit>(),
+              ),
+            ],
             child: const PackagesView(),
+          ),
+        );
+
+      case Routes.mySubscribedPackages:
+        return MaterialPageRoute(
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (_) =>
+                    locator<SubscriptionsCubit>()..getActiveSubscriptions(),
+              ),
+              BlocProvider(
+                create: (_) => locator<PackagesCubit>()..getPackages(),
+              ),
+            ],
+            child: const MySubscribedPackagesView(),
           ),
         );
 

@@ -244,6 +244,8 @@ class ProfileView extends StatelessWidget {
                           onTap: () {
                             if (FetchUserData.isGuest()) {
                               _promptGuestToLogin(context);
+                            } else {
+                              context.pushNamed(Routes.mySubscribedPackages);
                             }
                           },
                         ),

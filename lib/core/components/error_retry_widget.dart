@@ -35,8 +35,8 @@ class ErrorRetryWidget extends StatelessWidget {
             const SizedBox(height: 12),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: context.colors.primary,
-                foregroundColor: context.colors.themeColor,
+                backgroundColor: context.colors.brandHover,
+                foregroundColor: context.colors.primary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -45,7 +45,7 @@ class ErrorRetryWidget extends StatelessWidget {
               child: Text(
                 LocaleKeys.retry.tr(),
                 style: AppTextStyles.medium14.copyWith(
-                  color: context.colors.themeColor,
+                  color: context.colors.primary,
                 ),
               ),
             ),

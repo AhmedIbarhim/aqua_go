@@ -95,10 +95,10 @@ class PackageCard extends StatelessWidget {
                             color: context.colors.primary,
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: packageModel.image.startsWith('http')
-                              ? CustomNetworkImage(packageModel.image)
+                          child: packageModel.iconUrl.isNotEmpty
+                              ? CustomNetworkImage(packageModel.iconUrl)
                               : Image.asset(
-                                  packageModel.image,
+                                  'assets/images/gift_demo.png',
                                   color: context.colors.textTheme,
                                 ),
                         ),

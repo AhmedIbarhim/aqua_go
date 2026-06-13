@@ -37,6 +37,7 @@ class CodegenLoader extends AssetLoader{
   "duration": "المدة",
   "retry": "إعادة المحاولة",
   "all": "الكل",
+  "expiry_date": "تاريخ الانتهاء",
   "onboarding": {
     "title1": "نظافة السيارة بسهولة",
     "title2": "تألق في أي وقت وأي مكان",
@@ -390,6 +391,7 @@ static const Map<String,dynamic> _en = {
   "duration": "Duration",
   "retry": "Retry",
   "all": "All",
+  "expiry_date": "Expiry Date",
   "onboarding": {
     "title1": "Effortless Car Care",
     "title2": "Shine Anytime, Anywhere",

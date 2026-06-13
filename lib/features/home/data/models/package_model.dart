@@ -4,6 +4,7 @@ import '../../../../core/constants.dart';
 
 class PackageModel {
   final String id;
+  final String referenceNumber;
   final String nameAr;
   final String nameEn;
   final String descriptionAr;
@@ -16,8 +17,6 @@ class PackageModel {
   final bool allowScheduleLater;
   final bool active;
   final List<String> bundledServiceIds;
-  final List<AddOnModel> includedAddons;
-  final List<AddOnModel> optionalAddons;
   final String createdAt;
   final String updatedAt;
   final int version;
@@ -25,10 +24,12 @@ class PackageModel {
   final bool isPopular;
   final int carsPerWash;
   final String effectiveFromAt;
+  final String iconUrl;
   final List<AddOnModel> addons;
 
   PackageModel({
     required this.id,
+    this.referenceNumber = '',
     required this.nameAr,
     required this.nameEn,
     required this.descriptionAr,
@@ -41,8 +42,6 @@ class PackageModel {
     required this.allowScheduleLater,
     required this.active,
     required this.bundledServiceIds,
-    required this.includedAddons,
-    required this.optionalAddons,
     required this.createdAt,
     required this.updatedAt,
     required this.version,
@@ -50,7 +49,8 @@ class PackageModel {
     required this.isPopular,
     required this.carsPerWash,
     required this.effectiveFromAt,
-    this.addons = const [],
+    this.iconUrl = '',
+    required this.addons,
   });
 
   // Dynamic getters for full backward compatibility
@@ -77,15 +77,18 @@ class PackageModel {
     return isArabic ? '$validityDays يوم' : '$validityDays Days';
   }
 
-  String get image =>
-      imageUrl.isNotEmpty ? imageUrl : 'assets/images/gift_demo.png';
-
   String get total => (num.parse(price) + num.parse(vat)).toStringAsFixed(2);
   String get vat => "0.0";
   // (num.parse(price) * .14).toStringAsFixed(2);
 
+  List<AddOnModel> get includedAddons =>
+      addons.where((e) => e.kind == 'INCLUDED').toList();
+
+  List<AddOnModel> get optionalAddons =>
+      addons.where((e) => e.kind == 'OPTIONAL').toList();
+
   factory PackageModel.fromJson(Map<String, dynamic> json) {
-    final List<AddOnModel> parsedAddons =
+    List<AddOnModel> parsedAddons =
         (json['addons'] as List<dynamic>?)
             ?.map((e) => AddOnModel.fromJson(e as Map<String, dynamic>))
             .toList() ??
@@ -101,8 +104,6 @@ class PackageModel {
       parsedIncluded = (json['addOns'] as List<dynamic>)
           .map((e) => AddOnModel.fromJson(e as Map<String, dynamic>))
           .toList();
-    } else {
-      parsedIncluded = parsedAddons.where((e) => e.kind == 'INCLUDED').toList();
     }
 
     if (json['optionalAddons'] != null) {
@@ -113,12 +114,21 @@ class PackageModel {
       parsedOptional = (json['availableOptionalAddons'] as List<dynamic>)
           .map((e) => AddOnModel.fromJson(e as Map<String, dynamic>))
           .toList();
-    } else {
-      parsedOptional = parsedAddons.where((e) => e.kind == 'OPTIONAL').toList();
+    }
+
+    if (parsedAddons.isEmpty) {
+      for (final addon in parsedIncluded) {
+        addon.kind ??= 'INCLUDED';
+      }
+      for (final addon in parsedOptional) {
+        addon.kind ??= 'OPTIONAL';
+      }
+      parsedAddons = [...parsedIncluded, ...parsedOptional];
     }
 
     return PackageModel(
       id: json['id'] as String? ?? '',
+      referenceNumber: json['referenceNumber'] as String? ?? '',
       nameAr: json['nameAr'] as String? ?? '',
       nameEn: json['nameEn'] as String? ?? '',
       descriptionAr: json['descriptionAr'] as String? ?? '',
@@ -136,8 +146,6 @@ class PackageModel {
               ?.map((e) => e.toString())
               .toList() ??
           [],
-      includedAddons: parsedIncluded,
-      optionalAddons: parsedOptional,
       createdAt: json['createdAt'] as String? ?? '',
       updatedAt: json['updatedAt'] as String? ?? '',
       version: (json['version'] as num?)?.toInt() ?? 0,
@@ -145,6 +153,7 @@ class PackageModel {
       isPopular: json['isPopular'] as bool? ?? false,
       carsPerWash: (json['carsPerWash'] as num?)?.toInt() ?? 0,
       effectiveFromAt: json['effectiveFromAt'] as String? ?? '',
+      iconUrl: json['iconUrl'] as String? ?? '',
       addons: parsedAddons,
     );
   }
@@ -152,6 +161,7 @@ class PackageModel {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'referenceNumber': referenceNumber,
       'nameAr': nameAr,
       'nameEn': nameEn,
       'descriptionAr': descriptionAr,
@@ -173,6 +183,7 @@ class PackageModel {
       'isPopular': isPopular,
       'carsPerWash': carsPerWash,
       'effectiveFromAt': effectiveFromAt,
+      'iconUrl': iconUrl,
       'addons': addons.map((e) => e.toJson()).toList(),
     };
   }
