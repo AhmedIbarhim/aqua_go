@@ -152,7 +152,12 @@ class _MySubscribedPackagesViewState extends State<MySubscribedPackagesView> {
                               context,
                             ),
                             SizedBox(height: sh(8)),
-                            _buildDetailCard(desc, context, sw, sh),
+                            _buildDetailCard(
+                              sub.description.isEmpty ? desc : sub.description,
+                              context,
+                              sw,
+                              sh,
+                            ),
                             SizedBox(height: sh(20)),
 
                             _buildSectionTitle(
@@ -328,33 +333,22 @@ class _MySubscribedPackagesViewState extends State<MySubscribedPackagesView> {
         ),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            LocaleKeys.bookings_total.tr(),
-            style: AppTextStyles.regular14.copyWith(
-              color: context.colors.textSecondary,
+            price.toStringAsFixed(2),
+            style: AppTextStyles.bold18.copyWith(
+              color: context.colors.textPrimary,
             ),
           ),
-          Row(
-            children: [
-              Text(
-                price.toStringAsFixed(2),
-                style: AppTextStyles.bold18.copyWith(
-                  color: context.colors.textPrimary,
-                ),
-              ),
-              const SizedBox(width: 6),
-              SvgPicture.asset(
-                AppAssets.currency,
-                width: 20,
-                height: 20,
-                colorFilter: ColorFilter.mode(
-                  context.colors.textPrimary,
-                  BlendMode.srcIn,
-                ),
-              ),
-            ],
+          const SizedBox(width: 6),
+          SvgPicture.asset(
+            AppAssets.currency,
+            width: 20,
+            height: 20,
+            colorFilter: ColorFilter.mode(
+              context.colors.textPrimary,
+              BlendMode.srcIn,
+            ),
           ),
         ],
       ),
@@ -380,13 +374,11 @@ class _MySubscribedPackagesViewState extends State<MySubscribedPackagesView> {
           color: context.colors.borderSecondary.withValues(alpha: 0.3),
         ),
       ),
-      child: Center(
-        child: Text(
-          formattedDate,
-          style: AppTextStyles.medium16.copyWith(
-            color: context.colors.textPrimary,
-            letterSpacing: 1.2,
-          ),
+      child: Text(
+        formattedDate,
+        style: AppTextStyles.medium16.copyWith(
+          color: context.colors.textPrimary,
+          letterSpacing: 1.2,
         ),
       ),
     );

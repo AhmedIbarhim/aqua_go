@@ -75,12 +75,6 @@ class _MyCarsViewState extends State<MyCarsView> {
         ),
         child: BlocConsumer<MyCarsCubit, MyCarsState>(
           listener: (context, state) {
-            if (state is MyCarsActionLoading) {
-              context.showLoadingOverlay();
-            } else {
-              context.hideLoadingOverlay();
-            }
-
             if (state is MyCarsActionSuccess && state is! MyCarsActionAdding) {
               context.showSuccessSnackBar(state.message);
             }
@@ -96,11 +90,7 @@ class _MyCarsViewState extends State<MyCarsView> {
               current is MyCarsInitial,
           builder: (context, state) {
             if (state is MyCarsLoading || state is MyCarsInitial) {
-              return Expanded(
-                child: SizedBox(
-                  child: Center(child: CustomLoadingIndicator(size: 80)),
-                ),
-              );
+              return const Center(child: CustomLoadingIndicator(size: 80));
             }
             if (state is MyCarsError) {
               return ErrorRetryWidget(
