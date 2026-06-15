@@ -154,17 +154,19 @@ class BookingRepository {
     }
   }
 
-  Future<Either<Failure, Map<String, dynamic>>> previewScheduleSubscriptionWash({
+  Future<Either<Failure, Map<String, dynamic>>>
+  previewScheduleSubscriptionWash({
     required String subscriptionId,
     required String washId,
     required Map<String, dynamic> scheduleData,
   }) async {
     try {
-      final response = await bookingsRemoteDataSource.previewScheduleSubscriptionWash(
-        subscriptionId: subscriptionId,
-        washId: washId,
-        scheduleData: scheduleData,
-      );
+      final response = await bookingsRemoteDataSource
+          .previewScheduleSubscriptionWash(
+            subscriptionId: subscriptionId,
+            washId: washId,
+            scheduleData: scheduleData,
+          );
       return response.fold(
         (failure) => left(failure),
         (data) => right(data as Map<String, dynamic>),
@@ -213,12 +215,13 @@ class BookingRepository {
   }) async {
     try {
       final idempotencyKey = 'customer-reschedule:$washId:$newScheduledAtIso';
-      final response = await bookingsRemoteDataSource.rescheduleSubscriptionWash(
-        subscriptionId: subscriptionId,
-        washId: washId,
-        rescheduleData: rescheduleData,
-        idempotencyKey: idempotencyKey,
-      );
+      final response = await bookingsRemoteDataSource
+          .rescheduleSubscriptionWash(
+            subscriptionId: subscriptionId,
+            washId: washId,
+            rescheduleData: rescheduleData,
+            idempotencyKey: idempotencyKey,
+          );
       return response.fold((failure) => left(failure), (data) {
         if (data != null) {
           try {

@@ -20,7 +20,9 @@ class BookingFlowConfig {
 
   // ─── Details View Sections ───
   bool get showCarSelection => true;
-  bool get showAddOns => flowType == BookingFlowType.service;
+  bool get showAddOns =>
+      flowType == BookingFlowType.service ||
+      flowType == BookingFlowType.package;
   bool get showDateTime => true;
 
   // ─── Summary View Sections ───

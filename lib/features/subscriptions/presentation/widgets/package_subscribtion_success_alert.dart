@@ -4,18 +4,34 @@ import 'package:svg_flutter/svg.dart';
 
 import '../../../../core/components/custom_button.dart';
 import '../../../../core/extentions/context_extentions.dart';
+import '../../../../core/route/routes.dart';
+import '../../../../core/route/app_router.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../../generated/locale_keys.g.dart';
+import '../../../booking/domain/configs/booking_flow_config.dart';
+import '../../../booking/domain/strategies/package_booking_submit.dart';
 
 class PackageSubscribtionSuccessAlert extends StatelessWidget {
   final String? referenceNumber;
+  final String? subscriptionId;
 
-  const PackageSubscribtionSuccessAlert({super.key, this.referenceNumber});
+  const PackageSubscribtionSuccessAlert({
+    super.key,
+    this.referenceNumber,
+    this.subscriptionId,
+  });
 
-  static Future<T?> show<T>(BuildContext context, {String? referenceNumber}) {
+  static Future<T?> show<T>(
+    BuildContext context, {
+    String? referenceNumber,
+    String? subscriptionId,
+  }) {
     return context.showCustomAlert<T>(
-      child: PackageSubscribtionSuccessAlert(referenceNumber: referenceNumber),
+      child: PackageSubscribtionSuccessAlert(
+        referenceNumber: referenceNumber,
+        subscriptionId: subscriptionId,
+      ),
     );
   }
 
@@ -64,7 +80,16 @@ class PackageSubscribtionSuccessAlert extends StatelessWidget {
           text: LocaleKeys.booking_package_request_wash.tr(),
           onPressed: () {
             context.pop();
-            // TODO: Implement navigation to request wash
+            context.pushNamed(
+              Routes.bookingLocation,
+              arguments: BookingFlowStartArgs(
+                flowConfig: const BookingFlowConfig(
+                  flowType: BookingFlowType.package,
+                ),
+                submitStrategy: const PackageBookingSubmit(),
+                subscriptionId: subscriptionId,
+              ),
+            );
           },
         ),
         const SizedBox(height: 16),
@@ -76,7 +101,7 @@ class PackageSubscribtionSuccessAlert extends StatelessWidget {
           textColor: context.colors.primary,
           onPressed: () {
             context.pop();
-            // TODO: Implement navigation to home
+            context.pushNamedAndRemoveUntil(Routes.layout);
           },
         ),
       ],

@@ -1,3 +1,4 @@
+import 'package:aqua_go/core/components/custom_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
@@ -29,7 +30,9 @@ class PackageSubscribtionDetailsContent extends StatelessWidget {
         SizedBox(
           height: height * 0.25,
           width: width * 0.75,
-          child: SvgPicture.asset(AppAssets.onboarding1, fit: BoxFit.fill),
+          child: packageModel.imageUrl.isNotEmpty
+              ? CustomNetworkImage(packageModel.imageUrl, fit: BoxFit.cover)
+              : SvgPicture.asset(AppAssets.onboarding1, fit: BoxFit.fill),
         ),
         SizedBox(height: height * 0.05),
 

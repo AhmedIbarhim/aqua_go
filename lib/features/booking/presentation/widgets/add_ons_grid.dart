@@ -10,20 +10,21 @@ class AddOnsGrid extends StatelessWidget {
   final List<AddOnModel> addons;
   final Set<int> selectedIndices;
   final Function(int index) onServiceToggled;
+  final bool isPackageFlow;
 
   const AddOnsGrid({
     super.key,
     required this.addons,
     required this.selectedIndices,
     required this.onServiceToggled,
+    this.isPackageFlow = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    if (addons.isEmpty) {
-      return const SizedBox.shrink();
-    }
+    if (addons.isEmpty) return const SizedBox.shrink();
+
     return GridView.builder(
       shrinkWrap: true,
       padding: EdgeInsets.zero,
@@ -41,32 +42,48 @@ class AddOnsGrid extends StatelessWidget {
         final title = context.isAr
             ? (addon.nameAr ?? addon.nameEn ?? '')
             : (addon.nameEn ?? addon.nameAr ?? '');
-        final priceStr = addon.price.toStringAsFixed(2);
-        final iconUrl = addon.imageUrl ?? '';
+
+        // Package-specific: usage fraction & exhausted state
+        String? fraction;
+        bool isExhausted = false;
+        if (isPackageFlow &&
+            addon.maxQtyPerWash != null &&
+            addon.maxQtyPerWash! > 0) {
+          final used = addon.qty ?? 0;
+          final max = addon.maxQtyPerWash!;
+          fraction = '$used/$max';
+          isExhausted = used >= max;
+        }
 
         return GestureDetector(
-          onTap: () => onServiceToggled(index),
-          child: _buildAddOnCard(
-            context,
-            title,
-            priceStr,
-            iconUrl,
-            width,
-            isSelected: isSelected,
+          onTap: isExhausted ? null : () => onServiceToggled(index),
+          child: Opacity(
+            opacity: isExhausted ? 0.38 : 1.0,
+            child: _buildCard(
+              context,
+              addon,
+              title,
+              fraction,
+              width,
+              isSelected: isSelected && !isExhausted,
+            ),
           ),
         );
       },
     );
   }
 
-  Widget _buildAddOnCard(
+  Widget _buildCard(
     BuildContext context,
+    AddOnModel addon,
     String title,
-    String price,
-    String icon,
+    String? fraction,
     double width, {
     bool isSelected = false,
   }) {
+    final iconUrl = addon.imageUrl ?? '';
+    final priceStr = addon.price.toStringAsFixed(2);
+
     return Container(
       padding: EdgeInsets.all(width * 0.025),
       decoration: BoxDecoration(
@@ -83,7 +100,7 @@ class AddOnsGrid extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          _buildIcon(icon, width * 0.09),
+          _buildIcon(iconUrl, width * 0.09),
           SizedBox(width: width * 0.015),
           Expanded(
             child: Column(
@@ -96,11 +113,11 @@ class AddOnsGrid extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
+                const SizedBox(height: 2),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
-                      price,
+                      priceStr,
                       style: AppTextStyles.medium14.copyWith(
                         color: context.colors.textSecondary,
                       ),
@@ -114,6 +131,25 @@ class AddOnsGrid extends StatelessWidget {
                         BlendMode.srcIn,
                       ),
                     ),
+                    if (fraction != null) ...[
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 5,
+                          vertical: 1,
+                        ),
+                        decoration: BoxDecoration(
+                          color: context.colors.borderSecondary,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          fraction,
+                          style: AppTextStyles.regular12.copyWith(
+                            color: context.colors.textSecondary,
+                          ),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ],
@@ -124,13 +160,13 @@ class AddOnsGrid extends StatelessWidget {
     );
   }
 
-  Widget _buildIcon(String url, double width) {
+  Widget _buildIcon(String url, double size) {
     if (url.isEmpty) {
-      return SvgPicture.asset(AppAssets.fragant, width: width);
+      return SvgPicture.asset(AppAssets.fragant, width: size);
     }
     return SizedBox(
-      width: width,
-      height: width,
+      width: size,
+      height: size,
       child: CustomNetworkImage(url, fit: BoxFit.contain),
     );
   }

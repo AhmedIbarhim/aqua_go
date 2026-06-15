@@ -9,6 +9,7 @@ import '../../data/repos/booking_repository.dart';
 import '../../../../core/enums/payment_method_enum.dart';
 import '../../domain/strategies/booking_submit_strategy.dart';
 import 'booking_state.dart';
+import 'package:aqua_go/features/home/data/models/add_on_model.dart';
 import 'package:aqua_go/features/subscriptions/data/repos/subscriptions_repository.dart';
 import 'package:aqua_go/features/subscriptions/data/models/subscription_response_model/subscription_wash.dart';
 
@@ -97,6 +98,50 @@ class BookingCubit extends Cubit<BookingState> {
           return;
         }
 
+        // --- Build unified addons list from PackageInfo ---
+        // 1) Included addons — come with price data for when free qty runs out
+        final includedAddons = detailedPackage.packageInfo.includedAddons
+            .map((a) => AddOnModel(
+                  id: a.id,
+                  nameAr: a.nameAr,
+                  nameEn: a.nameEn,
+                  priceMinor: a.priceMinor,
+                  currency: a.currency,
+                  imageUrl: a.imageUrl,
+                  freeQty: a.freeQty,
+                  maxQtyPerWash: a.maxQtyPerWash,
+                  qty: a.qty,
+                  kind: 'included',
+                ))
+            .toList();
+
+        // 2) Optional addons — always paid. Prefer packageInfo, fall back to wash.
+        final rawOptional = detailedPackage.packageInfo.optionalAddons.isNotEmpty
+            ? detailedPackage.packageInfo.optionalAddons
+            : wash.availableOptionalAddons;
+        final optionalAddons = rawOptional
+            .map((a) => AddOnModel(
+                  id: a.id,
+                  nameAr: a.nameAr,
+                  nameEn: a.nameEn,
+                  priceMinor: a.priceMinor,
+                  currency: a.currency,
+                  imageUrl: a.imageUrl,
+                  kind: 'optional',
+                ))
+            .toList();
+
+        final allAddons = [...includedAddons, ...optionalAddons];
+
+        final includedIds = includedAddons
+            .map((a) => a.id)
+            .whereType<String>()
+            .toSet();
+        final optionalIds = optionalAddons
+            .map((a) => a.id)
+            .whereType<String>()
+            .toSet();
+
         final service = ServiceModel(
           id: detailedPackage.packageId,
           code: '',
@@ -106,7 +151,7 @@ class BookingCubit extends Cubit<BookingState> {
           ),
           rawDescription: const ServiceDescription(descAr: '', descEn: ''),
           active: true,
-          addons: wash.availableOptionalAddons,
+          addons: allAddons,
         );
 
         emit(
@@ -115,6 +160,8 @@ class BookingCubit extends Cubit<BookingState> {
             selectedService: service,
             washId: wash.washId,
             subscriptionId: subscriptionId,
+            includedAddonIds: includedIds,
+            optionalAddonIds: optionalIds,
           ),
         );
       },

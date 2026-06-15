@@ -99,7 +99,9 @@ class BookingSummaryModel {
   }
 
   factory BookingSummaryModel.fromDetails(BookingResponseModel details) {
-    final vehicle = details.vehicles?.isNotEmpty == true ? details.vehicles!.first : null;
+    final vehicle = details.vehicles?.isNotEmpty == true
+        ? details.vehicles!.first
+        : null;
     return BookingSummaryModel(
       id: details.id,
       customerId: details.customerId,

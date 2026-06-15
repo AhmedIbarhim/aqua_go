@@ -53,6 +53,7 @@ class _PackageSubscribtionBottomSheetState
           PackageSubscribtionSuccessAlert.show(
             context,
             referenceNumber: state.subscription.referenceNumber,
+            subscriptionId: state.subscription.id,
           );
         } else if (state is SubscriptionsError) {
           context.showErrorSnackBar(state.message);

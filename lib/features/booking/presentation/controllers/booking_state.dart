@@ -29,6 +29,11 @@ class BookingState extends Equatable {
   final BookingResponseModel? createdBooking;
   final String? subscriptionId;
   final String? washId;
+  /// IDs of addons that are INCLUDED in the subscription but whose free
+  /// quota has been exhausted — selecting them requires payment.
+  final Set<String> includedAddonIds;
+  /// IDs of addons that are purely optional (always paid).
+  final Set<String> optionalAddonIds;
 
   const BookingState({
     this.status = BookingStatus.initial,
@@ -51,6 +56,8 @@ class BookingState extends Equatable {
     this.createdBooking,
     this.subscriptionId,
     this.washId,
+    this.includedAddonIds = const {},
+    this.optionalAddonIds = const {},
   });
 
   BookingState copyWith({
@@ -72,6 +79,8 @@ class BookingState extends Equatable {
     BookingResponseModel? createdBooking,
     String? subscriptionId,
     String? washId,
+    Set<String>? includedAddonIds,
+    Set<String>? optionalAddonIds,
     bool clearError = false,
   }) {
     return BookingState(
@@ -95,6 +104,8 @@ class BookingState extends Equatable {
       createdBooking: createdBooking ?? this.createdBooking,
       subscriptionId: subscriptionId ?? this.subscriptionId,
       washId: washId ?? this.washId,
+      includedAddonIds: includedAddonIds ?? this.includedAddonIds,
+      optionalAddonIds: optionalAddonIds ?? this.optionalAddonIds,
     );
   }
 
@@ -118,5 +129,7 @@ class BookingState extends Equatable {
     createdBooking,
     subscriptionId,
     washId,
+    includedAddonIds,
+    optionalAddonIds,
   ];
 }

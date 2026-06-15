@@ -18,6 +18,7 @@ import '../../../../generated/locale_keys.g.dart';
 import '../widgets/car_selection_list.dart';
 import '../widgets/add_ons_grid.dart';
 import '../widgets/date_time_picker.dart';
+import '../widgets/package_addon_payment_bottom_sheet.dart';
 import '../controllers/booking_cubit.dart';
 import '../controllers/booking_state.dart';
 import '../../../../core/route/app_router.dart';
@@ -25,6 +26,23 @@ import '../../../../core/helpers/shimmer_helper.dart';
 
 class BookingDetailsView extends StatelessWidget {
   const BookingDetailsView({super.key});
+
+  /// Returns true if any currently-selected addon in a package flow requires
+  /// payment (optional addons always do; included addons do when free qty = 0).
+  bool _requiresPayment(BookingState state) {
+    if (!state.flowConfig.isPackage) return false;
+    final addons = state.selectedService?.addons ?? [];
+    final optionalIds = state.optionalAddonIds;
+    final includedIds = state.includedAddonIds;
+    for (final idx in state.selectedServiceIndices) {
+      if (idx >= addons.length) continue;
+      final addon = addons[idx];
+      final id = addon.id ?? '';
+      if (optionalIds.contains(id)) return true;
+      if (includedIds.contains(id) && (addon.freeQty ?? 0) <= 0) return true;
+    }
+    return false;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -185,6 +203,7 @@ class BookingDetailsView extends StatelessWidget {
               onServiceToggled: (index) {
                 context.read<BookingCubit>().toggleService(index);
               },
+              isPackageFlow: config.isPackage,
             ),
           ],
           SizedBox(height: height * 0.02),
@@ -290,7 +309,17 @@ class BookingDetailsView extends StatelessWidget {
             text: LocaleKeys.bookings_book_now.tr(),
             enabled: isComplete,
             onPressed: isComplete
-                ? () {
+                ? () async {
+                    // For package flow with payable addons, collect payment
+                    // method before proceeding to the summary screen.
+                    if (_requiresPayment(bookingState)) {
+                      final confirmed =
+                          await PackageAddonPaymentBottomSheet.show(context);
+                      if (!context.mounted) return;
+                      // User tapped outside or dragged down — abort navigation.
+                      if (!confirmed) return;
+                    }
+                    if (!context.mounted) return;
                     context.pushNamed(
                       Routes.bookingSummary,
                       arguments: BookingFlowArgs(

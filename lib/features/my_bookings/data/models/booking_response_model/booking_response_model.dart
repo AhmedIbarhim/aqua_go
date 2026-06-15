@@ -6,6 +6,7 @@ import '../../enums/booking_status_enum.dart';
 import '../../enums/booking_type_enum.dart';
 import 'assigned_worker.dart';
 import 'booking_addon.dart';
+import 'booking_address.dart';
 import 'booking_vehicle.dart';
 import 'breakdown.dart';
 import 'cancellation_policy.dart';
@@ -15,6 +16,7 @@ import 'photos.dart';
 import 'reschedule_policy.dart';
 export 'assigned_worker.dart';
 export 'booking_addon.dart';
+export 'booking_address.dart';
 export 'booking_vehicle.dart';
 export 'bookings_list_response_model.dart';
 export 'breakdown.dart';
@@ -66,6 +68,7 @@ class BookingResponseModel {
   String? customerPhone;
   List<BookingAddon>? addOns;
   Breakdown? breakdown;
+  BookingAddress? address;
 
   BookingResponseModel({
     this.id,
@@ -109,6 +112,7 @@ class BookingResponseModel {
     this.customerPhone,
     this.addOns,
     this.breakdown,
+    this.address,
   });
 
   BookingResponseModel.fromJson(Map<String, dynamic> json) {
@@ -186,6 +190,9 @@ class BookingResponseModel {
     breakdown = json['breakdown'] != null
         ? Breakdown.fromJson(json['breakdown'])
         : null;
+    address = json['address'] != null
+        ? BookingAddress.fromJson(json['address'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -249,6 +256,9 @@ class BookingResponseModel {
     if (breakdown != null) {
       data['breakdown'] = breakdown!.toJson();
     }
+    if (address != null) {
+      data['address'] = address!.toJson();
+    }
     return data;
   }
 
@@ -258,18 +268,18 @@ class BookingResponseModel {
       ? (packageName?.ar ?? '')
       : (packageName?.en ?? '');
 
-  String get location => addressLabel ?? '';
+  String get location => addressLabel ?? address?.label ?? '';
 
-  double get latitude => addressLat != null
-      ? (addressLat!.toDouble().abs() > 180.0
-            ? addressLat!.toDouble() / 1000000.0
-            : addressLat!.toDouble())
+  double get latitude => (addressLat ?? address?.lat) != null
+      ? ((addressLat ?? address!.lat!).toDouble().abs() > 180.0
+            ? (addressLat ?? address!.lat!).toDouble() / 1000000.0
+            : (addressLat ?? address!.lat!).toDouble())
       : 0.0;
 
-  double get longitude => addressLng != null
-      ? (addressLng!.toDouble().abs() > 180.0
-            ? addressLng!.toDouble() / 1000000.0
-            : addressLng!.toDouble())
+  double get longitude => (addressLng ?? address?.lng) != null
+      ? ((addressLng ?? address!.lng!).toDouble().abs() > 180.0
+            ? (addressLng ?? address!.lng!).toDouble() / 1000000.0
+            : (addressLng ?? address!.lng!).toDouble())
       : 0.0;
 
   double get totalAmount => (totalAmountMinor ?? 0) / 100.0;
