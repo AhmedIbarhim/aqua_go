@@ -56,6 +56,7 @@ dependencies:
   image_cropper: ^12.2.1
   image_picker: ^1.2.2
   modal_progress_hud_nsn: ^0.5.1
+  pinput: ^6.0.2
   provider: ^6.1.5+1
   shared_preferences: ^2.5.5
   skeletonizer: ^2.1.3
