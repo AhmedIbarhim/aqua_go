@@ -32,6 +32,7 @@ import '../widgets/booking_details_number_card.dart';
 import '../widgets/booking_details_vehicle_card.dart';
 import '../widgets/booking_details_biker_card.dart';
 import '../widgets/booking_details_summary_card.dart';
+import '../widgets/booking_details_worker_notes_cart.dart';
 
 class MyBookingDetailsArgs {
   final BookingSummaryModel booking;
@@ -114,6 +115,11 @@ class MyBookingDetailsView extends StatelessWidget {
                             const SizedBox(height: 16),
                           ],
                           BookingDetailsSummaryCard(booking: activeBooking),
+                          if (activeBooking.workerNotes != null &&
+                              activeBooking.workerNotes!.isNotEmpty) ...[
+                            const SizedBox(height: 16),
+                            BookingDetailsWorkerNotesCard(booking: activeBooking),
+                          ],
 
                           if (activeBooking.status !=
                               BookingStatus.COMPLETED) ...[
@@ -222,7 +228,8 @@ class MyBookingDetailsView extends StatelessWidget {
             color: booking.vehicles?.firstOrNull?.vehicleColor ?? '',
             modelYear: booking.vehicles?.firstOrNull?.vehicleYear ?? 0,
             logoUrl: booking.vehicles?.firstOrNull?.makeLogoUrl ?? '',
-            plateNumber: booking.plate ?? booking.vehicles?.firstOrNull?.plate ?? '',
+            plateNumber:
+                booking.plate ?? booking.vehicles?.firstOrNull?.plate ?? '',
           );
 
           final service = ServiceModel(

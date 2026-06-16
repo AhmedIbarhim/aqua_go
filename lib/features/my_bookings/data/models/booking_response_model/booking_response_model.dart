@@ -14,6 +14,7 @@ import 'invoice.dart';
 import 'package_name.dart';
 import 'photos.dart';
 import 'reschedule_policy.dart';
+import 'service_name.dart';
 export 'assigned_worker.dart';
 export 'booking_addon.dart';
 export 'booking_address.dart';
@@ -63,6 +64,7 @@ class BookingResponseModel {
   String? addressArrivalNotes;
   List<BookingVehicle>? vehicles;
   PackageName? packageName;
+  ServiceName? serviceName;
   ReschedulePolicy? reschedulePolicy;
   String? customerName;
   String? customerPhone;
@@ -107,6 +109,7 @@ class BookingResponseModel {
     this.addressArrivalNotes,
     this.vehicles,
     this.packageName,
+    this.serviceName,
     this.reschedulePolicy,
     this.customerName,
     this.customerPhone,
@@ -176,6 +179,9 @@ class BookingResponseModel {
     packageName = json['packageName'] != null
         ? PackageName.fromJson(json['packageName'])
         : null;
+    serviceName = json['serviceName'] != null
+        ? ServiceName.fromJson(json['serviceName'])
+        : null;
     reschedulePolicy = json['reschedulePolicyView'] != null
         ? ReschedulePolicy.fromJson(json['reschedulePolicyView'])
         : null;
@@ -195,78 +201,11 @@ class BookingResponseModel {
         : null;
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
-    data['referenceNumber'] = referenceNumber;
-    data['customerId'] = customerId;
-    data['workerId'] = workerId;
-    data['addressLabel'] = addressLabel;
-    data['addressLat'] = addressLat;
-    data['addressLng'] = addressLng;
-    data['zoneId'] = zoneId;
-    data['packageId'] = packageId;
-    data['type'] = type?.name;
-    data['status'] = status?.name;
-    data['scheduledAt'] = scheduledAt;
-    data['createdAt'] = createdAt;
-    data['updatedAt'] = updatedAt;
-    data['quoteId'] = quoteId;
-    data['totalAmountMinor'] = totalAmountMinor;
-    data['currency'] = currency;
-    data['paymentStatus'] = paymentStatus;
-    data['paymentIntentId'] = paymentIntentId;
-    data['invoiceId'] = invoiceId;
-    data['paymentVoidedAt'] = paymentVoidedAt;
-    data['paymentStuckDetectedAt'] = paymentStuckDetectedAt;
-    data['cancellationFeeMinor'] = cancellationFeeMinor;
-    data['cancellationFeeWaived'] = cancellationFeeWaived;
-    data['reschedulesUsed'] = reschedulesUsed;
-    data['rescheduledAt'] = rescheduledAt;
-    if (cancellationPolicy != null) {
-      data['cancellationPolicy'] = cancellationPolicy!.toJson();
-    }
-    data['pspRedirectUrl'] = pspRedirectUrl;
-    if (photos != null) {
-      data['photos'] = photos!.map((v) => v.toJson()).toList();
-    }
-    if (assignedWorker != null) {
-      data['assignedWorker'] = assignedWorker!.toJson();
-    }
-    data['plate'] = plate;
-    if (invoice != null) {
-      data['invoice'] = invoice!.toJson();
-    }
-    data['workerNotes'] = workerNotes;
-    data['addressArrivalNotes'] = addressArrivalNotes;
-    if (vehicles != null) {
-      data['vehicles'] = vehicles!.map((v) => v.toJson()).toList();
-    }
-    if (packageName != null) {
-      data['packageName'] = packageName!.toJson();
-    }
-    if (reschedulePolicy != null) {
-      data['reschedulePolicyView'] = reschedulePolicy!.toJson();
-    }
-    data['customerName'] = customerName;
-    data['customerPhone'] = customerPhone;
-    if (addOns != null) {
-      data['addOns'] = addOns!.map((v) => v.toJson()).toList();
-    }
-    if (breakdown != null) {
-      data['breakdown'] = breakdown!.toJson();
-    }
-    if (address != null) {
-      data['address'] = address!.toJson();
-    }
-    return data;
-  }
-
   // --- UI Compatibility Helpers ---
   String get title =>
       CacheClient.getString(kLanguage, defaultValue: kArabicLang) == kArabicLang
-      ? (packageName?.ar ?? '')
-      : (packageName?.en ?? '');
+      ? (serviceName?.ar ?? packageName?.ar ?? '')
+      : (serviceName?.ar ?? packageName?.en ?? '');
 
   String get location => addressLabel ?? address?.label ?? '';
 

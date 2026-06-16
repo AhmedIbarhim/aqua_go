@@ -36,11 +36,7 @@ class BookingDetailsSummaryCard extends StatelessWidget {
               _buildSummaryRow(
                 context,
                 title: LocaleKeys.bookings_service_name.tr(),
-                value: context.isAr
-                    ? (booking.packageName?.ar ?? booking.packageName?.en ?? '')
-                    : (booking.packageName?.en ??
-                          booking.packageName?.ar ??
-                          ''),
+                value: booking.title,
                 icon: AppAssets.document,
               ),
               _buildSummaryRow(

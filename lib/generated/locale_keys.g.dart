@@ -128,6 +128,7 @@ abstract class  LocaleKeys {
   static const bookings_previous_bookings = 'bookings.previous_bookings';
   static const bookings_current_bookings = 'bookings.current_bookings';
   static const bookings_upcoming = 'bookings.upcoming';
+  static const bookings_notes = 'bookings.notes';
   static const bookings_booking_details = 'bookings.booking_details';
   static const bookings_car_location = 'bookings.car_location';
   static const bookings_add_car = 'bookings.add_car';

@@ -12,6 +12,8 @@ class MyBookingDetailsCubit extends Cubit<MyBookingDetailsState> {
 
     final result = await _repository.getBookingDetails(id);
 
+    // if (isClosed) return;
+
     result.fold(
       (failure) => emit(MyBookingDetailsFailure(failure.message)),
       (booking) => emit(MyBookingDetailsSuccess(booking)),
