@@ -49,9 +49,9 @@ class MyCarCard extends StatelessWidget {
                 // Car Image
                 Center(
                   child: SizedBox(
-                    height: height * 0.07,
+                    height: height * 0.15,
                     child: Image.asset(
-                      AppAssets.myCar,
+                      AppAssets.myVehicle,
                       color: Color(car.colorCode),
                       fit: BoxFit.fill,
                     ),

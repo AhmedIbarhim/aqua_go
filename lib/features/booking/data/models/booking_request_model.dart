@@ -37,6 +37,7 @@ class BookingRequestModel {
       time != null;
 
   Map<String, dynamic> toJson() {
+    final addr = address;
     String? scheduledAt;
     if (date != null && time != null) {
       scheduledAt = DayTimeModel(
@@ -46,19 +47,21 @@ class BookingRequestModel {
     }
 
     final isSavedAddress =
-        address?.id != null &&
-        address?.id != 'current_gps' &&
-        address?.id != 'custom_map';
+        addr?.id != null &&
+        addr?.id != 'current_gps' &&
+        addr?.id != 'custom_map';
 
     return {
       if (quote?.quoteId != null) 'quoteId': quote!.quoteId,
-      if (isSavedAddress) 'savedAddressId': address?.id,
-      if (!isSavedAddress && address != null) ...{
-        'addressLabel': address?.label ?? '',
-        'lat': address?.lat ?? 0.0,
-        'lng': address?.lng ?? 0.0,
-        if (address?.arrivalNotes != null)
-          'addressArrivalNotes': address?.arrivalNotes,
+      if (isSavedAddress) ...{
+        'savedAddressId': addr?.id,
+        // 'addressLabel': addr?.details ?? '',
+      },
+      if (!isSavedAddress && addr != null) ...{
+        'addressLabel': addr.details.isNotEmpty ? addr.details : addr.label,
+        'lat': addr.lat,
+        'lng': addr.lng,
+        if (addr.arrivalNotes != null) 'addressArrivalNotes': addr.arrivalNotes,
       },
       'vehicles': [
         {
@@ -78,9 +81,7 @@ class BookingRequestModel {
       'scheduledAt': ?scheduledAt,
       if (workerNotes.isNotEmpty) 'workerNotes': workerNotes,
       if (serviceAddOns.isNotEmpty)
-        'addOns': serviceAddOns
-            .map((e) => {'addonId': e.id})
-            .toList(),
+        'addOns': serviceAddOns.map((e) => {'addonId': e.id}).toList(),
       if (paymentMethod != null) 'paymentMethod': paymentMethod!.name,
     };
   }

@@ -67,6 +67,7 @@ abstract class AppAssets {
   static const String colorDropper = 'assets/images/color_dropper.png';
   static const String note = 'assets/svg/note.svg';
   static const String myCar = 'assets/images/my_car.png';
+  static const String myVehicle = 'assets/images/my_vehicle.png';
   static const String demoLandcroser = 'assets/images/demo_landcroser.png';
 
   // Booking
