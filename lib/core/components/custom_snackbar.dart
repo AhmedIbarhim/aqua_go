@@ -6,7 +6,7 @@ class CustomSnackbar {
   static void showSuccess(
     BuildContext context,
     String message, {
-    Duration duration = const Duration(seconds: 4),
+    Duration duration = const Duration(seconds: 1),
   }) {
     _show(
       context,
@@ -20,7 +20,7 @@ class CustomSnackbar {
   static void showError(
     BuildContext context,
     String message, {
-    Duration duration = const Duration(seconds: 4),
+    Duration duration = const Duration(seconds: 1),
   }) {
     _show(
       context,
@@ -34,7 +34,7 @@ class CustomSnackbar {
   static void showWarning(
     BuildContext context,
     String message, {
-    Duration duration = const Duration(seconds: 4),
+    Duration duration = const Duration(seconds: 1),
   }) {
     _show(
       context,

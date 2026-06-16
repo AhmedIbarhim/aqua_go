@@ -98,14 +98,18 @@ class RefreshTokenInterceptor extends Interceptor {
       );
 
       // Validate HTTP status code
-      if (refreshResponse.statusCode == null || refreshResponse.statusCode! < 200 || refreshResponse.statusCode! >= 300) {
+      if (refreshResponse.statusCode == null ||
+          refreshResponse.statusCode! < 200 ||
+          refreshResponse.statusCode! >= 300) {
         return null;
       }
 
       // Accept both camelCase and snake_case keys to be defensive against server variations
       final data = refreshResponse.data as Map<String, dynamic>?;
-      final newAccessToken = (data?['accessToken'] ?? data?['access_token']) as String?;
-      final newRefreshToken = (data?['refreshToken'] ?? data?['refresh_token']) as String?;
+      final newAccessToken =
+          (data?['accessToken'] ?? data?['access_token']) as String?;
+      final newRefreshToken =
+          (data?['refreshToken'] ?? data?['refresh_token']) as String?;
 
       if (newAccessToken != null && newAccessToken.isNotEmpty) {
         // Persist the new tokens
@@ -138,5 +142,9 @@ class RefreshTokenInterceptor extends Interceptor {
       Routes.login,
       (route) => false,
     );
+
+    // Future.delayed(const Duration(seconds: 2), () {
+    //   _isRedirecting = false;
+    // });
   }
 }

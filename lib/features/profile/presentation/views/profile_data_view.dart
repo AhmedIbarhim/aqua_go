@@ -80,9 +80,7 @@ class _ProfileDataViewState extends State<ProfileDataView> {
               setState(() => isEditing = false);
             }
           } else if (state is ProfileUpdateError) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(state.message)));
+            context.showErrorSnackBar(state.message);
           }
         },
         child: Builder(

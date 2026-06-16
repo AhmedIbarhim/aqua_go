@@ -98,8 +98,13 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
             Row(
               children: [
                 BlocProvider(
-                  create: (context) =>
-                      locator<NotificationsCubit>()..fetchUnreadCount(),
+                  create: (context) {
+                    final cubit = locator<NotificationsCubit>();
+                    if (!FetchUserData.isGuest()) {
+                      cubit.fetchUnreadCount();
+                    }
+                    return cubit;
+                  },
                   child: BlocBuilder<NotificationsCubit, NotificationsState>(
                     builder: (context, state) {
                       final int unreadCount = state is NotificationsSuccess
@@ -109,11 +114,15 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                         children: [
                           GestureDetector(
                             onTap: () async {
-                              await context.pushNamed(Routes.notification);
-                              if (context.mounted) {
-                                context
-                                    .read<NotificationsCubit>()
-                                    .fetchUnreadCount();
+                              if (FetchUserData.isGuest()) {
+                                FetchUserData.promptGuestToLogin(context);
+                              } else {
+                                await context.pushNamed(Routes.notification);
+                                if (context.mounted) {
+                                  context
+                                      .read<NotificationsCubit>()
+                                      .fetchUnreadCount();
+                                }
                               }
                             },
                             child: Container(

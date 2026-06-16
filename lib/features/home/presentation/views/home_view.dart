@@ -21,6 +21,7 @@ import '../widgets/offers_list_view.dart';
 import '../widgets/current_package_section.dart';
 import '../../../../core/helpers/shimmer_helper.dart';
 import '../../../../core/components/error_retry_widget.dart';
+import '../../../../core/helpers/fetch_user_data_helper.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -43,7 +44,9 @@ class _HomeViewState extends State<HomeView> {
     _servicesCubit.getServices();
     _bannersCubit.getBanners();
     _packagesCubit.getPackages();
-    _subscriptionsCubit.getActiveSubscriptions();
+    if (!FetchUserData.isGuest()) {
+      _subscriptionsCubit.getActiveSubscriptions();
+    }
   }
 
   @override
@@ -88,7 +91,8 @@ class _HomeViewState extends State<HomeView> {
                           _servicesCubit.getServices(),
                           _bannersCubit.getBanners(),
                           _packagesCubit.getPackages(),
-                          _subscriptionsCubit.getActiveSubscriptions(),
+                          if (!FetchUserData.isGuest())
+                            _subscriptionsCubit.getActiveSubscriptions(),
                         ]);
                       },
                     ),
@@ -102,7 +106,8 @@ class _HomeViewState extends State<HomeView> {
                     _servicesCubit.getServices(),
                     _bannersCubit.getBanners(),
                     _packagesCubit.getPackages(),
-                    _subscriptionsCubit.getActiveSubscriptions(),
+                    if (!FetchUserData.isGuest())
+                      _subscriptionsCubit.getActiveSubscriptions(),
                   ]);
                 },
                 child: SingleChildScrollView(
