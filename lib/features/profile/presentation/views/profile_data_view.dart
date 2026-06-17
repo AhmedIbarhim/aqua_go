@@ -177,11 +177,22 @@ class _ProfileDataViewState extends State<ProfileDataView> {
   }
 
   Future<void> _selectDate() async {
+    final DateTime now = DateTime.now();
+    final DateTime lastDate = now.subtract(const Duration(days: 16 * 365));
+    final DateTime firstDate = DateTime(now.year - 90);
+
+    DateTime initialDate = _birthDate ?? DateTime(1990);
+    if (initialDate.isBefore(firstDate)) {
+      initialDate = firstDate;
+    } else if (initialDate.isAfter(lastDate)) {
+      initialDate = lastDate;
+    }
+
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: _birthDate ?? DateTime(1990),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
+      initialDate: initialDate,
+      firstDate: firstDate,
+      lastDate: lastDate,
     );
     if (picked != null) {
       setState(() {
