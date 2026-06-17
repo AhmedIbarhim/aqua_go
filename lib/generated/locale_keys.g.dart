@@ -336,5 +336,7 @@ abstract class  LocaleKeys {
   static const snackbar_booking_created = 'snackbar.booking_created';
   static const snackbar_booking_rescheduled = 'snackbar.booking_rescheduled';
   static const snackbar = 'snackbar';
+  static const errors_internal_error = 'errors.internal_error';
+  static const errors = 'errors';
 
 }

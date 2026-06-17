@@ -37,9 +37,21 @@ class PackageBookingSubmit implements BookingSubmitStrategy {
       scheduledAt = '${scheduledAt}Z';
     }
 
+    final addr = state.selectedAddress;
+    final isSavedAddress =
+        addr?.id != null &&
+        addr?.id != 'current_gps' &&
+        addr?.id != 'custom_map';
+
     final scheduleData = {
       'scheduledAt': scheduledAt,
-      'addressId': state.selectedAddress?.id,
+      if (isSavedAddress) 'savedAddressId': addr?.id,
+      if (!isSavedAddress && addr != null) ...{
+        'addressLabel': addr.details.isNotEmpty ? addr.details : addr.label,
+        'lat': addr.lat,
+        'lng': addr.lng,
+        if (addr.arrivalNotes != null) 'addressArrivalNotes': addr.arrivalNotes,
+      },
       'vehicleIds': vehicleIds,
       'addOns': addonsJson,
     };

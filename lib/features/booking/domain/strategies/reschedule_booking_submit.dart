@@ -29,7 +29,7 @@ class RescheduleBookingSubmit implements BookingSubmitStrategy {
       bookingId: existingBookingId,
       date: state.selectedDate!,
       time: state.selectedTime!,
-      addressId: state.selectedAddress?.id,
+      address: state.selectedAddress,
       vehicleIds: vehicleIds,
     );
 

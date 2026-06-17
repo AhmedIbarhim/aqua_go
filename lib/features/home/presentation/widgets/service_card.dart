@@ -132,17 +132,19 @@ class ServiceCard extends StatelessWidget {
                     ),
                     Expanded(
                       flex: 5,
-                      child: Transform.flip(
-                        flipX: context.isEn,
-                        child:
-                            serviceModel.imageUrl != null &&
-                                serviceModel.imageUrl!.isNotEmpty
-                            ? CustomNetworkImage(serviceModel.imageUrl!)
-                            : Image.asset(
-                                AppAssets.carDemo,
-                                fit: BoxFit.fill,
-                                color: context.colors.primary,
-                              ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Transform.flip(
+                          flipX: context.isEn,
+                          child:
+                              serviceModel.imageUrl != null &&
+                                  serviceModel.imageUrl!.isNotEmpty
+                              ? CustomNetworkImage(serviceModel.imageUrl!)
+                              : Image.asset(
+                                  AppAssets.carDemo,
+                                  fit: BoxFit.fill,
+                                ),
+                        ),
                       ),
                     ),
                   ],

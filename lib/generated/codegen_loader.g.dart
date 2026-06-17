@@ -370,6 +370,9 @@ class CodegenLoader extends AssetLoader{
     "default_error": "عذرا، حدث خطأ ما. يرجى المحاولة مرة أخرى لاحقًا",
     "booking_created": "تم إنشاء الحجز بنجاح",
     "booking_rescheduled": "تم تعديل الحجز بنجاح"
+  },
+  "errors": {
+    "internal_error": "الموقع قيد الصيانة، سنعود قريباً"
   }
 };
 static const Map<String,dynamic> _en = {
@@ -728,6 +731,9 @@ static const Map<String,dynamic> _en = {
     "default_error": "Oops, something went wrong. Please try again later",
     "booking_created": "Booking created successfully",
     "booking_rescheduled": "Booking updated successfully"
+  },
+  "errors": {
+    "internal_error": "The site is currently under maintenance, we will be back soon"
   }
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"ar": _ar, "en": _en};

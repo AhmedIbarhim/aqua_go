@@ -102,8 +102,8 @@ class ServerFailure extends Failure {
       case StatusCodes.internalServerError:
       case StatusCodes.badGateway:
       case StatusCodes.serviceUnavailable:
-        return const ServerFailure(
-          'Internal server error',
+        return ServerFailure(
+          LocaleKeys.errors_internal_error.tr(),
           type: FailureType.server,
         );
 
