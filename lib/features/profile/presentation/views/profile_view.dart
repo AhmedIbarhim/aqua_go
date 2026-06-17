@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:aqua_go/core/config/di/service_locator.dart';
 import 'package:aqua_go/features/auth/presentation/controllers/auth_cubit/auth_cubit.dart';
 
+import '../../../auth/data/repos/auth_repository.dart';
 import '../../../rating/presentation/widgets/rating_widget.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/helpers/fetch_user_data_helper.dart';
@@ -19,9 +20,14 @@ import '../../../../core/utils/image_picker_helper.dart';
 
 import '../widgets/profile_tile.dart';
 
-class ProfileView extends StatelessWidget {
+class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
 
+  @override
+  State<ProfileView> createState() => _ProfileViewState();
+}
+
+class _ProfileViewState extends State<ProfileView> {
   @override
   Widget build(BuildContext context) {
     double sw(double width) => context.sw(width);
@@ -43,6 +49,7 @@ class ProfileView extends StatelessWidget {
             context.showSuccessSnackBar(
               LocaleKeys.snackbar_profile_updated_success.tr(),
             );
+            locator<AuthRepository>().getUser();
           } else if (state is ProfileUpdateError) {
             context.showErrorSnackBar(state.message);
           } else if (state is LoginError) {
@@ -322,7 +329,9 @@ class ProfileView extends StatelessWidget {
         if (FetchUserData.isGuest()) {
           _promptGuestToLogin(context);
         } else {
-          context.pushNamed(Routes.profileData);
+          context.pushNamed(Routes.profileData).then((_) {
+            if (mounted) setState(() {});
+          });
         }
       },
       child: Container(

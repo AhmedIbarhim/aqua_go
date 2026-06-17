@@ -241,6 +241,7 @@ abstract class  LocaleKeys {
   static const profile_edit_profile = 'profile.edit_profile';
   static const profile_view_profile = 'profile.view_profile';
   static const profile_edit_profile_data = 'profile.edit_profile_data';
+  static const profile_complete_profile = 'profile.complete_profile';
   static const profile_full_name = 'profile.full_name';
   static const profile_dob = 'profile.dob';
   static const profile_gender = 'profile.gender';

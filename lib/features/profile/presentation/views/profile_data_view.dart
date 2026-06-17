@@ -52,10 +52,16 @@ class _ProfileDataViewState extends State<ProfileDataView> {
     if (!widget.isFirstTime && user?.gender != null) {
       _gender = GenderEnumExtension.fromString(user?.gender);
     }
+    _nameController.addListener(_onNameChanged);
+  }
+
+  void _onNameChanged() {
+    setState(() {});
   }
 
   @override
   void dispose() {
+    _nameController.removeListener(_onNameChanged);
     _nameController.dispose();
     _dobController.dispose();
     super.dispose();
@@ -88,7 +94,9 @@ class _ProfileDataViewState extends State<ProfileDataView> {
             return Scaffold(
               backgroundColor: context.colors.screenBG,
               appBar: GenericAppBar(
-                title: isEditing
+                title: widget.isFirstTime
+                    ? LocaleKeys.profile_complete_profile.tr()
+                    : isEditing
                     ? LocaleKeys.profile_edit_profile_data.tr()
                     : LocaleKeys.profile_view_profile.tr(),
               ),
@@ -129,7 +137,7 @@ class _ProfileDataViewState extends State<ProfileDataView> {
                               label: LocaleKeys.profile_dob.tr(),
                               hint: '',
                               controller: _dobController,
-                              isRequired: false,
+                              isRequired: isEditing,
                               enabled: isEditing,
                               readOnly: true,
                               onTap: isEditing ? _selectDate : null,
@@ -223,11 +231,12 @@ class _ProfileDataViewState extends State<ProfileDataView> {
       child: widget.isFirstTime
           ? CustomButton(
               text: LocaleKeys.proceed.tr(),
+              enabled: _formIsValid(),
               onPressed: () {
                 final user = locator<AuthRepository>().getUser();
                 if (user != null) {
                   final updatedUser = user.copyWith(
-                    name: _nameController.text,
+                    name: _nameController.text.trim(),
                     gender: _gender.name,
                     birthdate: _birthDate,
                     locale: context.isAr ? 'ar_SA' : 'en',
@@ -249,11 +258,12 @@ class _ProfileDataViewState extends State<ProfileDataView> {
                   flex: 2,
                   child: CustomButton(
                     text: LocaleKeys.profile_save_changes.tr(),
+                    enabled: _formIsValid(),
                     onPressed: () {
                       final user = locator<AuthRepository>().getUser();
                       if (user != null) {
                         final updatedUser = user.copyWith(
-                          name: _nameController.text,
+                          name: _nameController.text.trim(),
                           gender: _gender.name,
                           birthdate: _birthDate,
                           locale: context.isAr ? 'ar_SA' : 'en',
@@ -289,5 +299,9 @@ class _ProfileDataViewState extends State<ProfileDataView> {
               onPressed: () => setState(() => isEditing = true),
             ),
     );
+  }
+
+  bool _formIsValid() {
+    return _nameController.text.trim().isNotEmpty && _birthDate != null;
   }
 }

@@ -9,8 +9,6 @@ import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/core/route/routes.dart';
 import 'package:aqua_go/core/route/app_router.dart';
 
-import '../config/networking/endpoints.dart';
-
 class FetchUserData {
   static UserModel? getUser() {
     return locator<AuthRepository>().getUser();
@@ -37,8 +35,10 @@ class FetchUserData {
     if (avatar != null && avatar.isNotEmpty) {
       return avatar;
     }
-    final name = getUser()?.name;
-    return name != null ? Endpoints.nameAvatar(name) : null;
+
+    return null;
+    // final name = getUser()?.name;
+    // return name != null ? Endpoints.nameAvatar(name) : null;
   }
 
   static String? getEmail() {
