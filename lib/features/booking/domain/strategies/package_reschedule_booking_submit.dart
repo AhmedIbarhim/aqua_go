@@ -36,7 +36,7 @@ class PackageRescheduleBookingSubmit implements BookingSubmitStrategy {
 
     final rescheduleData = {
       'newScheduledAt': scheduledAt,
-      if (isSavedAddress) 'savedAddressId': addr?.id,
+      if (isSavedAddress) 'addressId': addr?.id,
       if (!isSavedAddress && addr != null) ...{
         'addressLabel': addr.details.isNotEmpty ? addr.details : addr.label,
         'lat': addr.lat,
