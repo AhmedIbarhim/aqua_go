@@ -17,25 +17,6 @@ class VehicleColorPicker extends StatelessWidget {
     required this.onColorChanged,
   });
 
-  // static const List<Color> _availableColors = [
-  //   Color(0xFFa97142), // Bronze
-  //   Color(0xFFf97316), // Orange
-  //   Color(0xFF4b5563), // Charcoal
-  //   Color(0xFF9ca3af), // Gray
-  //   Color(0xFFc0c0c0), // Silver
-  //   Color(0xFFf5f5f0), // Pearl White
-  //   Color(0xFFffffff), // White
-  //   Color(0xFF0e0e0e), // Black
-  //   Color(0xFF7c4a2d), // Brown
-  //   Color(0xFFfacc15), // Yellow
-  //   Color(0xFF15803d), // Green
-  //   Color(0xFF7f1d1d), // Burgundy
-  //   Color(0xFFdc2626), // Red
-  //   Color(0xFF1e3a8a), // Dark Blue
-  //   Color(0xFF2563eb), // Blue
-  //   Color(0xFF7dd3fc), // Light Blue
-  // ];
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -47,6 +28,12 @@ class VehicleColorPicker extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
+                Text(
+                  "* ",
+                  style: AppTextStyles.regular14.copyWith(
+                    color: context.colors.error,
+                  ),
+                ),
                 Text(
                   LocaleKeys.my_cars_color.tr(),
                   style: AppTextStyles.medium14.copyWith(

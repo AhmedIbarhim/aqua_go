@@ -199,7 +199,7 @@ const darkAppColors = AppColors(
   error: Color(0xFFD90421),
   successLight: Color(0xFF22C55E),
   errorLight: Color(0xFFEF4444),
-  warning: Color(0xFFF59E0B),
+  warning: Color(0xFFF59E00),
 );
 
 // -----------------------------------------------------------------------------

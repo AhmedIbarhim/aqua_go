@@ -13,20 +13,20 @@ class ServerFailure extends Failure {
   factory ServerFailure.fromDioException(DioException dioException) {
     switch (dioException.type) {
       case DioExceptionType.connectionTimeout:
-        return const ServerFailure(
-          'Connection timeout with server',
+        return ServerFailure(
+          LocaleKeys.snackbar_connection_timeout.tr(),
           type: FailureType.timeout,
         );
 
       case DioExceptionType.sendTimeout:
-        return const ServerFailure(
-          'Send timeout with server',
+        return ServerFailure(
+          LocaleKeys.snackbar_connection_timeout.tr(),
           type: FailureType.timeout,
         );
 
       case DioExceptionType.receiveTimeout:
-        return const ServerFailure(
-          'Receive timeout with server',
+        return ServerFailure(
+          LocaleKeys.snackbar_connection_timeout.tr(),
           type: FailureType.timeout,
         );
 
@@ -37,8 +37,8 @@ class ServerFailure extends Failure {
         );
 
       case DioExceptionType.cancel:
-        return const ServerFailure(
-          'Request was cancelled',
+        return ServerFailure(
+          LocaleKeys.snackbar_connection_timeout.tr(),
           type: FailureType.cancelled,
         );
 

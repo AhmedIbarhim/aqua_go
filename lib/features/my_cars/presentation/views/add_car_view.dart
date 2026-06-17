@@ -86,7 +86,8 @@ class _AddCarViewState extends State<AddCarView> {
     return _selectedBrandModel != null &&
         _selectedModelModel != null &&
         isPlateValid &&
-        _selectedColor != null;
+        _selectedColor != null &&
+        _selectedYear != null;
   }
 
   @override
@@ -173,7 +174,7 @@ class _AddCarViewState extends State<AddCarView> {
                               20,
                               (index) => (2026 - index).toString(),
                             ),
-                            isRequired: false,
+                            isRequired: true,
                           ),
                           const SizedBox(height: 16),
                           CustomTextField(
@@ -215,15 +216,15 @@ class _AddCarViewState extends State<AddCarView> {
                 final brandId = _selectedBrandModel?.id ?? widget.car?.makeId;
                 final modelId = _selectedModelModel?.id ?? widget.car?.modelId;
 
-                if (brandId == null || modelId == null) {
-                  // Fallback safety check
-                  context.showWarningAlert(
-                    title: 'Error',
-                    message: 'Please select a valid brand and model.',
-                    primaryButtonText: 'OK',
-                  );
-                  return;
-                }
+                // if (brandId == null || modelId == null) {
+                //   // Fallback safety check
+                //   context.showWarningAlert(
+                //     title: 'Error',
+                //     message: 'Please select a valid brand and model.',
+                //     primaryButtonText: 'OK',
+                //   );
+                //   return;
+                // }
 
                 // Format Color to ARGB hex string, e.g. "0xFFFFFFFF"
                 final colorHex =
@@ -231,8 +232,8 @@ class _AddCarViewState extends State<AddCarView> {
 
                 final car = MyCarModel(
                   id: widget.car?.id ?? '',
-                  makeId: brandId,
-                  modelId: modelId,
+                  makeId: brandId!,
+                  modelId: modelId!,
                   modelYear: int.parse(_selectedYear!),
                   logoUrl: widget.car?.logoUrl ?? '',
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
+import '../../../../core/components/custom_network_image.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/route/routes.dart';
 import '../../../../core/route/app_router.dart';
@@ -133,11 +134,15 @@ class ServiceCard extends StatelessWidget {
                       flex: 5,
                       child: Transform.flip(
                         flipX: context.isEn,
-                        child: Image.asset(
-                          serviceModel.image,
-                          fit: BoxFit.fill,
-                          color: context.colors.primary,
-                        ),
+                        child:
+                            serviceModel.imageUrl != null &&
+                                serviceModel.imageUrl!.isNotEmpty
+                            ? CustomNetworkImage(serviceModel.imageUrl!)
+                            : Image.asset(
+                                AppAssets.carDemo,
+                                fit: BoxFit.fill,
+                                color: context.colors.primary,
+                              ),
                       ),
                     ),
                   ],

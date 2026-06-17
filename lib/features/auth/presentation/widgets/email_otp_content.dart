@@ -145,9 +145,11 @@ class _EmailOtpContentState extends State<EmailOtpContent> {
       builder: (context, state) {
         return Container(
           width: double.infinity,
-          padding: EdgeInsets.symmetric(
-            horizontal: 24,
-            vertical: height * 0.02,
+          padding: EdgeInsets.only(
+            left: 24,
+            right: 24,
+            top: height * 0.02,
+            bottom: height * 0.02 + MediaQuery.of(context).viewInsets.bottom,
           ),
           decoration: BoxDecoration(
             color: darkAppColors.themeColor,

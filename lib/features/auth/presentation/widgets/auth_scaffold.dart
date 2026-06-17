@@ -10,6 +10,7 @@ class AuthScaffold extends StatelessWidget {
     final height = MediaQuery.sizeOf(context).height;
     final width = MediaQuery.sizeOf(context).width;
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       extendBodyBehindAppBar: true,
       body: SingleChildScrollView(
         child: SizedBox(

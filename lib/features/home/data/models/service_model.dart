@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 import 'add_on_model.dart';
-import '../../../../core/utils/app_assets.dart';
 import '../../../my_bookings/data/models/booking_response_model/breakdown.dart';
 
 class ServiceModel extends Equatable {
@@ -15,6 +14,7 @@ class ServiceModel extends Equatable {
   final int? vatMinor;
   final String? currency;
   final Breakdown? breakdown;
+  final String? imageUrl;
 
   // Optionals for override values
   final String? priceOverride;
@@ -36,6 +36,7 @@ class ServiceModel extends Equatable {
     this.priceOverride,
     this.oldPriceOverride,
     this.imageOverride,
+    this.imageUrl,
   });
 
   // Fallback getters for UI compatibility
@@ -45,7 +46,6 @@ class ServiceModel extends Equatable {
             ? (priceMinor! / 100).toStringAsFixed(2)
             : (priceOverride ?? ''));
   String get oldPrice => oldPriceOverride ?? '';
-  String get image => imageOverride ?? AppAssets.carDemo;
 
   double get basePriceDouble =>
       breakdown != null ? breakdown!.net : (priceDouble - vatDouble);
@@ -73,6 +73,7 @@ class ServiceModel extends Equatable {
       breakdown: json['breakdown'] != null
           ? Breakdown.fromJson(json['breakdown'] as Map<String, dynamic>)
           : null,
+      imageUrl: json['imageUrl'] ?? '',
     );
   }
 
@@ -89,6 +90,7 @@ class ServiceModel extends Equatable {
     vatMinor,
     currency,
     breakdown,
+    imageUrl,
   ];
 }
 

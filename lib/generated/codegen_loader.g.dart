@@ -364,6 +364,7 @@ class CodegenLoader extends AssetLoader{
     "car_deleted_success": "تم حذف السيارة بنجاح",
     "error": "حدث خطأ",
     "no_internet": "لا يوجد اتصال بالإنترنت",
+    "connection_timeout": "تعذر الاتصال بالخادم. يرجى المحاولة مرة أخرى",
     "default_error": "عذرا، حدث خطأ ما. يرجى المحاولة مرة أخرى لاحقًا",
     "booking_created": "تم إنشاء الحجز بنجاح",
     "booking_rescheduled": "تم تعديل الحجز بنجاح"
@@ -719,6 +720,7 @@ static const Map<String,dynamic> _en = {
     "car_deleted_success": "Car deleted successfully",
     "error": "Error occurred",
     "no_internet": "No internet connection",
+    "connection_timeout": "Failed to connect to the server. Please try again.",
     "default_error": "Oops, something went wrong. Please try again later",
     "booking_created": "Booking created successfully",
     "booking_rescheduled": "Booking updated successfully"

@@ -61,5 +61,5 @@ class AddOnModel {
 
   double get price => ((priceMinor ?? 0) / 100);
 
-  bool get isPackageAddon => freeQty != null || maxQtyPerWash != null;
+  // bool get isPackageAddon => freeQty != null || maxQtyPerWash != null;
 }
