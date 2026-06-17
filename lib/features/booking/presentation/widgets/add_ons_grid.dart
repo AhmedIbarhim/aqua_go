@@ -43,29 +43,30 @@ class AddOnsGrid extends StatelessWidget {
             ? (addon.nameAr ?? addon.nameEn ?? '')
             : (addon.nameEn ?? addon.nameAr ?? '');
 
-        // Package-specific: usage fraction & exhausted state
+        // Package-specific: usage fraction
         String? fraction;
-        bool isExhausted = false;
+        int? remain;
         if (isPackageFlow &&
+            addon.kind?.toLowerCase() == 'included' &&
             addon.maxQtyPerWash != null &&
             addon.maxQtyPerWash! > 0) {
           final used = addon.qty ?? 0;
+          remain = (addon.maxQtyPerWash ?? 0) - used;
           final max = addon.maxQtyPerWash!;
-          fraction = '$used/$max';
-          isExhausted = used >= max;
+          fraction = '$remain/$max';
         }
 
         return GestureDetector(
-          onTap: isExhausted ? null : () => onServiceToggled(index),
+          onTap: () => onServiceToggled(index),
           child: Opacity(
-            opacity: isExhausted ? 0.38 : 1.0,
+            opacity: remain == 0 ? 0.5 : 1.0,
             child: _buildCard(
               context,
               addon,
               title,
               fraction,
               width,
-              isSelected: isSelected && !isExhausted,
+              isSelected: isSelected,
             ),
           ),
         );

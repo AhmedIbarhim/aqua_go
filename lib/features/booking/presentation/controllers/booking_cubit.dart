@@ -12,6 +12,7 @@ import 'booking_state.dart';
 import 'package:aqua_go/features/home/data/models/add_on_model.dart';
 import 'package:aqua_go/features/subscriptions/data/repos/subscriptions_repository.dart';
 import 'package:aqua_go/features/subscriptions/data/models/subscription_response_model/subscription_wash.dart';
+import 'package:aqua_go/features/subscriptions/data/models/subscription_response_model/subscription_included_allowance.dart';
 
 class BookingCubit extends Cubit<BookingState> {
   final BookingRepository _bookingRepo;
@@ -101,18 +102,30 @@ class BookingCubit extends Cubit<BookingState> {
         // --- Build unified addons list from PackageInfo ---
         // 1) Included addons — come with price data for when free qty runs out
         final includedAddons = detailedPackage.packageInfo.includedAddons
-            .map((a) => AddOnModel(
-                  id: a.id,
-                  nameAr: a.nameAr,
-                  nameEn: a.nameEn,
-                  priceMinor: a.priceMinor,
-                  currency: a.currency,
-                  imageUrl: a.imageUrl,
-                  freeQty: a.freeQty,
-                  maxQtyPerWash: a.maxQtyPerWash,
-                  qty: a.qty,
-                  kind: 'included',
-                ))
+            .map((a) {
+              final allowance = detailedPackage.includedAllowances.firstWhere(
+                (allow) => allow.addonId == a.id,
+                orElse: () => SubscriptionIncludedAllowance(
+                  addonId: a.id ?? '',
+                  totalQty: a.freeQty ?? 0,
+                  consumedQty: 0,
+                  remainingQty: a.freeQty ?? 0,
+                ),
+              );
+
+              return AddOnModel(
+                id: a.id,
+                nameAr: a.nameAr,
+                nameEn: a.nameEn,
+                priceMinor: allowance.remainingQty > 0 ? 0 : a.priceMinor,
+                currency: a.currency,
+                imageUrl: a.imageUrl,
+                freeQty: allowance.remainingQty,
+                maxQtyPerWash: a.maxQtyPerWash ?? allowance.totalQty,
+                qty: allowance.consumedQty,
+                kind: 'included',
+              );
+            })
             .toList();
 
         // 2) Optional addons — always paid. Prefer packageInfo, fall back to wash.
