@@ -13,8 +13,13 @@ import '../../../../core/themes/app_colors.dart';
 import '../../../../core/themes/app_text_styles.dart';
 
 class PhoneOtpContent extends StatefulWidget {
-  const PhoneOtpContent({super.key, required this.phoneNumber});
+  const PhoneOtpContent({
+    super.key,
+    required this.phoneNumber,
+    required this.otpSessionId,
+  });
   final String phoneNumber;
+  final String otpSessionId;
 
   @override
   State<PhoneOtpContent> createState() => _PhoneOtpContentState();
@@ -60,12 +65,10 @@ class _PhoneOtpContentState extends State<PhoneOtpContent> {
   @override
   void initState() {
     super.initState();
+    _otpSessionId = widget.otpSessionId;
     _controllers = List.generate(4, (index) => TextEditingController());
     _focusNodes = List.generate(4, (index) => FocusNode());
     startTimer();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<AuthCubit>().login(widget.phoneNumber);
-    });
   }
 
   void startTimer() {

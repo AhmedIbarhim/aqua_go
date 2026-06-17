@@ -69,7 +69,10 @@ abstract class AppRouter {
       case Routes.phoneOtp:
         final args = settings.arguments as PhoneOtpArgs;
         return MaterialPageRoute(
-          builder: (_) => PhoneOtpView(phoneNumber: args.phoneNumber),
+          builder: (_) => PhoneOtpView(
+            phoneNumber: args.phoneNumber,
+            otpSessionId: args.otpSessionId,
+          ),
         );
 
       case Routes.emailOtp:

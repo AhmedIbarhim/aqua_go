@@ -10,12 +10,18 @@ import '../widgets/phone_otp_content.dart';
 
 class PhoneOtpArgs {
   final String phoneNumber;
-  PhoneOtpArgs({required this.phoneNumber});
+  final String otpSessionId;
+  PhoneOtpArgs({required this.phoneNumber, required this.otpSessionId});
 }
 
 class PhoneOtpView extends StatelessWidget {
-  const PhoneOtpView({super.key, required this.phoneNumber});
+  const PhoneOtpView({
+    super.key,
+    required this.phoneNumber,
+    required this.otpSessionId,
+  });
   final String phoneNumber;
+  final String otpSessionId;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +40,12 @@ class PhoneOtpView extends StatelessWidget {
             }
           }
         },
-        child: AuthScaffold(content: PhoneOtpContent(phoneNumber: phoneNumber)),
+        child: AuthScaffold(
+          content: PhoneOtpContent(
+            phoneNumber: phoneNumber,
+            otpSessionId: otpSessionId,
+          ),
+        ),
       ),
     );
   }
