@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:svg_flutter/svg.dart';
 
 import '../../../../core/components/custom_text_field.dart';
+import '../../../../core/helpers/fetch_user_data_helper.dart';
 import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
@@ -83,14 +84,17 @@ class _EmailContentState extends State<EmailContent> {
                 left: 24,
                 right: 24,
                 top: height * 0.02,
-                bottom: height * 0.02 + MediaQuery.of(context).viewInsets.bottom,
+                bottom:
+                    height * 0.02 + MediaQuery.of(context).viewInsets.bottom,
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    LocaleKeys.auth_add_email.tr(),
+                    FetchUserData.getEmail() == null
+                        ? LocaleKeys.auth_add_email.tr()
+                        : LocaleKeys.auth_change_email.tr(),
                     style: AppTextStyles.semiBold24,
                   ),
                   SizedBox(height: height * 0.01),

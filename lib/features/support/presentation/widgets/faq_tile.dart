@@ -33,7 +33,7 @@ class FaqTile extends StatelessWidget {
           border: Border.all(
             color: isExpanded
                 ? context.colors.borderSecondary
-                : context.colors.borderSecondary.withOpacity(0.3),
+                : context.colors.borderSecondary.withValues(alpha: 0.3),
             width: 1,
           ),
           borderRadius: BorderRadius.circular(sw(12)),

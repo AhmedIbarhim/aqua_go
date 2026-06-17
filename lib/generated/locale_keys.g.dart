@@ -54,6 +54,7 @@ abstract class  LocaleKeys {
   static const auth_enter_email = 'auth.enter_email';
   static const auth_email_address = 'auth.email_address';
   static const auth_add_email = 'auth.add_email';
+  static const auth_change_email = 'auth.change_email';
   static const auth_verify_email = 'auth.verify_email';
   static const auth_back_to_profile = 'auth.back_to_profile';
   static const auth_email_added_successfully = 'auth.email_added_successfully';

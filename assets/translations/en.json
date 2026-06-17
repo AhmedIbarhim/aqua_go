@@ -53,6 +53,7 @@
         "enter_email": "Enter Email",
         "email_address": "Email Address",
         "add_email": "Add Email Address",
+        "change_email": "Change Email",
         "verify_email": "Verify Email",
         "back_to_profile": "Back to Profile",
         "email_added_successfully": "Email Added Successfully",
