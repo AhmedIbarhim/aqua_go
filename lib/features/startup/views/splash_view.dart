@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../core/config/local_storage/secure_storage.dart';
 import '../../../core/config/local_storage/shared_prefs.dart';
 import '../../../core/constants.dart';
+import '../../../core/helpers/fetch_user_data_helper.dart';
 import '../../../core/route/routes.dart';
 
 class SplashView extends StatefulWidget {
@@ -29,7 +30,20 @@ class _SplashViewState extends State<SplashView> {
     if (!mounted) return;
 
     if (token != null && token.isNotEmpty) {
-      context.pushReplacementNamed(Routes.layout);
+      final user = FetchUserData.getUser();
+      if (user == null ||
+          user.name == null ||
+          user.name!.trim().isEmpty ||
+          user.gender == null ||
+          user.gender!.trim().isEmpty ||
+          user.birthdate == null) {
+        context.pushReplacementNamed(
+          Routes.profileData,
+          arguments: true, // isFirstTime = true
+        );
+      } else {
+        context.pushReplacementNamed(Routes.layout);
+      }
     } else {
       final isNotFirstUse = CacheClient.getBool(kNotFirstUse);
       if (isNotFirstUse) {

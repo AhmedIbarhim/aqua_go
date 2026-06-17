@@ -8,6 +8,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/config/di/service_locator.dart';
+import '../../../../core/helpers/fetch_user_data_helper.dart';
 import '../../../../core/route/routes.dart';
 import '../../data/models/notification_preferences_model.dart';
 import '../controllers/notification_preferences_cubit/notification_preferences_cubit.dart';
@@ -22,7 +23,7 @@ class SettingsView extends StatefulWidget {
 }
 
 class _SettingsViewState extends State<SettingsView> {
-  bool isWhatsapp = true;
+  final bool isGuest = FetchUserData.isGuest();
 
   @override
   Widget build(BuildContext context) {
@@ -30,8 +31,13 @@ class _SettingsViewState extends State<SettingsView> {
     double sh(double height) => context.sh(height);
 
     return BlocProvider(
-      create: (context) =>
-          locator<NotificationPreferencesCubit>()..getNotificationPreferences(),
+      create: (context) {
+        final cubit = locator<NotificationPreferencesCubit>();
+        if (!isGuest) {
+          cubit.getNotificationPreferences();
+        }
+        return cubit;
+      },
       child: BlocListener<NotificationPreferencesCubit, NotificationPreferencesState>(
         listener: (context, state) {
           if (state is NotificationPreferencesUpdating) {
@@ -111,129 +117,138 @@ class _SettingsViewState extends State<SettingsView> {
                         //     );
                         //   },
                         // ),
-                        SizedBox(height: sh(24)),
-                        _buildSectionTitle(
-                          LocaleKeys.settings_get_notifications.tr(),
-                          context,
-                        ),
-                        SizedBox(height: sh(8)),
-                        BlocBuilder<
-                          NotificationPreferencesCubit,
-                          NotificationPreferencesState
-                        >(
-                          builder: (context, state) {
-                            if (state is NotificationPreferencesLoading ||
-                                state is NotificationPreferencesInitial) {
-                              return SizedBox(
-                                height: sh(300),
-                                child: Center(
-                                  child: CustomLoadingIndicator(size: 70),
-                                ),
+                        if (!isGuest) ...[
+                          SizedBox(height: sh(24)),
+                          _buildSectionTitle(
+                            LocaleKeys.settings_get_notifications.tr(),
+                            context,
+                          ),
+                          SizedBox(height: sh(8)),
+                          BlocBuilder<
+                            NotificationPreferencesCubit,
+                            NotificationPreferencesState
+                          >(
+                            builder: (context, state) {
+                              if (state is NotificationPreferencesLoading ||
+                                  state is NotificationPreferencesInitial) {
+                                return SizedBox(
+                                  height: sh(300),
+                                  child: Center(
+                                    child: CustomLoadingIndicator(size: 70),
+                                  ),
+                                );
+                              }
+
+                              NotificationPreferencesModel? preferences;
+                              if (state is NotificationPreferencesLoaded) {
+                                preferences = state.preferences;
+                              } else if (state
+                                  is NotificationPreferencesUpdating) {
+                                preferences = state.currentPreferences;
+                              } else if (state
+                                  is NotificationPreferencesUpdateSuccess) {
+                                preferences = state.preferences;
+                              } else if (state
+                                  is NotificationPreferencesUpdateError) {
+                                preferences = state.currentPreferences;
+                              }
+
+                              final isMarketingNotif =
+                                  preferences?.marketingPush ?? false;
+                              final isSms = preferences?.marketingSms ?? false;
+                              final isEmail =
+                                  preferences?.marketingEmail ?? false;
+
+                              return Column(
+                                children: [
+                                  ProfileTile(
+                                    title: LocaleKeys
+                                        .settings_marketing_notification
+                                        .tr(),
+                                    icon: AppAssets.notification,
+                                    hasToggle: true,
+                                    toggleValue: isMarketingNotif,
+                                    onToggleChanged: (val) {
+                                      final updated =
+                                          (preferences ??
+                                                  const NotificationPreferencesModel(
+                                                    marketingPush: false,
+                                                    marketingSms: false,
+                                                    marketingEmail: false,
+                                                  ))
+                                              .copyWith(marketingPush: val);
+                                      context
+                                          .read<NotificationPreferencesCubit>()
+                                          .updateNotificationPreferences(
+                                            updated,
+                                          );
+                                    },
+                                  ),
+                                  // SizedBox(height: sh(8)),
+                                  // ProfileTile(
+                                  //   title: LocaleKeys.settings_whatsapp_messages
+                                  //       .tr(),
+                                  //   icon: AppAssets.whatsppOutlined,
+                                  //   hasToggle: true,
+                                  //   toggleValue: isWhatsapp,
+                                  //   onToggleChanged: (val) {
+                                  //     setState(() {
+                                  //       isWhatsapp = val;
+                                  //     });
+                                  //   },
+                                  // ),
+                                  SizedBox(height: sh(8)),
+                                  ProfileTile(
+                                    title: LocaleKeys.settings_sms_messages
+                                        .tr(),
+                                    icon: AppAssets.sms,
+                                    hasToggle: true,
+                                    toggleValue: isSms,
+                                    onToggleChanged: (val) {
+                                      final updated =
+                                          (preferences ??
+                                                  const NotificationPreferencesModel(
+                                                    marketingPush: false,
+                                                    marketingSms: false,
+                                                    marketingEmail: false,
+                                                  ))
+                                              .copyWith(marketingSms: val);
+                                      context
+                                          .read<NotificationPreferencesCubit>()
+                                          .updateNotificationPreferences(
+                                            updated,
+                                          );
+                                    },
+                                  ),
+                                  SizedBox(height: sh(8)),
+                                  ProfileTile(
+                                    title: LocaleKeys
+                                        .settings_email_notifications
+                                        .tr(),
+                                    icon: AppAssets.mail,
+                                    hasToggle: true,
+                                    toggleValue: isEmail,
+                                    onToggleChanged: (val) {
+                                      final updated =
+                                          (preferences ??
+                                                  const NotificationPreferencesModel(
+                                                    marketingPush: false,
+                                                    marketingSms: false,
+                                                    marketingEmail: false,
+                                                  ))
+                                              .copyWith(marketingEmail: val);
+                                      context
+                                          .read<NotificationPreferencesCubit>()
+                                          .updateNotificationPreferences(
+                                            updated,
+                                          );
+                                    },
+                                  ),
+                                ],
                               );
-                            }
-
-                            NotificationPreferencesModel? preferences;
-                            if (state is NotificationPreferencesLoaded) {
-                              preferences = state.preferences;
-                            } else if (state
-                                is NotificationPreferencesUpdating) {
-                              preferences = state.currentPreferences;
-                            } else if (state
-                                is NotificationPreferencesUpdateSuccess) {
-                              preferences = state.preferences;
-                            } else if (state
-                                is NotificationPreferencesUpdateError) {
-                              preferences = state.currentPreferences;
-                            }
-
-                            final isMarketingNotif =
-                                preferences?.marketingPush ?? false;
-                            final isSms = preferences?.marketingSms ?? false;
-                            final isEmail =
-                                preferences?.marketingEmail ?? false;
-
-                            return Column(
-                              children: [
-                                ProfileTile(
-                                  title: LocaleKeys
-                                      .settings_marketing_notification
-                                      .tr(),
-                                  icon: AppAssets.notification,
-                                  hasToggle: true,
-                                  toggleValue: isMarketingNotif,
-                                  onToggleChanged: (val) {
-                                    final updated =
-                                        (preferences ??
-                                                const NotificationPreferencesModel(
-                                                  marketingPush: false,
-                                                  marketingSms: false,
-                                                  marketingEmail: false,
-                                                ))
-                                            .copyWith(marketingPush: val);
-                                    context
-                                        .read<NotificationPreferencesCubit>()
-                                        .updateNotificationPreferences(updated);
-                                  },
-                                ),
-                                // SizedBox(height: sh(8)),
-                                // ProfileTile(
-                                //   title: LocaleKeys.settings_whatsapp_messages
-                                //       .tr(),
-                                //   icon: AppAssets.whatsppOutlined,
-                                //   hasToggle: true,
-                                //   toggleValue: isWhatsapp,
-                                //   onToggleChanged: (val) {
-                                //     setState(() {
-                                //       isWhatsapp = val;
-                                //     });
-                                //   },
-                                // ),
-                                SizedBox(height: sh(8)),
-                                ProfileTile(
-                                  title: LocaleKeys.settings_sms_messages.tr(),
-                                  icon: AppAssets.sms,
-                                  hasToggle: true,
-                                  toggleValue: isSms,
-                                  onToggleChanged: (val) {
-                                    final updated =
-                                        (preferences ??
-                                                const NotificationPreferencesModel(
-                                                  marketingPush: false,
-                                                  marketingSms: false,
-                                                  marketingEmail: false,
-                                                ))
-                                            .copyWith(marketingSms: val);
-                                    context
-                                        .read<NotificationPreferencesCubit>()
-                                        .updateNotificationPreferences(updated);
-                                  },
-                                ),
-                                SizedBox(height: sh(8)),
-                                ProfileTile(
-                                  title: LocaleKeys.settings_email_notifications
-                                      .tr(),
-                                  icon: AppAssets.mail,
-                                  hasToggle: true,
-                                  toggleValue: isEmail,
-                                  onToggleChanged: (val) {
-                                    final updated =
-                                        (preferences ??
-                                                const NotificationPreferencesModel(
-                                                  marketingPush: false,
-                                                  marketingSms: false,
-                                                  marketingEmail: false,
-                                                ))
-                                            .copyWith(marketingEmail: val);
-                                    context
-                                        .read<NotificationPreferencesCubit>()
-                                        .updateNotificationPreferences(updated);
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                        SizedBox(height: sh(24)),
+                            },
+                          ),
+                        ],
                       ],
                     ),
                   ),
