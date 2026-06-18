@@ -7,8 +7,6 @@ import '../../data/repos/booking_repository.dart';
 import '../../presentation/controllers/booking_state.dart';
 import 'booking_submit_strategy.dart';
 
-/// Strategy for rescheduling an existing booking.
-/// Only sends newScheduledAt, addressId, and vehicleIds.
 class RescheduleBookingSubmit implements BookingSubmitStrategy {
   final String existingBookingId;
 
@@ -19,7 +17,6 @@ class RescheduleBookingSubmit implements BookingSubmitStrategy {
     required BookingRepository repo,
     required BookingState state,
   }) async {
-    // Build vehicle IDs list from selected car
     final List<String> vehicleIds = [];
     if (state.selectedCar != null) {
       vehicleIds.add(state.selectedCar!.id);

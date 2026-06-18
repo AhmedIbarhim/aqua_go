@@ -1,6 +1,6 @@
+import 'package:aqua_go/core/components/custom_network_image.dart';
 import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:aqua_go/features/my_cars/data/models/my_car_model.dart';
-import 'package:aqua_go/features/my_cars/presentation/widgets/car_make_logo_network_svg.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg_flutter.dart';
@@ -67,7 +67,7 @@ class MyCarCard extends StatelessWidget {
                       SizedBox(
                         height: height * 0.05,
                         width: height * 0.05,
-                        child: CarMakeNetworkLogo(logoUrl: car.logoUrl),
+                        child: CustomNetworkImage(car.logoUrl),
                       ),
                       Row(
                         children: [

@@ -1,3 +1,4 @@
+import 'package:aqua_go/core/components/custom_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:svg_flutter/svg.dart';
@@ -6,7 +7,6 @@ import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:aqua_go/core/helpers/car_color_helper.dart';
-import 'package:aqua_go/features/my_cars/presentation/widgets/car_make_logo_network_svg.dart';
 import '../../data/models/booking_response_model/booking_response_model.dart';
 
 class BookingDetailsVehicleCard extends StatelessWidget {
@@ -86,8 +86,8 @@ class BookingDetailsVehicleCard extends StatelessWidget {
                 child:
                     (vehicle?.makeLogoUrl != null &&
                         vehicle!.makeLogoUrl!.isNotEmpty)
-                    ? CarMakeNetworkLogo(
-                        logoUrl: vehicle.makeLogoUrl!,
+                    ? CustomNetworkImage(
+                        vehicle.makeLogoUrl!,
                         width: 48,
                         height: 48,
                         fit: BoxFit.contain,
