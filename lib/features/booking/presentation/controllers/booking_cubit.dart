@@ -101,47 +101,50 @@ class BookingCubit extends Cubit<BookingState> {
 
         // --- Build unified addons list from PackageInfo ---
         // 1) Included addons — come with price data for when free qty runs out
-        final includedAddons = detailedPackage.packageInfo.includedAddons
-            .map((a) {
-              final allowance = detailedPackage.includedAllowances.firstWhere(
-                (allow) => allow.addonId == a.id,
-                orElse: () => SubscriptionIncludedAllowance(
-                  addonId: a.id ?? '',
-                  totalQty: a.freeQty ?? 0,
-                  consumedQty: 0,
-                  remainingQty: a.freeQty ?? 0,
-                ),
-              );
+        final includedAddons = detailedPackage.packageInfo.includedAddons.map((
+          a,
+        ) {
+          final allowance = detailedPackage.includedAllowances.firstWhere(
+            (allow) => allow.addonId == a.id,
+            orElse: () => SubscriptionIncludedAllowance(
+              addonId: a.id ?? '',
+              totalQty: a.freeQty ?? 0,
+              consumedQty: 0,
+              remainingQty: a.freeQty ?? 0,
+            ),
+          );
 
-              return AddOnModel(
-                id: a.id,
-                nameAr: a.nameAr,
-                nameEn: a.nameEn,
-                priceMinor: allowance.remainingQty > 0 ? 0 : a.priceMinor,
-                currency: a.currency,
-                imageUrl: a.imageUrl,
-                freeQty: allowance.remainingQty,
-                maxQtyPerWash: a.maxQtyPerWash ?? allowance.totalQty,
-                qty: allowance.consumedQty,
-                kind: 'included',
-              );
-            })
-            .toList();
+          return AddOnModel(
+            id: a.id,
+            nameAr: a.nameAr,
+            nameEn: a.nameEn,
+            priceMinor: allowance.remainingQty > 0 ? 0 : a.priceMinor,
+            currency: a.currency,
+            imageUrl: a.imageUrl,
+            freeQty: allowance.remainingQty,
+            maxQtyPerWash: a.maxQtyPerWash ?? allowance.totalQty,
+            qty: allowance.consumedQty,
+            kind: 'included',
+          );
+        }).toList();
 
         // 2) Optional addons — always paid. Prefer packageInfo, fall back to wash.
-        final rawOptional = detailedPackage.packageInfo.optionalAddons.isNotEmpty
+        final rawOptional =
+            detailedPackage.packageInfo.optionalAddons.isNotEmpty
             ? detailedPackage.packageInfo.optionalAddons
             : wash.availableOptionalAddons;
         final optionalAddons = rawOptional
-            .map((a) => AddOnModel(
-                  id: a.id,
-                  nameAr: a.nameAr,
-                  nameEn: a.nameEn,
-                  priceMinor: a.priceMinor,
-                  currency: a.currency,
-                  imageUrl: a.imageUrl,
-                  kind: 'optional',
-                ))
+            .map(
+              (a) => AddOnModel(
+                id: a.id,
+                nameAr: a.nameAr,
+                nameEn: a.nameEn,
+                priceMinor: a.priceMinor,
+                currency: a.currency,
+                imageUrl: a.imageUrl,
+                kind: 'optional',
+              ),
+            )
             .toList();
 
         final allAddons = [...includedAddons, ...optionalAddons];
@@ -217,6 +220,8 @@ class BookingCubit extends Cubit<BookingState> {
       state.copyWith(
         selectedDate: date,
         selectedTime: dateChanged ? null : time,
+        clearSelectedDate: date == null,
+        clearSelectedTime: dateChanged || time == null,
         clearError: true,
       ),
     );

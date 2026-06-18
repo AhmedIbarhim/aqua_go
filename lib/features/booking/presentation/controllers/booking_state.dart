@@ -81,6 +81,8 @@ class BookingState extends Equatable {
     String? washId,
     Set<String>? includedAddonIds,
     Set<String>? optionalAddonIds,
+    bool clearSelectedDate = false,
+    bool clearSelectedTime = false,
     bool clearError = false,
   }) {
     return BookingState(
@@ -91,8 +93,8 @@ class BookingState extends Equatable {
       selectedCar: selectedCar ?? this.selectedCar,
       selectedServiceIndices:
           selectedServiceIndices ?? this.selectedServiceIndices,
-      selectedDate: selectedDate ?? this.selectedDate,
-      selectedTime: selectedTime ?? this.selectedTime,
+      selectedDate: clearSelectedDate ? null : (selectedDate ?? this.selectedDate),
+      selectedTime: clearSelectedTime ? null : (selectedTime ?? this.selectedTime),
       bikerNotes: bikerNotes ?? this.bikerNotes,
       specialNoteText: specialNoteText ?? this.specialNoteText,
       paymentMethod: paymentMethod ?? this.paymentMethod,
