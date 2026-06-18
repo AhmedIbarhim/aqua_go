@@ -366,6 +366,7 @@ class BookingCubit extends Cubit<BookingState> {
   }
 
   Future<void> submitBooking({String? promoCode}) async {
+    emit(state.copyWith(status: BookingStatus.loading));
     // Delegate to the strategy
     final result = await _submitStrategy.submit(
       repo: _bookingRepo,

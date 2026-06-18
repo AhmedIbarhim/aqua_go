@@ -196,7 +196,7 @@ class PackageAddonPaymentBottomSheet extends StatelessWidget {
 
                 BottomActionSheetContainer(
                   child: CustomButton(
-                    text: LocaleKeys.bookings_confirm_payment.tr(),
+                    text: LocaleKeys.proceed.tr(),
                     enabled: bookingState.paymentMethod != null,
                     onPressed: bookingState.paymentMethod != null
                         ? () => Navigator.pop(context, true)
