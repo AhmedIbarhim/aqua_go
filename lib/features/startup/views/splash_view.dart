@@ -24,7 +24,9 @@ class _SplashViewState extends State<SplashView> {
 
   Future<void> _checkNavigation() async {
     await Future.delayed(const Duration(seconds: 2));
+
     if (!mounted) return;
+    // context.pushReplacementNamed(Routes.onboarding);
 
     final token = await SecureStorage.getSecuredString(kAccessToken);
     if (!mounted) return;

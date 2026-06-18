@@ -1,6 +1,5 @@
 import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:flutter/material.dart';
-import 'package:svg_flutter/svg_flutter.dart';
 
 class OnboardingPageView extends StatelessWidget {
   const OnboardingPageView({super.key, required this.pageController});
@@ -8,8 +7,8 @@ class OnboardingPageView extends StatelessWidget {
 
   List<String> get assetPages => [
     AppAssets.onboarding1,
-    AppAssets.onboarding2,
-    AppAssets.onboarding3,
+    AppAssets.onboarding1,
+    AppAssets.onboarding1,
   ];
 
   @override
@@ -18,7 +17,7 @@ class OnboardingPageView extends StatelessWidget {
       controller: pageController,
       itemCount: assetPages.length,
       itemBuilder: (context, index) =>
-          SvgPicture.asset(assetPages[index], fit: BoxFit.contain),
+          Image.asset(assetPages[index], fit: BoxFit.contain),
     );
   }
 }

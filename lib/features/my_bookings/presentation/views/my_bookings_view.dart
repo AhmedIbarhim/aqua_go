@@ -105,13 +105,7 @@ class _MyBookingsViewState extends State<MyBookingsView> {
                               isRefresh: true,
                             );
                           },
-                          child: const SingleChildScrollView(
-                            physics: AlwaysScrollableScrollPhysics(),
-                            child: SizedBox(
-                              height: 400,
-                              child: EmptyBookingsWidget(),
-                            ),
-                          ),
+                          child: const EmptyBookingsWidget(),
                         );
                       }
 

@@ -13,11 +13,17 @@ class MainLayout extends StatefulWidget {
   const MainLayout({super.key});
 
   @override
-  State<MainLayout> createState() => _MainLayoutState();
+  State<MainLayout> createState() => MainLayoutState();
 }
 
-class _MainLayoutState extends State<MainLayout> {
+class MainLayoutState extends State<MainLayout> {
   int _currentIndex = 0;
+
+  void changeIndex(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
 
   static const List<Widget> _pageBuilders = [
     HomeView(),

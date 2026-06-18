@@ -23,7 +23,7 @@ abstract class AppAssets {
   // Auth
   static const String logo = 'assets/images/app_logo.png';
   static const String logoTransparent = 'assets/images/logo_transparent.png';
-  static const String onboarding1 = 'assets/svg/onboarding_1.svg';
+  static const String onboarding1 = 'assets/images/onboarding_1.png';
   static const String onboarding2 = 'assets/svg/onboarding_2.svg';
   static const String onboarding3 = 'assets/svg/onboarding_3.svg';
   static const String onboardingShadowTop =
