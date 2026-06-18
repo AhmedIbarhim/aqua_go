@@ -23,6 +23,8 @@ class BookingSummaryModel {
   final String? currency;
   final String? serviceNameAr;
   final String? serviceNameEn;
+  final String? packageNameAr;
+  final String? packageNameEn;
   final bool? isSubscription;
   final int? vehicleYear;
   final String? vehicleMake;
@@ -49,6 +51,8 @@ class BookingSummaryModel {
     this.currency,
     this.serviceNameAr,
     this.serviceNameEn,
+    this.packageNameAr,
+    this.packageNameEn,
     this.isSubscription,
     this.vehicleYear,
     this.vehicleMake,
@@ -81,6 +85,8 @@ class BookingSummaryModel {
       currency: json['currency'] as String?,
       serviceNameAr: json['serviceNameAr'] as String?,
       serviceNameEn: json['serviceNameEn'] as String?,
+      packageNameAr: json['packageNameAr'] as String?,
+      packageNameEn: json['packageNameEn'] as String?,
       isSubscription: json['isSubscription'] as bool?,
       vehicleYear: json['vehicleYear'] != null
           ? int.tryParse(json['vehicleYear'].toString())
@@ -124,38 +130,11 @@ class BookingSummaryModel {
       vehicleColor: vehicle?.vehicleColor,
       plate: vehicle?.plate ?? details.plate,
       vehicleMakeLogoUrl: vehicle?.makeLogoUrl,
-      serviceNameEn: details.packageName?.en,
-      serviceNameAr: details.packageName?.ar,
+      serviceNameEn: details.serviceName?.en,
+      serviceNameAr: details.serviceName?.ar,
+      packageNameAr: details.packageName?.ar,
+      packageNameEn: details.packageName?.en,
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'customerId': customerId,
-      'workerId': workerId,
-      'addressLabel': addressLabel,
-      'addressLat': addressLat,
-      'addressLng': addressLng,
-      'zoneId': zoneId,
-      'packageId': packageId,
-      'type': type?.name,
-      'status': status?.name,
-      'scheduledAt': scheduledAt,
-      'createdAt': createdAt,
-      'updatedAt': updatedAt,
-      'totalAmountMinor': totalAmountMinor,
-      'currency': currency,
-      'serviceNameAr': serviceNameAr,
-      'serviceNameEn': serviceNameEn,
-      'isSubscription': isSubscription,
-      'vehicleYear': vehicleYear,
-      'vehicleMake': vehicleMake,
-      'vehicleModel': vehicleModel,
-      'vehicleColor': vehicleColor,
-      'plate': plate,
-      'vehicleMakeLogoUrl': vehicleMakeLogoUrl,
-    };
   }
 
   // Bridging mapper to details model
@@ -194,8 +173,8 @@ class BookingSummaryModel {
   // --- UI Compatibility Helpers ---
   String get title =>
       CacheClient.getString(kLanguage, defaultValue: kArabicLang) == kArabicLang
-      ? (serviceNameAr ?? '')
-      : (serviceNameEn ?? '');
+      ? (serviceNameAr ?? packageNameAr ?? '')
+      : (serviceNameEn ?? packageNameEn ?? '');
 
   String get location => addressLabel ?? '';
 

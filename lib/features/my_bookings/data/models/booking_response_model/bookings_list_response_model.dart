@@ -25,12 +25,4 @@ class BookingsListResponseModel {
       totalMatching: json['totalMatching'] as int?,
     );
   }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'items': items.map((item) => item.toJson()).toList(),
-      'nextCursor': nextCursor,
-      'totalMatching': totalMatching,
-    };
-  }
 }

@@ -4,8 +4,10 @@ import 'package:dartz/dartz.dart';
 
 import '../../../../core/config/networking/exceptions/failure.dart';
 import 'package:aqua_go/features/my_bookings/data/models/booking_response_model/booking_response_model.dart';
-import '../models/booking_request_model.dart';
-import '../models/reschedule_request_model.dart';
+import '../models/service_booking_request_model.dart';
+import '../models/service_reschedule_request_model.dart';
+import '../models/package_booking_request_model.dart';
+import '../models/package_reschedule_request_model.dart';
 import '../models/quote_model.dart';
 import '../models/availability_response_model.dart';
 import '../data_sources/bookings_remote_data_source.dart';
@@ -92,7 +94,7 @@ class BookingRepository {
   }
 
   Future<Either<Failure, BookingResponseModel>> createBooking(
-    BookingRequestModel booking,
+    ServiceBookingRequestModel booking,
   ) async {
     try {
       final idempotencyKey = IdempotencyKeyHelper.generate(
@@ -122,7 +124,7 @@ class BookingRepository {
   }
 
   Future<Either<Failure, BookingResponseModel>> rescheduleBooking(
-    RescheduleRequestModel rescheduleRequest,
+    ServiceRescheduleRequestModel rescheduleRequest,
   ) async {
     try {
       final idempotencyKey = IdempotencyKeyHelper.generate(
@@ -179,14 +181,14 @@ class BookingRepository {
   Future<Either<Failure, BookingResponseModel>> scheduleSubscriptionWash({
     required String subscriptionId,
     required String washId,
-    required Map<String, dynamic> scheduleData,
+    required PackageBookingRequestModel request,
   }) async {
     try {
       final idempotencyKey = 'customer-booking-schedule:$washId';
       final response = await bookingsRemoteDataSource.scheduleSubscriptionWash(
         subscriptionId: subscriptionId,
         washId: washId,
-        scheduleData: scheduleData,
+        scheduleData: request.toJson(),
         idempotencyKey: idempotencyKey,
       );
       return response.fold((failure) => left(failure), (data) {
@@ -210,16 +212,16 @@ class BookingRepository {
   Future<Either<Failure, BookingResponseModel>> rescheduleSubscriptionWash({
     required String subscriptionId,
     required String washId,
-    required Map<String, dynamic> rescheduleData,
-    required String newScheduledAtIso,
+    required PackageRescheduleRequestModel request,
   }) async {
     try {
+      final newScheduledAtIso = request.toJson()['newScheduledAt'] as String;
       final idempotencyKey = 'customer-reschedule:$washId:$newScheduledAtIso';
       final response = await bookingsRemoteDataSource
           .rescheduleSubscriptionWash(
             subscriptionId: subscriptionId,
             washId: washId,
-            rescheduleData: rescheduleData,
+            rescheduleData: request.toJson(),
             idempotencyKey: idempotencyKey,
           );
       return response.fold((failure) => left(failure), (data) {

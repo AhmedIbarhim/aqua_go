@@ -1,15 +1,13 @@
 import '../../../address/data/models/address_model.dart';
 import 'day_time_model.dart';
 
-class RescheduleRequestModel {
-  final String bookingId;
+class PackageRescheduleRequestModel {
   final DateTime date;
   final String time;
   final AddressModel? address;
   final List<String> vehicleIds;
 
-  RescheduleRequestModel({
-    required this.bookingId,
+  PackageRescheduleRequestModel({
     required this.date,
     required this.time,
     this.address,
@@ -17,10 +15,12 @@ class RescheduleRequestModel {
   });
 
   Map<String, dynamic> toJson() {
-    final scheduledAt = DayTimeModel(
+    String scheduledAt = '';
+    scheduledAt = DayTimeModel(
       date: date,
       rawTime: time,
     ).toScheduledAtString();
+    scheduledAt = '${scheduledAt}Z';
 
     final addr = address;
     final isSavedAddress =
@@ -30,14 +30,14 @@ class RescheduleRequestModel {
 
     return {
       'newScheduledAt': scheduledAt,
-      if (isSavedAddress) 'savedAddressId': addr?.id,
+      if (isSavedAddress) 'addressId': addr?.id,
       if (!isSavedAddress && addr != null) ...{
         'addressLabel': addr.details.isNotEmpty ? addr.details : addr.label,
         'lat': addr.lat,
         'lng': addr.lng,
         if (addr.arrivalNotes != null) 'addressArrivalNotes': addr.arrivalNotes,
       },
-      if (vehicleIds.isNotEmpty) 'vehicleIds': vehicleIds,
+      'vehicleIds': vehicleIds,
     };
   }
 }

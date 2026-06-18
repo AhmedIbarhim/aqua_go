@@ -6,7 +6,7 @@ import 'day_time_model.dart';
 import '../../../../core/enums/payment_method_enum.dart';
 import 'quote_model.dart';
 
-class BookingRequestModel {
+class ServiceBookingRequestModel {
   final ServiceModel? service;
   final MyCarModel? car;
   final AddressModel? address;
@@ -17,7 +17,7 @@ class BookingRequestModel {
   final PaymentMethod? paymentMethod;
   final QuoteModel? quote;
 
-  BookingRequestModel({
+  ServiceBookingRequestModel({
     this.service,
     this.car,
     this.address,

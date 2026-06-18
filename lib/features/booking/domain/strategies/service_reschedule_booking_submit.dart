@@ -2,15 +2,15 @@ import 'package:dartz/dartz.dart';
 
 import '../../../../core/config/networking/exceptions/failure.dart';
 import '../../../my_bookings/data/models/booking_response_model/booking_response_model.dart';
-import '../../data/models/reschedule_request_model.dart';
+import '../../data/models/service_reschedule_request_model.dart';
 import '../../data/repos/booking_repository.dart';
 import '../../presentation/controllers/booking_state.dart';
 import 'booking_submit_strategy.dart';
 
-class RescheduleBookingSubmit implements BookingSubmitStrategy {
+class ServiceRescheduleBookingSubmit implements BookingSubmitStrategy {
   final String existingBookingId;
 
-  RescheduleBookingSubmit({required this.existingBookingId});
+  ServiceRescheduleBookingSubmit({required this.existingBookingId});
 
   @override
   Future<Either<Failure, BookingResponseModel>> submit({
@@ -22,7 +22,7 @@ class RescheduleBookingSubmit implements BookingSubmitStrategy {
       vehicleIds.add(state.selectedCar!.id);
     }
 
-    final rescheduleRequest = RescheduleRequestModel(
+    final rescheduleRequest = ServiceRescheduleRequestModel(
       bookingId: existingBookingId,
       date: state.selectedDate!,
       time: state.selectedTime!,

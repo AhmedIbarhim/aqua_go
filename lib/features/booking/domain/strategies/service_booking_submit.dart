@@ -7,7 +7,7 @@ import '../../../../core/config/networking/exceptions/failure.dart';
 import '../../../my_bookings/data/models/booking_response_model/booking_response_model.dart';
 import '../../../home/data/models/add_on_model.dart';
 import '../../data/models/biker_note.dart';
-import '../../data/models/booking_request_model.dart';
+import '../../data/models/service_booking_request_model.dart';
 import '../../data/repos/booking_repository.dart';
 import '../../presentation/controllers/booking_state.dart';
 import 'booking_submit_strategy.dart';
@@ -46,7 +46,7 @@ class ServiceBookingSubmit implements BookingSubmitStrategy {
       }
     }
 
-    final booking = BookingRequestModel(
+    final booking = ServiceBookingRequestModel(
       service: state.selectedService,
       car: state.selectedCar,
       address: state.selectedAddress,

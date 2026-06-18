@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 import '../../../../core/config/networking/exceptions/failure.dart';
 import '../../../my_bookings/data/models/booking_response_model/booking_response_model.dart';
-import '../../data/models/day_time_model.dart';
+import '../../data/models/package_reschedule_request_model.dart';
 import '../../data/repos/booking_repository.dart';
 import '../../presentation/controllers/booking_state.dart';
 import 'booking_submit_strategy.dart';
@@ -19,38 +19,17 @@ class PackageRescheduleBookingSubmit implements BookingSubmitStrategy {
       vehicleIds.add(state.selectedCar!.id);
     }
 
-    String scheduledAt = '';
-    if (state.selectedDate != null && state.selectedTime != null) {
-      scheduledAt = DayTimeModel(
-        date: state.selectedDate!,
-        rawTime: state.selectedTime!,
-      ).toScheduledAtString();
-      scheduledAt = '${scheduledAt}Z';
-    }
-
-    final addr = state.selectedAddress;
-    final isSavedAddress =
-        addr?.id != null &&
-        addr?.id != 'current_gps' &&
-        addr?.id != 'custom_map';
-
-    final rescheduleData = {
-      'newScheduledAt': scheduledAt,
-      if (isSavedAddress) 'addressId': addr?.id,
-      if (!isSavedAddress && addr != null) ...{
-        'addressLabel': addr.details.isNotEmpty ? addr.details : addr.label,
-        'lat': addr.lat,
-        'lng': addr.lng,
-        if (addr.arrivalNotes != null) 'addressArrivalNotes': addr.arrivalNotes,
-      },
-      'vehicleIds': vehicleIds,
-    };
+    final rescheduleRequest = PackageRescheduleRequestModel(
+      date: state.selectedDate!,
+      time: state.selectedTime!,
+      address: state.selectedAddress,
+      vehicleIds: vehicleIds,
+    );
 
     return repo.rescheduleSubscriptionWash(
       subscriptionId: state.subscriptionId!,
       washId: state.washId!,
-      rescheduleData: rescheduleData,
-      newScheduledAtIso: scheduledAt,
+      request: rescheduleRequest,
     );
   }
 }
