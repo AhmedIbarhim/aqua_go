@@ -19,10 +19,12 @@ class CustomTextFormField extends StatelessWidget {
     this.obscureText = false,
     this.onSaved,
     this.readOnly = false,
+    this.hintText,
     this.onTap,
   });
 
   final String label;
+  final String? hintText;
   final TextInputType? keyboardType;
   final Widget? suffixIcon;
   final Widget? prefixIcon;
@@ -62,6 +64,10 @@ class CustomTextFormField extends StatelessWidget {
           border: buildBorder(),
           enabledBorder: buildBorder(),
           labelText: label,
+          hintText: hintText,
+          hintStyle: AppTextStyles.regular14.copyWith(
+            color: context.colors.textSecondary,
+          ),
           labelStyle: AppTextStyles.regular12,
           suffixIcon: suffixIcon,
           prefixIcon: prefixIcon,

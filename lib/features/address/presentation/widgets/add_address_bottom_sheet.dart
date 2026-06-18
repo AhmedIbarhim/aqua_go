@@ -190,6 +190,7 @@ class _AddAddressBottomSheetState extends State<AddAddressBottomSheet> {
             CustomTextFormField(
               controller: _addressNameController,
               label: LocaleKeys.address_address_name_label.tr(),
+              hintText: LocaleKeys.address_address_name_example.tr(),
               prefixIcon: Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: SvgPicture.asset(
