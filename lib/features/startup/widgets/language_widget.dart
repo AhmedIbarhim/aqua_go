@@ -6,75 +6,82 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:svg_flutter/svg_flutter.dart';
 
-import '../../../core/extentions/context_extentions.dart';
-
-class LanguageWidget extends StatelessWidget {
+class LanguageWidget extends StatefulWidget {
   const LanguageWidget({super.key});
+
+  @override
+  State<LanguageWidget> createState() => _LanguageWidgetState();
+}
+
+class _LanguageWidgetState extends State<LanguageWidget> {
+  bool _isOpened = false;
 
   @override
   Widget build(BuildContext context) {
     final currentLocale = context.watch<LanguageCubit>().state.locale;
-    final isArabic = currentLocale.languageCode == 'ar';
-    final targetLanguageName = isArabic ? 'English' : 'العربية';
-    final targetFlag = isArabic ? AppAssets.usFlag : AppAssets.ksaFlag;
 
-    return GestureDetector(
-      onTap: () => context.read<LanguageCubit>().toggleLanguage(context),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(100),
-          border: Border.all(color: darkAppColors.contentTertiary),
-          color: darkAppColors.themeOpositeColor.withValues(alpha: 0.8),
-        ),
-        child: Directionality(
-          textDirection: TextDirection.rtl,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (context.isEn) ...[
-                CircleAvatar(
-                  radius: 8,
-                  backgroundColor: darkAppColors.themeOpositeColor,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: SvgPicture.asset(
-                      targetFlag,
-                      width: 16,
-                      height: 16,
-                      fit: BoxFit.fill,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-              ],
-
-              if (context.isAr) ...[
-                const SizedBox(width: 8),
-                CircleAvatar(
-                  radius: 8,
-                  backgroundColor: darkAppColors.themeOpositeColor,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: SvgPicture.asset(
-                      targetFlag,
-                      width: 16,
-                      height: 16,
-                      fit: BoxFit.fill,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-              ],
-
-              Text(
-                targetLanguageName,
+    return PopupMenuButton<String>(
+      onOpened: () {
+        setState(() {
+          _isOpened = true;
+        });
+      },
+      onCanceled: () {
+        setState(() {
+          _isOpened = false;
+        });
+      },
+      onSelected: (String langCode) {
+        setState(() {
+          _isOpened = false;
+        });
+        if (currentLocale.languageCode != langCode) {
+          context.read<LanguageCubit>().changeLanguage(context, langCode);
+        }
+      },
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      color: lightAppColors.background,
+      elevation: 4,
+      offset: const Offset(0, 40),
+      itemBuilder: (BuildContext context) {
+        return [
+          PopupMenuItem<String>(
+            value: 'en',
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'English',
                 style: AppTextStyles.regular14.copyWith(
-                  color: darkAppColors.contentSecondary,
+                  color: currentLocale.languageCode == 'en'
+                      ? darkAppColors.primary
+                      : darkAppColors.textSecondary,
                 ),
               ),
-            ],
+            ),
           ),
+          PopupMenuItem<String>(
+            value: 'ar',
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'العربية',
+                style: AppTextStyles.regular14.copyWith(
+                  color: currentLocale.languageCode == 'ar'
+                      ? darkAppColors.primary
+                      : darkAppColors.textSecondary,
+                ),
+              ),
+            ),
+          ),
+        ];
+      },
+      child: SvgPicture.asset(
+        AppAssets.locale,
+        width: 18,
+        height: 18,
+        colorFilter: ColorFilter.mode(
+          _isOpened ? darkAppColors.primary : darkAppColors.contentDisabled,
+          BlendMode.srcIn,
         ),
       ),
     );
