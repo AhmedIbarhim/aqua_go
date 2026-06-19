@@ -1,6 +1,7 @@
 import 'add_on_model.dart';
 import '../../../../core/config/local_storage/shared_prefs.dart';
 import '../../../../core/constants.dart';
+import '../../../my_bookings/data/models/booking_response_model/breakdown.dart';
 
 class PackageModel {
   final String id;
@@ -26,6 +27,7 @@ class PackageModel {
   final String effectiveFromAt;
   final String iconUrl;
   final List<AddOnModel> addons;
+  final Breakdown? breakdown;
 
   PackageModel({
     required this.id,
@@ -51,6 +53,7 @@ class PackageModel {
     required this.effectiveFromAt,
     this.iconUrl = '',
     required this.addons,
+    this.breakdown,
   });
 
   // Dynamic getters for full backward compatibility
@@ -68,7 +71,9 @@ class PackageModel {
     return isArabic ? descriptionAr : descriptionEn;
   }
 
-  String get price => (priceMinor / 100).toStringAsFixed(2);
+  String get price => breakdown != null
+      ? breakdown!.net.toStringAsFixed(2)
+      : (priceMinor / 100).toStringAsFixed(2);
 
   String get duration {
     final isArabic =
@@ -77,8 +82,12 @@ class PackageModel {
     return isArabic ? '$validityDays يوم' : '$validityDays Days';
   }
 
-  String get total => (num.parse(price) + num.parse(vat)).toStringAsFixed(2);
-  String get vat => "0.0";
+  String get total => breakdown != null
+      ? breakdown!.gross.toStringAsFixed(2)
+      : (num.parse(price) + num.parse(vat)).toStringAsFixed(2);
+
+  String get vat =>
+      breakdown != null ? breakdown!.vat.toStringAsFixed(2) : "0.0";
   // (num.parse(price) * .14).toStringAsFixed(2);
 
   List<AddOnModel> get includedAddons =>
@@ -155,6 +164,9 @@ class PackageModel {
       effectiveFromAt: json['effectiveFromAt'] as String? ?? '',
       iconUrl: json['iconUrl'] as String? ?? '',
       addons: parsedAddons,
+      breakdown: json['priceBreakdown'] != null
+          ? Breakdown.fromJson(json['priceBreakdown'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -185,6 +197,7 @@ class PackageModel {
       'effectiveFromAt': effectiveFromAt,
       'iconUrl': iconUrl,
       'addons': addons.map((e) => e.toJson()).toList(),
+      if (breakdown != null) 'breakdown': breakdown!.toJson(),
     };
   }
 }
