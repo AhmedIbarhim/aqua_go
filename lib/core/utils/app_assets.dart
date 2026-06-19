@@ -23,9 +23,9 @@ abstract class AppAssets {
   // Auth
   static const String logo = 'assets/images/app_logo.png';
   static const String logoTransparent = 'assets/images/logo_transparent.png';
-  static const String onboarding1 = 'assets/images/onboarding_1.png';
-  static const String onboarding2 = 'assets/svg/onboarding_2.svg';
-  static const String onboarding3 = 'assets/svg/onboarding_3.svg';
+  static const String onboarding1 = 'assets/images/onboarding_1.jpeg';
+  static const String onboarding2 = 'assets/images/onboarding_2.jpeg';
+  static const String onboarding3 = 'assets/images/onboarding_3.jpeg';
   static const String onboardingShadowTop =
       'assets/images/onboarding_shadow_top.png';
   static const String authBackImage = 'assets/images/auth_background.png';
@@ -71,6 +71,7 @@ abstract class AppAssets {
   static const String demoLandcroser = 'assets/images/demo_landcroser.png';
 
   // Booking
+  static const String packageDefault = 'assets/svg/package_default.svg';
   static const String bookingHeaderImage =
       'assets/images/booking_header_image.png';
   static const String addCarIcon = 'assets/svg/add_car.svg';

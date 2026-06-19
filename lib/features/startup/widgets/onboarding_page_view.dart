@@ -7,8 +7,8 @@ class OnboardingPageView extends StatelessWidget {
 
   List<String> get assetPages => [
     AppAssets.onboarding1,
-    AppAssets.onboarding1,
-    AppAssets.onboarding1,
+    AppAssets.onboarding2,
+    AppAssets.onboarding3,
   ];
 
   @override
