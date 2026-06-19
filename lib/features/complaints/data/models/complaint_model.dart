@@ -8,7 +8,8 @@ enum ComplaintStatus {
   open,
   closed,
   resolved,
-  pending;
+  pending,
+  rejected;
 
   static ComplaintStatus fromString(String? status) {
     if (status == null) return ComplaintStatus.open;
@@ -19,9 +20,10 @@ enum ComplaintStatus {
         return ComplaintStatus.closed;
       case 'RESOLVED':
         return ComplaintStatus.resolved;
+      case 'REJECTED':
+        return ComplaintStatus.rejected;
       case 'UNDER_REVIEW':
       case 'AWAITING_CUSTOMER':
-      case 'REJECTED':
       case 'PENDING':
       default:
         return ComplaintStatus.pending;
@@ -38,6 +40,8 @@ enum ComplaintStatus {
         return 'RESOLVED';
       case ComplaintStatus.pending:
         return 'UNDER_REVIEW';
+      case ComplaintStatus.rejected:
+        return 'REJECTED';
     }
   }
 
@@ -51,6 +55,8 @@ enum ComplaintStatus {
         return LocaleKeys.complaint_status_resolved;
       case ComplaintStatus.pending:
         return LocaleKeys.complaint_status_pending;
+      case ComplaintStatus.rejected:
+        return LocaleKeys.complaint_status_rejected;
     }
   }
 
@@ -64,6 +70,8 @@ enum ComplaintStatus {
         return context.colors.successLight;
       case ComplaintStatus.pending:
         return context.colors.defaultSubtle;
+      case ComplaintStatus.rejected:
+        return context.colors.errorLight;
     }
   }
 
@@ -76,6 +84,8 @@ enum ComplaintStatus {
       case ComplaintStatus.resolved:
         return darkAppColors.themeColor;
       case ComplaintStatus.pending:
+        return darkAppColors.themeOpositeColor;
+      case ComplaintStatus.rejected:
         return darkAppColors.themeOpositeColor;
     }
   }
@@ -214,6 +224,8 @@ class ComplaintModel {
   final String? desiredOutcome;
   final String? preferredContactChannel;
   final List<ComplaintPhoto>? photos;
+  final String? resolutionNote;
+  final String? rejectionReason;
 
   const ComplaintModel({
     required this.id,
@@ -236,6 +248,8 @@ class ComplaintModel {
     this.desiredOutcome,
     this.preferredContactChannel,
     this.photos,
+    this.resolutionNote,
+    this.rejectionReason,
   });
 
   factory ComplaintModel.fromJson(Map<String, dynamic> json) {
@@ -259,9 +273,11 @@ class ComplaintModel {
       preferredContactChannel: json['preferredContactChannel'] as String?,
       photos: json['photos'] != null
           ? (json['photos'] as List)
-              .map((e) => ComplaintPhoto.fromJson(e as Map<String, dynamic>))
-              .toList()
+                .map((e) => ComplaintPhoto.fromJson(e as Map<String, dynamic>))
+                .toList()
           : const [],
+      resolutionNote: json['resolutionNote'] as String?,
+      rejectionReason: json['rejectionReason'] as String?,
     );
   }
 
@@ -277,6 +293,8 @@ class ComplaintModel {
         'preferredContactChannel': preferredContactChannel,
       if (photoObjectKeys != null) 'photoObjectKeys': photoObjectKeys,
       if (photos != null) 'photos': photos!.map((e) => e.toJson()).toList(),
+      if (resolutionNote != null) 'resolutionNote': resolutionNote,
+      if (rejectionReason != null) 'rejectionReason': rejectionReason,
     };
   }
 
@@ -301,6 +319,8 @@ class ComplaintModel {
     String? desiredOutcome,
     String? preferredContactChannel,
     List<ComplaintPhoto>? photos,
+    String? resolutionNote,
+    String? rejectionReason,
   }) {
     return ComplaintModel(
       id: id ?? this.id,
@@ -324,6 +344,8 @@ class ComplaintModel {
       preferredContactChannel:
           preferredContactChannel ?? this.preferredContactChannel,
       photos: photos ?? this.photos,
+      resolutionNote: resolutionNote ?? this.resolutionNote,
+      rejectionReason: rejectionReason ?? this.rejectionReason,
     );
   }
 
@@ -375,10 +397,6 @@ class ComplaintPhoto {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'photoIndex': photoIndex,
-      'url': url,
-      'contentType': contentType,
-    };
+    return {'photoIndex': photoIndex, 'url': url, 'contentType': contentType};
   }
 }

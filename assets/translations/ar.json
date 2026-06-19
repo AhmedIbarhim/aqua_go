@@ -339,8 +339,11 @@
         "status_closed": "مغلقة",
         "status_resolved": "تم حلها",
         "status_pending": "معلقة",
+        "status_rejected": "مرفوضة",
         "no_complaints": "لا توجد شكاوى مقدمة حالياً",
-        "complaint_details_limit": "يجب أن تكون تفاصيل الشكوى 20 حرف على الأقل"
+        "complaint_details_limit": "يجب أن تكون تفاصيل الشكوى 20 حرف على الأقل",
+        "resolution_note": "ملاحظة الحل",
+        "rejection_reason": "سبب الرفض"
     },
     "snackbar": {
         "login_success": "تم تسجيل الدخول بنجاح",
