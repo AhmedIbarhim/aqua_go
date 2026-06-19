@@ -53,7 +53,7 @@ class _ComplaintImageFieldState extends State<ComplaintImageField> {
             isLoading = true;
           });
           try {
-            final pickedFile = await ImagePickerHelper.pickWithCamera(
+            final pickedFile = await ImagePickerHelper.showImageSourceDialog(
               context,
               withCropping: false,
             );

@@ -6,7 +6,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:aqua_go/core/components/custom_button.dart';
 import 'package:aqua_go/core/components/generic_app_bar.dart';
 import 'package:aqua_go/core/themes/app_colors.dart';
-import 'package:aqua_go/core/themes/app_text_styles.dart';
+// import 'package:aqua_go/core/themes/app_text_styles.dart';
 import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
@@ -137,8 +137,8 @@ class MyBookingDetailsView extends StatelessWidget {
                             MyBookingPhotosSection(
                               photos: activeBooking.photos,
                             ),
-                          const SizedBox(height: 16),
-                          _buildInvoicesLink(context, activeBooking),
+                          // const SizedBox(height: 16),
+                          // _buildInvoicesLink(context, activeBooking),
                           const SizedBox(height: 24),
                         ],
                       ),
@@ -155,52 +155,52 @@ class MyBookingDetailsView extends StatelessWidget {
     );
   }
 
-  Widget _buildInvoicesLink(
-    BuildContext context,
-    BookingResponseModel booking,
-  ) {
-    if (booking.invoice == null) {
-      return const SizedBox.shrink();
-    }
-    return InkWell(
-      onTap: () {
-        if (booking.invoice?.pdfUrl != null) {
-          // TODO: Open the PDF URL (requires url_launcher package or similar)
-          context.showSuccessSnackBar(booking.invoice!.pdfUrl!);
-        } else {
-          context.showWarningSnackBar(
-            context.isAr
-                ? "رابط الفاتورة غير متوفر حالياً"
-                : "Invoice PDF URL is not available yet.",
-          );
-        }
-      },
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: context.colors.themeColor,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              LocaleKeys.bookings_go_to_invoice_list.tr(),
-              style: AppTextStyles.medium14.copyWith(
-                color: context.colors.primary,
-              ),
-            ),
-            Icon(
-              Icons.arrow_forward_ios,
-              color: context.colors.primary,
-              size: 16,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  // Widget _buildInvoicesLink(
+  //   BuildContext context,
+  //   BookingResponseModel booking,
+  // ) {
+  //   if (booking.invoice == null) {
+  //     return const SizedBox.shrink();
+  //   }
+  //   return InkWell(
+  //     onTap: () {
+  //       if (booking.invoice?.pdfUrl != null) {
+  //         // TODO: Open the PDF URL (requires url_launcher package or similar)
+  //         context.showSuccessSnackBar(booking.invoice!.pdfUrl!);
+  //       } else {
+  //         context.showWarningSnackBar(
+  //           context.isAr
+  //               ? "رابط الفاتورة غير متوفر حالياً"
+  //               : "Invoice PDF URL is not available yet.",
+  //         );
+  //       }
+  //     },
+  //     borderRadius: BorderRadius.circular(12),
+  //     child: Container(
+  //       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+  //       decoration: BoxDecoration(
+  //         color: context.colors.themeColor,
+  //         borderRadius: BorderRadius.circular(12),
+  //       ),
+  //       child: Row(
+  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //         children: [
+  //           Text(
+  //             LocaleKeys.bookings_go_to_invoice_list.tr(),
+  //             style: AppTextStyles.medium14.copyWith(
+  //               color: context.colors.primary,
+  //             ),
+  //           ),
+  //           Icon(
+  //             Icons.arrow_forward_ios,
+  //             color: context.colors.primary,
+  //             size: 16,
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _buildActionSheet(BuildContext context, BookingResponseModel booking) {
     return BottomActionSheetContainer(
