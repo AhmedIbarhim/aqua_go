@@ -110,7 +110,6 @@ class NotificationCard extends StatelessWidget {
                     style: AppTextStyles.regular14.copyWith(
                       color: context.colors.textSecondary,
                     ),
-                    textAlign: TextAlign.right,
                   ),
                   const SizedBox(height: 8),
                   Row(

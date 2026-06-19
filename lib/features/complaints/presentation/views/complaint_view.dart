@@ -51,7 +51,7 @@ class _ComplaintViewState extends State<ComplaintView> {
     CustomBottomSheet.show(
       context: context,
       title: LocaleKeys.bookings_select_complaint_type.tr(),
-      child: ComplaintTypes(
+      child: ComplaintTypesTiles(
         initialValue: _typeController.text,
         onSelected: (value) {
           setState(() {

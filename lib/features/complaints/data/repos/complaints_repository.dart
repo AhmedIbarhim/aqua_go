@@ -71,31 +71,52 @@ class ComplaintsRepository {
           return const Left(ServerFailure('Failed to create complaint'));
         }
         try {
-          final complaint = ComplaintModel.fromJson(
+          final createdComplaint = ComplaintModel.fromJson(
             data as Map<String, dynamic>,
           );
 
           if (photos.isNotEmpty) {
             final uploadResult = await uploadPhotos(
-              complaintId: complaint.id,
+              complaintId: createdComplaint.id,
               photos: photos,
             );
 
-            return uploadResult.fold(
-              (f) => Right(
-                complaint,
-              ), // Return created complaint even if photo upload fails
-              (_) async {
-                final detailResult = await getComplaintDetail(complaint.id);
-                return detailResult.fold(
-                  (f) => Right(complaint),
-                  (updatedComplaint) => Right(updatedComplaint),
-                );
-              },
-            );
+            return uploadResult.fold((f) => Right(createdComplaint), (
+              uploadedKeys,
+            ) async {
+              final confirmIdempotencyKey = IdempotencyKeyHelper.generate(
+                prefix: 'complaint-photo-confirm',
+                userId: userId ?? '',
+                requestId: createdComplaint.id,
+              );
+
+              final confirmResult = await _remoteDataSource
+                  .confirmComplaintPhotos(
+                    complaintId: createdComplaint.id,
+                    data: {'photoObjectKeys': uploadedKeys},
+                    idempotencyKey: confirmIdempotencyKey,
+                  );
+
+              return confirmResult.fold(
+                (f) => Right(
+                  createdComplaint.copyWith(photoObjectKeys: uploadedKeys),
+                ),
+                (_) async {
+                  final detailResult = await getComplaintDetail(
+                    createdComplaint.id,
+                  );
+                  return detailResult.fold(
+                    (f) => Right(
+                      createdComplaint.copyWith(photoObjectKeys: uploadedKeys),
+                    ),
+                    (updatedComplaint) => Right(updatedComplaint),
+                  );
+                },
+              );
+            });
           }
 
-          return Right(complaint);
+          return Right(createdComplaint);
         } catch (e) {
           return Left(ServerFailure('Parsing error: $e'));
         }
@@ -105,11 +126,12 @@ class ComplaintsRepository {
     }
   }
 
-  Future<Either<Failure, void>> uploadPhotos({
+  Future<Either<Failure, List<String>>> uploadPhotos({
     required String complaintId,
     required List<File> photos,
   }) async {
     final dio = Dio();
+    final List<String> uploadedKeys = [];
     for (int i = 0; i < photos.length; i++) {
       final file = photos[i];
       if (!await file.exists()) continue;
@@ -137,6 +159,10 @@ class ComplaintsRepository {
         final data = presignResult.getOrElse(() => null);
         if (data != null) {
           final String? uploadUrl = data['url'];
+          final String? key =
+              data['key'] as String? ??
+              data['photoObjectKey'] as String? ??
+              data['objectKey'] as String?;
           if (uploadUrl != null && uploadUrl.isNotEmpty) {
             try {
               final bytes = await file.readAsBytes();
@@ -154,6 +180,9 @@ class ComplaintsRepository {
                   uploadResponse.statusCode == 200 ||
                   uploadResponse.statusCode == 201 ||
                   uploadResponse.statusCode == 204;
+              if (uploadSuccess && key != null) {
+                uploadedKeys.add(key);
+              }
             } catch (_) {
               uploadSuccess = false;
             }
@@ -165,6 +194,6 @@ class ComplaintsRepository {
         return const Left(ServerFailure('Failed to upload one or more photos'));
       }
     }
-    return const Right(null);
+    return Right(uploadedKeys);
   }
 }

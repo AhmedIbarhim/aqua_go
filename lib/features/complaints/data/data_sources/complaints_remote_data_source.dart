@@ -39,4 +39,16 @@ class ComplaintsRemoteDataSource {
       options: Options(headers: {'Idempotency-Key': idempotencyKey}),
     );
   }
+
+  Future<Either<Failure, dynamic>> confirmComplaintPhotos({
+    required String complaintId,
+    required Map<String, dynamic> data,
+    required String idempotencyKey,
+  }) {
+    return _apiClient.post(
+      Endpoints.confirmComplaintPhotos(complaintId),
+      data: data,
+      options: Options(headers: {'Idempotency-Key': idempotencyKey}),
+    );
+  }
 }

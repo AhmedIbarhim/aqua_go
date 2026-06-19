@@ -213,6 +213,7 @@ class ComplaintModel {
   final List<String>? photoObjectKeys;
   final String? desiredOutcome;
   final String? preferredContactChannel;
+  final List<ComplaintPhoto>? photos;
 
   const ComplaintModel({
     required this.id,
@@ -234,6 +235,7 @@ class ComplaintModel {
     this.photoObjectKeys,
     this.desiredOutcome,
     this.preferredContactChannel,
+    this.photos,
   });
 
   factory ComplaintModel.fromJson(Map<String, dynamic> json) {
@@ -255,11 +257,17 @@ class ComplaintModel {
           : null,
       desiredOutcome: json['desiredOutcome'] as String?,
       preferredContactChannel: json['preferredContactChannel'] as String?,
+      photos: json['photos'] != null
+          ? (json['photos'] as List)
+              .map((e) => ComplaintPhoto.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : const [],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
+      if (id.isNotEmpty) 'id': id,
       'bookingId': bookingId,
       if (referenceNumber != null) 'referenceNumber': referenceNumber,
       'category': category,
@@ -267,7 +275,56 @@ class ComplaintModel {
       if (desiredOutcome?.isNotEmpty ?? false) 'desiredOutcome': desiredOutcome,
       if (preferredContactChannel?.isNotEmpty ?? false)
         'preferredContactChannel': preferredContactChannel,
+      if (photoObjectKeys != null) 'photoObjectKeys': photoObjectKeys,
+      if (photos != null) 'photos': photos!.map((e) => e.toJson()).toList(),
     };
+  }
+
+  ComplaintModel copyWith({
+    String? id,
+    String? dateAr,
+    String? dateEn,
+    String? timeAr,
+    String? timeEn,
+    ComplaintStatus? status,
+    String? detailsAr,
+    String? detailsEn,
+    String? bookingId,
+    String? referenceNumber,
+    String? customerId,
+    String? category,
+    String? description,
+    String? raisedAt,
+    String? updatedAt,
+    String? priority,
+    List<String>? photoObjectKeys,
+    String? desiredOutcome,
+    String? preferredContactChannel,
+    List<ComplaintPhoto>? photos,
+  }) {
+    return ComplaintModel(
+      id: id ?? this.id,
+      dateAr: dateAr ?? this.dateAr,
+      dateEn: dateEn ?? this.dateEn,
+      timeAr: timeAr ?? this.timeAr,
+      timeEn: timeEn ?? this.timeEn,
+      status: status ?? this.status,
+      detailsAr: detailsAr ?? this.detailsAr,
+      detailsEn: detailsEn ?? this.detailsEn,
+      bookingId: bookingId ?? this.bookingId,
+      referenceNumber: referenceNumber ?? this.referenceNumber,
+      customerId: customerId ?? this.customerId,
+      category: category ?? this.category,
+      description: description ?? this.description,
+      raisedAt: raisedAt ?? this.raisedAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      priority: priority ?? this.priority,
+      photoObjectKeys: photoObjectKeys ?? this.photoObjectKeys,
+      desiredOutcome: desiredOutcome ?? this.desiredOutcome,
+      preferredContactChannel:
+          preferredContactChannel ?? this.preferredContactChannel,
+      photos: photos ?? this.photos,
+    );
   }
 
   String getDate(BuildContext context) {
@@ -295,5 +352,33 @@ class ComplaintModel {
       return description!;
     }
     return context.isAr ? (detailsAr ?? '') : (detailsEn ?? '');
+  }
+}
+
+class ComplaintPhoto {
+  final int photoIndex;
+  final String url;
+  final String contentType;
+
+  const ComplaintPhoto({
+    required this.photoIndex,
+    required this.url,
+    required this.contentType,
+  });
+
+  factory ComplaintPhoto.fromJson(Map<String, dynamic> json) {
+    return ComplaintPhoto(
+      photoIndex: json['photoIndex'] as int? ?? 0,
+      url: json['url'] as String? ?? '',
+      contentType: json['contentType'] as String? ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'photoIndex': photoIndex,
+      'url': url,
+      'contentType': contentType,
+    };
   }
 }

@@ -74,12 +74,18 @@ abstract class Endpoints {
       'subscriptions/$subscriptionId/washes';
   static String subscriptionWashDetail(String subscriptionId, String washId) =>
       'subscriptions/$subscriptionId/washes/$washId';
-  static String previewScheduleSubscriptionWash(String subscriptionId, String washId) =>
-      'subscriptions/$subscriptionId/washes/$washId/schedule/preview';
-  static String scheduleSubscriptionWash(String subscriptionId, String washId) =>
-      'subscriptions/$subscriptionId/washes/$washId/schedule';
-  static String rescheduleSubscriptionWash(String subscriptionId, String washId) =>
-      'subscriptions/$subscriptionId/washes/$washId/reschedule';
+  static String previewScheduleSubscriptionWash(
+    String subscriptionId,
+    String washId,
+  ) => 'subscriptions/$subscriptionId/washes/$washId/schedule/preview';
+  static String scheduleSubscriptionWash(
+    String subscriptionId,
+    String washId,
+  ) => 'subscriptions/$subscriptionId/washes/$washId/schedule';
+  static String rescheduleSubscriptionWash(
+    String subscriptionId,
+    String washId,
+  ) => 'subscriptions/$subscriptionId/washes/$washId/reschedule';
 
   //  Availability Endpoints
   static const String availability = 'availability';
@@ -110,6 +116,8 @@ abstract class Endpoints {
       'complaints/$complaintId';
   static String complaintPhotoPresign(String complaintId) =>
       'complaints/$complaintId/photos/presign';
+  static String confirmComplaintPhotos(String complaintId) =>
+      'complaints/$complaintId/photos/confirm';
 
   // Wallet Endpoints
   static const String wallet = 'me/wallet';
