@@ -13,7 +13,9 @@ class BookingsRemoteDataSource {
     required String packageId,
     required double lat,
     required double lng,
+    List<Map<String, dynamic>>? addOns,
     String? promoCode,
+    int carCount = 1,
   }) {
     return _apiClient.post(
       Endpoints.quotes,
@@ -22,6 +24,8 @@ class BookingsRemoteDataSource {
         'lat': lat,
         'lng': lng,
         if (promoCode != null && promoCode.isNotEmpty) 'promoCode': promoCode,
+        if (addOns != null) 'addOns': addOns,
+        'carCount': carCount,
       },
     );
   }

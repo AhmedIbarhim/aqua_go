@@ -130,10 +130,10 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
     final double total;
 
     if (quoteBreakdown != null) {
-      basePrice = quoteBreakdown.net;
-      subtotal = quoteBreakdown.net + addonsNet;
+      subtotal = quoteBreakdown.net;
       vat = quoteBreakdown.vat;
-      total = quoteBreakdown.gross + addonsGross;
+      total = quoteBreakdown.gross;
+      basePrice = subtotal - addonsNet;
     } else {
       basePrice = bookingState.selectedService?.basePriceDouble ?? 0.0;
       subtotal = basePrice + addonsNet;
@@ -216,12 +216,29 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
     );
   }
 
+  double _calculateTotal(BookingState state) {
+    double addonsGross = 0.0;
+    final availableAddons = state.selectedService?.addons ?? [];
+    for (final idx in state.selectedServiceIndices) {
+      if (idx < availableAddons.length) {
+        addonsGross += availableAddons[idx].price;
+      }
+    }
+    final quoteBreakdown = state.quote?.breakdown;
+    if (quoteBreakdown != null) {
+      return quoteBreakdown.gross + addonsGross;
+    } else {
+      return (state.selectedService?.priceDouble ?? 0.0) + addonsGross;
+    }
+  }
+
   Widget _buildBottomActionSheet(
     BuildContext context,
     BookingState bookingState,
   ) {
     final config = bookingState.flowConfig;
-    final isEnabled = config.requiresPaymentMethod
+    final total = _calculateTotal(bookingState);
+    final isEnabled = (config.requiresPaymentMethod || total > 0)
         ? bookingState.paymentMethod != null
         : true;
 

@@ -21,14 +21,18 @@ class BookingRepository {
     required String packageId,
     required double lat,
     required double lng,
+    List<Map<String, dynamic>>? addOns,
     String? promoCode,
+    int carCount = 1,
   }) async {
     try {
       final response = await bookingsRemoteDataSource.getQuote(
         packageId: packageId,
         lat: lat,
         lng: lng,
+        addOns: addOns,
         promoCode: promoCode,
+        carCount: carCount,
       );
       return response.fold((failure) => left(failure), (data) {
         if (data != null) {

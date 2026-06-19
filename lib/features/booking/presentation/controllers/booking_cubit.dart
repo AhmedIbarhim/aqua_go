@@ -346,11 +346,21 @@ class BookingCubit extends Cubit<BookingState> {
 
     emit(state.copyWith(status: BookingStatus.loading));
 
+    final List<Map<String, dynamic>> addonsJson = [];
+    final availableAddons = state.selectedService?.addons ?? [];
+    for (final idx in state.selectedServiceIndices) {
+      if (idx < availableAddons.length) {
+        addonsJson.add({'addonId': availableAddons[idx].id});
+      }
+    }
+
     final result = await _bookingRepo.getQuote(
       packageId: state.selectedService!.id!,
       lat: state.selectedAddress!.lat,
       lng: state.selectedAddress!.lng,
+      addOns: addonsJson,
       promoCode: promoCode,
+      carCount: 1,
     );
 
     return result.fold(

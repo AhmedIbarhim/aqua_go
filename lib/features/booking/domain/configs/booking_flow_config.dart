@@ -28,7 +28,9 @@ class BookingFlowConfig {
   // ─── Summary View Sections ───
   bool get showBikerNotes => flowType != BookingFlowType.reschedule;
   bool get showPaymentMethod => flowType == BookingFlowType.service;
-  bool get showPaymentSummary => flowType == BookingFlowType.service;
+  bool get showPaymentSummary =>
+      flowType == BookingFlowType.service ||
+      flowType == BookingFlowType.package;
   bool get showBookingSummaryCard => flowType != BookingFlowType.reschedule;
 
   // ─── Pricing in Details bottom sheet ───

@@ -176,7 +176,7 @@ class CurrentPackageCard extends StatelessWidget {
                             LocaleKeys.home_use_package.tr(),
                             style: AppTextStyles.medium14.copyWith(
                               color: package.remainingWashes == 0
-                                  ? context.colors.textSecondary
+                                  ? context.colors.error
                                   : context.colors.textPrimary,
                             ),
                           ),
@@ -190,7 +190,7 @@ class CurrentPackageCard extends StatelessWidget {
                               borderRadius: BorderRadius.circular(4),
                               border: Border.all(
                                 color: package.remainingWashes == 0
-                                    ? context.colors.textSecondary
+                                    ? context.colors.error
                                     : context.colors.textPrimary,
                                 width: 1,
                               ),
@@ -201,7 +201,7 @@ class CurrentPackageCard extends StatelessWidget {
 
                                 size: 8,
                                 color: package.remainingWashes == 0
-                                    ? context.colors.textSecondary
+                                    ? context.colors.error
                                     : context.colors.textPrimary,
                               ),
                             ),
