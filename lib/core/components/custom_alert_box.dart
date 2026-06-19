@@ -116,7 +116,7 @@ class SuccessAlertBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
+    final width = MediaQuery.sizeOf(context).width;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [

@@ -9,8 +9,8 @@ class OfferCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var width = MediaQuery.of(context).size.width;
-    var height = MediaQuery.of(context).size.height;
+    var width = MediaQuery.sizeOf(context).width;
+    var height = MediaQuery.sizeOf(context).height;
     return Container(
       width: atHome == true ? height * 0.4 : width,
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),

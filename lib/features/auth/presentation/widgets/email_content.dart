@@ -85,7 +85,7 @@ class _EmailContentState extends State<EmailContent> {
                 right: 24,
                 top: height * 0.02,
                 bottom:
-                    height * 0.02 + MediaQuery.of(context).viewInsets.bottom,
+                    height * 0.02 + MediaQuery.viewInsetsOf(context).bottom,
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,

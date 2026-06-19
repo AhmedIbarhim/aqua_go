@@ -346,11 +346,24 @@ class BookingCubit extends Cubit<BookingState> {
 
     emit(state.copyWith(status: BookingStatus.loading));
 
+    final availableAddons = state.selectedService?.addons ?? [];
+    final List<String> addOnIds = [];
+    for (final idx in state.selectedServiceIndices) {
+      if (idx < availableAddons.length) {
+        final id = availableAddons[idx].id;
+        if (id != null) addOnIds.add(id);
+      }
+    }
+    // A service booking carries a single vehicle, so car count is 1.
+    const int carCount = 1;
+
     final result = await _bookingRepo.getQuote(
       packageId: state.selectedService!.id!,
       lat: state.selectedAddress!.lat,
       lng: state.selectedAddress!.lng,
       promoCode: promoCode,
+      addOnIds: addOnIds,
+      carCount: carCount,
     );
 
     return result.fold(

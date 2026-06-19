@@ -1,6 +1,4 @@
 import 'dart:io';
-import 'package:aqua_go/core/extentions/context_extentions/locale_extension.dart';
-import 'package:aqua_go/core/extentions/context_extentions/snackbar_extension.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -12,27 +10,13 @@ class ImagePickerHelper {
   static final ImagePicker _picker = ImagePicker();
 
   /// Picks an image using the camera.
-  static Future<File?> pickWithCamera(
-    BuildContext context, {
-    bool withCropping = true,
-  }) async {
-    return _pickImage(
-      context,
-      source: ImageSource.camera,
-      withCropping: withCropping,
-    );
+  static Future<File?> pickWithCamera({bool withCropping = true}) async {
+    return _pickImage(source: ImageSource.camera, withCropping: withCropping);
   }
 
   /// Picks an image from the gallery.
-  static Future<File?> pickWithGallery(
-    BuildContext context, {
-    bool withCropping = true,
-  }) async {
-    return _pickImage(
-      context,
-      source: ImageSource.gallery,
-      withCropping: withCropping,
-    );
+  static Future<File?> pickWithGallery({bool withCropping = true}) async {
+    return _pickImage(source: ImageSource.gallery, withCropping: withCropping);
   }
 
   /// Shows a bottom sheet to pick an image from camera or gallery.
@@ -69,13 +53,12 @@ class ImagePickerHelper {
     );
 
     if (source != null) {
-      return _pickImage(context, source: source, withCropping: withCropping);
+      return _pickImage(source: source, withCropping: withCropping);
     }
     return null;
   }
 
-  static Future<File?> _pickImage(
-    BuildContext context, {
+  static Future<File?> _pickImage({
     required ImageSource source,
     bool withCropping = true,
   }) async {
@@ -95,13 +78,7 @@ class ImagePickerHelper {
 
       return imageFile;
     } catch (e) {
-      if (!context.mounted) {
-        return null;
-      }
-      final String errorMsg = context.isAr
-          ? "لا يمكن الوصول للكاميرا أو الألبوم"
-          : "Cannot access camera or gallery";
-      context.showErrorSnackBar(errorMsg);
+      debugPrint('Error picking image: $e');
       return null;
     }
   }

@@ -33,8 +33,8 @@ class _ServicesPageViewState extends State<ServicesPageView> {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.sizeOf(context).width;
+    final height = MediaQuery.sizeOf(context).height;
     final cardHeight = context.isMobile ? width * 0.3 : height * 0.13;
 
     return Column(

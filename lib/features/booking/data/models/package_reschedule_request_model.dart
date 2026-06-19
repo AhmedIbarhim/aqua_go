@@ -20,7 +20,6 @@ class PackageRescheduleRequestModel {
       date: date,
       rawTime: time,
     ).toScheduledAtString();
-    scheduledAt = '${scheduledAt}Z';
 
     final addr = address;
     final isSavedAddress =

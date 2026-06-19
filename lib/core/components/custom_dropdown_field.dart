@@ -53,7 +53,7 @@ class CustomDropdownField extends StatelessWidget {
               title: label,
               child: ConstrainedBox(
                 constraints: BoxConstraints(
-                  maxHeight: MediaQuery.of(context).size.height * 0.65,
+                  maxHeight: MediaQuery.sizeOf(context).height * 0.65,
                 ),
                 child: SingleChildScrollView(
                   child: Column(
@@ -106,7 +106,7 @@ class CustomDropdownField extends StatelessWidget {
           child: Container(
             padding: EdgeInsets.symmetric(
               horizontal: 6,
-              vertical: MediaQuery.of(context).size.height * 0.012,
+              vertical: MediaQuery.sizeOf(context).height * 0.012,
             ),
             decoration: BoxDecoration(
               color: context.colors.background,

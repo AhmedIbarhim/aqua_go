@@ -124,6 +124,7 @@ class BookingSummaryModel {
       updatedAt: details.updatedAt,
       totalAmountMinor: details.totalAmountMinor,
       currency: details.currency,
+      isSubscription: details.isSubscription,
       vehicleYear: vehicle?.vehicleYear,
       vehicleMake: vehicle?.vehicleMake,
       vehicleModel: vehicle?.vehicleModel,
@@ -155,6 +156,7 @@ class BookingSummaryModel {
       updatedAt: updatedAt,
       totalAmountMinor: totalAmountMinor,
       currency: currency,
+      isSubscription: isSubscription,
       plate: plate,
       vehicles: [
         BookingVehicle(

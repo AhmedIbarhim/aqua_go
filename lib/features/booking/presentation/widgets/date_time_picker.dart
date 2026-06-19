@@ -82,7 +82,7 @@ class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
+    final height = MediaQuery.sizeOf(context).height;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -138,8 +138,8 @@ class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
   }
 
   Widget _buildDateSlider() {
-    final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.sizeOf(context).width;
+    final height = MediaQuery.sizeOf(context).height;
     return SizedBox(
       height: height * 0.1,
       child: ListView.separated(
@@ -213,8 +213,8 @@ class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
   }
 
   Widget _buildAvailableAppointments() {
-    final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.sizeOf(context).width;
+    final height = MediaQuery.sizeOf(context).height;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

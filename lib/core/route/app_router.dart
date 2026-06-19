@@ -101,8 +101,10 @@ abstract class AppRouter {
               BlocProvider(
                 create: (_) => locator<PackagesCubit>()..getPackages(),
               ),
-              BlocProvider(
-                create: (_) => locator<SubscriptionsCubit>(),
+              // SubscriptionsCubit is a shared lazy singleton — provide by value
+              // so popping this route does not close the shared instance.
+              BlocProvider.value(
+                value: locator<SubscriptionsCubit>(),
               ),
             ],
             child: const PackagesView(),
@@ -113,9 +115,11 @@ abstract class AppRouter {
         return MaterialPageRoute(
           builder: (_) => MultiBlocProvider(
             providers: [
-              BlocProvider(
-                create: (_) =>
-                    locator<SubscriptionsCubit>()..getActiveSubscriptions(),
+              // SubscriptionsCubit is a shared lazy singleton — provide by value
+              // (do not close on pop) but refetch so this screen shows the
+              // latest list, including a just-purchased subscription.
+              BlocProvider.value(
+                value: locator<SubscriptionsCubit>()..getActiveSubscriptions(),
               ),
               BlocProvider(
                 create: (_) => locator<PackagesCubit>()..getPackages(),

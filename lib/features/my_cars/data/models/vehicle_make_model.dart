@@ -9,6 +9,7 @@ class VehicleMakeModel extends Equatable {
   final bool active;
   final int version;
   final String logoUrl;
+  final bool colorEditable;
 
   const VehicleMakeModel({
     required this.id,
@@ -16,6 +17,7 @@ class VehicleMakeModel extends Equatable {
     required this.active,
     required this.version,
     this.logoUrl = '',
+    this.colorEditable = false,
   });
 
   factory VehicleMakeModel.fromJson(Map<String, dynamic> json) {
@@ -25,6 +27,7 @@ class VehicleMakeModel extends Equatable {
       active: json['active'] as bool? ?? true,
       version: json['version'] as int? ?? 1,
       logoUrl: json['logoUrl'] as String? ?? '',
+      colorEditable: json['colorEditable'] as bool? ?? false,
     );
   }
 
@@ -35,11 +38,30 @@ class VehicleMakeModel extends Equatable {
       'active': active,
       'version': version,
       'logoUrl': logoUrl,
+      'colorEditable': colorEditable,
     };
   }
 
+  VehicleMakeModel copyWith({
+    String? id,
+    MakeName? vehicleMakeName,
+    bool? active,
+    int? version,
+    String? logoUrl,
+    bool? colorEditable,
+  }) {
+    return VehicleMakeModel(
+      id: id ?? this.id,
+      vehicleMakeName: vehicleMakeName ?? this.vehicleMakeName,
+      active: active ?? this.active,
+      version: version ?? this.version,
+      logoUrl: logoUrl ?? this.logoUrl,
+      colorEditable: colorEditable ?? this.colorEditable,
+    );
+  }
+
   @override
-  List<Object?> get props => [id, vehicleMakeName, active, version, logoUrl];
+  List<Object?> get props => [id, vehicleMakeName, active, version, logoUrl, colorEditable];
 }
 
 class MakeName extends Equatable {

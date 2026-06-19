@@ -83,6 +83,8 @@
         "best_offers": "Best Offers",
         "available_offers": "Available Offers",
         "view_more": "View More",
+        "read_more": "Read more",
+        "read_less": "Read less",
         "notifications": "Notifications"
     },
     "my_cars": {
@@ -159,6 +161,8 @@
         "payment_summary": "Payment Summary",
         "subtotal": "Subtotal",
         "vat": "VAT",
+        "vat_included": "VAT 15% included",
+        "covered_by_subscription": "Covered by subscription",
         "no_available_times": "No available times for this day in this zone",
         "confirm_booking": "Confirm Booking",
         "confirm_payment": "Confirm Payment",
@@ -193,6 +197,8 @@
         "rating_reason": "Rating Reason",
         "rating_submitted": "Rating Submitted",
         "rating_submitted_desc": "Your feedback helps us improve our services and provide you with a better experience",
+        "your_rating": "Your Rating",
+        "rating_notes": "Your Notes",
         "rating_reasons": {
             "staff_behavior": "Staff Behavior",
             "damage": "Damage",
@@ -227,7 +233,8 @@
         "search_hint": "Search location...",
         "search_results": "Search Results",
         "address_label": "Address",
-        "address_name_label": "Address Name",
+        "address_name_label": "Label (e.g., Home, Office)",
+        "address_name_helper": "A short name to help you identify this address",
         "access_notes_label": "Access Notes",
         "save_address": "Save Address",
         "confirm_delete": "Are you sure you want to delete the address?",
@@ -339,8 +346,7 @@
         "status_closed": "Closed",
         "status_resolved": "Resolved",
         "status_pending": "Pending",
-        "no_complaints": "No submitted complaints yet",
-        "complaint_details_limit": "Complaint details must be at least 20 characters"
+        "no_complaints": "No submitted complaints yet"
     },
     "snackbar": {
         "login_success": "Logged in successfully",

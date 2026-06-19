@@ -98,7 +98,7 @@ class _AddAddressBottomSheetState extends State<AddAddressBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
+    final height = MediaQuery.sizeOf(context).height;
     return BlocConsumer<AddressesCubit, AddressesState>(
       listener: (context, state) {
         if (state is AddressesActionLoading) {
@@ -193,15 +193,18 @@ class _AddAddressBottomSheetState extends State<AddAddressBottomSheet> {
               hintText: LocaleKeys.address_address_name_example.tr(),
               prefixIcon: Padding(
                 padding: const EdgeInsets.all(12.0),
-                child: SvgPicture.asset(
-                  AppAssets.location,
-                  width: 24,
-                  height: 24,
-                  colorFilter: ColorFilter.mode(
-                    context.colors.textSecondary,
-                    BlendMode.srcIn,
-                  ),
+                child: Icon(
+                  Icons.label_outline,
+                  size: 24,
+                  color: context.colors.textSecondary,
                 ),
+              ),
+            ),
+            SizedBox(height: height * 0.008),
+            Text(
+              LocaleKeys.address_address_name_helper.tr(),
+              style: AppTextStyles.regular12.copyWith(
+                color: context.colors.textSecondary,
               ),
             ),
             SizedBox(height: height * 0.03),

@@ -22,6 +22,8 @@ class BookingRepository {
     required double lat,
     required double lng,
     String? promoCode,
+    List<String> addOnIds = const [],
+    int? carCount,
   }) async {
     try {
       final response = await bookingsRemoteDataSource.getQuote(
@@ -29,6 +31,8 @@ class BookingRepository {
         lat: lat,
         lng: lng,
         promoCode: promoCode,
+        addOnIds: addOnIds,
+        carCount: carCount,
       );
       return response.fold((failure) => left(failure), (data) {
         if (data != null) {

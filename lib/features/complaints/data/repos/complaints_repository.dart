@@ -55,15 +55,10 @@ class ComplaintsRepository {
   }) async {
     try {
       final userId = FetchUserData.getUserId();
-      final idempotencyKey = IdempotencyKeyHelper.generate(
-        prefix: 'customer-complaint-raise',
-        userId: userId ?? '',
-        requestId: complaint.bookingId,
-      );
-
+      // No Idempotency-Key on complaint raise (owner decision): a customer may
+      // file unlimited complaints per booking, so every raise creates a new row.
       final createResult = await _remoteDataSource.createComplaint(
         complaintData: complaint.toJson(),
-        idempotencyKey: idempotencyKey,
       );
 
       return createResult.fold((failure) => Left(failure), (data) async {

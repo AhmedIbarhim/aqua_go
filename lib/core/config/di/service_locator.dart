@@ -186,7 +186,12 @@ Future<void> initServiceLocator() async {
     () => PackagesCubit(packagesRepository: locator()),
   );
 
-  locator.registerFactory<SubscriptionsCubit>(
+  // Lazy singleton so every surface that displays the user's subscriptions
+  // (home current-package section, packages screen, my-subscribed-packages
+  // screen) shares ONE instance. A successful subscribe refetches that single
+  // instance, so the new subscription appears everywhere without a manual
+  // pull-to-refresh.
+  locator.registerLazySingleton<SubscriptionsCubit>(
     () => SubscriptionsCubit(subscriptionsRepository: locator()),
   );
 

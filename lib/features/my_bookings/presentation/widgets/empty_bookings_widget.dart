@@ -39,7 +39,7 @@ class EmptyBookingsWidget extends StatelessWidget {
           ),
           const SizedBox(height: 30),
           SizedBox(
-            width: MediaQuery.of(context).size.width * 0.6,
+            width: MediaQuery.sizeOf(context).width * 0.6,
             child: CustomButton(
               text: context.locale.languageCode == 'ar'
                   ? 'احجز الآن'

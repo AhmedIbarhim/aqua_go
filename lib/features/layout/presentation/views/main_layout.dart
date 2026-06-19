@@ -34,7 +34,7 @@ class MainLayoutState extends State<MainLayout> {
 
   @override
   Widget build(BuildContext context) {
-    var height = MediaQuery.of(context).size.height;
+    var height = MediaQuery.sizeOf(context).height;
     return Scaffold(
       body: Stack(
         children: [

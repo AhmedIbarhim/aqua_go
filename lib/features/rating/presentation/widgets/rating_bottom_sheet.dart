@@ -47,8 +47,8 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.sizeOf(context).width;
+    final height = MediaQuery.sizeOf(context).height;
     return BlocListener<RatingCubit, RatingState>(
       listener: (context, state) {
         if (state is RatingSubmitLoading) {
@@ -132,7 +132,7 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
   }
 
   Widget _buildRatingStars() {
-    final width = MediaQuery.of(context).size.width;
+    final width = MediaQuery.sizeOf(context).width;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(5, (index) {
@@ -174,7 +174,7 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
   }
 
   Widget _buildBikerInfo() {
-    final width = MediaQuery.of(context).size.width;
+    final width = MediaQuery.sizeOf(context).width;
     final worker = widget.booking.assignedWorker;
     if (worker == null) {
       return const SizedBox.shrink();
@@ -247,7 +247,7 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
   }
 
   Widget _buildRatingReasons() {
-    final width = MediaQuery.of(context).size.width;
+    final width = MediaQuery.sizeOf(context).width;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

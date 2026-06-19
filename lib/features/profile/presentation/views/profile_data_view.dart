@@ -216,7 +216,7 @@ class _ProfileDataViewState extends State<ProfileDataView> {
         left: 24,
         right: 24,
         top: 24,
-        bottom: MediaQuery.of(context).padding.bottom + 24,
+        bottom: MediaQuery.paddingOf(context).bottom + 24,
       ),
       decoration: BoxDecoration(
         color: context.colors.screenBG,

@@ -9,6 +9,10 @@ class AuthCubit extends Cubit<AuthState> {
   final AuthRepository _authRepo;
   AuthCubit(this._authRepo) : super(LoginInitial());
 
+  /// Clears any stale/expired token so a fresh session (including guest mode)
+  /// never reuses an invalid token. Silent pre-login cleanup with no state change.
+  Future<void> clearStaleSession() => _authRepo.clearSession();
+
   Future<void> login(String phone) async {
     emit(LoginLoading());
     final result = await _authRepo.login(phone.trim());

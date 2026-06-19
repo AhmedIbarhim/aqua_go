@@ -147,7 +147,7 @@ class _PhoneOtpContentState extends State<PhoneOtpContent> {
             left: 24,
             right: 24,
             top: height * 0.02,
-            bottom: height * 0.02 + MediaQuery.of(context).viewInsets.bottom,
+            bottom: height * 0.02 + MediaQuery.viewInsetsOf(context).bottom,
           ),
           decoration: BoxDecoration(
             color: darkAppColors.themeColor,

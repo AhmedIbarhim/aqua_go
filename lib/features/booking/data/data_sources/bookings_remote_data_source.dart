@@ -14,6 +14,8 @@ class BookingsRemoteDataSource {
     required double lat,
     required double lng,
     String? promoCode,
+    List<String> addOnIds = const [],
+    int? carCount,
   }) {
     return _apiClient.post(
       Endpoints.quotes,
@@ -22,6 +24,10 @@ class BookingsRemoteDataSource {
         'lat': lat,
         'lng': lng,
         if (promoCode != null && promoCode.isNotEmpty) 'promoCode': promoCode,
+        if (addOnIds.isNotEmpty) ...{
+          'addOns': addOnIds.map((id) => {'addonId': id}).toList(),
+          'carCount': carCount ?? 1,
+        },
       },
     );
   }

@@ -54,7 +54,9 @@ class _HomeViewState extends State<HomeView> {
     _servicesCubit.close();
     _bannersCubit.close();
     _packagesCubit.close();
-    _subscriptionsCubit.close();
+    // _subscriptionsCubit is a shared lazy singleton (see service_locator):
+    // do NOT close it here, otherwise other surfaces lose their data source
+    // and a post-subscribe refetch can't propagate.
     super.dispose();
   }
 

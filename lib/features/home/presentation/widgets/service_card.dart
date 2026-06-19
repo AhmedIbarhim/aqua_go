@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
 import '../../../../core/components/custom_network_image.dart';
@@ -6,18 +7,36 @@ import '../../../../core/route/routes.dart';
 import '../../../../core/route/app_router.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
+import '../../../../generated/locale_keys.g.dart';
 import '../../data/models/service_model.dart';
 
 import '../../../../core/helpers/fetch_user_data_helper.dart';
 
-class ServiceCard extends StatelessWidget {
+class ServiceCard extends StatefulWidget {
   const ServiceCard({super.key, required this.serviceModel});
 
   final ServiceModel serviceModel;
 
   @override
+  State<ServiceCard> createState() => _ServiceCardState();
+}
+
+class _ServiceCardState extends State<ServiceCard> {
+  bool _descriptionExpanded = false;
+
+  ServiceModel get serviceModel => widget.serviceModel;
+
+  /// Heuristic: a description long enough to be clipped at 2 lines should
+  /// offer a read-more affordance. The exact 2-line clip is decided by the
+  /// renderer; this guards against showing the toggle for short text.
+  bool _isDescriptionLong(String description) => description.length > 60;
+
+  @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
+    final width = MediaQuery.sizeOf(context).width;
+    final description = context.isEn
+        ? serviceModel.rawDescription?.descEn ?? ''
+        : serviceModel.rawDescription?.descAr ?? '';
     return InkWell(
       onTap: () {
         if (FetchUserData.isGuest()) {
@@ -81,15 +100,36 @@ class ServiceCard extends StatelessWidget {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                context.isEn
-                                    ? serviceModel.rawDescription?.descEn ?? ''
-                                    : serviceModel.rawDescription?.descAr ?? '',
+                                description,
                                 style: AppTextStyles.regular12.copyWith(
                                   color: context.colors.textSecondary,
                                 ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
+                                maxLines: _descriptionExpanded ? null : 2,
+                                overflow: _descriptionExpanded
+                                    ? TextOverflow.visible
+                                    : TextOverflow.ellipsis,
                               ),
+                              if (_isDescriptionLong(description)) ...[
+                                const SizedBox(height: 4),
+                                GestureDetector(
+                                  behavior: HitTestBehavior.opaque,
+                                  onTap: () {
+                                    setState(() {
+                                      _descriptionExpanded =
+                                          !_descriptionExpanded;
+                                    });
+                                  },
+                                  child: Text(
+                                    _descriptionExpanded
+                                        ? LocaleKeys.home_read_less.tr()
+                                        : LocaleKeys.home_read_more.tr(),
+                                    style: AppTextStyles.regular12.copyWith(
+                                      color: context.colors.primary,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ],
                           ),
                           if (serviceModel.price.isNotEmpty) ...[

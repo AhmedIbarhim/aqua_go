@@ -45,7 +45,9 @@ class BookingDetailsSummaryCard extends StatelessWidget {
                 value: booking.formattedDateTime,
                 icon: AppAssets.date,
               ),
-              if (booking.addOns != null && booking.addOns!.isNotEmpty)
+              if (!booking.isCoveredBySubscription &&
+                  booking.addOns != null &&
+                  booking.addOns!.isNotEmpty)
                 ...booking.addOns!.map(
                   (addon) => _buildSummaryRow(
                     context,
@@ -58,8 +60,9 @@ class BookingDetailsSummaryCard extends StatelessWidget {
               _buildSummaryRow(
                 context,
                 title: LocaleKeys.bookings_total_amount.tr(),
-                value:
-                    '${booking.totalAmount.toStringAsFixed(2)} ${booking.currency ?? "SAR"}',
+                value: booking.isCoveredBySubscription
+                    ? LocaleKeys.bookings_covered_by_subscription.tr()
+                    : '${booking.totalAmount.toStringAsFixed(2)} ${booking.currency ?? "SAR"}',
                 icon: AppAssets.currency,
               ),
             ],

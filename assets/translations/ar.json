@@ -83,6 +83,8 @@
         "best_offers": "أفضل العروض",
         "available_offers": "العروض المتاحة",
         "view_more": "عرض المزيد",
+        "read_more": "اقرأ المزيد",
+        "read_less": "عرض أقل",
         "notifications": "الإشعارات"
     },
     "my_cars": {
@@ -159,6 +161,8 @@
         "payment_summary": "ملخص الدفع",
         "subtotal": "المبلغ قبل الضريبة",
         "vat": "ضريبة القيمة المضافة",
+        "vat_included": "شامل ضريبة القيمة المضافة 15%",
+        "covered_by_subscription": "مغطاة بالاشتراك",
         "no_available_times": "لا توجد أوقات متاحة لهذا اليوم في هذه المنطقة",
         "confirm_booking": "تأكيد الحجز",
         "confirm_payment": "تأكيد الدفع",
@@ -193,6 +197,8 @@
         "rating_reason": "سبب التقييم",
         "rating_submitted": "تم تسجيل تقييمك بنجاح",
         "rating_submitted_desc": "رأيك يساعدنا في تحسين خدماتنا وتقديم تجربة أفضل لك",
+        "your_rating": "تقييمك",
+        "rating_notes": "ملاحظاتك",
         "rating_reasons": {
             "staff_behavior": "سلوك العاملين",
             "damage": "التلف",
@@ -227,7 +233,8 @@
         "search_hint": "إبحث عن موقع ...",
         "search_results": "نتائج البحث",
         "address_label": "العنوان",
-        "address_name_label": "اسم العنوان",
+        "address_name_label": "تسمية (مثل: المنزل، المكتب)",
+        "address_name_helper": "اسم قصير لمساعدتك في تمييز هذا العنوان",
         "access_notes_label": "ملاحظات الوصول",
         "save_address": "حفظ العنوان",
         "confirm_delete": "هل انت متأكد من حذف العنوان؟",
@@ -339,8 +346,7 @@
         "status_closed": "مغلقة",
         "status_resolved": "تم حلها",
         "status_pending": "معلقة",
-        "no_complaints": "لا توجد شكاوى مقدمة حالياً",
-        "complaint_details_limit": "يجب أن تكون تفاصيل الشكوى 20 حرف على الأقل"
+        "no_complaints": "لا توجد شكاوى مقدمة حالياً"
     },
     "snackbar": {
         "login_success": "تم تسجيل الدخول بنجاح",

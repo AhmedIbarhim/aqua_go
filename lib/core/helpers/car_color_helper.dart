@@ -59,3 +59,19 @@ List<Color> carColors = [
   Color(0xFF2563eb), // Blue
   Color(0xFF7dd3fc), // Light Blue
 ];
+
+int parseVehicleColorCode(String? raw) {
+  if (raw == null || raw.isEmpty) return 0xFFFFFFFF;
+  try {
+    String clean = raw
+        .replaceAll('#', '')
+        .replaceAll('0x', '')
+        .replaceAll('0X', '');
+    if (clean.length == 6) clean = 'FF$clean';
+    return int.parse(clean, radix: 16);
+  } catch (_) {
+    return 0xFFFFFFFF;
+  }
+}
+
+Color parseVehicleColor(String? raw) => Color(parseVehicleColorCode(raw));

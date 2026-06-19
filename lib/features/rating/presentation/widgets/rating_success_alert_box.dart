@@ -18,8 +18,8 @@ class RatingSuccessAlertBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.sizeOf(context).width;
+    final height = MediaQuery.sizeOf(context).height;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [

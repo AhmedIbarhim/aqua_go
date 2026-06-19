@@ -79,7 +79,7 @@ class _CustomColorPickerState extends State<CustomColorPicker> {
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenWidth = MediaQuery.sizeOf(context).width;
     final double pickerSize = (screenWidth / 2).clamp(200.0, 360.0);
 
     return Column(

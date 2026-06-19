@@ -82,6 +82,8 @@ abstract class  LocaleKeys {
   static const home_best_offers = 'home.best_offers';
   static const home_available_offers = 'home.available_offers';
   static const home_view_more = 'home.view_more';
+  static const home_read_more = 'home.read_more';
+  static const home_read_less = 'home.read_less';
   static const home_notifications = 'home.notifications';
   static const home = 'home';
   static const my_cars_empty_state = 'my_cars.empty_state';
@@ -154,6 +156,8 @@ abstract class  LocaleKeys {
   static const bookings_payment_summary = 'bookings.payment_summary';
   static const bookings_subtotal = 'bookings.subtotal';
   static const bookings_vat = 'bookings.vat';
+  static const bookings_vat_included = 'bookings.vat_included';
+  static const bookings_covered_by_subscription = 'bookings.covered_by_subscription';
   static const bookings_no_available_times = 'bookings.no_available_times';
   static const bookings_confirm_booking = 'bookings.confirm_booking';
   static const bookings_confirm_payment = 'bookings.confirm_payment';
@@ -188,6 +192,8 @@ abstract class  LocaleKeys {
   static const bookings_rating_reason = 'bookings.rating_reason';
   static const bookings_rating_submitted = 'bookings.rating_submitted';
   static const bookings_rating_submitted_desc = 'bookings.rating_submitted_desc';
+  static const bookings_your_rating = 'bookings.your_rating';
+  static const bookings_rating_notes = 'bookings.rating_notes';
   static const bookings_rating_reasons_staff_behavior = 'bookings.rating_reasons.staff_behavior';
   static const bookings_rating_reasons_damage = 'bookings.rating_reasons.damage';
   static const bookings_rating_reasons_delivery_delay = 'bookings.rating_reasons.delivery_delay';
@@ -220,6 +226,7 @@ abstract class  LocaleKeys {
   static const address_search_results = 'address.search_results';
   static const address_address_label = 'address.address_label';
   static const address_address_name_label = 'address.address_name_label';
+  static const address_address_name_helper = 'address.address_name_helper';
   static const address_access_notes_label = 'address.access_notes_label';
   static const address_save_address = 'address.save_address';
   static const address_confirm_delete = 'address.confirm_delete';
@@ -322,7 +329,6 @@ abstract class  LocaleKeys {
   static const complaint_status_resolved = 'complaint.status_resolved';
   static const complaint_status_pending = 'complaint.status_pending';
   static const complaint_no_complaints = 'complaint.no_complaints';
-  static const complaint_complaint_details_limit = 'complaint.complaint_details_limit';
   static const complaint = 'complaint';
   static const snackbar_login_success = 'snackbar.login_success';
   static const snackbar_logout_success = 'snackbar.logout_success';

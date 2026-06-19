@@ -1,5 +1,6 @@
 abstract class Endpoints {
   static const String baseUrl = 'https://api.aquago.sa/api/customer/';
+  // static const String baseUrl = 'https://qa-api.aquago.sa/api/customer/';
 
   //  Auth Endpoints
   static const String sendOtp = 'login/otp';
@@ -74,18 +75,12 @@ abstract class Endpoints {
       'subscriptions/$subscriptionId/washes';
   static String subscriptionWashDetail(String subscriptionId, String washId) =>
       'subscriptions/$subscriptionId/washes/$washId';
-  static String previewScheduleSubscriptionWash(
-    String subscriptionId,
-    String washId,
-  ) => 'subscriptions/$subscriptionId/washes/$washId/schedule/preview';
-  static String scheduleSubscriptionWash(
-    String subscriptionId,
-    String washId,
-  ) => 'subscriptions/$subscriptionId/washes/$washId/schedule';
-  static String rescheduleSubscriptionWash(
-    String subscriptionId,
-    String washId,
-  ) => 'subscriptions/$subscriptionId/washes/$washId/reschedule';
+  static String previewScheduleSubscriptionWash(String subscriptionId, String washId) =>
+      'subscriptions/$subscriptionId/washes/$washId/schedule/preview';
+  static String scheduleSubscriptionWash(String subscriptionId, String washId) =>
+      'subscriptions/$subscriptionId/washes/$washId/schedule';
+  static String rescheduleSubscriptionWash(String subscriptionId, String washId) =>
+      'subscriptions/$subscriptionId/washes/$washId/reschedule';
 
   //  Availability Endpoints
   static const String availability = 'availability';
@@ -116,7 +111,7 @@ abstract class Endpoints {
       'complaints/$complaintId';
   static String complaintPhotoPresign(String complaintId) =>
       'complaints/$complaintId/photos/presign';
-  static String confirmComplaintPhotos(String complaintId) =>
+  static String complaintPhotoConfirm(String complaintId) =>
       'complaints/$complaintId/photos/confirm';
 
   // Wallet Endpoints

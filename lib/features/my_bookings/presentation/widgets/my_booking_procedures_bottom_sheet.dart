@@ -24,7 +24,7 @@ class MyBookingProceduresBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
+    final height = MediaQuery.sizeOf(context).height;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -57,7 +57,7 @@ class MyBookingProceduresBottomSheet extends StatelessWidget {
     required String title,
     required VoidCallback onTap,
   }) {
-    final width = MediaQuery.of(context).size.width;
+    final width = MediaQuery.sizeOf(context).width;
     return GestureDetector(
       onTap: onTap,
       child: Container(

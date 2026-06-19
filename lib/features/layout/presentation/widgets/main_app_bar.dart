@@ -58,7 +58,10 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                               color: context.colors.primary,
                             ),
                           )
-                        : Icon(Icons.person, color: context.colors.primary),
+                        : Icon(
+                            Icons.person,
+                            color: context.colors.primary,
+                          ),
                   ),
                 ),
                 SizedBox(width: sw(8)),
@@ -174,24 +177,24 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                     },
                   ),
                 ),
-                // SizedBox(width: sw(8)),
-                // GestureDetector(
-                //   onTap: () {},
-                //   child: Container(
-                //     padding: EdgeInsets.all(sw(8)),
-                //     decoration: BoxDecoration(
-                //       color: Colors.transparent,
-                //       borderRadius: BorderRadius.circular(sw(8)),
-                //     ),
-                //     child: SvgPicture.asset(
-                //       AppAssets.gift,
-                //       width: sw(24),
-                //       height: sw(24),
-                //       placeholderBuilder: (context) =>
-                //           SizedBox(width: sw(24), height: sw(24)),
-                //     ),
-                //   ),
-                // ),
+                SizedBox(width: sw(8)),
+                GestureDetector(
+                  onTap: () {},
+                  child: Container(
+                    padding: EdgeInsets.all(sw(8)),
+                    decoration: BoxDecoration(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(sw(8)),
+                    ),
+                    child: SvgPicture.asset(
+                      AppAssets.gift,
+                      width: sw(24),
+                      height: sw(24),
+                      placeholderBuilder: (context) =>
+                          SizedBox(width: sw(24), height: sw(24)),
+                    ),
+                  ),
+                ),
               ],
             ),
           ],

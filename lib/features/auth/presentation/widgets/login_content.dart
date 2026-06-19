@@ -1,4 +1,5 @@
 import 'package:aqua_go/core/components/custom_button.dart';
+import 'package:aqua_go/core/helpers/connectivity_helper.dart';
 import 'package:aqua_go/core/themes/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -82,7 +83,7 @@ class _LoginContentState extends State<LoginContent> {
                 right: 24,
                 top: height * 0.02,
                 bottom:
-                    height * 0.02 + MediaQuery.of(context).viewInsets.bottom,
+                    height * 0.02 + MediaQuery.viewInsetsOf(context).bottom,
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -110,6 +111,12 @@ class _LoginContentState extends State<LoginContent> {
                   CustomButton(
                     onPressed: _isPhoneValid
                         ? () {
+                            if (!ConnectivityHelper().isConnected) {
+                              context.showErrorSnackBar(
+                                LocaleKeys.snackbar_no_internet.tr(),
+                              );
+                              return;
+                            }
                             context.read<AuthCubit>().login(
                               '+966${_phoneController.text}',
                             );
@@ -124,6 +131,12 @@ class _LoginContentState extends State<LoginContent> {
                     color: darkAppColors.themeColor,
                     textColor: context.colors.primary,
                     onPressed: () {
+                      if (!ConnectivityHelper().isConnected) {
+                        context.showErrorSnackBar(
+                          LocaleKeys.snackbar_no_internet.tr(),
+                        );
+                        return;
+                      }
                       context.pushReplacementNamed(Routes.layout);
                     },
                   ),

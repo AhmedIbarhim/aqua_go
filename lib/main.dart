@@ -14,7 +14,7 @@ import 'core/config/local_storage/shared_prefs.dart';
 import 'core/constants.dart';
 import 'generated/codegen_loader.g.dart';
 import 'package:flutter/services.dart';
-
+//569123456
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   ConnectivityHelper().init();

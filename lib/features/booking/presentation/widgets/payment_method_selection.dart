@@ -103,7 +103,7 @@ class _PaymentMethodSelectionState extends State<PaymentMethodSelection> {
         child: Row(
           children: [
             SizedBox(
-              width: MediaQuery.of(context).size.width * 0.5,
+              width: MediaQuery.sizeOf(context).width * 0.5,
               child: Row(
                 children: [
                   Text(
@@ -116,7 +116,7 @@ class _PaymentMethodSelectionState extends State<PaymentMethodSelection> {
                   ),
                   const Spacer(),
                   SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.25,
+                    width: MediaQuery.sizeOf(context).width * 0.25,
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
                       alignment: AlignmentDirectional.centerStart,

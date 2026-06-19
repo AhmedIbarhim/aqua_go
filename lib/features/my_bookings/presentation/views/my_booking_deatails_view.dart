@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:svg_flutter/svg.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 import 'package:aqua_go/core/components/custom_button.dart';
 import 'package:aqua_go/core/components/generic_app_bar.dart';
 import 'package:aqua_go/core/themes/app_colors.dart';
-// import 'package:aqua_go/core/themes/app_text_styles.dart';
+import 'package:aqua_go/core/themes/app_text_styles.dart';
 import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
@@ -33,6 +34,7 @@ import '../widgets/booking_details_vehicle_card.dart';
 import '../widgets/booking_details_biker_card.dart';
 import '../widgets/booking_details_summary_card.dart';
 import '../widgets/booking_details_worker_notes_cart.dart';
+import '../widgets/booking_details_rating_card.dart';
 
 class MyBookingDetailsArgs {
   final BookingSummaryModel booking;
@@ -54,6 +56,9 @@ class MyBookingDetailsView extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<MyBookingDetailsCubit, MyBookingDetailsState>(
       builder: (context, state) {
+        final bool isLoading =
+            state is MyBookingDetailsLoading || state is MyBookingDetailsInitial;
+        final bool isFailure = state is MyBookingDetailsFailure;
         final activeBooking = state is MyBookingDetailsSuccess
             ? state.booking
             : booking.toDetailsPlaceholder();
@@ -77,7 +82,9 @@ class MyBookingDetailsView extends StatelessWidget {
                       context.pushNamedAndRemoveUntil(Routes.layout);
                     },
                   )
-                else if (!activeBooking.isUpcoming)
+                else if (!isLoading &&
+                    !isFailure &&
+                    !activeBooking.isUpcoming)
                   IconButton(
                     onPressed: () => MyBookingProceduresBottomSheet.show(
                       context,
@@ -87,120 +94,191 @@ class MyBookingDetailsView extends StatelessWidget {
                   ),
               ],
             ),
-            body: Column(
-              children: [
-                if (state is MyBookingDetailsLoading)
-                  const LinearProgressIndicator(),
-                Expanded(
-                  child: RefreshIndicator(
-                    color: context.colors.primary,
-                    onRefresh: () async {
-                      await context
-                          .read<MyBookingDetailsCubit>()
-                          .fetchBookingDetails(activeBooking.id ?? '');
-                    },
-                    child: SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      padding: const EdgeInsets.all(24),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          BookingDetailsNumberCard(booking: activeBooking),
-                          const SizedBox(height: 16),
-                          BookingDetailsVehicleCard(booking: activeBooking),
-                          const SizedBox(height: 16),
-                          if (activeBooking.status ==
-                              BookingStatus.COMPLETED) ...[
-                            BookingDetailsBikerCard(booking: activeBooking),
-                            const SizedBox(height: 16),
-                          ],
-                          BookingDetailsSummaryCard(booking: activeBooking),
-                          if (activeBooking.workerNotes != null &&
-                              activeBooking.workerNotes!.isNotEmpty) ...[
-                            const SizedBox(height: 16),
-                            BookingDetailsWorkerNotesCard(
-                              booking: activeBooking,
+            body: isFailure
+                ? _buildErrorState(context, state.errMessage)
+                : Column(
+                    children: [
+                      Expanded(
+                        child: RefreshIndicator(
+                          color: context.colors.primary,
+                          onRefresh: () async {
+                            await context
+                                .read<MyBookingDetailsCubit>()
+                                .fetchBookingDetails(activeBooking.id ?? '');
+                          },
+                          child: Skeletonizer(
+                            enabled: isLoading,
+                            child: SingleChildScrollView(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              padding: const EdgeInsets.all(24),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  BookingDetailsNumberCard(
+                                    booking: activeBooking,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  BookingDetailsVehicleCard(
+                                    booking: activeBooking,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  if (_showsBikerCard(activeBooking.status)) ...[
+                                    BookingDetailsBikerCard(
+                                      booking: activeBooking,
+                                    ),
+                                    const SizedBox(height: 16),
+                                  ],
+                                  BookingDetailsSummaryCard(
+                                    booking: activeBooking,
+                                  ),
+                                  if (activeBooking.workerNotes != null &&
+                                      activeBooking
+                                          .workerNotes!.isNotEmpty) ...[
+                                    const SizedBox(height: 16),
+                                    BookingDetailsWorkerNotesCard(
+                                      booking: activeBooking,
+                                    ),
+                                  ],
+                                  const SizedBox(height: 16),
+                                  MyBookingLocationSection(
+                                    address: activeBooking.location,
+                                    latitude: activeBooking.latitude,
+                                    longitude: activeBooking.longitude,
+                                    arrivalNotes:
+                                        activeBooking.addressArrivalNotes,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  if (activeBooking.status ==
+                                      BookingStatus.COMPLETED)
+                                    MyBookingPhotosSection(
+                                      photos: activeBooking.photos,
+                                    ),
+                                  if (activeBooking.rating != null) ...[
+                                    const SizedBox(height: 16),
+                                    BookingDetailsRatingCard(
+                                      rating: activeBooking.rating!,
+                                    ),
+                                  ],
+                                  const SizedBox(height: 16),
+                                  _buildInvoicesLink(context, activeBooking),
+                                  const SizedBox(height: 24),
+                                ],
+                              ),
                             ),
-                          ],
-
-                          if (activeBooking.status !=
-                              BookingStatus.COMPLETED) ...[
-                            const SizedBox(height: 16),
-                            MyBookingLocationSection(
-                              address: activeBooking.location,
-                              latitude: activeBooking.latitude,
-                              longitude: activeBooking.longitude,
-                            ),
-                          ],
-                          const SizedBox(height: 16),
-                          if (activeBooking.status == BookingStatus.COMPLETED)
-                            MyBookingPhotosSection(
-                              photos: activeBooking.photos,
-                            ),
-                          // const SizedBox(height: 16),
-                          // _buildInvoicesLink(context, activeBooking),
-                          const SizedBox(height: 24),
-                        ],
+                          ),
+                        ),
                       ),
-                    ),
+                      if (!isLoading && activeBooking.isUpcoming)
+                        _buildActionSheet(context, activeBooking),
+                    ],
                   ),
-                ),
-                if (activeBooking.isUpcoming)
-                  _buildActionSheet(context, activeBooking),
-              ],
-            ),
           ),
         );
       },
     );
   }
 
-  // Widget _buildInvoicesLink(
-  //   BuildContext context,
-  //   BookingResponseModel booking,
-  // ) {
-  //   if (booking.invoice == null) {
-  //     return const SizedBox.shrink();
-  //   }
-  //   return InkWell(
-  //     onTap: () {
-  //       if (booking.invoice?.pdfUrl != null) {
-  //         // TODO: Open the PDF URL (requires url_launcher package or similar)
-  //         context.showSuccessSnackBar(booking.invoice!.pdfUrl!);
-  //       } else {
-  //         context.showWarningSnackBar(
-  //           context.isAr
-  //               ? "رابط الفاتورة غير متوفر حالياً"
-  //               : "Invoice PDF URL is not available yet.",
-  //         );
-  //       }
-  //     },
-  //     borderRadius: BorderRadius.circular(12),
-  //     child: Container(
-  //       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-  //       decoration: BoxDecoration(
-  //         color: context.colors.themeColor,
-  //         borderRadius: BorderRadius.circular(12),
-  //       ),
-  //       child: Row(
-  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //         children: [
-  //           Text(
-  //             LocaleKeys.bookings_go_to_invoice_list.tr(),
-  //             style: AppTextStyles.medium14.copyWith(
-  //               color: context.colors.primary,
-  //             ),
-  //           ),
-  //           Icon(
-  //             Icons.arrow_forward_ios,
-  //             color: context.colors.primary,
-  //             size: 16,
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
+  Widget _buildErrorState(BuildContext context, String message) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 56,
+              color: context.colors.error,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              message.isNotEmpty
+                  ? message
+                  : (context.isAr
+                        ? 'تعذّر تحميل تفاصيل الحجز'
+                        : 'Failed to load booking details'),
+              textAlign: TextAlign.center,
+              style: AppTextStyles.regular14.copyWith(
+                color: context.colors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 24),
+            CustomButton(
+              text: LocaleKeys.retry.tr(),
+              onPressed: () {
+                context
+                    .read<MyBookingDetailsCubit>()
+                    .fetchBookingDetails(booking.id ?? '');
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  bool _showsBikerCard(BookingStatus? status) {
+    switch (status) {
+      case BookingStatus.ASSIGNED:
+      case BookingStatus.ON_THE_WAY:
+      case BookingStatus.ARRIVED:
+      case BookingStatus.STARTED:
+      case BookingStatus.COMPLETED:
+        return true;
+      case BookingStatus.PENDING:
+      case BookingStatus.UNSCHEDULED:
+      case BookingStatus.CANCELLED:
+      case null:
+        return false;
+    }
+  }
+
+  Widget _buildInvoicesLink(
+    BuildContext context,
+    BookingResponseModel booking,
+  ) {
+    if (booking.invoice == null) {
+      return const SizedBox.shrink();
+    }
+    return InkWell(
+      onTap: () {
+        if (booking.invoice?.pdfUrl != null) {
+          // TODO: Open the PDF URL (requires url_launcher package or similar)
+          context.showSuccessSnackBar(booking.invoice!.pdfUrl!);
+        } else {
+          context.showWarningSnackBar(
+            context.isAr
+                ? "رابط الفاتورة غير متوفر حالياً"
+                : "Invoice PDF URL is not available yet.",
+          );
+        }
+      },
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: context.colors.themeColor,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              LocaleKeys.bookings_go_to_invoice_list.tr(),
+              style: AppTextStyles.medium14.copyWith(
+                color: context.colors.primary,
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios,
+              color: context.colors.primary,
+              size: 16,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   Widget _buildActionSheet(BuildContext context, BookingResponseModel booking) {
     return BottomActionSheetContainer(

@@ -7,6 +7,7 @@ import '../../enums/booking_type_enum.dart';
 import 'assigned_worker.dart';
 import 'booking_addon.dart';
 import 'booking_address.dart';
+import 'booking_rating.dart';
 import 'booking_vehicle.dart';
 import 'breakdown.dart';
 import 'cancellation_policy.dart';
@@ -18,6 +19,7 @@ import 'service_name.dart';
 export 'assigned_worker.dart';
 export 'booking_addon.dart';
 export 'booking_address.dart';
+export 'booking_rating.dart';
 export 'booking_vehicle.dart';
 export 'bookings_list_response_model.dart';
 export 'breakdown.dart';
@@ -46,6 +48,7 @@ class BookingResponseModel {
   int? totalAmountMinor;
   String? currency;
   String? paymentStatus;
+  bool? isSubscription;
   String? paymentIntentId;
   String? invoiceId;
   String? paymentVoidedAt;
@@ -71,6 +74,7 @@ class BookingResponseModel {
   List<BookingAddon>? addOns;
   Breakdown? breakdown;
   BookingAddress? address;
+  BookingRatingModel? rating;
 
   BookingResponseModel({
     this.id,
@@ -91,6 +95,7 @@ class BookingResponseModel {
     this.totalAmountMinor,
     this.currency,
     this.paymentStatus,
+    this.isSubscription,
     this.paymentIntentId,
     this.invoiceId,
     this.paymentVoidedAt,
@@ -116,6 +121,7 @@ class BookingResponseModel {
     this.addOns,
     this.breakdown,
     this.address,
+    this.rating,
   });
 
   BookingResponseModel.fromJson(Map<String, dynamic> json) {
@@ -141,6 +147,7 @@ class BookingResponseModel {
     totalAmountMinor = json['totalAmountMinor'];
     currency = json['currency'];
     paymentStatus = json['paymentStatus'];
+    isSubscription = json['isSubscription'];
     paymentIntentId = json['paymentIntentId'];
     invoiceId = json['invoiceId'];
     paymentVoidedAt = json['paymentVoidedAt'];
@@ -199,6 +206,9 @@ class BookingResponseModel {
     address = json['address'] != null
         ? BookingAddress.fromJson(json['address'])
         : null;
+    rating = json['rating'] != null
+        ? BookingRatingModel.fromJson(json['rating'])
+        : null;
   }
 
   // --- UI Compatibility Helpers ---
@@ -222,6 +232,11 @@ class BookingResponseModel {
       : 0.0;
 
   double get totalAmount => (totalAmountMinor ?? 0) / 100.0;
+
+  /// A subscription wash is pre-paid by the subscription — there is no per-wash
+  /// charge (total is 0 / NOT_REQUIRED). `isSubscription` is the robust signal;
+  /// the per-wash money total must read as covered, not "0.00".
+  bool get isCoveredBySubscription => isSubscription == true;
 
   bool get isUpcoming {
     if (status == null) return false;

@@ -1,12 +1,10 @@
-import 'package:aqua_go/core/components/custom_network_image.dart';
+import 'package:aqua_go/core/components/car_color_indicator.dart';
+import 'package:aqua_go/core/components/vehicle_make_logo.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:svg_flutter/svg.dart';
 import 'package:aqua_go/core/themes/app_text_styles.dart';
 import 'package:aqua_go/core/extentions/context_extentions.dart';
-import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
-import 'package:aqua_go/core/helpers/car_color_helper.dart';
 import '../../data/models/booking_response_model/booking_response_model.dart';
 
 class BookingDetailsVehicleCard extends StatelessWidget {
@@ -28,30 +26,8 @@ class BookingDetailsVehicleCard extends StatelessWidget {
     }
 
     // Resolve Vehicle Color
-    String colorName = '';
-    Color? colorVisual;
     final vehicleColor = vehicle?.vehicleColor;
-    if (vehicleColor != null && vehicleColor.isNotEmpty) {
-      final colorStr = vehicleColor;
-      if (colorStr.startsWith('#') || colorStr.toLowerCase().startsWith('0x')) {
-        try {
-          String cleanColor = colorStr
-              .replaceAll('#', '')
-              .replaceAll('0x', '')
-              .replaceAll('0X', '');
-          if (cleanColor.length == 6) {
-            cleanColor = 'FF$cleanColor';
-          }
-          final colorVal = int.parse(cleanColor, radix: 16);
-          colorVisual = Color(colorVal);
-          colorName = getLocalizedColorName(colorVal);
-        } catch (_) {
-          colorName = colorStr;
-        }
-      } else {
-        colorName = colorStr;
-      }
-    }
+    final bool hasColor = vehicleColor != null && vehicleColor.isNotEmpty;
 
     // Resolve Plate Number
     final String plateText = vehicle?.plate ?? booking.plate ?? '';
@@ -80,28 +56,11 @@ class BookingDetailsVehicleCard extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(
-                width: 48,
-                height: 48,
-                child:
-                    (vehicle?.makeLogoUrl != null &&
-                        vehicle!.makeLogoUrl!.isNotEmpty)
-                    ? CustomNetworkImage(
-                        vehicle.makeLogoUrl!,
-                        width: 48,
-                        height: 48,
-                        fit: BoxFit.contain,
-                      )
-                    : SvgPicture.asset(
-                        AppAssets.raceCar,
-                        width: 48,
-                        height: 48,
-                        fit: BoxFit.contain,
-                        colorFilter: ColorFilter.mode(
-                          context.colors.textPrimary.withValues(alpha: 0.3),
-                          BlendMode.srcIn,
-                        ),
-                      ),
+              VehicleMakeLogo(
+                logoUrl: vehicle?.makeLogoUrl,
+                colorEditable: vehicle?.colorEditable ?? false,
+                size: 48,
+                fit: BoxFit.contain,
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -127,33 +86,8 @@ class BookingDetailsVehicleCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 12),
                         ],
-                        if (colorName.isNotEmpty) ...[
-                          if (colorVisual != null) ...[
-                            Row(
-                              children: [
-                                Container(
-                                  width: 12,
-                                  height: 12,
-                                  decoration: BoxDecoration(
-                                    color: colorVisual,
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: context.colors.borderSecondary,
-                                      width: 0.5,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  colorName,
-                                  style: AppTextStyles.regular12.copyWith(
-                                    color: context.colors.textSecondary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-
+                        if (hasColor) ...[
+                          CarColorIndicator(colorValue: vehicleColor),
                           const SizedBox(width: 12),
                         ],
                         if (plateText.isNotEmpty) ...[

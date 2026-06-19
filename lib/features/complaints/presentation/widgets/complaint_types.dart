@@ -6,21 +6,21 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../../../generated/locale_keys.g.dart';
 
-class ComplaintTypesTiles extends StatefulWidget {
+class ComplaintTypes extends StatefulWidget {
   final String? initialValue;
   final ValueChanged<String> onSelected;
 
-  const ComplaintTypesTiles({
+  const ComplaintTypes({
     super.key,
     this.initialValue,
     required this.onSelected,
   });
 
   @override
-  State<ComplaintTypesTiles> createState() => _ComplaintTypesTilesState();
+  State<ComplaintTypes> createState() => _ComplaintTypesState();
 }
 
-class _ComplaintTypesTilesState extends State<ComplaintTypesTiles> {
+class _ComplaintTypesState extends State<ComplaintTypes> {
   late String? _selectedValue;
 
   final List<String> _types = [
@@ -71,13 +71,15 @@ class _ComplaintTypesTilesState extends State<ComplaintTypesTiles> {
                   ),
                   child: Row(
                     children: [
-                      Text(
-                        type.tr(),
-                        style: AppTextStyles.medium14.copyWith(
-                          color: context.colors.textPrimary,
+                      Expanded(
+                        child: Text(
+                          type.tr(),
+                          style: AppTextStyles.medium14.copyWith(
+                            color: context.colors.textPrimary,
+                          ),
+                          textAlign: TextAlign.right,
                         ),
                       ),
-                      Spacer(),
                       CustomRadioWidget(isSelected: _selectedValue == type),
                     ],
                   ),

@@ -105,9 +105,9 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
   ) {
     final config = bookingState.flowConfig;
 
+    // Add-on prices from the catalog are VAT-inclusive (gross).
     final List<Map<String, dynamic>> selectedAddons = [];
     double addonsGross = 0.0;
-    double addonsNet = 0.0;
 
     final availableAddons = bookingState.selectedService?.addons ?? [];
     for (final idx in bookingState.selectedServiceIndices) {
@@ -118,27 +118,37 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
             : (addon.nameEn ?? addon.nameAr ?? '');
         selectedAddons.add({'name': title, 'price': addon.price});
         addonsGross += addon.price;
-        addonsNet += (addon.priceMinor ?? 0) / 100;
       }
     }
 
     final quoteBreakdown = bookingState.quote?.breakdown;
 
+    // Every line item is shown VAT-inclusive (gross) and VAT is surfaced as an
+    // informational "VAT 15% included" note rather than an additive line, so the
+    // sum of line items reconciles with the total. When a quote is present we
+    // drive the whole breakdown off quoteBreakdown.gross, which already includes
+    // the add-ons.
     final double basePrice;
     final double subtotal;
     final double vat;
     final double total;
+    final bool vatInclusive;
 
     if (quoteBreakdown != null) {
-      basePrice = quoteBreakdown.net;
-      subtotal = quoteBreakdown.net + addonsNet;
+      // quoteBreakdown.gross already includes the selected add-ons; the
+      // service line gross is the remainder after the add-on lines.
+      basePrice = quoteBreakdown.gross - addonsGross;
+      total = quoteBreakdown.gross;
+      subtotal = total;
       vat = quoteBreakdown.vat;
-      total = quoteBreakdown.gross + addonsGross;
+      vatInclusive = true;
     } else {
-      basePrice = bookingState.selectedService?.basePriceDouble ?? 0.0;
-      subtotal = basePrice + addonsNet;
+      basePrice = bookingState.selectedService?.priceDouble ?? 0.0;
+      total =
+          (bookingState.selectedService?.priceDouble ?? 0.0) + addonsGross;
+      subtotal = total;
       vat = (bookingState.selectedService?.vatDouble ?? 0.0);
-      total = (bookingState.selectedService?.priceDouble ?? 0.0) + addonsGross;
+      vatInclusive = true;
     }
 
     return Container(
@@ -199,6 +209,8 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
               subtotal: subtotal,
               vat: vat,
               total: total,
+              vatInclusive: vatInclusive,
+              isCoveredBySubscription: bookingState.subscriptionId != null,
             ),
           ],
           const SizedBox(height: 30),

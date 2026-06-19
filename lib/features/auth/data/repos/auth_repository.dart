@@ -127,6 +127,14 @@ class AuthRepository {
     });
   }
 
+  /// Wipes any stale/expired JWT so a fresh session (including guest mode)
+  /// never reuses an invalid token.
+  Future<void> clearSession() async {
+    _cachedUser = null;
+    await SecureStorage.deleteSecuredString(kAccessToken);
+    await SecureStorage.deleteSecuredString(kRefreshToken);
+  }
+
   Future<void> saveUser(UserModel user) async {
     _cachedUser = user;
     await CacheClient.setString(kUserData, user.toEncodedJson());

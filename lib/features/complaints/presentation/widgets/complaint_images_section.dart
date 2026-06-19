@@ -59,11 +59,7 @@ class _ComplaintImagesSectionState extends State<ComplaintImagesSection>
                 ),
                 child: GestureDetector(
                   onTap: () async {
-                    final pickedFile =
-                        await ImagePickerHelper.showImageSourceDialog(
-                          context,
-                          withCropping: false,
-                        );
+                    final pickedFile = await ImagePickerHelper.pickWithCamera();
                     if (pickedFile != null) {
                       setState(() {
                         images.add(pickedFile);
@@ -73,7 +69,7 @@ class _ComplaintImagesSectionState extends State<ComplaintImagesSection>
                   },
                   child: Container(
                     width: double.infinity,
-                    height: MediaQuery.of(context).size.width * 0.15,
+                    height: MediaQuery.sizeOf(context).width * 0.15,
                     color: context.colors.brandSubtle,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -90,7 +86,7 @@ class _ComplaintImagesSectionState extends State<ComplaintImagesSection>
                 ),
               )
             : SizedBox(
-                height: MediaQuery.of(context).size.height * 0.22,
+                height: MediaQuery.sizeOf(context).height * 0.22,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   clipBehavior: Clip.none,

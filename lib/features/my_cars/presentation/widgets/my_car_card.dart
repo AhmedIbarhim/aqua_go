@@ -1,4 +1,4 @@
-import 'package:aqua_go/core/components/custom_network_image.dart';
+import 'package:aqua_go/core/components/vehicle_make_logo.dart';
 import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:aqua_go/features/my_cars/data/models/my_car_model.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -64,10 +64,10 @@ class MyCarCard extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      SizedBox(
-                        height: height * 0.05,
-                        width: height * 0.05,
-                        child: CustomNetworkImage(car.logoUrl),
+                      VehicleMakeLogo(
+                        logoUrl: car.logoUrl,
+                        colorEditable: car.carMake?.colorEditable ?? false,
+                        size: height * 0.05,
                       ),
                       Row(
                         children: [

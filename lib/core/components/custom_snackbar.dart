@@ -6,7 +6,7 @@ class CustomSnackbar {
   static void showSuccess(
     BuildContext context,
     String message, {
-    Duration duration = const Duration(seconds: 2),
+    Duration duration = const Duration(seconds: 1),
   }) {
     _show(
       context,
@@ -20,7 +20,7 @@ class CustomSnackbar {
   static void showError(
     BuildContext context,
     String message, {
-    Duration duration = const Duration(seconds: 2),
+    Duration duration = const Duration(seconds: 1),
   }) {
     _show(
       context,
@@ -34,7 +34,7 @@ class CustomSnackbar {
   static void showWarning(
     BuildContext context,
     String message, {
-    Duration duration = const Duration(seconds: 2),
+    Duration duration = const Duration(seconds: 1),
   }) {
     _show(
       context,
@@ -54,6 +54,10 @@ class CustomSnackbar {
   }) {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     scaffoldMessenger.hideCurrentSnackBar();
+
+    final double bottomInset = MediaQuery.viewPaddingOf(context).bottom;
+    const double bottomClearance = 100;
+
     scaffoldMessenger.showSnackBar(
       SnackBar(
         content: Row(
@@ -73,7 +77,11 @@ class CustomSnackbar {
         backgroundColor: backgroundColor,
         elevation: 4,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        margin: EdgeInsets.only(
+          left: 16,
+          right: 16,
+          bottom: bottomClearance + bottomInset,
+        ),
         duration: duration,
         dismissDirection: DismissDirection.horizontal,
       ),

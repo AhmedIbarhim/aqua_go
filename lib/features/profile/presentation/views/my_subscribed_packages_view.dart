@@ -440,7 +440,7 @@ class _MySubscribedPackagesViewState extends State<MySubscribedPackagesView> {
         left: 24,
         right: 24,
         top: 16,
-        bottom: MediaQuery.of(context).padding.bottom + 16,
+        bottom: MediaQuery.paddingOf(context).bottom + 16,
       ),
       child: ElevatedButton(
         onPressed: () {

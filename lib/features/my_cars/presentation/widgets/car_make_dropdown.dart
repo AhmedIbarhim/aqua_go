@@ -97,7 +97,7 @@ class _CarMakeDropdownState extends State<CarMakeDropdown> {
                     value: myCarsCubit,
                     child: ConstrainedBox(
                       constraints: BoxConstraints(
-                        maxHeight: MediaQuery.of(context).size.height * 0.65,
+                        maxHeight: MediaQuery.sizeOf(context).height * 0.65,
                       ),
                       child: BlocBuilder<MyCarsCubit, MyCarsState>(
                         builder: (context, sheetState) {
@@ -182,7 +182,7 @@ class _CarMakeDropdownState extends State<CarMakeDropdown> {
               child: Container(
                 padding: EdgeInsets.symmetric(
                   horizontal: 6,
-                  vertical: MediaQuery.of(context).size.height * 0.012,
+                  vertical: MediaQuery.sizeOf(context).height * 0.012,
                 ),
                 decoration: BoxDecoration(
                   color: context.colors.background,

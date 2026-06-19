@@ -12,11 +12,15 @@ class MyBookingLocationSection extends StatelessWidget {
   final double latitude;
   final double longitude;
 
+  /// Optional arrival/access notes the customer left for the worker.
+  final String? arrivalNotes;
+
   const MyBookingLocationSection({
     super.key,
     required this.address,
     required this.latitude,
     required this.longitude,
+    this.arrivalNotes,
   });
 
   @override
@@ -63,6 +67,44 @@ class MyBookingLocationSection extends StatelessWidget {
                   ),
                 ],
               ),
+              if (arrivalNotes != null && arrivalNotes!.trim().isNotEmpty) ...[
+                const SizedBox(height: 12),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SvgPicture.asset(
+                      AppAssets.note,
+                      width: 24,
+                      height: 24,
+                      colorFilter: ColorFilter.mode(
+                        context.colors.contentDisabled,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            LocaleKeys.address_access_notes_label.tr(),
+                            style: AppTextStyles.regular12.copyWith(
+                              color: context.colors.contentDisabled,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            arrivalNotes!.trim(),
+                            style: AppTextStyles.regular14.copyWith(
+                              color: context.colors.contentSecondaryLight,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
               const SizedBox(height: 12),
               SizedBox(
                 height: 140,

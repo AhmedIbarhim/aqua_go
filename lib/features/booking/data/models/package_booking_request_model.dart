@@ -26,7 +26,6 @@ class PackageBookingRequestModel {
         date: date!,
         rawTime: time!,
       ).toScheduledAtString();
-      scheduledAt = '${scheduledAt}Z';
     }
 
     final addr = address;

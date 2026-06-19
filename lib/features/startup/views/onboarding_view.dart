@@ -73,7 +73,7 @@ class _OnboardingViewState extends State<OnboardingView> {
 
           Column(
             children: [
-              SizedBox(height: MediaQuery.of(context).size.height * 0.2),
+              SizedBox(height: MediaQuery.sizeOf(context).height * 0.2),
               Expanded(
                 child: OnboardingPageView(pageController: _pageController),
               ),
@@ -191,7 +191,7 @@ class _OnboardingViewState extends State<OnboardingView> {
           ),
           const Spacer(),
           SizedBox(
-            width: MediaQuery.of(context).size.width * 0.3,
+            width: MediaQuery.sizeOf(context).width * 0.3,
             child: CustomButton(
               text: LocaleKeys.next.tr(),
               postWidget: Icon(

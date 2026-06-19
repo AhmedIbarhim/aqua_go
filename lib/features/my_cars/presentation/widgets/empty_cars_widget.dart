@@ -36,7 +36,7 @@ class EmptyCarsWidget extends StatelessWidget {
           ),
           SizedBox(height: 30),
           SizedBox(
-            width: MediaQuery.of(context).size.width * 0.6,
+            width: MediaQuery.sizeOf(context).width * 0.6,
             child: CustomButton(
               onPressed: () {
                 context.pushNamed(Routes.addVehicle).then((val) {

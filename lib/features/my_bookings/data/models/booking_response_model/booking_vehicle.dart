@@ -6,6 +6,7 @@ class BookingVehicle {
   int? vehicleYear;
   String? plate;
   String? makeLogoUrl;
+  bool? colorEditable;
 
   BookingVehicle({
     this.vehicleSeq,
@@ -15,6 +16,7 @@ class BookingVehicle {
     this.vehicleYear,
     this.plate,
     this.makeLogoUrl,
+    this.colorEditable,
   });
 
   BookingVehicle.fromJson(Map<String, dynamic> json) {
@@ -27,6 +29,7 @@ class BookingVehicle {
         : null;
     plate = json['plate'];
     makeLogoUrl = json['makeLogoUrl'];
+    colorEditable = json['colorEditable'] as bool?;
   }
 
   Map<String, dynamic> toJson() {
@@ -38,6 +41,7 @@ class BookingVehicle {
     data['vehicleYear'] = vehicleYear;
     data['plate'] = plate;
     data['makeLogoUrl'] = makeLogoUrl;
+    data['colorEditable'] = colorEditable;
     return data;
   }
 }

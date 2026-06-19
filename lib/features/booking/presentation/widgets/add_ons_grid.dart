@@ -22,7 +22,7 @@ class AddOnsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
+    final width = MediaQuery.sizeOf(context).width;
     if (addons.isEmpty) return const SizedBox.shrink();
 
     return GridView.builder(

@@ -1,4 +1,4 @@
-import 'package:aqua_go/core/components/custom_network_image.dart';
+import 'package:aqua_go/core/components/vehicle_make_logo.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -24,8 +24,8 @@ class CarSelectionList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
-    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.sizeOf(context).height;
+    final width = MediaQuery.sizeOf(context).width;
     return SizedBox(
       height: height * 0.14,
       child: ListView.separated(
@@ -78,10 +78,10 @@ class CarSelectionList extends StatelessWidget {
         children: [
           Opacity(
             opacity: isSelected ? 1.0 : 0.5,
-            child: SizedBox(
-              height: height * 0.055,
-              width: width * 0.25,
-              child: CustomNetworkImage(car.logoUrl),
+            child: VehicleMakeLogo(
+              logoUrl: car.logoUrl,
+              colorEditable: car.carMake?.colorEditable ?? false,
+              size: height * 0.055,
             ),
           ),
           SizedBox(height: height * 0.01),

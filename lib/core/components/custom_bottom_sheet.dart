@@ -30,7 +30,7 @@ class CustomBottomSheet extends StatelessWidget {
         body: BackdropFilter(
           filter: ui.ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
           child: SizedBox(
-            height: MediaQuery.of(context).size.height,
+            height: MediaQuery.sizeOf(context).height,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -52,8 +52,8 @@ class CustomBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
-    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.sizeOf(context).height;
+    final width = MediaQuery.sizeOf(context).width;
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -71,7 +71,7 @@ class CustomBottomSheet extends StatelessWidget {
                 top: height * 0.03,
                 left: width * 0.06,
                 right: width * 0.06,
-                bottom: MediaQuery.of(context).viewInsets.bottom + 5,
+                bottom: MediaQuery.viewInsetsOf(context).bottom + 5,
               ),
           child: SingleChildScrollView(
             child: Column(

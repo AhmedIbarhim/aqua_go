@@ -133,7 +133,7 @@ class ComplaintDetailsView extends StatelessWidget {
                           ComplaintDetailsDescriptionCard(complaint: complaint),
                           SizedBox(height: sh(24)),
                           ComplaintDetailsPhotosCard(
-                            photos: complaint.photos ?? [],
+                            photos: complaint.photoObjectKeys ?? [],
                           ),
                         ],
                       ),
