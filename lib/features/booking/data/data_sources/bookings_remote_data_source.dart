@@ -13,6 +13,7 @@ class BookingsRemoteDataSource {
     required String packageId,
     required double lat,
     required double lng,
+    List<Map<String, dynamic>>? addOns,
     String? promoCode,
     List<String> addOnIds = const [],
     int? carCount,

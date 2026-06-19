@@ -131,6 +131,64 @@ class ComplaintDetailsView extends StatelessWidget {
                           ),
                           SizedBox(height: sh(24)),
                           ComplaintDetailsDescriptionCard(complaint: complaint),
+                          if (complaint.resolutionNote != null &&
+                              complaint.resolutionNote!.isNotEmpty) ...[
+                            SizedBox(height: sh(24)),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  LocaleKeys.complaint_resolution_note.tr(),
+                                  style: AppTextStyles.medium14,
+                                ),
+                                const SizedBox(height: 8),
+                                Container(
+                                  width: double.infinity,
+                                  padding: EdgeInsets.all(sw(16)),
+                                  decoration: BoxDecoration(
+                                    color: context.colors.brandSubtle,
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(color: context.colors.borderSecondary),
+                                  ),
+                                  child: Text(
+                                    complaint.resolutionNote!,
+                                    style: AppTextStyles.regular14.copyWith(
+                                      color: context.colors.textPrimary,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                          if (complaint.rejectionReason != null &&
+                              complaint.rejectionReason!.isNotEmpty) ...[
+                            SizedBox(height: sh(24)),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  LocaleKeys.complaint_rejection_reason.tr(),
+                                  style: AppTextStyles.medium14,
+                                ),
+                                const SizedBox(height: 8),
+                                Container(
+                                  width: double.infinity,
+                                  padding: EdgeInsets.all(sw(16)),
+                                  decoration: BoxDecoration(
+                                    color: context.colors.brandSubtle,
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(color: context.colors.borderSecondary),
+                                  ),
+                                  child: Text(
+                                    complaint.rejectionReason!,
+                                    style: AppTextStyles.regular14.copyWith(
+                                      color: context.colors.textPrimary,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                           SizedBox(height: sh(24)),
                           ComplaintDetailsPhotosCard(
                             photos: complaint.photoObjectKeys ?? [],

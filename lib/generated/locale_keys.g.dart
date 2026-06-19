@@ -328,7 +328,11 @@ abstract class  LocaleKeys {
   static const complaint_status_closed = 'complaint.status_closed';
   static const complaint_status_resolved = 'complaint.status_resolved';
   static const complaint_status_pending = 'complaint.status_pending';
+  static const complaint_status_rejected = 'complaint.status_rejected';
   static const complaint_no_complaints = 'complaint.no_complaints';
+  static const complaint_complaint_details_limit = 'complaint.complaint_details_limit';
+  static const complaint_resolution_note = 'complaint.resolution_note';
+  static const complaint_rejection_reason = 'complaint.rejection_reason';
   static const complaint = 'complaint';
   static const snackbar_login_success = 'snackbar.login_success';
   static const snackbar_logout_success = 'snackbar.logout_success';

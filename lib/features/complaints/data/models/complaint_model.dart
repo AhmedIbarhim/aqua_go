@@ -8,7 +8,8 @@ enum ComplaintStatus {
   open,
   closed,
   resolved,
-  pending;
+  pending,
+  rejected;
 
   static ComplaintStatus fromString(String? status) {
     if (status == null) return ComplaintStatus.open;
@@ -19,9 +20,10 @@ enum ComplaintStatus {
         return ComplaintStatus.closed;
       case 'RESOLVED':
         return ComplaintStatus.resolved;
+      case 'REJECTED':
+        return ComplaintStatus.rejected;
       case 'UNDER_REVIEW':
       case 'AWAITING_CUSTOMER':
-      case 'REJECTED':
       case 'PENDING':
       default:
         return ComplaintStatus.pending;
@@ -38,6 +40,8 @@ enum ComplaintStatus {
         return 'RESOLVED';
       case ComplaintStatus.pending:
         return 'UNDER_REVIEW';
+      case ComplaintStatus.rejected:
+        return 'REJECTED';
     }
   }
 
@@ -51,6 +55,8 @@ enum ComplaintStatus {
         return LocaleKeys.complaint_status_resolved;
       case ComplaintStatus.pending:
         return LocaleKeys.complaint_status_pending;
+      case ComplaintStatus.rejected:
+        return LocaleKeys.complaint_status_rejected;
     }
   }
 
@@ -64,6 +70,8 @@ enum ComplaintStatus {
         return context.colors.successLight;
       case ComplaintStatus.pending:
         return context.colors.defaultSubtle;
+      case ComplaintStatus.rejected:
+        return context.colors.errorLight;
     }
   }
 
@@ -76,6 +84,8 @@ enum ComplaintStatus {
       case ComplaintStatus.resolved:
         return darkAppColors.themeColor;
       case ComplaintStatus.pending:
+        return darkAppColors.themeOpositeColor;
+      case ComplaintStatus.rejected:
         return darkAppColors.themeOpositeColor;
     }
   }
@@ -213,6 +223,9 @@ class ComplaintModel {
   final List<String>? photoObjectKeys;
   final String? desiredOutcome;
   final String? preferredContactChannel;
+  final List<ComplaintPhoto>? photos;
+  final String? resolutionNote;
+  final String? rejectionReason;
 
   const ComplaintModel({
     required this.id,
@@ -234,6 +247,9 @@ class ComplaintModel {
     this.photoObjectKeys,
     this.desiredOutcome,
     this.preferredContactChannel,
+    this.photos,
+    this.resolutionNote,
+    this.rejectionReason,
   });
 
   factory ComplaintModel.fromJson(Map<String, dynamic> json) {
@@ -255,6 +271,13 @@ class ComplaintModel {
           : null,
       desiredOutcome: json['desiredOutcome'] as String?,
       preferredContactChannel: json['preferredContactChannel'] as String?,
+      photos: json['photos'] != null
+          ? (json['photos'] as List)
+                .map((e) => ComplaintPhoto.fromJson(e as Map<String, dynamic>))
+                .toList()
+          : const [],
+      resolutionNote: json['resolutionNote'] as String?,
+      rejectionReason: json['rejectionReason'] as String?,
     );
   }
 
@@ -267,7 +290,62 @@ class ComplaintModel {
       if (desiredOutcome?.isNotEmpty ?? false) 'desiredOutcome': desiredOutcome,
       if (preferredContactChannel?.isNotEmpty ?? false)
         'preferredContactChannel': preferredContactChannel,
+      if (photoObjectKeys != null) 'photoObjectKeys': photoObjectKeys,
+      if (photos != null) 'photos': photos!.map((e) => e.toJson()).toList(),
+      if (resolutionNote != null) 'resolutionNote': resolutionNote,
+      if (rejectionReason != null) 'rejectionReason': rejectionReason,
     };
+  }
+
+  ComplaintModel copyWith({
+    String? id,
+    String? dateAr,
+    String? dateEn,
+    String? timeAr,
+    String? timeEn,
+    ComplaintStatus? status,
+    String? detailsAr,
+    String? detailsEn,
+    String? bookingId,
+    String? referenceNumber,
+    String? customerId,
+    String? category,
+    String? description,
+    String? raisedAt,
+    String? updatedAt,
+    String? priority,
+    List<String>? photoObjectKeys,
+    String? desiredOutcome,
+    String? preferredContactChannel,
+    List<ComplaintPhoto>? photos,
+    String? resolutionNote,
+    String? rejectionReason,
+  }) {
+    return ComplaintModel(
+      id: id ?? this.id,
+      dateAr: dateAr ?? this.dateAr,
+      dateEn: dateEn ?? this.dateEn,
+      timeAr: timeAr ?? this.timeAr,
+      timeEn: timeEn ?? this.timeEn,
+      status: status ?? this.status,
+      detailsAr: detailsAr ?? this.detailsAr,
+      detailsEn: detailsEn ?? this.detailsEn,
+      bookingId: bookingId ?? this.bookingId,
+      referenceNumber: referenceNumber ?? this.referenceNumber,
+      customerId: customerId ?? this.customerId,
+      category: category ?? this.category,
+      description: description ?? this.description,
+      raisedAt: raisedAt ?? this.raisedAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      priority: priority ?? this.priority,
+      photoObjectKeys: photoObjectKeys ?? this.photoObjectKeys,
+      desiredOutcome: desiredOutcome ?? this.desiredOutcome,
+      preferredContactChannel:
+          preferredContactChannel ?? this.preferredContactChannel,
+      photos: photos ?? this.photos,
+      resolutionNote: resolutionNote ?? this.resolutionNote,
+      rejectionReason: rejectionReason ?? this.rejectionReason,
+    );
   }
 
   String getDate(BuildContext context) {
@@ -297,48 +375,28 @@ class ComplaintModel {
     return context.isAr ? (detailsAr ?? '') : (detailsEn ?? '');
   }
 
-  ComplaintModel copyWith({
-    String? id,
-    String? dateAr,
-    String? dateEn,
-    String? timeAr,
-    String? timeEn,
-    ComplaintStatus? status,
-    String? detailsAr,
-    String? detailsEn,
-    String? bookingId,
-    String? referenceNumber,
-    String? customerId,
-    String? category,
-    String? description,
-    String? raisedAt,
-    String? updatedAt,
-    String? priority,
-    List<String>? photoObjectKeys,
-    String? desiredOutcome,
-    String? preferredContactChannel,
-  }) {
-    return ComplaintModel(
-      id: id ?? this.id,
-      dateAr: dateAr ?? this.dateAr,
-      dateEn: dateEn ?? this.dateEn,
-      timeAr: timeAr ?? this.timeAr,
-      timeEn: timeEn ?? this.timeEn,
-      status: status ?? this.status,
-      detailsAr: detailsAr ?? this.detailsAr,
-      detailsEn: detailsEn ?? this.detailsEn,
-      bookingId: bookingId ?? this.bookingId,
-      referenceNumber: referenceNumber ?? this.referenceNumber,
-      customerId: customerId ?? this.customerId,
-      category: category ?? this.category,
-      description: description ?? this.description,
-      raisedAt: raisedAt ?? this.raisedAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-      priority: priority ?? this.priority,
-      photoObjectKeys: photoObjectKeys ?? this.photoObjectKeys,
-      desiredOutcome: desiredOutcome ?? this.desiredOutcome,
-      preferredContactChannel:
-          preferredContactChannel ?? this.preferredContactChannel,
+}
+
+class ComplaintPhoto {
+  final int photoIndex;
+  final String url;
+  final String contentType;
+
+  const ComplaintPhoto({
+    required this.photoIndex,
+    required this.url,
+    required this.contentType,
+  });
+
+  factory ComplaintPhoto.fromJson(Map<String, dynamic> json) {
+    return ComplaintPhoto(
+      photoIndex: json['photoIndex'] as int? ?? 0,
+      url: json['url'] as String? ?? '',
+      contentType: json['contentType'] as String? ?? '',
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'photoIndex': photoIndex, 'url': url, 'contentType': contentType};
   }
 }

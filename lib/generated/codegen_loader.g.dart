@@ -362,7 +362,11 @@ class CodegenLoader extends AssetLoader{
     "status_closed": "Closed",
     "status_resolved": "Resolved",
     "status_pending": "Pending",
-    "no_complaints": "No submitted complaints yet"
+    "status_rejected": "Rejected",
+    "no_complaints": "No submitted complaints yet",
+    "complaint_details_limit": "Complaint details must be at least 20 characters",
+    "resolution_note": "Resolution Note",
+    "rejection_reason": "Rejection Reason"
   },
   "snackbar": {
     "login_success": "Logged in successfully",
@@ -731,7 +735,11 @@ static const Map<String,dynamic> _ar = {
     "status_closed": "مغلقة",
     "status_resolved": "تم حلها",
     "status_pending": "معلقة",
-    "no_complaints": "لا توجد شكاوى مقدمة حالياً"
+    "status_rejected": "مرفوضة",
+    "no_complaints": "لا توجد شكاوى مقدمة حالياً",
+    "complaint_details_limit": "يجب أن تكون تفاصيل الشكوى 20 حرف على الأقل",
+    "resolution_note": "ملاحظة الحل",
+    "rejection_reason": "سبب الرفض"
   },
   "snackbar": {
     "login_success": "تم تسجيل الدخول بنجاح",

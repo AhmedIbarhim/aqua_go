@@ -175,7 +175,9 @@ class CurrentPackageCard extends StatelessWidget {
                           Text(
                             LocaleKeys.home_use_package.tr(),
                             style: AppTextStyles.medium14.copyWith(
-                              color: context.colors.textPrimary,
+                              color: package.remainingWashes == 0
+                                  ? context.colors.error
+                                  : context.colors.textPrimary,
                             ),
                           ),
                           const Spacer(),
@@ -187,7 +189,9 @@ class CurrentPackageCard extends StatelessWidget {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(4),
                               border: Border.all(
-                                color: context.colors.textPrimary,
+                                color: package.remainingWashes == 0
+                                    ? context.colors.error
+                                    : context.colors.textPrimary,
                                 width: 1,
                               ),
                             ),
@@ -196,7 +200,9 @@ class CurrentPackageCard extends StatelessWidget {
                                 Icons.arrow_forward_ios,
 
                                 size: 8,
-                                color: context.colors.textPrimary,
+                                color: package.remainingWashes == 0
+                                    ? context.colors.error
+                                    : context.colors.textPrimary,
                               ),
                             ),
                           ),
