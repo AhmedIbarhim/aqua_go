@@ -339,7 +339,8 @@
         "status_closed": "Closed",
         "status_resolved": "Resolved",
         "status_pending": "Pending",
-        "no_complaints": "No submitted complaints yet"
+        "no_complaints": "No submitted complaints yet",
+        "complaint_details_limit": "Complaint details must be at least 20 characters"
     },
     "snackbar": {
         "login_success": "Logged in successfully",

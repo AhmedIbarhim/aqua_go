@@ -59,7 +59,10 @@ class _ComplaintImagesSectionState extends State<ComplaintImagesSection>
                 ),
                 child: GestureDetector(
                   onTap: () async {
-                    final pickedFile = await ImagePickerHelper.pickWithCamera();
+                    final pickedFile = await ImagePickerHelper.pickWithCamera(
+                      context,
+                      withCropping: false,
+                    );
                     if (pickedFile != null) {
                       setState(() {
                         images.add(pickedFile);

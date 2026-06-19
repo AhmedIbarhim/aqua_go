@@ -339,7 +339,8 @@
         "status_closed": "مغلقة",
         "status_resolved": "تم حلها",
         "status_pending": "معلقة",
-        "no_complaints": "لا توجد شكاوى مقدمة حالياً"
+        "no_complaints": "لا توجد شكاوى مقدمة حالياً",
+        "complaint_details_limit": "يجب أن تكون تفاصيل الشكوى 20 حرف على الأقل"
     },
     "snackbar": {
         "login_success": "تم تسجيل الدخول بنجاح",

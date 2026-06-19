@@ -254,7 +254,7 @@ class _ComplaintViewState extends State<ComplaintView> {
             color: context.colors.textPrimary,
           ),
           decoration: InputDecoration(
-            hintText: LocaleKeys.write_here.tr(),
+            hintText: LocaleKeys.complaint_complaint_details_limit.tr(),
             hintStyle: AppTextStyles.regular14.copyWith(
               color: context.colors.contentDisabled,
             ),
@@ -288,7 +288,8 @@ class _ComplaintViewState extends State<ComplaintView> {
               text: LocaleKeys.submit.tr(),
               enabled:
                   _typeController.text.trim().isNotEmpty &&
-                  _detailsController.text.trim().isNotEmpty,
+                  _detailsController.text.trim().isNotEmpty &&
+                  _detailsController.text.trim().length >= 20,
               onPressed: () {
                 final category = ComplaintCategory.categoryFromTranslation(
                   _typeController.text,
