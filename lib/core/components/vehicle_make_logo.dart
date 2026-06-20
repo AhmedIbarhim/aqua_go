@@ -3,18 +3,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cached_network_svg_image/cached_network_svg_image.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
-import '../extentions/context_extentions.dart';
 import '../utils/app_assets.dart';
 
-/// Renders a vehicle make (brand) logo from a remote URL.
-///
-/// When [colorEditable] is true the logo is a clean monochrome asset and is
-/// tinted with [context.colors.themeOpositeColor] (white on the dark theme,
-/// near-black on the light theme) so it stays visible against the dark card
-/// background.  When false the logo has intrinsic colours (e.g. BMW) and is
-/// rendered as-is.
-///
-/// A null or empty [logoUrl] shows the generic race-car silhouette fallback.
 class VehicleMakeLogo extends StatelessWidget {
   const VehicleMakeLogo({
     super.key,
@@ -54,25 +44,32 @@ class VehicleMakeLogo extends StatelessWidget {
       return image;
     }
 
-    return ColorFiltered(
-      colorFilter: ColorFilter.mode(
-        context.colors.themeOpositeColor,
-        BlendMode.srcIn,
-      ),
-      child: image,
-    );
+    return _applyGradientFilter(image);
   }
 
   Widget _fallback(BuildContext context) {
-    return SvgPicture.asset(
-      AppAssets.raceCar,
-      width: size,
-      height: size,
-      fit: fit,
-      colorFilter: ColorFilter.mode(
-        context.colors.contentDisabled,
-        BlendMode.srcIn,
-      ),
+    return _applyGradientFilter(
+      SvgPicture.asset(AppAssets.raceCar, width: size, height: size, fit: fit),
+    );
+  }
+
+  Widget _applyGradientFilter(Widget child) {
+    return ShaderMask(
+      shaderCallback: (bounds) => LinearGradient(
+        colors: [
+          Colors.grey.shade300,
+
+          Colors.grey.shade600,
+          Colors.grey.shade100,
+          Colors.grey.shade600,
+
+          Colors.grey.shade800,
+        ],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ).createShader(bounds),
+      blendMode: BlendMode.srcIn,
+      child: child,
     );
   }
 }

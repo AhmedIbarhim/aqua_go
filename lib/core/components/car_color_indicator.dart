@@ -5,8 +5,6 @@ import '../helpers/car_color_helper.dart';
 import '../themes/app_text_styles.dart';
 
 /// Generic car-color display: a colored dot plus the localized color name.
-///
-/// Single source of truth for rendering a vehicle's editable color across every
 /// screen (my-cars, booking summary, booking details, complaints, etc.). Pass
 /// the backend's raw [colorValue] string (e.g. "0xFFdc2626" / "#dc2626") and the
 /// dot colour + localized name are derived through [car_color_helper].
@@ -28,7 +26,7 @@ class CarColorIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorCode = parseVehicleColorCode(colorValue);
     final dotColor = Color(colorCode);
-    final name = getLocalizedColorName(colorCode,context);
+    final name = getLocalizedColorName(colorCode, context);
 
     return Row(
       mainAxisSize: MainAxisSize.min,

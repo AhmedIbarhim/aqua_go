@@ -39,7 +39,9 @@ class LanguageSelectView extends StatelessWidget {
       },
       child: Scaffold(
         backgroundColor: context.colors.screenBG,
-        appBar: GenericAppBar(title: LocaleKeys.settings_language.tr(context: context)),
+        appBar: GenericAppBar(
+          title: LocaleKeys.settings_language.tr(context: context),
+        ),
         body: Column(
           children: [
             const SizedBox(height: 16),
@@ -128,10 +130,16 @@ class _LanguageItem extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(4),
               child: SvgPicture.asset(
-                flag,
+                AppAssets.locale,
                 width: 24,
                 height: 16,
                 fit: BoxFit.cover,
+                colorFilter: ColorFilter.mode(
+                  isSelected
+                      ? context.colors.primary
+                      : context.colors.textSecondary,
+                  BlendMode.srcIn,
+                ),
               ),
             ),
             const SizedBox(width: 12),
