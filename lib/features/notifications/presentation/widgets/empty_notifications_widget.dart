@@ -19,12 +19,12 @@ class EmptyNotificationsWidget extends StatelessWidget {
         SvgPicture.asset(AppAssets.notificationsEmpty),
         const SizedBox(height: 24),
         Text(
-          LocaleKeys.notifications_no_notifications.tr(),
+          LocaleKeys.notifications_no_notifications.tr(context: context),
           style: AppTextStyles.semiBold18,
         ),
         const SizedBox(height: 16),
         Text(
-          LocaleKeys.notifications_no_notification_desc.tr(),
+          LocaleKeys.notifications_no_notification_desc.tr(context: context),
           style: AppTextStyles.regular16.copyWith(
             color: context.colors.textSecondary,
           ),

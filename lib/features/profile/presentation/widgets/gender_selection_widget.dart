@@ -30,7 +30,7 @@ class GenderSelectionWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          LocaleKeys.profile_gender.tr(),
+          LocaleKeys.profile_gender.tr(context: context),
           style: AppTextStyles.medium14.copyWith(
             color: context.colors.textPrimary,
           ),

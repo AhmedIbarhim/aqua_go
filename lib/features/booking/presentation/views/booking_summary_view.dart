@@ -49,10 +49,10 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
         }
 
         if (state.status == BookingStatus.success) {
-          context.showSuccessSnackBar(LocaleKeys.snackbar_booking_created.tr());
+          context.showSuccessSnackBar(LocaleKeys.snackbar_booking_created.tr(context: context));
           context
               .showSuccessAlert(
-                message: LocaleKeys.bookings_booking_success_message.tr(),
+                message: LocaleKeys.bookings_booking_success_message.tr(context: context),
               )
               .then((_) {
                 if (!context.mounted) return;
@@ -78,7 +78,7 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
         return Scaffold(
           backgroundColor: context.colors.background,
           appBar: GenericAppBar(
-            title: LocaleKeys.bookings_booking_summary.tr(),
+            title: LocaleKeys.bookings_booking_summary.tr(context: context),
             hasBackground: true,
             backgroundImage: AppAssets.bookingHeaderImage,
             centerTitle: true,
@@ -158,7 +158,7 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (config.showBookingSummaryCard) ...[
-            _buildSectionTitle(LocaleKeys.bookings_booking_summary.tr()),
+            _buildSectionTitle(LocaleKeys.bookings_booking_summary.tr(context: context)),
             const SizedBox(height: 16),
             BookingSummaryCard(
               serviceName: context.isAr
@@ -174,7 +174,7 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
             const SizedBox(height: 24),
           ],
           if (config.showBikerNotes) ...[
-            _buildSectionTitle(LocaleKeys.bookings_notes_for_biker.tr()),
+            _buildSectionTitle(LocaleKeys.bookings_notes_for_biker.tr(context: context)),
             const SizedBox(height: 16),
             BikerNotesSelection(
               initialNotes: bookingState.bikerNotes,
@@ -198,7 +198,7 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
             const SizedBox(height: 24),
           ],
           if (config.showPaymentSummary) ...[
-            _buildSectionTitle(LocaleKeys.bookings_payment_summary.tr()),
+            _buildSectionTitle(LocaleKeys.bookings_payment_summary.tr(context: context)),
             const SizedBox(height: 16),
             PaymentSummaryCard(
               serviceName: context.isAr
@@ -256,7 +256,7 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
 
     return BottomActionSheetContainer(
       child: CustomButton(
-        text: LocaleKeys.bookings_confirm_booking.tr(),
+        text: LocaleKeys.bookings_confirm_booking.tr(context: context),
         enabled: isEnabled,
         onPressed: () {
           context.read<BookingCubit>().submitBooking();

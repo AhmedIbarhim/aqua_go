@@ -76,7 +76,7 @@ class LocationSelectionCard extends StatelessWidget {
                         const SizedBox(width: 4),
 
                         Text(
-                          LocaleKeys.edit.tr(),
+                          LocaleKeys.edit.tr(context: context),
                           style: AppTextStyles.medium14.copyWith(
                             color: context.colors.primary,
                           ),

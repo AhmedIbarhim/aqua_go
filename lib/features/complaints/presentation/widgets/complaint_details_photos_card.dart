@@ -17,8 +17,8 @@ class ComplaintDetailsPhotosCard extends StatelessWidget {
     if (path.startsWith('http')) {
       return path;
     }
-    return 'https://api.aquago.sa/api/customer/$path';
-    // return 'https://qa-api.aquago.sa/api/customer/$path';
+    // return 'https://api.aquago.sa/api/customer/$path';
+    return 'https://qa-api.aquago.sa/api/customer/$path';
   }
 
   @override
@@ -31,7 +31,7 @@ class ComplaintDetailsPhotosCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          LocaleKeys.bookings_car_images.tr(),
+          LocaleKeys.bookings_car_images.tr(context: context),
           style: AppTextStyles.medium14,
         ),
         const SizedBox(height: 8),

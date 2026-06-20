@@ -110,10 +110,10 @@ class _OnboardingViewState extends State<OnboardingView> {
           children: [
             Text(
               currentPage == 0
-                  ? LocaleKeys.onboarding_title1.tr()
+                  ? LocaleKeys.onboarding_title1.tr(context: context)
                   : currentPage == 1
-                  ? LocaleKeys.onboarding_title2.tr()
-                  : LocaleKeys.onboarding_title3.tr(),
+                  ? LocaleKeys.onboarding_title2.tr(context: context)
+                  : LocaleKeys.onboarding_title3.tr(context: context),
               textAlign: TextAlign.center,
               style: AppTextStyles.semiBold24,
             ),
@@ -122,10 +122,10 @@ class _OnboardingViewState extends State<OnboardingView> {
               height: size.height * 0.07,
               child: Text(
                 currentPage == 0
-                    ? LocaleKeys.onboarding_desc1.tr()
+                    ? LocaleKeys.onboarding_desc1.tr(context: context)
                     : currentPage == 1
-                    ? LocaleKeys.onboarding_desc2.tr()
-                    : LocaleKeys.onboarding_desc3.tr(),
+                    ? LocaleKeys.onboarding_desc2.tr(context: context)
+                    : LocaleKeys.onboarding_desc3.tr(context: context),
                 textAlign: TextAlign.center,
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
@@ -182,7 +182,7 @@ class _OnboardingViewState extends State<OnboardingView> {
               Navigator.pushReplacementNamed(context, Routes.login);
             },
             child: Text(
-              LocaleKeys.skip.tr(),
+              LocaleKeys.skip.tr(context: context),
               style: TextStyle(
                 color: darkAppColors.themeOpositeColor,
                 fontWeight: FontWeight.bold,
@@ -193,7 +193,7 @@ class _OnboardingViewState extends State<OnboardingView> {
           SizedBox(
             width: MediaQuery.sizeOf(context).width * 0.3,
             child: CustomButton(
-              text: LocaleKeys.next.tr(),
+              text: LocaleKeys.next.tr(context: context),
               postWidget: Icon(
                 Icons.arrow_forward,
                 color: darkAppColors.themeColor,
@@ -210,7 +210,7 @@ class _OnboardingViewState extends State<OnboardingView> {
       );
     } else {
       return CustomButton(
-        text: LocaleKeys.get_started.tr(),
+        text: LocaleKeys.get_started.tr(context: context),
         onPressed: () {
           CacheClient.setBool(kNotFirstUse, true);
           Navigator.pushReplacementNamed(context, Routes.login);

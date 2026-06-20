@@ -49,7 +49,7 @@ class _MySubscribedPackagesViewState extends State<MySubscribedPackagesView> {
     return Scaffold(
       backgroundColor: context.colors.screenBG,
       appBar: GenericAppBar(
-        title: LocaleKeys.profile_my_packages.tr(),
+        title: LocaleKeys.profile_my_packages.tr(context: context),
         centerTitle: false,
       ),
       body: BlocBuilder<SubscriptionsCubit, SubscriptionsState>(
@@ -140,7 +140,7 @@ class _MySubscribedPackagesViewState extends State<MySubscribedPackagesView> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _buildSectionTitle(
-                              LocaleKeys.bookings_package_name.tr(),
+                              LocaleKeys.bookings_package_name.tr(context: context),
                               context,
                             ),
                             SizedBox(height: sh(8)),
@@ -148,7 +148,7 @@ class _MySubscribedPackagesViewState extends State<MySubscribedPackagesView> {
                             SizedBox(height: sh(20)),
 
                             _buildSectionTitle(
-                              LocaleKeys.booking_package_package_details.tr(),
+                              LocaleKeys.booking_package_package_details.tr(context: context),
                               context,
                             ),
                             SizedBox(height: sh(8)),
@@ -161,7 +161,7 @@ class _MySubscribedPackagesViewState extends State<MySubscribedPackagesView> {
                             SizedBox(height: sh(20)),
 
                             _buildSectionTitle(
-                              LocaleKeys.bookings_total.tr(),
+                              LocaleKeys.bookings_total.tr(context: context),
                               context,
                             ),
                             SizedBox(height: sh(8)),
@@ -169,7 +169,7 @@ class _MySubscribedPackagesViewState extends State<MySubscribedPackagesView> {
                             SizedBox(height: sh(20)),
 
                             _buildSectionTitle(
-                              LocaleKeys.expiry_date.tr(),
+                              LocaleKeys.expiry_date.tr(context: context),
                               context,
                             ),
                             SizedBox(height: sh(8)),
@@ -178,7 +178,7 @@ class _MySubscribedPackagesViewState extends State<MySubscribedPackagesView> {
                             if (sub.includedAllowances.isNotEmpty) ...[
                               SizedBox(height: sh(20)),
                               _buildSectionTitle(
-                                LocaleKeys.bookings_additional_services.tr(),
+                                LocaleKeys.bookings_additional_services.tr(context: context),
                                 context,
                               ),
                               SizedBox(height: sh(8)),
@@ -270,7 +270,7 @@ class _MySubscribedPackagesViewState extends State<MySubscribedPackagesView> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                LocaleKeys.home_remaining.tr(),
+                LocaleKeys.home_remaining.tr(context: context),
                 style: AppTextStyles.regular10.copyWith(
                   color: context.colors.textSecondary,
                 ),
@@ -465,7 +465,7 @@ class _MySubscribedPackagesViewState extends State<MySubscribedPackagesView> {
           elevation: 0,
         ),
         child: Text(
-          LocaleKeys.home_use_package.tr(),
+          LocaleKeys.home_use_package.tr(context: context),
           style: AppTextStyles.bold16.copyWith(color: Colors.black),
         ),
       ),
@@ -528,7 +528,7 @@ class _MySubscribedPackagesViewState extends State<MySubscribedPackagesView> {
               elevation: 0,
             ),
             child: Text(
-              LocaleKeys.home_available_packages.tr(),
+              LocaleKeys.home_available_packages.tr(context: context),
               style: AppTextStyles.bold16.copyWith(color: Colors.black),
             ),
           ),

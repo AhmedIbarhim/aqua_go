@@ -41,7 +41,13 @@ class PaymentSummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (isCoveredBySubscription) {
-      return _buildCoveredRow(context);
+      // The subscription covers the base wash only. Any optional add-ons the
+      // customer picked are still payable, so surface them with their total
+      // instead of a blanket "Covered by subscription".
+      if (additionalItems.isEmpty) {
+        return _buildCoveredRow(context);
+      }
+      return _buildCoveredWithAddons(context);
     }
     return Column(
       children: [
@@ -66,7 +72,7 @@ class PaymentSummaryCard extends StatelessWidget {
           const SizedBox(height: 12),
           _buildPaymentRow(
             context,
-            label: LocaleKeys.bookings_subtotal.tr(),
+            label: LocaleKeys.bookings_subtotal.tr(context: context),
             value: subtotal,
           ),
         ],
@@ -78,7 +84,7 @@ class PaymentSummaryCard extends StatelessWidget {
         else
           _buildPaymentRow(
             context,
-            label: LocaleKeys.bookings_vat.tr(),
+            label: LocaleKeys.bookings_vat.tr(context: context),
             value: vat,
           ),
         const SizedBox(height: 12),
@@ -86,7 +92,7 @@ class PaymentSummaryCard extends StatelessWidget {
         const SizedBox(height: 12),
         _buildPaymentRow(
           context,
-          label: LocaleKeys.bookings_total_amount.tr(),
+          label: LocaleKeys.bookings_total_amount.tr(context: context),
           value: total,
           isTotal: true,
         ),
@@ -99,15 +105,74 @@ class PaymentSummaryCard extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          LocaleKeys.bookings_total_amount.tr(),
+          LocaleKeys.bookings_total_amount.tr(context: context),
           style: AppTextStyles.medium16.copyWith(
             color: context.colors.textPrimary,
           ),
         ),
         Text(
-          LocaleKeys.bookings_covered_by_subscription.tr(),
+          LocaleKeys.bookings_covered_by_subscription.tr(context: context),
           style: AppTextStyles.medium16.copyWith(
             color: context.colors.textPrimary,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCoveredWithAddons(BuildContext context) {
+    final addonsTotal = additionalItems.fold<double>(
+      0.0,
+      (sum, item) => sum + (item['price'] as num).toDouble(),
+    );
+    return Column(
+      children: [
+        _buildCoveredLabelRow(context, serviceName),
+        ...additionalItems.map(
+          (item) => Column(
+            children: [
+              const SizedBox(height: 12),
+              const Divider(height: 1, thickness: 0.5),
+              const SizedBox(height: 12),
+              _buildPaymentRow(
+                context,
+                label: item['name'],
+                value: item['price'],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        const Divider(height: 1, thickness: 0.5),
+        const SizedBox(height: 12),
+        _buildVatIncludedRow(context),
+        const SizedBox(height: 12),
+        const Divider(height: 1, thickness: 1, color: Colors.white),
+        const SizedBox(height: 12),
+        _buildPaymentRow(
+          context,
+          label: LocaleKeys.bookings_total_amount.tr(context: context),
+          value: addonsTotal,
+          isTotal: true,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCoveredLabelRow(BuildContext context, String label) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: AppTextStyles.regular16.copyWith(
+            color: context.colors.textSecondary,
+          ),
+        ),
+        Text(
+          LocaleKeys.bookings_covered_by_subscription.tr(context: context),
+          style: AppTextStyles.regular16.copyWith(
+            color: context.colors.textSecondary,
           ),
         ),
       ],
@@ -119,7 +184,7 @@ class PaymentSummaryCard extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          LocaleKeys.bookings_vat_included.tr(),
+          LocaleKeys.bookings_vat_included.tr(context: context),
           style: AppTextStyles.regular16.copyWith(
             color: context.colors.textSecondary,
           ),

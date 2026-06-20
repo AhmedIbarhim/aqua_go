@@ -114,8 +114,8 @@ class _AddCarViewState extends State<AddCarView> {
           backgroundColor: context.colors.screenBG,
           appBar: GenericAppBar(
             title: widget.car == null
-                ? LocaleKeys.my_cars_add_car_title.tr()
-                : LocaleKeys.my_cars_edit_car.tr(),
+                ? LocaleKeys.my_cars_add_car_title.tr(context: context)
+                : LocaleKeys.my_cars_edit_car.tr(context: context),
             centerTitle: true,
           ),
           body: Column(
@@ -165,8 +165,8 @@ class _AddCarViewState extends State<AddCarView> {
                           ),
                           const SizedBox(height: 16),
                           CustomDropdownField(
-                            label: LocaleKeys.my_cars_manufacturing_year.tr(),
-                            hint: LocaleKeys.select_here.tr(),
+                            label: LocaleKeys.my_cars_manufacturing_year.tr(context: context),
+                            hint: LocaleKeys.select_here.tr(context: context),
                             value: _selectedYear,
                             onChanged: (val) =>
                                 setState(() => _selectedYear = val),
@@ -179,8 +179,8 @@ class _AddCarViewState extends State<AddCarView> {
                           const SizedBox(height: 16),
                           CustomTextField(
                             mustCapitalize: true,
-                            label: LocaleKeys.my_cars_plate_number.tr(),
-                            hint: LocaleKeys.write_here.tr(),
+                            label: LocaleKeys.my_cars_plate_number.tr(context: context),
+                            hint: LocaleKeys.write_here.tr(context: context),
                             controller: _plateNumberController,
                             isRequired: true,
                           ),
@@ -206,7 +206,7 @@ class _AddCarViewState extends State<AddCarView> {
           Expanded(
             flex: 2,
             child: CustomButton(
-              text: LocaleKeys.my_cars_save_car.tr(),
+              text: LocaleKeys.my_cars_save_car.tr(context: context),
               enabled: _isFormValid,
               onPressed: () {
                 if (!formKey.currentState!.validate()) {
@@ -254,7 +254,7 @@ class _AddCarViewState extends State<AddCarView> {
             flex: 1,
             child: CustomButton(
               onPressed: () => context.pop(),
-              text: LocaleKeys.cancel.tr(),
+              text: LocaleKeys.cancel.tr(context: context),
               color: context.colors.background,
               textColor: context.colors.primary,
               borderColor: context.colors.contentDisabled,

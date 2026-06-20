@@ -49,7 +49,7 @@ class MyBookingsCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(100),
                   ),
                   child: Text(
-                    LocaleKeys.bookings_upcoming.tr(),
+                    LocaleKeys.bookings_upcoming.tr(context: context),
                     style: AppTextStyles.regular12.copyWith(
                       color: context.colors.screenBG,
                     ),
@@ -63,7 +63,7 @@ class MyBookingsCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                LocaleKeys.bookings_booking_details.tr(),
+                LocaleKeys.bookings_booking_details.tr(context: context),
                 style: AppTextStyles.medium12.copyWith(height: 16 / 12),
                 textAlign: TextAlign.start,
               ),
@@ -79,7 +79,7 @@ class MyBookingsCard extends StatelessWidget {
                     // Location
                     _buildDetailRow(
                       context: context,
-                      title: LocaleKeys.bookings_car_location.tr(),
+                      title: LocaleKeys.bookings_car_location.tr(context: context),
                       value: booking.location,
                       iconPath: AppAssets.location,
                     ),
@@ -87,7 +87,7 @@ class MyBookingsCard extends StatelessWidget {
                     // Date & Time
                     _buildDetailRow(
                       context: context,
-                      title: LocaleKeys.bookings_date_and_time.tr(),
+                      title: LocaleKeys.bookings_date_and_time.tr(context: context),
                       value: booking.formattedDateTime,
                       iconPath: AppAssets.calender,
                     ),
@@ -95,7 +95,7 @@ class MyBookingsCard extends StatelessWidget {
                     // Total Amount
                     _buildDetailRow(
                       context: context,
-                      title: LocaleKeys.bookings_total_amount.tr(),
+                      title: LocaleKeys.bookings_total_amount.tr(context: context),
                       value: booking.totalAmount.toStringAsFixed(2),
                       iconPath: AppAssets.money,
                       isAmount: true,
@@ -124,7 +124,7 @@ class MyBookingsCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Text(
-                    LocaleKeys.bookings_view_details.tr(),
+                    LocaleKeys.bookings_view_details.tr(context: context),
                     style: AppTextStyles.medium14.copyWith(
                       color: context.colors.primary,
                     ),

@@ -368,6 +368,15 @@
         "booking_rescheduled": "Booking updated successfully"
     },
     "errors": {
-        "internal_error": "The site is currently under maintenance, we will be back soon"
+        "internal_error": "The site is currently under maintenance, we will be back soon",
+        "max_active_subscriptions_exceeded": "You've reached the maximum number of active subscriptions for this package.",
+        "package_not_active": "This package is no longer available.",
+        "subscription_payment_declined": "Payment was declined. Please try another card.",
+        "subscription_allowance_concurrently_exhausted": "No remaining washes in this subscription.",
+        "subscription_not_cancellable": "This subscription can't be cancelled.",
+        "subscription_not_found": "Subscription not found.",
+        "subscription_package_not_found": "Package not found.",
+        "invalid_subscription_schedule": "The selected schedule isn't valid.",
+        "wash_schedule_not_allowed": "Scheduling this wash isn't allowed."
     }
 }

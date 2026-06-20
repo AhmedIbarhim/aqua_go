@@ -51,7 +51,7 @@ class PackageSubscribtionSuccessAlert extends StatelessWidget {
         SizedBox(height: height * 0.02),
 
         // Title
-        Text(LocaleKeys.success.tr(), style: AppTextStyles.medium16),
+        Text(LocaleKeys.success.tr(context: context), style: AppTextStyles.medium16),
         if (referenceNumber != null) ...[
           const SizedBox(height: 4),
           Text(
@@ -66,7 +66,7 @@ class PackageSubscribtionSuccessAlert extends StatelessWidget {
 
         // Description
         Text(
-          LocaleKeys.booking_package_booking_success.tr(),
+          LocaleKeys.booking_package_booking_success.tr(context: context),
           textAlign: TextAlign.center,
           style: AppTextStyles.regular16.copyWith(
             color: context.colors.textSecondary,
@@ -77,7 +77,7 @@ class PackageSubscribtionSuccessAlert extends StatelessWidget {
 
         // Primary Button
         CustomButton(
-          text: LocaleKeys.booking_package_request_wash.tr(),
+          text: LocaleKeys.booking_package_request_wash.tr(context: context),
           onPressed: () {
             context.pop();
             context.pushNamed(
@@ -95,7 +95,7 @@ class PackageSubscribtionSuccessAlert extends StatelessWidget {
         const SizedBox(height: 16),
         // Secondary Button
         CustomButton(
-          text: LocaleKeys.go_to_home.tr(),
+          text: LocaleKeys.go_to_home.tr(context: context),
           color: context.colors.cardBackGround,
           borderColor: context.colors.borderSecondary,
           textColor: context.colors.primary,

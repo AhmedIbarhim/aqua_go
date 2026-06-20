@@ -46,7 +46,7 @@ class _PackageSubscribtionPaymentContentState
         ),
         const SizedBox(height: 24),
         Text(
-          LocaleKeys.bookings_payment_summary.tr(),
+          LocaleKeys.bookings_payment_summary.tr(context: context),
           style: AppTextStyles.regular16.copyWith(
             color: context.colors.textPrimary,
           ),
@@ -54,26 +54,26 @@ class _PackageSubscribtionPaymentContentState
         const SizedBox(height: 16),
         _buildSummaryRow(
           context,
-          label: LocaleKeys.bookings_package_name.tr(),
+          label: LocaleKeys.bookings_package_name.tr(context: context),
           value: widget.packageModel.title,
           isTextValue: true,
         ),
         const Divider(height: 24),
         _buildSummaryRow(
           context,
-          label: LocaleKeys.bookings_subtotal.tr(),
-          value: widget.packageModel.price,
+          label: LocaleKeys.bookings_subtotal.tr(context: context),
+          value: widget.packageModel.subtotalBeforeVat,
         ),
         const Divider(height: 24),
         _buildSummaryRow(
           context,
-          label: LocaleKeys.bookings_vat.tr(),
+          label: LocaleKeys.bookings_vat.tr(context: context),
           value: widget.packageModel.vat,
         ),
         const Divider(height: 24),
         _buildSummaryRow(
           context,
-          label: LocaleKeys.bookings_total_amount.tr(),
+          label: LocaleKeys.bookings_total_amount.tr(context: context),
           value: widget.packageModel.total,
           isTotal: true,
         ),
@@ -83,7 +83,7 @@ class _PackageSubscribtionPaymentContentState
           onPressed: () => widget.onConfirm(context),
           text: widget.isLoading
               ? ''
-              : LocaleKeys.bookings_confirm_payment.tr(),
+              : LocaleKeys.bookings_confirm_payment.tr(context: context),
           preWidget: widget.isLoading
               ? SizedBox(
                   width: 20,

@@ -103,7 +103,7 @@ class ComplaintRecordCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(sw(16)),
               ),
               child: Text(
-                complaint.status.translationKey.tr(),
+                complaint.status.translationKey.tr(context: context),
                 style: AppTextStyles.regular12.copyWith(
                   color: complaint.status.getTextColor(context),
                   fontWeight: FontWeight.w500,

@@ -52,7 +52,7 @@ class PackagesListView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      LocaleKeys.home_available_packages.tr(),
+                      LocaleKeys.home_available_packages.tr(context: context),
                       style: !context.isTablet
                           ? AppTextStyles.bold16
                           : AppTextStyles.bold18,
@@ -67,7 +67,7 @@ class PackagesListView extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            LocaleKeys.home_view_more.tr(),
+                            LocaleKeys.home_view_more.tr(context: context),
                             style: AppTextStyles.regular12.copyWith(
                               color: context.colors.primary,
                             ),

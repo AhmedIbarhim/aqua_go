@@ -19,7 +19,7 @@ class PackagesView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: GenericAppBar(title: LocaleKeys.home_available_packages.tr()),
+      appBar: GenericAppBar(title: LocaleKeys.home_available_packages.tr(context: context)),
       body: Container(
         decoration: BoxDecoration(
           color: context.colors.background,
@@ -52,7 +52,7 @@ class PackagesView extends StatelessWidget {
             if (!isLoading && displayPackages.isEmpty) {
               return Center(
                 child: Text(
-                  LocaleKeys.home_available_packages.tr(),
+                  LocaleKeys.home_available_packages.tr(context: context),
                   style: AppTextStyles.regular14,
                 ),
               );

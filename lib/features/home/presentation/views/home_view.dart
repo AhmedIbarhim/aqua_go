@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/config/di/service_locator.dart';
+import '../../../../core/config/session/session_state.dart';
 import '../../data/models/banner_model.dart';
+import 'package:aqua_go/features/auth/data/models/user_model.dart';
 import 'package:aqua_go/features/subscriptions/data/models/subscription_response_model/subscription_response_model.dart';
 import '../controllers/services_controller/services_cubit.dart';
 import '../controllers/banners_controller/banners_cubit.dart';
@@ -19,7 +21,6 @@ import '../widgets/services_page_view.dart';
 import '../widgets/current_package_section.dart';
 import '../../../../core/helpers/shimmer_helper.dart';
 import '../../../../core/components/error_retry_widget.dart';
-import '../../../../core/helpers/fetch_user_data_helper.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -42,13 +43,22 @@ class _HomeViewState extends State<HomeView> {
     _servicesCubit.getServices();
     _bannersCubit.getBanners();
     _packagesCubit.getPackages();
-    if (!FetchUserData.isGuest()) {
+    if (currentUser.value != null) {
+      _subscriptionsCubit.getActiveSubscriptions();
+    }
+    // Load subscriptions reactively when user transitions from guest to logged-in.
+    currentUser.addListener(_onAuthChanged);
+  }
+
+  void _onAuthChanged() {
+    if (currentUser.value != null) {
       _subscriptionsCubit.getActiveSubscriptions();
     }
   }
 
   @override
   void dispose() {
+    currentUser.removeListener(_onAuthChanged);
     _servicesCubit.close();
     _bannersCubit.close();
     _packagesCubit.close();
@@ -67,10 +77,14 @@ class _HomeViewState extends State<HomeView> {
         BlocProvider.value(value: _packagesCubit),
         BlocProvider.value(value: _subscriptionsCubit),
       ],
-      child: BlocBuilder<ServicesCubit, ServicesState>(
-        builder: (context, servicesState) {
-          return BlocBuilder<PackagesCubit, PackagesState>(
-            builder: (context, packagesState) {
+      child: ValueListenableBuilder<UserModel?>(
+        valueListenable: currentUser,
+        builder: (context, user, _) {
+          final isLoggedIn = user != null;
+          return BlocBuilder<ServicesCubit, ServicesState>(
+            builder: (context, servicesState) {
+              return BlocBuilder<PackagesCubit, PackagesState>(
+                builder: (context, packagesState) {
               final isServicesError = servicesState is ServicesError;
               final isPackagesError = packagesState is PackagesError;
 
@@ -91,7 +105,7 @@ class _HomeViewState extends State<HomeView> {
                           _servicesCubit.getServices(),
                           _bannersCubit.getBanners(),
                           _packagesCubit.getPackages(),
-                          if (!FetchUserData.isGuest())
+                          if (isLoggedIn)
                             _subscriptionsCubit.getActiveSubscriptions(),
                         ]);
                       },
@@ -106,7 +120,7 @@ class _HomeViewState extends State<HomeView> {
                     _servicesCubit.getServices(),
                     _bannersCubit.getBanners(),
                     _packagesCubit.getPackages(),
-                    if (!FetchUserData.isGuest())
+                    if (isLoggedIn)
                       _subscriptionsCubit.getActiveSubscriptions(),
                   ]);
                 },
@@ -213,6 +227,8 @@ class _HomeViewState extends State<HomeView> {
                     ],
                   ),
                 ),
+              );
+                },
               );
             },
           );

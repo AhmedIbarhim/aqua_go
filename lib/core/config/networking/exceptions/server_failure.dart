@@ -71,8 +71,8 @@ class ServerFailure extends Failure {
       final title = response['title']?.toString();
       final type = response['type']?.toString();
       if (title == 'Address outside service area' ||
-          // type == 'https://qa-api.aquago.sa/errors/address-outside-service-area'
-          type == 'https://api.aquago.sa/errors/address-outside-service-area'
+          type == 'https://qa-api.aquago.sa/errors/address-outside-service-area'
+          // type == 'https://api.aquago.sa/errors/address-outside-service-area'
       ) {
         return const ServerFailure(
           'address-outside-service-area',
@@ -114,6 +114,22 @@ class ServerFailure extends Failure {
     }
   }
 
+  /// Snake_case machine codes (e.g. "max_active_subscriptions_exceeded") must
+  /// never reach the UI raw. When [value] looks like a code, map it to the
+  /// localized `errors.<code>` string; if no translation exists, fall back to
+  /// the human-readable ProblemDetail `title` (or the default message) rather
+  /// than leaking the code. Plain human messages pass through unchanged.
+  static final RegExp _codePattern = RegExp(r'^[a-z][a-z0-9]*(_[a-z0-9]+)+$');
+
+  static String _localizeOrRaw(String value, Map response) {
+    if (!_codePattern.hasMatch(value)) return value;
+    final key = 'errors.$value';
+    final localized = key.tr();
+    if (localized != key) return localized;
+    final title = response['title']?.toString();
+    return (title != null && title.isNotEmpty) ? title : _defaultMessage;
+  }
+
   static String _extractErrorMessage(dynamic response) {
     try {
       if (response is! Map<String, dynamic>) {
@@ -122,12 +138,12 @@ class ServerFailure extends Failure {
 
       /// message
       if (response['message'] != null) {
-        return response['message'].toString();
+        return _localizeOrRaw(response['message'].toString(), response);
       }
 
-      /// detail
+      /// detail (ProblemDetail — often a stable snake_case error code)
       if (response['detail'] != null) {
-        return response['detail'].toString();
+        return _localizeOrRaw(response['detail'].toString(), response);
       }
 
       /// title

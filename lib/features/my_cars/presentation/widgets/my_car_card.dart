@@ -87,9 +87,9 @@ class MyCarCard extends StatelessWidget {
                             onTap: () {
                               context.showWarningAlert(
                                 primaryButtonText: LocaleKeys.delete_confirm
-                                    .tr(),
-                                title: LocaleKeys.delete_confirm.tr(),
-                                message: LocaleKeys.my_cars_delete_message.tr(),
+                                    .tr(context: context),
+                                title: LocaleKeys.delete_confirm.tr(context: context),
+                                message: LocaleKeys.my_cars_delete_message.tr(context: context),
                                 onPrimaryPressed: () {
                                   Navigator.pop(context);
                                   onDelete?.call();
@@ -140,7 +140,7 @@ class MyCarCard extends StatelessWidget {
               _buildDivider(context),
               _buildSpecItem(
                 context,
-                text: car.colorName,
+                text: car.colorName(context),
                 icon: AppAssets.colorSwatch,
               ),
               _buildDivider(context),

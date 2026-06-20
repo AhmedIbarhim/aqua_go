@@ -28,7 +28,7 @@ class ComplaintBookingDetailsCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          LocaleKeys.bookings_booking_details.tr(),
+          LocaleKeys.bookings_booking_details.tr(context: context),
           style: AppTextStyles.regular16,
         ),
         const SizedBox(height: 8),
@@ -42,35 +42,35 @@ class ComplaintBookingDetailsCard extends StatelessWidget {
             children: [
               _buildDetailRow(
                 context: context,
-                title: LocaleKeys.bookings_booking_number.tr(),
+                title: LocaleKeys.bookings_booking_number.tr(context: context),
                 value: booking?.referenceNumber ?? bookingReferenceNumber ?? '',
                 icon: AppAssets.note,
               ),
               const SizedBox(height: 12),
               _buildDetailRow(
                 context: context,
-                title: LocaleKeys.bookings_service_name.tr(),
+                title: LocaleKeys.bookings_service_name.tr(context: context),
                 value: booking?.title ?? '',
                 icon: AppAssets.document,
               ),
               const SizedBox(height: 12),
               _buildDetailRow(
                 context: context,
-                title: LocaleKeys.bookings_car_plate.tr(),
+                title: LocaleKeys.bookings_car_plate.tr(context: context),
                 value: booking?.plate ?? '',
                 icon: AppAssets.boardNum,
               ),
               const SizedBox(height: 12),
               _buildDetailRow(
                 context: context,
-                title: LocaleKeys.bookings_date_and_time.tr(),
+                title: LocaleKeys.bookings_date_and_time.tr(context: context),
                 value: booking?.formattedDateTime ?? '',
                 icon: AppAssets.date,
               ),
               const SizedBox(height: 12),
               _buildDetailRow(
                 context: context,
-                title: LocaleKeys.bookings_worker_name.tr(),
+                title: LocaleKeys.bookings_worker_name.tr(context: context),
                 value: booking?.assignedWorker?.displayName ?? '',
                 icon: AppAssets.personDisabled,
               ),

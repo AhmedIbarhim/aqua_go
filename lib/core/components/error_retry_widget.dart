@@ -43,7 +43,7 @@ class ErrorRetryWidget extends StatelessWidget {
               ),
               onPressed: onRetry,
               child: Text(
-                LocaleKeys.retry.tr(),
+                LocaleKeys.retry.tr(context: context),
                 style: AppTextStyles.medium14.copyWith(
                   color: context.colors.primary,
                 ),

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:aqua_go/core/config/local_storage/shared_prefs.dart';
 import 'package:aqua_go/core/config/local_storage/secure_storage.dart';
+import 'package:aqua_go/core/config/session/session_state.dart';
 import 'package:aqua_go/core/constants.dart';
 import 'package:aqua_go/core/config/networking/exceptions/failure.dart';
 import 'package:aqua_go/features/auth/data/models/user_model.dart';
@@ -131,12 +132,24 @@ class AuthRepository {
   /// never reuses an invalid token.
   Future<void> clearSession() async {
     _cachedUser = null;
+    currentUser.value = null;
     await SecureStorage.deleteSecuredString(kAccessToken);
     await SecureStorage.deleteSecuredString(kRefreshToken);
   }
 
+  /// Purges the local session (tokens + cached user) WITHOUT a network call
+  /// and WITHOUT touching unrelated prefs (kNotFirstUse, language, theme,
+  /// install marker).
+  Future<void> purgeLocalSession() async {
+    _cachedUser = null;
+    currentUser.value = null;
+    await SecureStorage.clearSecuredData();
+    await CacheClient.removeString(kUserData);
+  }
+
   Future<void> saveUser(UserModel user) async {
     _cachedUser = user;
+    currentUser.value = user;
     await CacheClient.setString(kUserData, user.toEncodedJson());
   }
 
@@ -146,12 +159,33 @@ class AuthRepository {
     if (userJson.isNotEmpty) {
       try {
         _cachedUser = UserModel.fromEncodedJson(userJson);
+        // Seed the reactive notifier on first read from disk.
+        if (currentUser.value == null) currentUser.value = _cachedUser;
         return _cachedUser;
       } catch (_) {
         return null;
       }
     }
     return null;
+  }
+
+  /// Validates the persisted session by fetching `/api/customer/me`. On success
+  /// the fresh profile is cached and returned; on failure the caller decides
+  /// whether the session is recoverable (offline) or broken (auth/expired).
+  Future<Either<Failure, UserModel>> refreshProfile() async {
+    final result = await _authService.getProfile();
+    return result.fold((failure) => Left(failure), (profileData) async {
+      if (profileData == null) {
+        return const Left(ServerFailure('Failed to fetch user profile'));
+      }
+      final fetched = UserModel.fromJson(profileData);
+      // `/me` may omit the phone; keep the locally-known one when present.
+      final user = (fetched.phone == null || fetched.phone!.isEmpty)
+          ? fetched.copyWith(phone: getUser()?.phone)
+          : fetched;
+      await saveUser(user);
+      return Right(user);
+    });
   }
 
   Future<void> logout() async {
@@ -163,9 +197,16 @@ class AuthRepository {
     } catch (_) {
       // Silently ignore logout network failures to guarantee clean local state
     } finally {
+      // Use the same targeted teardown as purgeLocalSession() so that
+      // kNotFirstUse, kLanguage, kThemeMode, and kSessionInstallMarker survive.
+      // The install marker must persist across deliberate logouts — it only
+      // becomes absent after an OS-driven reinstall (when SharedPrefs is wiped
+      // externally), which is the reinstall-detection scenario it was designed for.
       _cachedUser = null;
+      currentUser.value = null;
       await SecureStorage.clearSecuredData();
-      await CacheClient.clearCachedData();
+      await CacheClient.removeString(kUserData);
+      await CacheClient.removeString(kIsGuest);
     }
   }
 
@@ -177,9 +218,13 @@ class AuthRepository {
       idempotencyKey: idempotencyKey,
     );
     return result.fold((failure) => Left(failure), (_) async {
+      // Same targeted teardown as logout() — preserve kNotFirstUse,
+      // kLanguage, kThemeMode, kSessionInstallMarker.
       _cachedUser = null;
+      currentUser.value = null;
       await SecureStorage.clearSecuredData();
-      await CacheClient.clearCachedData();
+      await CacheClient.removeString(kUserData);
+      await CacheClient.removeString(kIsGuest);
       return Right(null);
     });
   }

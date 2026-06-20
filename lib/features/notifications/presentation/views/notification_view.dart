@@ -34,7 +34,7 @@ class NotificationViewBody extends StatelessWidget {
 
     return Scaffold(
       appBar: GenericAppBar(
-        title: LocaleKeys.notifications_notifications.tr(),
+        title: LocaleKeys.notifications_notifications.tr(context: context),
         actions: [
           BlocBuilder<NotificationsCubit, NotificationsState>(
             builder: (context, state) {

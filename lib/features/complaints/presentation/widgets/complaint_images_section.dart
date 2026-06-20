@@ -43,7 +43,7 @@ class _ComplaintImagesSectionState extends State<ComplaintImagesSection>
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Text(
-              LocaleKeys.bookings_car_images.tr(),
+              LocaleKeys.bookings_car_images.tr(context: context),
               style: AppTextStyles.medium16,
             ),
           ],
@@ -77,7 +77,7 @@ class _ComplaintImagesSectionState extends State<ComplaintImagesSection>
                       children: [
                         SvgPicture.asset(AppAssets.addImage),
                         Text(
-                          LocaleKeys.bookings_upload_images.tr(),
+                          LocaleKeys.bookings_upload_images.tr(context: context),
                           style: AppTextStyles.medium14,
                         ),
                       ],

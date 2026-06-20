@@ -31,7 +31,7 @@ class CustomColorPicker extends StatefulWidget {
   }) {
     return CustomBottomSheet.show<T>(
       context: context,
-      title: LocaleKeys.my_cars_choose_car_color.tr(),
+      title: LocaleKeys.my_cars_choose_car_color.tr(context: context),
       child: CustomColorPicker(
         initialColor: initialColor,
         onColorChanged: onColorChanged,
@@ -74,7 +74,7 @@ class _CustomColorPickerState extends State<CustomColorPicker> {
     // if (luminance < 0.05) return "أسود";
     // if (luminance > 0.95) return "أبيض";
 
-    return LocaleKeys.my_cars_custom_color.tr();
+    return LocaleKeys.my_cars_custom_color.tr(context: context);
   }
 
   @override
@@ -141,7 +141,7 @@ class _CustomColorPickerState extends State<CustomColorPicker> {
               flex: 2,
               child: CustomButton(
                 onPressed: widget.onSave,
-                text: LocaleKeys.my_cars_save_color.tr(),
+                text: LocaleKeys.my_cars_save_color.tr(context: context),
               ),
             ),
             const SizedBox(width: 8),
@@ -149,7 +149,7 @@ class _CustomColorPickerState extends State<CustomColorPicker> {
               flex: 1,
               child: CustomButton(
                 onPressed: widget.onCancel,
-                text: LocaleKeys.cancel.tr(),
+                text: LocaleKeys.cancel.tr(context: context),
                 color: Colors.transparent,
                 borderColor: context.colors.borderSecondary,
                 textColor: context.colors.primary,

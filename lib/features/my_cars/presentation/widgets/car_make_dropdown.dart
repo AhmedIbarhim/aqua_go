@@ -79,7 +79,7 @@ class _CarMakeDropdownState extends State<CarMakeDropdown> {
                   ),
                 ),
                 Text(
-                  LocaleKeys.my_cars_car_make.tr(),
+                  LocaleKeys.my_cars_car_make.tr(context: context),
                   style: AppTextStyles.medium14.copyWith(
                     color: context.colors.textPrimary,
                   ),
@@ -92,7 +92,7 @@ class _CarMakeDropdownState extends State<CarMakeDropdown> {
                 final myCarsCubit = context.read<MyCarsCubit>();
                 CustomBottomSheet.show(
                   context: context,
-                  title: LocaleKeys.my_cars_car_make.tr(),
+                  title: LocaleKeys.my_cars_car_make.tr(context: context),
                   child: BlocProvider<MyCarsCubit>.value(
                     value: myCarsCubit,
                     child: ConstrainedBox(
@@ -193,7 +193,7 @@ class _CarMakeDropdownState extends State<CarMakeDropdown> {
                   children: [
                     Expanded(
                       child: Text(
-                        currentDisplayValue ?? LocaleKeys.select_here.tr(),
+                        currentDisplayValue ?? LocaleKeys.select_here.tr(context: context),
                         style: AppTextStyles.regular14.copyWith(
                           color: currentDisplayValue == null
                               ? context.colors.contentDisabled

@@ -79,7 +79,7 @@ class LocationSearchField extends StatelessWidget {
                       ),
                     ),
                   ),
-                  hintText: LocaleKeys.address_search_hint.tr(),
+                  hintText: LocaleKeys.address_search_hint.tr(context: context),
                   hintStyle: AppTextStyles.regular14.copyWith(
                     color: darkAppColors.contentSecondaryLight,
                   ),
@@ -108,7 +108,7 @@ class LocationSearchField extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      LocaleKeys.address_search_results.tr(),
+                      LocaleKeys.address_search_results.tr(context: context),
                       style: AppTextStyles.regular12.copyWith(
                         color: lightAppColors.themeColor,
                       ),

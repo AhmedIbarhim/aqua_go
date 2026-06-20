@@ -34,7 +34,7 @@ class MyAddressesList extends StatelessWidget {
           },
           onDelete: () {
             context.showWarningAlert(
-              message: LocaleKeys.address_confirm_delete.tr(),
+              message: LocaleKeys.address_confirm_delete.tr(context: context),
               onPrimaryPressed: () {
                 context.read<AddressesCubit>().deleteAddress(address.id!);
                 Navigator.pop(context);

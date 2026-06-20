@@ -142,7 +142,7 @@ class CurrentPackageCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            LocaleKeys.home_remaining.tr(),
+                            LocaleKeys.home_remaining.tr(context: context),
                             style: AppTextStyles.regular10.copyWith(
                               color: context.colors.textSecondary,
                             ),
@@ -159,7 +159,7 @@ class CurrentPackageCard extends StatelessWidget {
                   ),
                   SizedBox(height: context.screenHeight * 0.01),
                   GestureDetector(
-                    onTap: onUsePackage,
+                    onTap: package.remainingWashes == 0 ? null : onUsePackage,
                     child: Container(
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -173,7 +173,7 @@ class CurrentPackageCard extends StatelessWidget {
                         children: [
                           const SizedBox(width: 12),
                           Text(
-                            LocaleKeys.home_use_package.tr(),
+                            LocaleKeys.home_use_package.tr(context: context),
                             style: AppTextStyles.medium14.copyWith(
                               color: package.remainingWashes == 0
                                   ? context.colors.error

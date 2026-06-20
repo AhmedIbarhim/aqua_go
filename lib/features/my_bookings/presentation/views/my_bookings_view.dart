@@ -7,7 +7,7 @@ import '../../../../core/config/di/service_locator.dart';
 import '../widgets/my_bookings_list_view.dart';
 import '../widgets/my_bookings_tabs.dart';
 import '../widgets/empty_bookings_widget.dart';
-import '../../../../core/helpers/fetch_user_data_helper.dart';
+import '../../../../core/config/session/session_state.dart';
 import '../../../../core/components/guest_placeholder_widget.dart';
 import '../controllers/my_bookings_cubit.dart';
 import '../controllers/my_bookings_state.dart';
@@ -24,30 +24,33 @@ class _MyBookingsViewState extends State<MyBookingsView> {
 
   @override
   Widget build(BuildContext context) {
-    if (FetchUserData.isGuest()) {
-      return Scaffold(
-        backgroundColor: context.colors.screenBG,
-        body: Container(
-          height: double.infinity,
-          width: double.infinity,
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: context.colors.background,
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
+    return ValueListenableBuilder(
+      valueListenable: currentUser,
+      builder: (context, user, _) {
+        if (user == null) {
+          return Scaffold(
+            backgroundColor: context.colors.screenBG,
+            body: Container(
+              height: double.infinity,
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: context.colors.background,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+              ),
+              child: const GuestPlaceholderWidget(
+                titleEn: "Your Bookings",
+                titleAr: "حجوزاتك",
+                descEn:
+                    "Please log in to track and view your active and past bookings.",
+                descAr: "يرجى تسجيل الدخول لمتابعة وعرض حجوزاتك الحالية والسابقة.",
+              ),
             ),
-          ),
-          child: const GuestPlaceholderWidget(
-            titleEn: "Your Bookings",
-            titleAr: "حجوزاتك",
-            descEn:
-                "Please log in to track and view your active and past bookings.",
-            descAr: "يرجى تسجيل الدخول لمتابعة وعرض حجوزاتك الحالية والسابقة.",
-          ),
-        ),
-      );
-    }
+          );
+        }
 
     return BlocProvider(
       create: (context) => locator<MyBookingsCubit>()..fetchBookings(),
@@ -138,6 +141,8 @@ class _MyBookingsViewState extends State<MyBookingsView> {
           ),
         ),
       ),
+      );
+      },
     );
   }
 }

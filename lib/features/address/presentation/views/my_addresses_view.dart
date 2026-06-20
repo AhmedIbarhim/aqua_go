@@ -48,7 +48,7 @@ class _MyAddressesViewState extends State<MyAddressesView> {
       child: Scaffold(
         backgroundColor: context.colors.screenBG,
         appBar: GenericAppBar(
-          title: LocaleKeys.address_my_addresses.tr(),
+          title: LocaleKeys.address_my_addresses.tr(context: context),
           centerTitle: true,
         ),
         body: BlocConsumer<AddressesCubit, AddressesState>(
@@ -122,7 +122,7 @@ class _MyAddressesViewState extends State<MyAddressesView> {
   Widget _buildBottomActionSheet(BuildContext context) {
     return BottomActionSheetContainer(
       child: CustomButton(
-        text: LocaleKeys.address_add_new_location.tr(),
+        text: LocaleKeys.address_add_new_location.tr(context: context),
         preWidget: const Icon(Icons.add, size: 24),
         onPressed: () {
           context

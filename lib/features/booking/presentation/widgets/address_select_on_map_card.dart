@@ -60,7 +60,7 @@ class AddressSelectOnMapCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  LocaleKeys.address_select_on_map.tr(),
+                  LocaleKeys.address_select_on_map.tr(context: context),
                   style: AppTextStyles.regular16.copyWith(
                     color: context.colors.textSecondary,
                   ),

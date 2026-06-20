@@ -48,7 +48,7 @@ class MyAddressCard extends StatelessWidget {
                     child: Row(
                       children: [
                         Text(
-                          LocaleKeys.edit.tr(),
+                          LocaleKeys.edit.tr(context: context),
                           style: AppTextStyles.medium14.copyWith(
                             color: context.colors.primary,
                           ),

@@ -349,6 +349,15 @@ abstract class  LocaleKeys {
   static const snackbar_booking_rescheduled = 'snackbar.booking_rescheduled';
   static const snackbar = 'snackbar';
   static const errors_internal_error = 'errors.internal_error';
+  static const errors_max_active_subscriptions_exceeded = 'errors.max_active_subscriptions_exceeded';
+  static const errors_package_not_active = 'errors.package_not_active';
+  static const errors_subscription_payment_declined = 'errors.subscription_payment_declined';
+  static const errors_subscription_allowance_concurrently_exhausted = 'errors.subscription_allowance_concurrently_exhausted';
+  static const errors_subscription_not_cancellable = 'errors.subscription_not_cancellable';
+  static const errors_subscription_not_found = 'errors.subscription_not_found';
+  static const errors_subscription_package_not_found = 'errors.subscription_package_not_found';
+  static const errors_invalid_subscription_schedule = 'errors.invalid_subscription_schedule';
+  static const errors_wash_schedule_not_allowed = 'errors.wash_schedule_not_allowed';
   static const errors = 'errors';
 
 }

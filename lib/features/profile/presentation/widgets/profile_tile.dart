@@ -96,7 +96,7 @@ class ProfileTile extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      LocaleKeys.profile_verified.tr(),
+                      LocaleKeys.profile_verified.tr(context: context),
                       style: AppTextStyles.regular12.copyWith(
                         color: context.colors.success,
                       ),

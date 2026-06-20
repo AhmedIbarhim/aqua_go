@@ -73,7 +73,7 @@ class _ComplaintTypesState extends State<ComplaintTypes> {
                     children: [
                       Expanded(
                         child: Text(
-                          type.tr(),
+                          type.tr(context: context),
                           style: AppTextStyles.medium14.copyWith(
                             color: context.colors.textPrimary,
                           ),

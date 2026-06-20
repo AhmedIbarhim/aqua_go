@@ -112,7 +112,7 @@ class _ComplaintImageFieldState extends State<ComplaintImageField> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              LocaleKeys.bookings_add_image.tr(),
+                              LocaleKeys.bookings_add_image.tr(context: context),
                               style: AppTextStyles.medium12,
                             ),
                           ],

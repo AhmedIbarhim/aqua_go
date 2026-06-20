@@ -57,9 +57,9 @@ class _EmailOtpContentState extends State<EmailOtpContent> {
   String get _displayError {
     if (_errorMessage == null) return '';
     if (_isExpiredError) {
-      return LocaleKeys.auth_otp_expired_message.tr();
+      return LocaleKeys.auth_otp_expired_message.tr(context: context);
     }
-    return LocaleKeys.auth_otp_invalid_message.tr();
+    return LocaleKeys.auth_otp_invalid_message.tr(context: context);
   }
 
   @override
@@ -115,7 +115,7 @@ class _EmailOtpContentState extends State<EmailOtpContent> {
           setState(() {
             _currentOtpSessionId = state.otpSessionId;
           });
-          context.showSuccessSnackBar(LocaleKeys.auth_otp_code_sent.tr());
+          context.showSuccessSnackBar(LocaleKeys.auth_otp_code_sent.tr(context: context));
         } else if (state is LoginSuccess) {
           if (state.user.name == null || state.user.name!.isEmpty) {
             context.pushNamedAndRemoveUntil(
@@ -164,7 +164,7 @@ class _EmailOtpContentState extends State<EmailOtpContent> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  LocaleKeys.auth_verify_email.tr(),
+                  LocaleKeys.auth_verify_email.tr(context: context),
                   style: AppTextStyles.semiBold24.copyWith(
                     color: darkAppColors.textPrimary,
                   ),
@@ -174,7 +174,7 @@ class _EmailOtpContentState extends State<EmailOtpContent> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
-                      LocaleKeys.auth_enter_verification_code.tr(),
+                      LocaleKeys.auth_enter_verification_code.tr(context: context),
                       style: AppTextStyles.regular16.copyWith(
                         color: darkAppColors.textSecondary,
                       ),
@@ -217,7 +217,7 @@ class _EmailOtpContentState extends State<EmailOtpContent> {
                 ],
                 SizedBox(height: height * 0.03),
                 CustomButton(
-                  text: LocaleKeys.auth_verify.tr(),
+                  text: LocaleKeys.auth_verify.tr(context: context),
                   onPressed:
                       _isOtpComplete &&
                           _currentOtpSessionId != null &&
@@ -251,7 +251,7 @@ class _EmailOtpContentState extends State<EmailOtpContent> {
                             );
                           },
                           child: Text(
-                            LocaleKeys.auth_resend_code_button.tr(),
+                            LocaleKeys.auth_resend_code_button.tr(context: context),
                             style: AppTextStyles.regular16.copyWith(
                               color: context.colors.primary,
                             ),
@@ -261,7 +261,7 @@ class _EmailOtpContentState extends State<EmailOtpContent> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              LocaleKeys.auth_resend_code.tr(),
+                              LocaleKeys.auth_resend_code.tr(context: context),
                               style: AppTextStyles.regular16.copyWith(
                                 color: darkAppColors.contentSecondaryLight,
                               ),

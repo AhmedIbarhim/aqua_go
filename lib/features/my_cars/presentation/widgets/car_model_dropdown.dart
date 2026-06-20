@@ -95,7 +95,7 @@ class _CarModelDropdownState extends State<CarModelDropdown> {
                   ),
                 ),
                 Text(
-                  LocaleKeys.my_cars_model.tr(),
+                  LocaleKeys.my_cars_model.tr(context: context),
                   style: AppTextStyles.medium14.copyWith(
                     color: context.colors.textPrimary,
                   ),
@@ -110,7 +110,7 @@ class _CarModelDropdownState extends State<CarModelDropdown> {
                       final myCarsCubit = context.read<MyCarsCubit>();
                       CustomBottomSheet.show(
                         context: context,
-                        title: LocaleKeys.my_cars_model.tr(),
+                        title: LocaleKeys.my_cars_model.tr(context: context),
                         child: BlocProvider<MyCarsCubit>.value(
                           value: myCarsCubit,
                           child: ConstrainedBox(
@@ -218,7 +218,7 @@ class _CarModelDropdownState extends State<CarModelDropdown> {
                   children: [
                     Expanded(
                       child: Text(
-                        currentDisplayValue ?? LocaleKeys.select_here.tr(),
+                        currentDisplayValue ?? LocaleKeys.select_here.tr(context: context),
                         style: AppTextStyles.regular14.copyWith(
                           color: currentDisplayValue == null
                               ? context.colors.contentDisabled

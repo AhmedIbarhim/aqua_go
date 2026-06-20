@@ -1,4 +1,5 @@
 import 'package:aqua_go/core/constants.dart';
+import 'package:flutter/material.dart';
 
 import '../../../../core/config/local_storage/shared_prefs.dart';
 import '../../../../core/helpers/car_color_helper.dart';
@@ -33,7 +34,9 @@ class MyCarModel {
   // Getter for make name
   String get make {
     if (carMake == null) return '';
-    final isArabic = CacheClient.getString(kLanguage, defaultValue: kArabicLang) == kArabicLang;
+    final isArabic =
+        CacheClient.getString(kLanguage, defaultValue: kArabicLang) ==
+        kArabicLang;
     return isArabic
         ? carMake!.vehicleMakeName.nameAr
         : carMake!.vehicleMakeName.nameEn;
@@ -42,7 +45,9 @@ class MyCarModel {
   // Getter for model name
   String get model {
     if (carModel == null) return '';
-    final isArabic = CacheClient.getString(kLanguage, defaultValue: kArabicLang) == kArabicLang;
+    final isArabic =
+        CacheClient.getString(kLanguage, defaultValue: kArabicLang) ==
+        kArabicLang;
     return isArabic
         ? carModel!.vehicleModelName.nameAr
         : carModel!.vehicleModelName.nameEn;
@@ -70,7 +75,8 @@ class MyCarModel {
     }
   }
 
-  String get colorName => getLocalizedColorName(colorCode);
+  String colorName(BuildContext context) =>
+      getLocalizedColorName(colorCode, context);
 
   factory MyCarModel.fromJson(
     Map<String, dynamic> json, {

@@ -215,7 +215,7 @@ class _NewAddressMapViewState extends State<NewAddressMapView> {
                       ),
                       decoration: BoxDecoration(color: context.colors.screenBG),
                       child: CustomButton(
-                        text: LocaleKeys.proceed.tr(),
+                        text: LocaleKeys.proceed.tr(context: context),
                         onPressed: () {
                           _addAddress(context, state);
                         },

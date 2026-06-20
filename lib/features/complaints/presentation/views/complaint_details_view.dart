@@ -45,7 +45,7 @@ class ComplaintDetailsView extends StatelessWidget {
         borderRadius: BorderRadius.circular(sw(16)),
       ),
       child: Text(
-        status.translationKey.tr(),
+        status.translationKey.tr(context: context),
         style: AppTextStyles.regular14.copyWith(
           color: status.getTextColor(context),
           fontWeight: FontWeight.bold,
@@ -80,7 +80,7 @@ class ComplaintDetailsView extends StatelessWidget {
         return Scaffold(
           backgroundColor: context.colors.screenBG,
           appBar: GenericAppBar(
-            title: LocaleKeys.bookings_complaint_details.tr(),
+            title: LocaleKeys.bookings_complaint_details.tr(context: context),
             trailing: complaint != null
                 ? _buildStatusBadge(context, status)
                 : null,
@@ -138,7 +138,7 @@ class ComplaintDetailsView extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  LocaleKeys.complaint_resolution_note.tr(),
+                                  LocaleKeys.complaint_resolution_note.tr(context: context),
                                   style: AppTextStyles.medium14,
                                 ),
                                 const SizedBox(height: 8),
@@ -167,7 +167,7 @@ class ComplaintDetailsView extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  LocaleKeys.complaint_rejection_reason.tr(),
+                                  LocaleKeys.complaint_rejection_reason.tr(context: context),
                                   style: AppTextStyles.medium14,
                                 ),
                                 const SizedBox(height: 8),

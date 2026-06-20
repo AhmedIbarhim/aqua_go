@@ -35,7 +35,7 @@ class PhoneOtpView extends StatelessWidget {
             context.hideLoadingOverlay();
             if (state is LoginSuccess) {
               context.showSuccessSnackBar(
-                LocaleKeys.snackbar_login_success.tr(),
+                LocaleKeys.snackbar_login_success.tr(context: context),
               );
             }
           }

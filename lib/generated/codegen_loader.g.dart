@@ -384,7 +384,16 @@ class CodegenLoader extends AssetLoader{
     "booking_rescheduled": "Booking updated successfully"
   },
   "errors": {
-    "internal_error": "The site is currently under maintenance, we will be back soon"
+    "internal_error": "The site is currently under maintenance, we will be back soon",
+    "max_active_subscriptions_exceeded": "You've reached the maximum number of active subscriptions for this package.",
+    "package_not_active": "This package is no longer available.",
+    "subscription_payment_declined": "Payment was declined. Please try another card.",
+    "subscription_allowance_concurrently_exhausted": "No remaining washes in this subscription.",
+    "subscription_not_cancellable": "This subscription can't be cancelled.",
+    "subscription_not_found": "Subscription not found.",
+    "subscription_package_not_found": "Package not found.",
+    "invalid_subscription_schedule": "The selected schedule isn't valid.",
+    "wash_schedule_not_allowed": "Scheduling this wash isn't allowed."
   }
 };
 static const Map<String,dynamic> _ar = {
@@ -757,7 +766,16 @@ static const Map<String,dynamic> _ar = {
     "booking_rescheduled": "تم تعديل الحجز بنجاح"
   },
   "errors": {
-    "internal_error": "الموقع قيد الصيانة، سنعود قريباً"
+    "internal_error": "الموقع قيد الصيانة، سنعود قريباً",
+    "max_active_subscriptions_exceeded": "لقد وصلت إلى الحد الأقصى لعدد الاشتراكات النشطة لهذه الباقة.",
+    "package_not_active": "هذه الباقة لم تعد متاحة.",
+    "subscription_payment_declined": "تم رفض عملية الدفع. يرجى المحاولة ببطاقة أخرى.",
+    "subscription_allowance_concurrently_exhausted": "لا توجد غسلات متبقية في هذا الاشتراك.",
+    "subscription_not_cancellable": "لا يمكن إلغاء هذا الاشتراك.",
+    "subscription_not_found": "لم يتم العثور على الاشتراك.",
+    "subscription_package_not_found": "لم يتم العثور على الباقة.",
+    "invalid_subscription_schedule": "الموعد المحدد غير صالح.",
+    "wash_schedule_not_allowed": "لا يمكن جدولة هذه الغسلة."
   }
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"en": _en, "ar": _ar};

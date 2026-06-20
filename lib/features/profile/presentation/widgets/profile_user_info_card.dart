@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
+import 'package:aqua_go/core/config/session/session_state.dart';
 import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/core/helpers/fetch_user_data_helper.dart';
 import 'package:aqua_go/core/themes/app_text_styles.dart';
@@ -18,7 +19,9 @@ class ProfileUserInfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     double sw(double width) => context.sw(width);
 
-    return GestureDetector(
+    return ValueListenableBuilder(
+      valueListenable: currentUser,
+      builder: (context, user, _) => GestureDetector(
       onTap: onTap,
       child: Container(
         padding: EdgeInsets.all(sw(12)),
@@ -54,7 +57,7 @@ class ProfileUserInfoCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    FetchUserData.getUserName(),
+                    user?.name ?? FetchUserData.getUserName(),
                     style: AppTextStyles.regular14.copyWith(
                       color: context.colors.textPrimary,
                     ),
@@ -64,7 +67,7 @@ class ProfileUserInfoCard extends StatelessWidget {
                       RatingWidget(rating: FetchUserData.getUserRating()),
                       SizedBox(width: sw(4)),
                       Text(
-                        FetchUserData.isGuest()
+                        user == null
                             ? ""
                             : FetchUserData.getUserRating() == 0
                             ? ""
@@ -81,6 +84,7 @@ class ProfileUserInfoCard extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 }

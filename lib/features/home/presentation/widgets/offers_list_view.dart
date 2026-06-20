@@ -37,7 +37,7 @@ class _OffersListViewState extends State<OffersListView> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                LocaleKeys.home_best_offers.tr(),
+                LocaleKeys.home_best_offers.tr(context: context),
                 style: !context.isTablet
                     ? AppTextStyles.bold16
                     : AppTextStyles.bold18,
@@ -53,7 +53,7 @@ class _OffersListViewState extends State<OffersListView> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      LocaleKeys.home_view_more.tr(),
+                      LocaleKeys.home_view_more.tr(context: context),
                       style: AppTextStyles.regular12.copyWith(
                         color: context.colors.primary,
                       ),

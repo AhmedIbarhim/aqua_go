@@ -14,7 +14,7 @@ class AboutUsView extends StatelessWidget {
     return Scaffold(
       backgroundColor: context.colors.screenBG,
       appBar: GenericAppBar(
-        title: LocaleKeys.about_title.tr(),
+        title: LocaleKeys.about_title.tr(context: context),
         centerTitle: true,
       ),
       body: Column(
@@ -37,7 +37,7 @@ class AboutUsView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      LocaleKeys.about_intro_title.tr(),
+                      LocaleKeys.about_intro_title.tr(context: context),
                       style: AppTextStyles.medium16.copyWith(
                         color: context.colors.textPrimary,
                         height: 1.5,
@@ -45,7 +45,7 @@ class AboutUsView extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      LocaleKeys.about_intro_p1.tr(),
+                      LocaleKeys.about_intro_p1.tr(context: context),
                       style: AppTextStyles.regular16.copyWith(
                         color: context.colors.textSecondary,
                         height: 1.6,
@@ -53,7 +53,7 @@ class AboutUsView extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      LocaleKeys.about_intro_p2.tr(),
+                      LocaleKeys.about_intro_p2.tr(context: context),
                       style: AppTextStyles.regular16.copyWith(
                         color: context.colors.textSecondary,
                         height: 1.6,
@@ -61,7 +61,7 @@ class AboutUsView extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      LocaleKeys.about_intro_p3.tr(),
+                      LocaleKeys.about_intro_p3.tr(context: context),
                       style: AppTextStyles.regular16.copyWith(
                         color: context.colors.textSecondary,
                         height: 1.6,
@@ -69,7 +69,7 @@ class AboutUsView extends StatelessWidget {
                     ),
                     const SizedBox(height: 24),
                     Text(
-                      LocaleKeys.about_features_title.tr(),
+                      LocaleKeys.about_features_title.tr(context: context),
                       style: AppTextStyles.medium16.copyWith(
                         color: context.colors.textPrimary,
                         height: 1.5,
@@ -97,7 +97,7 @@ class AboutUsView extends StatelessWidget {
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
-                                key.tr(),
+                                key.tr(context: context),
                                 style: AppTextStyles.regular16.copyWith(
                                   color: context.colors.textSecondary,
                                   height: 1.5,
@@ -115,7 +115,7 @@ class AboutUsView extends StatelessWidget {
                         fit: BoxFit.scaleDown,
                         alignment: Alignment.center,
                         child: Text(
-                          LocaleKeys.about_footer.tr(),
+                          LocaleKeys.about_footer.tr(context: context),
                           style: AppTextStyles.medium16.copyWith(
                             color: context.colors.primary,
                             height: 1.5,

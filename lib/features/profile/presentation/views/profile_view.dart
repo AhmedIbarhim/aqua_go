@@ -8,6 +8,7 @@ import 'package:aqua_go/core/config/di/service_locator.dart';
 import 'package:aqua_go/features/auth/presentation/controllers/auth_cubit/auth_cubit.dart';
 
 import '../../../auth/data/repos/auth_repository.dart';
+import '../../../../core/config/session/session_state.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/helpers/fetch_user_data_helper.dart';
 import '../../../../core/route/routes.dart';
@@ -45,7 +46,7 @@ class _ProfileViewState extends State<ProfileView> {
             context.pushNamedAndRemoveUntil(Routes.login);
           } else if (state is ProfileUpdateSuccess) {
             context.showSuccessSnackBar(
-              LocaleKeys.snackbar_profile_updated_success.tr(),
+              LocaleKeys.snackbar_profile_updated_success.tr(context: context),
             );
             locator<AuthRepository>().getUser();
           } else if (state is ProfileUpdateError) {
@@ -56,6 +57,10 @@ class _ProfileViewState extends State<ProfileView> {
         },
         child: Builder(
           builder: (context) {
+            return ValueListenableBuilder(
+              valueListenable: currentUser,
+              builder: (context, user, _) {
+            final isGuest = user == null;
             return SingleChildScrollView(
               child: Column(
                 children: [
@@ -65,12 +70,12 @@ class _ProfileViewState extends State<ProfileView> {
                   SizedBox(height: sh(16)),
                   // Name
                   Text(
-                    FetchUserData.getUserName(),
+                    user?.name ?? FetchUserData.getUserName(),
                     style: AppTextStyles.bold23.copyWith(
                       color: context.colors.textPrimary,
                     ),
                   ),
-                  if (!FetchUserData.isGuest()) ...[
+                  if (!isGuest) ...[
                     SizedBox(height: sh(8)),
                     // Phone
                     Text(
@@ -102,7 +107,7 @@ class _ProfileViewState extends State<ProfileView> {
                       children: [
                         ProfileUserInfoCard(
                           onTap: () {
-                            if (FetchUserData.isGuest()) {
+                            if (isGuest) {
                               _promptGuestToLogin(context);
                             } else {
                               context.pushNamed(Routes.profileData).then((_) {
@@ -114,21 +119,21 @@ class _ProfileViewState extends State<ProfileView> {
                         SizedBox(height: sh(24)),
 
                         _buildSectionTitle(
-                          LocaleKeys.profile_account_info.tr(),
+                          LocaleKeys.profile_account_info.tr(context: context),
                           context,
                         ),
                         SizedBox(height: sh(8)),
                         ProfileTile(
                           title: FetchUserData.isGuest()
-                              ? LocaleKeys.profile_add_email.tr()
+                              ? LocaleKeys.profile_add_email.tr(context: context)
                               : (FetchUserData.getEmail() ??
-                                    LocaleKeys.profile_add_email.tr()),
+                                    LocaleKeys.profile_add_email.tr(context: context)),
                           icon: AppAssets.mail,
                           isVerified:
                               !FetchUserData.isGuest() &&
                               FetchUserData.getEmail() != null,
                           onTap: () {
-                            if (FetchUserData.isGuest()) {
+                            if (isGuest) {
                               _promptGuestToLogin(context);
                             } else
                             // if (FetchUserData.getEmail() == null)
@@ -138,7 +143,7 @@ class _ProfileViewState extends State<ProfileView> {
                           },
                         ),
 
-                        if (!FetchUserData.isGuest()) ...[
+                        if (!isGuest) ...[
                           SizedBox(height: sh(8)),
                           ProfileTile(
                             title: FetchUserData.getPhone().replaceFirst(
@@ -152,10 +157,10 @@ class _ProfileViewState extends State<ProfileView> {
                         ],
                         SizedBox(height: sh(8)),
                         ProfileTile(
-                          title: LocaleKeys.profile_my_addresses.tr(),
+                          title: LocaleKeys.profile_my_addresses.tr(context: context),
                           icon: AppAssets.location,
                           onTap: () {
-                            if (FetchUserData.isGuest()) {
+                            if (isGuest) {
                               _promptGuestToLogin(context);
                             } else {
                               context.pushNamed(Routes.myAddresses);
@@ -165,10 +170,10 @@ class _ProfileViewState extends State<ProfileView> {
 
                         // SizedBox(height: sh(8)),
                         // ProfileTile(
-                        //   title: LocaleKeys.profile_my_wallet.tr(),
+                        //   title: LocaleKeys.profile_my_wallet.tr(context: context),
                         //   icon: AppAssets.wallet,
                         //   onTap: () {
-                        //     if (FetchUserData.isGuest()) {
+                        //     if (isGuest) {
                         //       _promptGuestToLogin(context);
                         //     }
                         //   },
@@ -176,10 +181,10 @@ class _ProfileViewState extends State<ProfileView> {
                         SizedBox(height: sh(8)),
 
                         ProfileTile(
-                          title: LocaleKeys.profile_my_packages.tr(),
+                          title: LocaleKeys.profile_my_packages.tr(context: context),
                           icon: AppAssets.packages,
                           onTap: () {
-                            if (FetchUserData.isGuest()) {
+                            if (isGuest) {
                               _promptGuestToLogin(context);
                             } else {
                               context.pushNamed(Routes.mySubscribedPackages);
@@ -188,12 +193,12 @@ class _ProfileViewState extends State<ProfileView> {
                         ),
                         SizedBox(height: sh(24)),
                         _buildSectionTitle(
-                          LocaleKeys.profile_about_app.tr(),
+                          LocaleKeys.profile_about_app.tr(context: context),
                           context,
                         ),
                         SizedBox(height: sh(8)),
                         ProfileTile(
-                          title: LocaleKeys.profile_about_us.tr(),
+                          title: LocaleKeys.profile_about_us.tr(context: context),
                           icon: AppAssets.aboutUs,
                           onTap: () {
                             context.pushNamed(Routes.aboutUs);
@@ -201,7 +206,7 @@ class _ProfileViewState extends State<ProfileView> {
                         ),
                         SizedBox(height: sh(8)),
                         ProfileTile(
-                          title: LocaleKeys.profile_settings.tr(),
+                          title: LocaleKeys.profile_settings.tr(context: context),
                           icon: AppAssets.settings,
                           onTap: () {
                             context.pushNamed(Routes.settings);
@@ -209,7 +214,7 @@ class _ProfileViewState extends State<ProfileView> {
                         ),
                         SizedBox(height: sh(8)),
                         ProfileTile(
-                          title: LocaleKeys.profile_technical_support.tr(),
+                          title: LocaleKeys.profile_technical_support.tr(context: context),
                           icon: AppAssets.support,
                           onTap: () {
                             context.pushNamed(Routes.support);
@@ -219,8 +224,8 @@ class _ProfileViewState extends State<ProfileView> {
                         ProfileTile(
                           alreadyColoredIcon: true,
                           title: FetchUserData.isGuest()
-                              ? LocaleKeys.auth_login.tr()
-                              : LocaleKeys.auth_logout.tr(),
+                              ? LocaleKeys.auth_login.tr(context: context)
+                              : LocaleKeys.auth_logout.tr(context: context),
                           icon: FetchUserData.isGuest()
                               ? AppAssets.login
                               : AppAssets.logout,
@@ -228,7 +233,7 @@ class _ProfileViewState extends State<ProfileView> {
                               ? context.colors.success
                               : context.colors.error,
                           onTap: () {
-                            if (FetchUserData.isGuest()) {
+                            if (isGuest) {
                               context.read<AuthCubit>().logout();
                             } else {
                               _logout(context);
@@ -242,6 +247,8 @@ class _ProfileViewState extends State<ProfileView> {
                   ),
                 ],
               ),
+            );
+              },
             );
           },
         ),
@@ -263,12 +270,12 @@ class _ProfileViewState extends State<ProfileView> {
   }
 
   void _logout(BuildContext context) {
-    if (FetchUserData.isGuest()) {
+    if (currentUser.value == null) {
       context.read<AuthCubit>().logout();
     } else {
       context.showWarningAlert(
-        message: LocaleKeys.profile_confirm_logout.tr(),
-        primaryButtonText: LocaleKeys.auth_logout.tr(),
+        message: LocaleKeys.profile_confirm_logout.tr(context: context),
+        primaryButtonText: LocaleKeys.auth_logout.tr(context: context),
         onPrimaryPressed: () {
           context.read<AuthCubit>().logout();
           Navigator.pop(context);

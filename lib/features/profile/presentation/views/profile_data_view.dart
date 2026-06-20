@@ -95,10 +95,10 @@ class _ProfileDataViewState extends State<ProfileDataView> {
               backgroundColor: context.colors.screenBG,
               appBar: GenericAppBar(
                 title: widget.isFirstTime
-                    ? LocaleKeys.profile_complete_profile.tr()
+                    ? LocaleKeys.profile_complete_profile.tr(context: context)
                     : isEditing
-                    ? LocaleKeys.profile_edit_profile_data.tr()
-                    : LocaleKeys.profile_view_profile.tr(),
+                    ? LocaleKeys.profile_edit_profile_data.tr(context: context)
+                    : LocaleKeys.profile_view_profile.tr(context: context),
               ),
               body: Column(
                 children: [
@@ -118,7 +118,7 @@ class _ProfileDataViewState extends State<ProfileDataView> {
                         child: Column(
                           children: [
                             CustomTextField(
-                              label: LocaleKeys.profile_full_name.tr(),
+                              label: LocaleKeys.profile_full_name.tr(context: context),
                               hint: '',
                               controller: _nameController,
                               isRequired: isEditing,
@@ -134,7 +134,7 @@ class _ProfileDataViewState extends State<ProfileDataView> {
                             ),
                             const SizedBox(height: 24),
                             CustomTextField(
-                              label: LocaleKeys.profile_dob.tr(),
+                              label: LocaleKeys.profile_dob.tr(context: context),
                               hint: '',
                               controller: _dobController,
                               isRequired: isEditing,
@@ -230,7 +230,7 @@ class _ProfileDataViewState extends State<ProfileDataView> {
       ),
       child: widget.isFirstTime
           ? CustomButton(
-              text: LocaleKeys.proceed.tr(),
+              text: LocaleKeys.proceed.tr(context: context),
               enabled: _formIsValid(),
               onPressed: () {
                 final user = locator<AuthRepository>().getUser();
@@ -257,7 +257,7 @@ class _ProfileDataViewState extends State<ProfileDataView> {
                 Expanded(
                   flex: 2,
                   child: CustomButton(
-                    text: LocaleKeys.profile_save_changes.tr(),
+                    text: LocaleKeys.profile_save_changes.tr(context: context),
                     enabled: _formIsValid(),
                     onPressed: () {
                       final user = locator<AuthRepository>().getUser();
@@ -279,7 +279,7 @@ class _ProfileDataViewState extends State<ProfileDataView> {
                 Expanded(
                   flex: 1,
                   child: CustomButton(
-                    text: LocaleKeys.cancel.tr(),
+                    text: LocaleKeys.cancel.tr(context: context),
                     color: context.colors.background,
                     textColor: context.colors.primary,
                     onPressed: () => setState(() => isEditing = false),
@@ -288,7 +288,7 @@ class _ProfileDataViewState extends State<ProfileDataView> {
               ],
             )
           : CustomButton(
-              text: LocaleKeys.profile_edit_data.tr(),
+              text: LocaleKeys.profile_edit_data.tr(context: context),
               postWidget: SvgPicture.asset(
                 AppAssets.edit,
                 colorFilter: ColorFilter.mode(

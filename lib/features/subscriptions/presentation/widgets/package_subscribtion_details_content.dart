@@ -99,7 +99,7 @@ class PackageSubscribtionDetailsContent extends StatelessWidget {
               const SizedBox(height: 16),
 
               Text(
-                LocaleKeys.booking_package_price.tr(),
+                LocaleKeys.booking_package_price.tr(context: context),
                 style: AppTextStyles.regular14.copyWith(
                   color: context.colors.textSecondary,
                 ),
@@ -127,7 +127,7 @@ class PackageSubscribtionDetailsContent extends StatelessWidget {
 
         // Subscribe Button
         CustomButton(
-          text: LocaleKeys.booking_package_buy.tr(),
+          text: LocaleKeys.booking_package_buy.tr(context: context),
           onPressed: onBuy,
         ),
       ],

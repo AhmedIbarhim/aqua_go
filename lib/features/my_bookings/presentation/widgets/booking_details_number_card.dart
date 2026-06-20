@@ -23,7 +23,7 @@ class BookingDetailsNumberCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          LocaleKeys.bookings_booking_number.tr(),
+          LocaleKeys.bookings_booking_number.tr(context: context),
           style: AppTextStyles.regular16.copyWith(
             color: context.colors.textPrimary,
           ),

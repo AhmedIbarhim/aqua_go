@@ -21,7 +21,7 @@ class RatingBottomSheet extends StatefulWidget {
   static Future<void> show(BuildContext context, BookingResponseModel booking) {
     return CustomBottomSheet.show(
       context: context,
-      title: LocaleKeys.bookings_rate_service.tr(),
+      title: LocaleKeys.bookings_rate_service.tr(context: context),
       child: BlocProvider<RatingCubit>(
         create: (_) => locator<RatingCubit>(),
         child: RatingBottomSheet(booking: booking),
@@ -70,7 +70,7 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: width * 0.06),
             child: Text(
-              LocaleKeys.bookings_share_opinion.tr(),
+              LocaleKeys.bookings_share_opinion.tr(context: context),
               style: AppTextStyles.regular20.copyWith(
                 color: context.colors.textPrimary,
               ),
@@ -108,7 +108,7 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
                       reasons: _rating < 5 ? _selectedReasons : null,
                     );
                   },
-                  text: LocaleKeys.submit.tr(),
+                  text: LocaleKeys.submit.tr(context: context),
                 ),
               ),
               SizedBox(width: width * 0.02),
@@ -117,7 +117,7 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
                 flex: 1,
                 child: CustomButton(
                   onPressed: () => Navigator.pop(context),
-                  text: LocaleKeys.cancel.tr(),
+                  text: LocaleKeys.cancel.tr(context: context),
                   color: Colors.transparent,
                   textColor: context.colors.primary,
                   borderColor: context.colors.borderSecondary,
@@ -183,7 +183,7 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          LocaleKeys.bookings_your_biker.tr(),
+          LocaleKeys.bookings_your_biker.tr(context: context),
           style: AppTextStyles.regular14.copyWith(
             color: context.colors.textPrimary,
           ),
@@ -252,7 +252,7 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          LocaleKeys.bookings_rating_reason.tr(),
+          LocaleKeys.bookings_rating_reason.tr(context: context),
           style: AppTextStyles.regular14.copyWith(
             color: context.colors.textPrimary,
           ),

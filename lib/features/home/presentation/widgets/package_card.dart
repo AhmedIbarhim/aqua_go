@@ -9,6 +9,7 @@ import '../../../../generated/locale_keys.g.dart';
 import '../../../subscriptions/presentation/widgets/package_subscribtion_bottom_sheet.dart';
 import '../../data/models/package_model.dart';
 
+import '../../../../core/config/session/session_state.dart';
 import '../../../../core/helpers/fetch_user_data_helper.dart';
 
 class PackageCard extends StatelessWidget {
@@ -25,9 +26,11 @@ class PackageCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
     final height = MediaQuery.sizeOf(context).height;
-    return GestureDetector(
+    return ValueListenableBuilder(
+      valueListenable: currentUser,
+      builder: (context, user, _) => GestureDetector(
       onTap: () {
-        if (FetchUserData.isGuest()) {
+        if (user == null) {
           FetchUserData.promptGuestToLogin(context);
         } else {
           PackageSubscribtionBottomSheet.show(
@@ -116,7 +119,7 @@ class PackageCard extends StatelessWidget {
                               borderRadius: BorderRadius.circular(100),
                             ),
                             child: Text(
-                              '${LocaleKeys.duration.tr()}: ${packageModel.duration}',
+                              '${LocaleKeys.duration.tr(context: context)}: ${packageModel.duration}',
                               style: AppTextStyles.medium10,
                             ),
                           ),
@@ -193,6 +196,7 @@ class PackageCard extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
   }
 }

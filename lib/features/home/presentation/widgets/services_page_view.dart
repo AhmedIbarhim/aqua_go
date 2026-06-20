@@ -45,7 +45,7 @@ class _ServicesPageViewState extends State<ServicesPageView> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Text(
-                LocaleKeys.home_services.tr(),
+                LocaleKeys.home_services.tr(context: context),
                 style: !context.isTablet
                     ? AppTextStyles.bold16
                     : AppTextStyles.bold18,

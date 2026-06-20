@@ -41,7 +41,7 @@ class BookingDetailsVehicleCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          LocaleKeys.bookings_car.tr(),
+          LocaleKeys.bookings_car.tr(context: context),
           style: AppTextStyles.regular16.copyWith(
             color: context.colors.textPrimary,
           ),

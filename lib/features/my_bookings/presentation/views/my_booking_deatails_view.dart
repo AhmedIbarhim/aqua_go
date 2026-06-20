@@ -72,7 +72,7 @@ class MyBookingDetailsView extends StatelessWidget {
           child: Scaffold(
             backgroundColor: context.colors.screenBG,
             appBar: GenericAppBar(
-              title: LocaleKeys.bookings_booking_details.tr(),
+              title: LocaleKeys.bookings_booking_details.tr(context: context),
               automaticallyImplyLeading: !isFromBookingFlow,
               actions: [
                 if (isFromBookingFlow)
@@ -204,7 +204,7 @@ class MyBookingDetailsView extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             CustomButton(
-              text: LocaleKeys.retry.tr(),
+              text: LocaleKeys.retry.tr(context: context),
               onPressed: () {
                 context
                     .read<MyBookingDetailsCubit>()
@@ -264,7 +264,7 @@ class MyBookingDetailsView extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              LocaleKeys.bookings_go_to_invoice_list.tr(),
+              LocaleKeys.bookings_go_to_invoice_list.tr(context: context),
               style: AppTextStyles.medium14.copyWith(
                 color: context.colors.primary,
               ),
@@ -283,7 +283,7 @@ class MyBookingDetailsView extends StatelessWidget {
   Widget _buildActionSheet(BuildContext context, BookingResponseModel booking) {
     return BottomActionSheetContainer(
       child: CustomButton(
-        text: LocaleKeys.bookings_edit_booking.tr(),
+        text: LocaleKeys.bookings_edit_booking.tr(context: context),
         postWidget: SvgPicture.asset(
           AppAssets.edit,
           width: 24,

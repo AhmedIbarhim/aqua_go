@@ -20,7 +20,7 @@ class PrivacyPolicyView extends StatelessWidget {
     return Scaffold(
       backgroundColor: context.colors.screenBG,
       appBar: GenericAppBar(
-        title: LocaleKeys.privacy_title.tr(),
+        title: LocaleKeys.privacy_title.tr(context: context),
         centerTitle: true,
       ),
       body: BlocProvider(
@@ -48,7 +48,7 @@ class PrivacyPolicyView extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        LocaleKeys.privacy_intro.tr(),
+                        LocaleKeys.privacy_intro.tr(context: context),
                         style: AppTextStyles.regular14.copyWith(
                           color: context.colors.textSecondary,
                           height: 1.5,
@@ -65,7 +65,7 @@ class PrivacyPolicyView extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              titleKey.tr(),
+                              titleKey.tr(context: context),
                               style: AppTextStyles.medium16.copyWith(
                                 color: context.colors.textPrimary,
                                 height: 1.5,
@@ -73,7 +73,7 @@ class PrivacyPolicyView extends StatelessWidget {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              contentKey.tr(),
+                              contentKey.tr(context: context),
                               style: AppTextStyles.regular16.copyWith(
                                 color: context.colors.textSecondary,
                                 height: 1.5,
@@ -85,7 +85,7 @@ class PrivacyPolicyView extends StatelessWidget {
                       }),
                       const SizedBox(height: 24),
                       Text(
-                        LocaleKeys.privacy_footer.tr(),
+                        LocaleKeys.privacy_footer.tr(context: context),
                         style: AppTextStyles.medium16.copyWith(height: 1.5),
                       ),
                       const SizedBox(height: 48),
@@ -102,23 +102,23 @@ class PrivacyPolicyView extends StatelessWidget {
                           }
                           if (state is DeleteAccountSuccess) {
                             context.showWarningSnackBar(
-                              LocaleKeys.auth_delete_account_success.tr(),
+                              LocaleKeys.auth_delete_account_success.tr(context: context),
                             );
                             context.pushNamedAndRemoveUntil(Routes.onboarding);
                           }
                         },
                         builder: (context, state) {
                           return CustomButton(
-                            text: LocaleKeys.auth_delete_account.tr(),
+                            text: LocaleKeys.auth_delete_account.tr(context: context),
                             color: context.colors.error,
                             textColor: lightAppColors.themeColor,
                             borderColor: context.colors.error,
                             onPressed: () {
                               context.showWarningAlert(
-                                title: LocaleKeys.auth_delete_account.tr(),
+                                title: LocaleKeys.auth_delete_account.tr(context: context),
                                 message: LocaleKeys
                                     .auth_delete_account_confirmation
-                                    .tr(),
+                                    .tr(context: context),
                                 onPrimaryPressed: () {
                                   context.read<AuthCubit>().deleteAccount();
                                 },

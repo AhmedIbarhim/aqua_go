@@ -1,4 +1,5 @@
 import 'package:aqua_go/core/config/di/service_locator.dart';
+import 'package:aqua_go/core/config/session/session_state.dart';
 import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:aqua_go/features/auth/data/models/user_model.dart';
 import 'package:aqua_go/features/auth/data/repos/auth_repository.dart';
@@ -59,17 +60,19 @@ class FetchUserData {
   }
 
   static bool isGuest() {
-    return getUser() == null;
+    // Prefer the reactive notifier so callers that read this synchronously
+    // inside build() reflect the latest auth state without a restart.
+    return currentUser.value == null && getUser() == null;
   }
 
   static void promptGuestToLogin(BuildContext context) {
     context.showWarningAlert(
-      title: LocaleKeys.auth_login.tr(),
+      title: LocaleKeys.auth_login.tr(context: context),
       iconPath: AppAssets.loginAlert,
       message: context.isAr
           ? "يرجى تسجيل الدخول للوصول إلى هذه الميزة"
           : "Please log in to access this feature",
-      primaryButtonText: LocaleKeys.auth_login.tr(),
+      primaryButtonText: LocaleKeys.auth_login.tr(context: context),
       mainButtonColor: context.colors.primary,
       mainButtonTextColor: context.colors.themeColor,
       onPrimaryPressed: () {
@@ -81,7 +84,7 @@ class FetchUserData {
           );
         });
       },
-      secondaryButtonText: LocaleKeys.cancel.tr(),
+      secondaryButtonText: LocaleKeys.cancel.tr(context: context),
       onSecondaryPressed: () {
         Navigator.pop(context);
       },

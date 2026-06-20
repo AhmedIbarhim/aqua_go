@@ -1,10 +1,11 @@
 import 'package:dio/dio.dart';
-import 'package:aqua_go/core/config/local_storage/shared_prefs.dart';
 import 'package:aqua_go/core/config/local_storage/secure_storage.dart';
+import 'package:aqua_go/core/config/di/service_locator.dart';
 import 'package:aqua_go/core/constants.dart';
 import 'package:aqua_go/core/route/app_router.dart';
 import 'package:aqua_go/core/route/routes.dart';
 import 'package:aqua_go/core/config/networking/endpoints.dart';
+import 'package:aqua_go/features/auth/data/repos/auth_repository.dart';
 
 class RefreshTokenInterceptor extends Interceptor {
   final Dio dio;
@@ -130,10 +131,8 @@ class RefreshTokenInterceptor extends Interceptor {
   /// Wipes all local credentials and navigates to the login screen
   /// without requiring a BuildContext.
   Future<void> _clearSessionAndRedirect() async {
-    // Always guarantee that local cache is wiped first and awaited by all parallel callers
-    await SecureStorage.deleteSecuredString(kAccessToken);
-    await SecureStorage.deleteSecuredString(kRefreshToken);
-    await CacheClient.removeString(kUserData);
+    // purgeLocalSession clears _cachedUser + currentUser notifier + tokens.
+    await locator<AuthRepository>().purgeLocalSession();
 
     if (_isRedirecting) return;
     _isRedirecting = true;
@@ -143,8 +142,7 @@ class RefreshTokenInterceptor extends Interceptor {
       (route) => false,
     );
 
-    // Future.delayed(const Duration(seconds: 2), () {
-    //   _isRedirecting = false;
-    // });
+    // Reset so a subsequent expiry (after re-login) can redirect again.
+    _isRedirecting = false;
   }
 }

@@ -64,7 +64,7 @@ class BookingDetailsView extends StatelessWidget {
 
             if (state.status == BookingStatus.success) {
               context.showSuccessSnackBar(
-                LocaleKeys.bookings_reschedule_success.tr(),
+                LocaleKeys.bookings_reschedule_success.tr(context: context),
               );
               Navigator.popUntil(context, (route) => route.isFirst);
               if (state.createdBooking != null) {
@@ -89,8 +89,8 @@ class BookingDetailsView extends StatelessWidget {
             backgroundColor: context.colors.background,
             appBar: GenericAppBar(
               title: bookingState.flowConfig.isReschedule
-                  ? LocaleKeys.bookings_reschedule_booking.tr()
-                  : LocaleKeys.bookings_booking_details.tr(),
+                  ? LocaleKeys.bookings_reschedule_booking.tr(context: context)
+                  : LocaleKeys.bookings_booking_details.tr(context: context),
               hasBackground: true,
               backgroundImage: AppAssets.bookingHeaderImage,
               centerTitle: true,
@@ -131,7 +131,7 @@ class BookingDetailsView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildSectionTitle(
-            LocaleKeys.bookings_choose_car.tr(),
+            LocaleKeys.bookings_choose_car.tr(context: context),
             isRequired: true,
           ),
           SizedBox(height: height * 0.02),
@@ -195,7 +195,7 @@ class BookingDetailsView extends StatelessWidget {
               bookingState.selectedService != null &&
               bookingState.selectedService!.addons.isNotEmpty) ...[
             SizedBox(height: height * 0.03),
-            _buildSectionTitle(LocaleKeys.bookings_additional_services.tr()),
+            _buildSectionTitle(LocaleKeys.bookings_additional_services.tr(context: context)),
             SizedBox(height: height * 0.02),
             AddOnsGrid(
               addons: bookingState.selectedService?.addons ?? [],
@@ -257,7 +257,7 @@ class BookingDetailsView extends StatelessWidget {
     if (!config.showSummaryStep) {
       return BottomActionSheetContainer(
         child: CustomButton(
-          text: LocaleKeys.bookings_confirm_reschedule.tr(),
+          text: LocaleKeys.bookings_confirm_reschedule.tr(context: context),
           enabled: isComplete,
           onPressed: isComplete
               ? () {
@@ -287,7 +287,7 @@ class BookingDetailsView extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  LocaleKeys.bookings_total.tr(),
+                  LocaleKeys.bookings_total.tr(context: context),
                   style: AppTextStyles.regular14.copyWith(
                     color: context.colors.textSecondary,
                   ),
@@ -306,7 +306,7 @@ class BookingDetailsView extends StatelessWidget {
               ],
             ),
           CustomButton(
-            text: LocaleKeys.bookings_book_now.tr(),
+            text: LocaleKeys.bookings_book_now.tr(context: context),
             enabled: isComplete,
             onPressed: isComplete
                 ? () async {

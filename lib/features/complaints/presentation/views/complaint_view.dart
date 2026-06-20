@@ -50,7 +50,7 @@ class _ComplaintViewState extends State<ComplaintView> {
   void _showComplainTypes() {
     CustomBottomSheet.show(
       context: context,
-      title: LocaleKeys.bookings_select_complaint_type.tr(),
+      title: LocaleKeys.bookings_select_complaint_type.tr(context: context),
       child: ComplaintTypes(
         initialValue: _typeController.text,
         onSelected: (value) {
@@ -76,7 +76,7 @@ class _ComplaintViewState extends State<ComplaintView> {
 
         if (state is ComplaintSubmitSuccess) {
           context.showSuccessSnackBar(
-            LocaleKeys.bookings_complaint_submitted.tr(),
+            LocaleKeys.bookings_complaint_submitted.tr(context: context),
           );
           Navigator.pop(context, true);
         } else if (state is ComplaintSubmitFailure) {
@@ -86,7 +86,7 @@ class _ComplaintViewState extends State<ComplaintView> {
       child: Scaffold(
         backgroundColor: context.colors.screenBG,
         appBar: GenericAppBar(
-          title: LocaleKeys.bookings_submit_complaint.tr(),
+          title: LocaleKeys.bookings_submit_complaint.tr(context: context),
           centerTitle: true,
         ),
         body: Column(
@@ -103,8 +103,8 @@ class _ComplaintViewState extends State<ComplaintView> {
                       onTap: _showComplainTypes,
                       child: AbsorbPointer(
                         child: CustomTextField(
-                          label: LocaleKeys.bookings_complaint_type.tr(),
-                          hint: LocaleKeys.select_here.tr(),
+                          label: LocaleKeys.bookings_complaint_type.tr(context: context),
+                          hint: LocaleKeys.select_here.tr(context: context),
                           controller: _typeController,
                           isRequired: true,
                         ),
@@ -137,7 +137,7 @@ class _ComplaintViewState extends State<ComplaintView> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          LocaleKeys.bookings_booking_details.tr(),
+          LocaleKeys.bookings_booking_details.tr(context: context),
           style: AppTextStyles.regular16,
         ),
         const SizedBox(height: 8),
@@ -150,32 +150,32 @@ class _ComplaintViewState extends State<ComplaintView> {
           child: Column(
             children: [
               _buildDetailRow(
-                title: LocaleKeys.bookings_booking_number.tr(),
+                title: LocaleKeys.bookings_booking_number.tr(context: context),
                 value:
                     widget.booking.referenceNumber ?? '#${widget.booking.id}',
                 icon: AppAssets.note,
               ),
               const SizedBox(height: 12),
               _buildDetailRow(
-                title: LocaleKeys.bookings_service_name.tr(),
+                title: LocaleKeys.bookings_service_name.tr(context: context),
                 value: widget.booking.title,
                 icon: AppAssets.document,
               ),
               const SizedBox(height: 12),
               _buildDetailRow(
-                title: LocaleKeys.bookings_car_plate.tr(),
+                title: LocaleKeys.bookings_car_plate.tr(context: context),
                 value: widget.booking.plate ?? '',
                 icon: AppAssets.boardNum,
               ),
               const SizedBox(height: 12),
               _buildDetailRow(
-                title: LocaleKeys.bookings_date_and_time.tr(),
+                title: LocaleKeys.bookings_date_and_time.tr(context: context),
                 value: widget.booking.formattedDateTime,
                 icon: AppAssets.date,
               ),
               const SizedBox(height: 12),
               _buildDetailRow(
-                title: LocaleKeys.bookings_worker_name.tr(),
+                title: LocaleKeys.bookings_worker_name.tr(context: context),
                 value: widget.booking.assignedWorker?.displayName ?? '',
                 icon: AppAssets.personDisabled,
               ),
@@ -239,7 +239,7 @@ class _ComplaintViewState extends State<ComplaintView> {
               ),
             ),
             Text(
-              LocaleKeys.bookings_complaint_details.tr(),
+              LocaleKeys.bookings_complaint_details.tr(context: context),
               style: AppTextStyles.medium14,
             ),
           ],
@@ -254,7 +254,7 @@ class _ComplaintViewState extends State<ComplaintView> {
             color: context.colors.textPrimary,
           ),
           decoration: InputDecoration(
-            hintText: LocaleKeys.write_here.tr(),
+            hintText: LocaleKeys.write_here.tr(context: context),
             hintStyle: AppTextStyles.regular14.copyWith(
               color: context.colors.contentDisabled,
             ),
@@ -285,7 +285,7 @@ class _ComplaintViewState extends State<ComplaintView> {
           Expanded(
             flex: 2,
             child: CustomButton(
-              text: LocaleKeys.submit.tr(),
+              text: LocaleKeys.submit.tr(context: context),
               enabled:
                   _typeController.text.trim().isNotEmpty &&
                   _detailsController.text.trim().isNotEmpty,
@@ -311,7 +311,7 @@ class _ComplaintViewState extends State<ComplaintView> {
           Expanded(
             flex: 1,
             child: CustomButton(
-              text: LocaleKeys.cancel.tr(),
+              text: LocaleKeys.cancel.tr(context: context),
               color: Colors.transparent,
               textColor: context.colors.primary,
               borderColor: context.colors.borderSecondary,

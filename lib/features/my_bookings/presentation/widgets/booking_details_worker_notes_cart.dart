@@ -22,7 +22,7 @@ class BookingDetailsWorkerNotesCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          LocaleKeys.bookings_notes.tr(),
+          LocaleKeys.bookings_notes.tr(context: context),
           style: AppTextStyles.regular16.copyWith(
             color: context.colors.textPrimary,
           ),

@@ -53,7 +53,7 @@ class _CurrentPackageSectionState extends State<CurrentPackageSection> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                LocaleKeys.home_current_package.tr(),
+                LocaleKeys.home_current_package.tr(context: context),
                 style: !context.isTablet
                     ? AppTextStyles.bold16
                     : AppTextStyles.bold18,
@@ -66,7 +66,7 @@ class _CurrentPackageSectionState extends State<CurrentPackageSection> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      LocaleKeys.home_available_packages.tr(),
+                      LocaleKeys.home_available_packages.tr(context: context),
                       style: AppTextStyles.regular12.copyWith(
                         color: context.colors.primary,
                       ),

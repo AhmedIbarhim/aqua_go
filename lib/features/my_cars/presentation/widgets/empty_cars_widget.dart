@@ -23,12 +23,12 @@ class EmptyCarsWidget extends StatelessWidget {
           SvgPicture.asset(AppAssets.emptyCars),
           const SizedBox(height: 40),
           Text(
-            LocaleKeys.my_cars_empty_state.tr(),
+            LocaleKeys.my_cars_empty_state.tr(context: context),
             style: AppTextStyles.semiBold16,
           ),
           const SizedBox(height: 20),
           Text(
-            LocaleKeys.my_cars_empty_desc.tr(),
+            LocaleKeys.my_cars_empty_desc.tr(context: context),
             textAlign: TextAlign.center,
             style: AppTextStyles.regular14.copyWith(
               color: context.colors.textSecondary,
@@ -45,7 +45,7 @@ class EmptyCarsWidget extends StatelessWidget {
                   }
                 });
               },
-              text: LocaleKeys.my_cars_add_car.tr(),
+              text: LocaleKeys.my_cars_add_car.tr(context: context),
               preWidget: Icon(Icons.add),
             ),
           ),

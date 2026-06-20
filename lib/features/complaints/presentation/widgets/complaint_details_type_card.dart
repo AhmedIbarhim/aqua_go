@@ -17,13 +17,13 @@ class ComplaintDetailsTypeCard extends StatelessWidget {
     double sh(double height) => context.sh(height);
 
     final categoryEnum = ComplaintCategory.fromString(category);
-    final categoryText = categoryEnum.translationKey.tr();
+    final categoryText = categoryEnum.translationKey.tr(context: context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          LocaleKeys.bookings_complaint_type.tr(),
+          LocaleKeys.bookings_complaint_type.tr(context: context),
           style: AppTextStyles.medium14,
         ),
         const SizedBox(height: 8),

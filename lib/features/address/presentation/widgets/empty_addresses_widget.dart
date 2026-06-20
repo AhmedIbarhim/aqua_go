@@ -21,12 +21,12 @@ class EmptyAddressesWidget extends StatelessWidget {
             SvgPicture.asset(AppAssets.noAddresses),
             const SizedBox(height: 40),
             Text(
-              LocaleKeys.address_no_addresses.tr(),
+              LocaleKeys.address_no_addresses.tr(context: context),
               style: AppTextStyles.bold18,
             ),
             const SizedBox(height: 12),
             Text(
-              LocaleKeys.address_no_addresses_desc.tr(),
+              LocaleKeys.address_no_addresses_desc.tr(context: context),
               style: AppTextStyles.regular16.copyWith(
                 color: context.colors.textSecondary,
               ),

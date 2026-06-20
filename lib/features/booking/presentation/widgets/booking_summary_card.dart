@@ -32,28 +32,28 @@ class BookingSummaryCard extends StatelessWidget {
         children: [
           _buildSummaryRow(
             context,
-            label: LocaleKeys.bookings_service_name.tr(),
+            label: LocaleKeys.bookings_service_name.tr(context: context),
             value: serviceName,
             icon: AppAssets.document,
           ),
           const SizedBox(height: 8),
           _buildSummaryRow(
             context,
-            label: LocaleKeys.bookings_selected_car.tr(),
+            label: LocaleKeys.bookings_selected_car.tr(context: context),
             value: carName,
             icon: AppAssets.myCarsDisabled,
           ),
           const SizedBox(height: 8),
           _buildSummaryRow(
             context,
-            label: LocaleKeys.bookings_car_location.tr(),
+            label: LocaleKeys.bookings_car_location.tr(context: context),
             value: location,
             icon: AppAssets.location,
           ),
           const SizedBox(height: 8),
           _buildSummaryRow(
             context,
-            label: LocaleKeys.bookings_date_and_time.tr(),
+            label: LocaleKeys.bookings_date_and_time.tr(context: context),
             value: dateTime,
             icon: AppAssets.date,
           ),

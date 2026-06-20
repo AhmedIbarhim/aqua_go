@@ -17,7 +17,7 @@ class MyBookingProceduresBottomSheet extends StatelessWidget {
   static void show(BuildContext context, BookingResponseModel booking) {
     CustomBottomSheet.show(
       context: context,
-      title: LocaleKeys.bookings_booking_procedures.tr(),
+      title: LocaleKeys.bookings_booking_procedures.tr(context: context),
       child: MyBookingProceduresBottomSheet(booking: booking),
     );
   }
@@ -30,7 +30,7 @@ class MyBookingProceduresBottomSheet extends StatelessWidget {
       children: [
         _buildActionItem(
           context,
-          title: LocaleKeys.bookings_rate_service.tr(),
+          title: LocaleKeys.bookings_rate_service.tr(context: context),
           onTap: () {
             Navigator.pop(context);
             RatingBottomSheet.show(context, booking);
@@ -39,7 +39,7 @@ class MyBookingProceduresBottomSheet extends StatelessWidget {
         SizedBox(height: height * 0.015),
         _buildActionItem(
           context,
-          title: LocaleKeys.bookings_submit_complaint.tr(),
+          title: LocaleKeys.bookings_submit_complaint.tr(context: context),
           onTap: () {
             context.pushNamed(
               Routes.complain,

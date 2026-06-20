@@ -90,19 +90,19 @@ class _LoginContentState extends State<LoginContent> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    LocaleKeys.auth_login.tr(),
+                    LocaleKeys.auth_login.tr(context: context),
                     style: AppTextStyles.semiBold24,
                   ),
                   SizedBox(height: height * 0.01),
                   Text(
-                    LocaleKeys.auth_send_verification_code.tr(),
+                    LocaleKeys.auth_send_verification_code.tr(context: context),
                     style: AppTextStyles.regular16.copyWith(
                       color: darkAppColors.textSecondary,
                     ),
                   ),
                   SizedBox(height: height * 0.02),
                   Text(
-                    LocaleKeys.auth_phone_number.tr(),
+                    LocaleKeys.auth_phone_number.tr(context: context),
                     style: AppTextStyles.regular14,
                   ),
                   SizedBox(height: height * 0.01),
@@ -113,7 +113,7 @@ class _LoginContentState extends State<LoginContent> {
                         ? () {
                             if (!ConnectivityHelper().isConnected) {
                               context.showErrorSnackBar(
-                                LocaleKeys.snackbar_no_internet.tr(),
+                                LocaleKeys.snackbar_no_internet.tr(context: context),
                               );
                               return;
                             }
@@ -122,18 +122,18 @@ class _LoginContentState extends State<LoginContent> {
                             );
                           }
                         : null,
-                    text: LocaleKeys.auth_login.tr(),
+                    text: LocaleKeys.auth_login.tr(context: context),
                     enabled: _isPhoneValid,
                   ),
                   SizedBox(height: height * 0.01),
                   CustomButton(
-                    text: LocaleKeys.auth_continue_as_guest.tr(),
+                    text: LocaleKeys.auth_continue_as_guest.tr(context: context),
                     color: darkAppColors.themeColor,
                     textColor: context.colors.primary,
                     onPressed: () {
                       if (!ConnectivityHelper().isConnected) {
                         context.showErrorSnackBar(
-                          LocaleKeys.snackbar_no_internet.tr(),
+                          LocaleKeys.snackbar_no_internet.tr(context: context),
                         );
                         return;
                       }

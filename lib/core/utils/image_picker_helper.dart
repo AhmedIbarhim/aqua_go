@@ -37,12 +37,12 @@ class ImagePickerHelper {
               const SizedBox(height: 10),
               ListTile(
                 leading: const Icon(Icons.camera_alt),
-                title: Text(LocaleKeys.take_photo.tr()),
+                title: Text(LocaleKeys.take_photo.tr(context: context)),
                 onTap: () => Navigator.of(context).pop(ImageSource.camera),
               ),
               ListTile(
                 leading: const Icon(Icons.photo_library),
-                title: Text(LocaleKeys.select_from_gallery.tr()),
+                title: Text(LocaleKeys.select_from_gallery.tr(context: context)),
                 onTap: () => Navigator.of(context).pop(ImageSource.gallery),
               ),
               const SizedBox(height: 10),

@@ -41,8 +41,8 @@ class AddAddressBottomSheet extends StatefulWidget {
     CustomBottomSheet.show(
       context: context,
       title: existingAddress == null
-          ? LocaleKeys.address_add_new_location.tr()
-          : LocaleKeys.address_edit_location.tr(),
+          ? LocaleKeys.address_add_new_location.tr(context: context)
+          : LocaleKeys.address_edit_location.tr(context: context),
       child: addressesCubit != null
           ? BlocProvider.value(
               value: addressesCubit,
@@ -117,7 +117,7 @@ class _AddAddressBottomSheetState extends State<AddAddressBottomSheet> {
         if (state is AddressesActionError) {
           if (state.message == 'address-outside-service-area') {
             context.showErrorSnackBar(
-              LocaleKeys.address_zone_not_available.tr(),
+              LocaleKeys.address_zone_not_available.tr(context: context),
             );
           } else {
             context.showErrorSnackBar(state.message);
@@ -130,13 +130,13 @@ class _AddAddressBottomSheetState extends State<AddAddressBottomSheet> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildSectionLabel(
-              LocaleKeys.address_address_label.tr(),
+              LocaleKeys.address_address_label.tr(context: context),
               isRequired: true,
             ),
             SizedBox(height: height * 0.01),
             CustomTextFormField(
               controller: _addressController,
-              label: LocaleKeys.address_address_label.tr(),
+              label: LocaleKeys.address_address_label.tr(context: context),
               readOnly: true,
               maxLines: 1,
               prefixIcon: Padding(
@@ -183,14 +183,14 @@ class _AddAddressBottomSheetState extends State<AddAddressBottomSheet> {
             SizedBox(height: height * 0.03),
 
             _buildSectionLabel(
-              LocaleKeys.address_address_name_label.tr(),
+              LocaleKeys.address_address_name_label.tr(context: context),
               isRequired: true,
             ),
             SizedBox(height: height * 0.01),
             CustomTextFormField(
               controller: _addressNameController,
-              label: LocaleKeys.address_address_name_label.tr(),
-              hintText: LocaleKeys.address_address_name_example.tr(),
+              label: LocaleKeys.address_address_name_label.tr(context: context),
+              hintText: LocaleKeys.address_address_name_example.tr(context: context),
               prefixIcon: Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: Icon(
@@ -202,18 +202,18 @@ class _AddAddressBottomSheetState extends State<AddAddressBottomSheet> {
             ),
             SizedBox(height: height * 0.008),
             Text(
-              LocaleKeys.address_address_name_helper.tr(),
+              LocaleKeys.address_address_name_helper.tr(context: context),
               style: AppTextStyles.regular12.copyWith(
                 color: context.colors.textSecondary,
               ),
             ),
             SizedBox(height: height * 0.03),
 
-            _buildSectionLabel(LocaleKeys.address_access_notes_label.tr()),
+            _buildSectionLabel(LocaleKeys.address_access_notes_label.tr(context: context)),
             SizedBox(height: height * 0.01),
             CustomTextFormField(
               controller: _accessNotesController,
-              label: LocaleKeys.address_access_notes_label.tr(),
+              label: LocaleKeys.address_access_notes_label.tr(context: context),
               keyboardType: TextInputType.multiline,
               minLines: 3,
             ),
@@ -225,8 +225,8 @@ class _AddAddressBottomSheetState extends State<AddAddressBottomSheet> {
                   flex: 2,
                   child: CustomButton(
                     text: widget.existingAddress == null
-                        ? LocaleKeys.address_save_address.tr()
-                        : LocaleKeys.profile_save_changes.tr(),
+                        ? LocaleKeys.address_save_address.tr(context: context)
+                        : LocaleKeys.profile_save_changes.tr(context: context),
                     onPressed: () {
                       if (_addressNameController.text.trim().isEmpty) return;
 
@@ -254,7 +254,7 @@ class _AddAddressBottomSheetState extends State<AddAddressBottomSheet> {
                   flex: 1,
                   child: CustomButton(
                     onPressed: () => Navigator.pop(context),
-                    text: LocaleKeys.cancel.tr(),
+                    text: LocaleKeys.cancel.tr(context: context),
                     color: Colors.transparent,
                     textColor: context.colors.textPrimary,
                     borderColor: context.colors.borderSecondary,

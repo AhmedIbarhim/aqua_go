@@ -103,7 +103,7 @@ class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
           children: [
             const Text('* ', style: TextStyle(color: Colors.red, fontSize: 16)),
             Text(
-              LocaleKeys.bookings_date.tr(),
+              LocaleKeys.bookings_date.tr(context: context),
               style: AppTextStyles.regular16.copyWith(
                 color: context.colors.textPrimary,
               ),
@@ -117,7 +117,7 @@ class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
                   ? (context.isAr
                         ? DateFormat('MMMM, yyyy', 'ar').format(selectedDate!)
                         : DateFormat('MMMM, yyyy').format(selectedDate!))
-                  : LocaleKeys.bookings_choose_day.tr(),
+                  : LocaleKeys.bookings_choose_day.tr(context: context),
               style: AppTextStyles.medium14.copyWith(
                 color: context.colors.textSecondary,
               ),
@@ -221,7 +221,7 @@ class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
         SizedBox(
           width: double.infinity,
           child: Text(
-            LocaleKeys.bookings_available_times.tr(),
+            LocaleKeys.bookings_available_times.tr(context: context),
             style: AppTextStyles.regular16.copyWith(
               color: context.colors.textPrimary,
             ),
@@ -243,8 +243,8 @@ class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
             alignment: Alignment.center,
             child: Text(
               selectedDate == null
-                  ? LocaleKeys.bookings_choose_day.tr()
-                  : LocaleKeys.bookings_no_available_times.tr(),
+                  ? LocaleKeys.bookings_choose_day.tr(context: context)
+                  : LocaleKeys.bookings_no_available_times.tr(context: context),
               style: AppTextStyles.regular14.copyWith(
                 color: context.colors.textSecondary,
               ),

@@ -116,7 +116,7 @@ class PackageAddonPaymentBottomSheet extends StatelessWidget {
                       // Addons cost summary
                       if (paidAddons.isNotEmpty) ...[
                         Text(
-                          LocaleKeys.bookings_additional_services.tr(),
+                          LocaleKeys.bookings_additional_services.tr(context: context),
                           style: AppTextStyles.regular14.copyWith(
                             color: context.colors.textSecondary,
                           ),
@@ -162,7 +162,7 @@ class PackageAddonPaymentBottomSheet extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              LocaleKeys.bookings_total.tr(),
+                              LocaleKeys.bookings_total.tr(context: context),
                               style: AppTextStyles.medium14.copyWith(
                                 color: context.colors.textPrimary,
                               ),
@@ -196,7 +196,7 @@ class PackageAddonPaymentBottomSheet extends StatelessWidget {
 
                 BottomActionSheetContainer(
                   child: CustomButton(
-                    text: LocaleKeys.proceed.tr(),
+                    text: LocaleKeys.proceed.tr(context: context),
                     enabled: bookingState.paymentMethod != null,
                     onPressed: bookingState.paymentMethod != null
                         ? () => Navigator.pop(context, true)

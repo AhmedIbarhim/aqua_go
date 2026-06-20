@@ -8,7 +8,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/config/di/service_locator.dart';
-import '../../../../core/helpers/fetch_user_data_helper.dart';
+import '../../../../core/config/session/session_state.dart';
 import '../../../../core/route/routes.dart';
 import '../../data/models/notification_preferences_model.dart';
 import '../controllers/notification_preferences_cubit/notification_preferences_cubit.dart';
@@ -23,14 +23,17 @@ class SettingsView extends StatefulWidget {
 }
 
 class _SettingsViewState extends State<SettingsView> {
-  final bool isGuest = FetchUserData.isGuest();
+  // Backed by the reactive notifier so a login-while-open transition is reflected.
+  bool get isGuest => currentUser.value == null;
 
   @override
   Widget build(BuildContext context) {
     double sw(double width) => context.sw(width);
     double sh(double height) => context.sh(height);
 
-    return BlocProvider(
+    return ValueListenableBuilder(
+      valueListenable: currentUser,
+      builder: (context, user, _) => BlocProvider(
       create: (context) {
         final cubit = locator<NotificationPreferencesCubit>();
         if (!isGuest) {
@@ -54,7 +57,7 @@ class _SettingsViewState extends State<SettingsView> {
         },
         child: Scaffold(
           backgroundColor: context.colors.screenBG,
-          appBar: GenericAppBar(title: LocaleKeys.profile_settings.tr()),
+          appBar: GenericAppBar(title: LocaleKeys.profile_settings.tr(context: context)),
           body: Column(
             children: [
               SizedBox(height: sh(16)),
@@ -74,12 +77,12 @@ class _SettingsViewState extends State<SettingsView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildSectionTitle(
-                          LocaleKeys.settings_more_settings.tr(),
+                          LocaleKeys.settings_more_settings.tr(context: context),
                           context,
                         ),
                         SizedBox(height: sh(8)),
                         ProfileTile(
-                          title: LocaleKeys.settings_language.tr(),
+                          title: LocaleKeys.settings_language.tr(context: context),
                           icon: AppAssets.language,
                           onTap: () {
                             context.pushNamed(Routes.languageSelect);
@@ -87,7 +90,7 @@ class _SettingsViewState extends State<SettingsView> {
                         ),
                         SizedBox(height: sh(8)),
                         ProfileTile(
-                          title: LocaleKeys.settings_privacy_policy.tr(),
+                          title: LocaleKeys.settings_privacy_policy.tr(context: context),
                           icon: AppAssets.privacy,
                           onTap: () {
                             context.pushNamed(Routes.privacyPolicy);
@@ -95,7 +98,7 @@ class _SettingsViewState extends State<SettingsView> {
                         ),
                         SizedBox(height: sh(8)),
                         ProfileTile(
-                          title: LocaleKeys.settings_terms_and_conditions.tr(),
+                          title: LocaleKeys.settings_terms_and_conditions.tr(context: context),
                           icon: AppAssets.terms,
                           onTap: () {
                             context.pushNamed(Routes.termsAndConditions);
@@ -107,7 +110,7 @@ class _SettingsViewState extends State<SettingsView> {
                         //     final isDarkMode =
                         //         themeState.themeMode == ThemeMode.dark;
                         //     return ProfileTile(
-                        //       title: LocaleKeys.settings_dark_mode.tr(),
+                        //       title: LocaleKeys.settings_dark_mode.tr(context: context),
                         //       icon: AppAssets.darkMode,
                         //       hasToggle: true,
                         //       toggleValue: isDarkMode,
@@ -120,7 +123,7 @@ class _SettingsViewState extends State<SettingsView> {
                         if (!isGuest) ...[
                           SizedBox(height: sh(24)),
                           _buildSectionTitle(
-                            LocaleKeys.settings_get_notifications.tr(),
+                            LocaleKeys.settings_get_notifications.tr(context: context),
                             context,
                           ),
                           SizedBox(height: sh(8)),
@@ -164,7 +167,7 @@ class _SettingsViewState extends State<SettingsView> {
                                   ProfileTile(
                                     title: LocaleKeys
                                         .settings_marketing_notification
-                                        .tr(),
+                                        .tr(context: context),
                                     icon: AppAssets.notification,
                                     hasToggle: true,
                                     toggleValue: isMarketingNotif,
@@ -187,7 +190,7 @@ class _SettingsViewState extends State<SettingsView> {
                                   // SizedBox(height: sh(8)),
                                   // ProfileTile(
                                   //   title: LocaleKeys.settings_whatsapp_messages
-                                  //       .tr(),
+                                  //       .tr(context: context),
                                   //   icon: AppAssets.whatsppOutlined,
                                   //   hasToggle: true,
                                   //   toggleValue: isWhatsapp,
@@ -200,7 +203,7 @@ class _SettingsViewState extends State<SettingsView> {
                                   SizedBox(height: sh(8)),
                                   ProfileTile(
                                     title: LocaleKeys.settings_sms_messages
-                                        .tr(),
+                                        .tr(context: context),
                                     icon: AppAssets.sms,
                                     hasToggle: true,
                                     toggleValue: isSms,
@@ -224,7 +227,7 @@ class _SettingsViewState extends State<SettingsView> {
                                   ProfileTile(
                                     title: LocaleKeys
                                         .settings_email_notifications
-                                        .tr(),
+                                        .tr(context: context),
                                     icon: AppAssets.mail,
                                     hasToggle: true,
                                     toggleValue: isEmail,
@@ -258,6 +261,7 @@ class _SettingsViewState extends State<SettingsView> {
           ),
         ),
       ),
+    ),
     );
   }
 

@@ -126,7 +126,7 @@ class _BikerNotesSelectionState extends State<BikerNotesSelection> {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          (note['key'] as String).tr(),
+                          (note['key'] as String).tr(context: context),
                           style: AppTextStyles.regular14.copyWith(
                             color: isSelected
                                 ? context.colors.textPrimary

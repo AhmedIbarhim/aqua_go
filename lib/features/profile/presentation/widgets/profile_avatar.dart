@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:aqua_go/core/config/session/session_state.dart';
 import 'package:aqua_go/features/auth/presentation/controllers/auth_cubit/auth_cubit.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/helpers/fetch_user_data_helper.dart';
@@ -13,11 +14,13 @@ class ProfileAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     double sw(double width) => context.sw(width);
 
-    return BlocBuilder<AuthCubit, AuthState>(
+    return ValueListenableBuilder(
+      valueListenable: currentUser,
+      builder: (context, user, _) => BlocBuilder<AuthCubit, AuthState>(
       builder: (context, state) {
         return GestureDetector(
           onTap: () async {
-            if (FetchUserData.isGuest()) {
+            if (user == null) {
               FetchUserData.promptGuestToLogin(context);
             } else {
               final file = await ImagePickerHelper.showImageSourceDialog(
@@ -43,9 +46,9 @@ class ProfileAvatar extends StatelessWidget {
                   ),
                 ),
                 child: ClipOval(
-                  child: FetchUserData.getAvatarUrl() != null
+                  child: user?.imageUrl != null && user!.imageUrl!.isNotEmpty
                       ? CachedNetworkImage(
-                          imageUrl: FetchUserData.getAvatarUrl()!,
+                          imageUrl: user.imageUrl!,
                           fit: BoxFit.cover,
                           placeholder: (context, url) => const Center(
                             child: CircularProgressIndicator(
@@ -65,7 +68,7 @@ class ProfileAvatar extends StatelessWidget {
                         ),
                 ),
               ),
-              if (!FetchUserData.isGuest())
+              if (user != null)
                 Positioned(
                   right: sw(4),
                   bottom: sw(4),
@@ -90,6 +93,7 @@ class ProfileAvatar extends StatelessWidget {
           ),
         );
       },
+    ),
     );
   }
 }

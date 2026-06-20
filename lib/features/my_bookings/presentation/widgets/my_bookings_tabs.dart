@@ -49,7 +49,7 @@ class MyBookingsTabs extends StatelessWidget {
                 ),
                 alignment: Alignment.center,
                 child: Text(
-                  LocaleKeys.bookings_current_bookings.tr(),
+                  LocaleKeys.bookings_current_bookings.tr(context: context),
                   style: selectedIndex == 0
                       ? AppTextStyles.medium14
                       : AppTextStyles.regular14.copyWith(
@@ -73,7 +73,7 @@ class MyBookingsTabs extends StatelessWidget {
                 ),
                 alignment: Alignment.center,
                 child: Text(
-                  LocaleKeys.bookings_previous_bookings.tr(),
+                  LocaleKeys.bookings_previous_bookings.tr(context: context),
                   style: selectedIndex == 1
                       ? AppTextStyles.medium14
                       : AppTextStyles.regular14.copyWith(

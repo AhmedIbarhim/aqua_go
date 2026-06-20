@@ -35,7 +35,7 @@ class VehicleColorPicker extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  LocaleKeys.my_cars_color.tr(),
+                  LocaleKeys.my_cars_color.tr(context: context),
                   style: AppTextStyles.medium14.copyWith(
                     color: context.colors.textPrimary,
                   ),

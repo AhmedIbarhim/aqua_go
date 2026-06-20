@@ -1,3 +1,4 @@
+import 'package:aqua_go/core/config/session/session_state.dart';
 import 'package:aqua_go/core/helpers/fetch_user_data_helper.dart';
 import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
@@ -18,9 +19,14 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userName = FetchUserData.getUserName();
     double sw(double width) => context.sw(width);
     double sh(double height) => context.sh(height);
+
+    return ValueListenableBuilder(
+      valueListenable: currentUser,
+      builder: (context, user, _) {
+    final userName = FetchUserData.getUserName();
+    final isGuest = user == null;
 
     return SafeArea(
       child: Padding(
@@ -39,9 +45,9 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(sw(40)),
-                    child: FetchUserData.getAvatarUrl() != null
+                    child: user?.imageUrl != null && user!.imageUrl!.isNotEmpty
                         ? CachedNetworkImage(
-                            imageUrl: FetchUserData.getAvatarUrl()!,
+                            imageUrl: user.imageUrl!,
                             fit: BoxFit.cover,
                             placeholder: (context, url) => Center(
                               child: SizedBox(
@@ -70,7 +76,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      '${LocaleKeys.layout_welcome.tr()} $userName.',
+                      '${LocaleKeys.layout_welcome.tr(context: context)} $userName.',
                       style: AppTextStyles.regular12.copyWith(
                         color: context.colors.textSecondary,
                       ),
@@ -78,7 +84,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                     Row(
                       children: [
                         Text(
-                          LocaleKeys.layout_ready_to_serve.tr(),
+                          LocaleKeys.layout_ready_to_serve.tr(context: context),
                           style: AppTextStyles.medium14,
                         ),
                         SizedBox(width: sw(4)),
@@ -100,7 +106,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                 BlocProvider(
                   create: (context) {
                     final cubit = locator<NotificationsCubit>();
-                    if (!FetchUserData.isGuest()) {
+                    if (!isGuest) {
                       cubit.fetchUnreadCount();
                     }
                     return cubit;
@@ -114,7 +120,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                         children: [
                           GestureDetector(
                             onTap: () async {
-                              if (FetchUserData.isGuest()) {
+                              if (isGuest) {
                                 FetchUserData.promptGuestToLogin(context);
                               } else {
                                 await context.pushNamed(Routes.notification);
@@ -200,6 +206,8 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
           ],
         ),
       ),
+    );
+      },
     );
   }
 

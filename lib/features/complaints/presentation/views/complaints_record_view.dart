@@ -32,7 +32,7 @@ class _ComplaintsRecordViewState extends State<ComplaintsRecordView> {
     return Scaffold(
       backgroundColor: context.colors.screenBG,
       appBar: GenericAppBar(
-        title: LocaleKeys.support_complaint_log.tr(),
+        title: LocaleKeys.support_complaint_log.tr(context: context),
         centerTitle: false,
       ),
       body: Column(
@@ -129,7 +129,7 @@ class _ComplaintsRecordViewState extends State<ComplaintsRecordView> {
           ),
           const SizedBox(height: 16),
           Text(
-            LocaleKeys.complaint_no_complaints.tr(),
+            LocaleKeys.complaint_no_complaints.tr(context: context),
             style: AppTextStyles.medium16.copyWith(
               color: context.colors.textPrimary,
             ),

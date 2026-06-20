@@ -10,6 +10,7 @@ import '../../../../core/utils/app_assets.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../../data/models/service_model.dart';
 
+import '../../../../core/config/session/session_state.dart';
 import '../../../../core/helpers/fetch_user_data_helper.dart';
 
 class ServiceCard extends StatefulWidget {
@@ -37,9 +38,11 @@ class _ServiceCardState extends State<ServiceCard> {
     final description = context.isEn
         ? serviceModel.rawDescription?.descEn ?? ''
         : serviceModel.rawDescription?.descAr ?? '';
-    return InkWell(
+    return ValueListenableBuilder(
+      valueListenable: currentUser,
+      builder: (context, user, child) => InkWell(
       onTap: () {
-        if (FetchUserData.isGuest()) {
+        if (user == null) {
           FetchUserData.promptGuestToLogin(context);
         } else {
           context.pushNamed(
@@ -121,8 +124,8 @@ class _ServiceCardState extends State<ServiceCard> {
                                   },
                                   child: Text(
                                     _descriptionExpanded
-                                        ? LocaleKeys.home_read_less.tr()
-                                        : LocaleKeys.home_read_more.tr(),
+                                        ? LocaleKeys.home_read_less.tr(context: context)
+                                        : LocaleKeys.home_read_more.tr(context: context),
                                     style: AppTextStyles.regular12.copyWith(
                                       color: context.colors.primary,
                                       fontWeight: FontWeight.w600,
@@ -194,6 +197,7 @@ class _ServiceCardState extends State<ServiceCard> {
           ),
         ),
       ),
+    ),
     );
   }
 }

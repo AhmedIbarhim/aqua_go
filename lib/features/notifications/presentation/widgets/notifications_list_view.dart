@@ -26,9 +26,9 @@ class NotificationsListView extends StatelessWidget {
 
       String dateKey;
       if (notificationDate == today) {
-        dateKey = LocaleKeys.notifications_today.tr();
+        dateKey = LocaleKeys.notifications_today.tr(context: context);
       } else if (notificationDate == yesterday) {
-        dateKey = LocaleKeys.notifications_yesterday.tr();
+        dateKey = LocaleKeys.notifications_yesterday.tr(context: context);
       } else {
         dateKey = DateFormat(
           'd MMMM, yyyy',

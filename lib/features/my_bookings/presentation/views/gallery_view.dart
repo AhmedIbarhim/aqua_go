@@ -49,9 +49,9 @@ class _GalleryViewState extends State<GalleryView> {
       return widget.labels![index];
     }
     if (index == 0) {
-      return LocaleKeys.bookings_before_washing.tr();
+      return LocaleKeys.bookings_before_washing.tr(context: context);
     } else {
-      return LocaleKeys.bookings_after_washing.tr();
+      return LocaleKeys.bookings_after_washing.tr(context: context);
     }
   }
 
@@ -156,7 +156,7 @@ class _GalleryViewState extends State<GalleryView> {
         children: [
           Expanded(
             child: Text(
-              LocaleKeys.bookings_photo_gallery.tr(),
+              LocaleKeys.bookings_photo_gallery.tr(context: context),
               style: AppTextStyles.regular18.copyWith(
                 color: context.colors.textPrimary,
               ),

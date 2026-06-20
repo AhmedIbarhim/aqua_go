@@ -82,7 +82,7 @@ class GuestPlaceholderWidget extends StatelessWidget {
                       onPressed: () {
                         FetchUserData.promptGuestToLogin(context);
                       },
-                      text: LocaleKeys.auth_login.tr(),
+                      text: LocaleKeys.auth_login.tr(context: context),
                     ),
                   ),
                 ],

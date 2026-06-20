@@ -126,7 +126,7 @@ class CarSelectionList extends StatelessWidget {
           ),
           SizedBox(height: height * 0.01),
           Text(
-            LocaleKeys.bookings_add_car.tr(),
+            LocaleKeys.bookings_add_car.tr(context: context),
             style: AppTextStyles.medium12.copyWith(
               color: context.colors.textPrimary,
             ),

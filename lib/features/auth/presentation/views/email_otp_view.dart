@@ -37,7 +37,7 @@ class EmailOtpView extends StatelessWidget {
           }
           if (state is LoginSuccess) {
             context.showSuccessSnackBar(
-              LocaleKeys.snackbar_update_email_success.tr(),
+              LocaleKeys.snackbar_update_email_success.tr(context: context),
             );
             Navigator.pushNamedAndRemoveUntil(
               context,

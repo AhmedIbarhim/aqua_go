@@ -18,7 +18,7 @@ class BookingDetailsSummaryCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          LocaleKeys.bookings_booking_summary.tr(),
+          LocaleKeys.bookings_booking_summary.tr(context: context),
           style: AppTextStyles.regular16.copyWith(
             color: context.colors.textPrimary,
           ),
@@ -35,13 +35,13 @@ class BookingDetailsSummaryCard extends StatelessWidget {
             children: [
               _buildSummaryRow(
                 context,
-                title: LocaleKeys.bookings_service_name.tr(),
+                title: LocaleKeys.bookings_service_name.tr(context: context),
                 value: booking.title,
                 icon: AppAssets.document,
               ),
               _buildSummaryRow(
                 context,
-                title: LocaleKeys.bookings_date_and_time.tr(),
+                title: LocaleKeys.bookings_date_and_time.tr(context: context),
                 value: booking.formattedDateTime,
                 icon: AppAssets.date,
               ),
@@ -59,9 +59,9 @@ class BookingDetailsSummaryCard extends StatelessWidget {
                 ),
               _buildSummaryRow(
                 context,
-                title: LocaleKeys.bookings_total_amount.tr(),
+                title: LocaleKeys.bookings_total_amount.tr(context: context),
                 value: booking.isCoveredBySubscription
-                    ? LocaleKeys.bookings_covered_by_subscription.tr()
+                    ? LocaleKeys.bookings_covered_by_subscription.tr(context: context)
                     : '${booking.totalAmount.toStringAsFixed(2)} ${booking.currency ?? "SAR"}',
                 icon: AppAssets.currency,
               ),

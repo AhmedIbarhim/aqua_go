@@ -24,7 +24,7 @@ class GpsLocationCard extends StatelessWidget {
         return LocationSelectionCard(
           isEnabled: hasData && !state.isLoading,
           icon: AppAssets.gps,
-          title: LocaleKeys.address_current_location.tr(),
+          title: LocaleKeys.address_current_location.tr(context: context),
           subtitle: state.isLoading
               ? '...'
               : state.selectedAddressName.isEmpty

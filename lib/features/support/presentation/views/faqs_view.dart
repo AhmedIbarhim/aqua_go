@@ -29,7 +29,7 @@ class _FaqsViewState extends State<FaqsView> {
     return Scaffold(
       backgroundColor: context.colors.screenBG,
       appBar: GenericAppBar(
-        title: LocaleKeys.support_faq.tr(),
+        title: LocaleKeys.support_faq.tr(context: context),
         centerTitle: false,
       ),
       body: Column(

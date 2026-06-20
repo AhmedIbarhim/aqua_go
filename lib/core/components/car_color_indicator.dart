@@ -28,7 +28,7 @@ class CarColorIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorCode = parseVehicleColorCode(colorValue);
     final dotColor = Color(colorCode);
-    final name = getLocalizedColorName(colorCode);
+    final name = getLocalizedColorName(colorCode,context);
 
     return Row(
       mainAxisSize: MainAxisSize.min,

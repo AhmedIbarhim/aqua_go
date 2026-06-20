@@ -2,42 +2,42 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../../generated/locale_keys.g.dart';
 
-String getLocalizedColorName(int colorCode) {
+String getLocalizedColorName(int colorCode, BuildContext context) {
   switch (colorCode) {
     case 0xFFa97142:
-      return LocaleKeys.my_cars_colors_bronze.tr();
+      return LocaleKeys.my_cars_colors_bronze.tr(context: context);
     case 0xFFf97316:
-      return LocaleKeys.my_cars_colors_orange.tr();
+      return LocaleKeys.my_cars_colors_orange.tr(context: context);
     case 0xFF4b5563:
-      return LocaleKeys.my_cars_colors_charcoal.tr();
+      return LocaleKeys.my_cars_colors_charcoal.tr(context: context);
     case 0xFF9ca3af:
-      return LocaleKeys.my_cars_colors_gray.tr();
+      return LocaleKeys.my_cars_colors_gray.tr(context: context);
     case 0xFFc0c0c0:
-      return LocaleKeys.my_cars_colors_silver.tr();
+      return LocaleKeys.my_cars_colors_silver.tr(context: context);
     case 0xFFf5f5f0:
-      return LocaleKeys.my_cars_colors_pearl_white.tr();
+      return LocaleKeys.my_cars_colors_pearl_white.tr(context: context);
     case 0xFFffffff:
-      return LocaleKeys.my_cars_colors_white.tr();
+      return LocaleKeys.my_cars_colors_white.tr(context: context);
     case 0xFF0e0e0e:
-      return LocaleKeys.my_cars_colors_black.tr();
+      return LocaleKeys.my_cars_colors_black.tr(context: context);
     case 0xFF7c4a2d:
-      return LocaleKeys.my_cars_colors_brown.tr();
+      return LocaleKeys.my_cars_colors_brown.tr(context: context);
     case 0xFFfacc15:
-      return LocaleKeys.my_cars_colors_yellow.tr();
+      return LocaleKeys.my_cars_colors_yellow.tr(context: context);
     case 0xFF15803d:
-      return LocaleKeys.my_cars_colors_green.tr();
+      return LocaleKeys.my_cars_colors_green.tr(context: context);
     case 0xFF7f1d1d:
-      return LocaleKeys.my_cars_colors_burgundy.tr();
+      return LocaleKeys.my_cars_colors_burgundy.tr(context: context);
     case 0xFFdc2626:
-      return LocaleKeys.my_cars_colors_red.tr();
+      return LocaleKeys.my_cars_colors_red.tr(context: context);
     case 0xFF1e3a8a:
-      return LocaleKeys.my_cars_colors_dark_blue.tr();
+      return LocaleKeys.my_cars_colors_dark_blue.tr(context: context);
     case 0xFF2563eb:
-      return LocaleKeys.my_cars_colors_blue.tr();
+      return LocaleKeys.my_cars_colors_blue.tr(context: context);
     case 0xFF7dd3fc:
-      return LocaleKeys.my_cars_colors_light_blue.tr();
+      return LocaleKeys.my_cars_colors_light_blue.tr(context: context);
     default:
-      return LocaleKeys.my_cars_custom_color.tr();
+      return LocaleKeys.my_cars_custom_color.tr(context: context);
   }
 }
 

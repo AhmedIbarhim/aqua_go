@@ -20,7 +20,7 @@ class ComplaintDetailsDescriptionCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          LocaleKeys.bookings_complaint_details.tr(),
+          LocaleKeys.bookings_complaint_details.tr(context: context),
           style: AppTextStyles.medium14,
         ),
         const SizedBox(height: 8),

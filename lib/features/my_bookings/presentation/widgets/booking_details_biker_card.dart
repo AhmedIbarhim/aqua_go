@@ -31,7 +31,7 @@ class BookingDetailsBikerCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          LocaleKeys.bookings_your_biker.tr(),
+          LocaleKeys.bookings_your_biker.tr(context: context),
           style: AppTextStyles.regular16.copyWith(
             color: context.colors.textPrimary,
           ),

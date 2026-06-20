@@ -93,13 +93,13 @@ class _EmailContentState extends State<EmailContent> {
                 children: [
                   Text(
                     FetchUserData.getEmail() == null
-                        ? LocaleKeys.auth_add_email.tr()
-                        : LocaleKeys.auth_change_email.tr(),
+                        ? LocaleKeys.auth_add_email.tr(context: context)
+                        : LocaleKeys.auth_change_email.tr(context: context),
                     style: AppTextStyles.semiBold24,
                   ),
                   SizedBox(height: height * 0.01),
                   Text(
-                    LocaleKeys.auth_send_verification_mail.tr(),
+                    LocaleKeys.auth_send_verification_mail.tr(context: context),
                     style: AppTextStyles.regular16.copyWith(
                       color: darkAppColors.textSecondary,
                     ),
@@ -107,8 +107,8 @@ class _EmailContentState extends State<EmailContent> {
                   SizedBox(height: height * 0.02),
                   CustomTextField(
                     controller: _emailController,
-                    label: LocaleKeys.auth_email_address.tr(),
-                    hint: LocaleKeys.auth_enter_email.tr(),
+                    label: LocaleKeys.auth_email_address.tr(context: context),
+                    hint: LocaleKeys.auth_enter_email.tr(context: context),
                     keyboardType: TextInputType.emailAddress,
                     prefixIcon: Padding(
                       padding: const EdgeInsets.all(12.0),
@@ -124,7 +124,7 @@ class _EmailContentState extends State<EmailContent> {
                             );
                           }
                         : null,
-                    text: LocaleKeys.proceed.tr(),
+                    text: LocaleKeys.proceed.tr(context: context),
                     enabled: _isEmailValid,
                   ),
                   SizedBox(height: height * 0.01),
@@ -132,7 +132,7 @@ class _EmailContentState extends State<EmailContent> {
                     onPressed: () {
                       context.pop();
                     },
-                    text: LocaleKeys.auth_back_to_profile.tr(),
+                    text: LocaleKeys.auth_back_to_profile.tr(context: context),
                     textColor: context.colors.primary,
                     color: darkAppColors.themeColor,
                     enabled: true,

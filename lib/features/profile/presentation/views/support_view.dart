@@ -20,7 +20,7 @@ class SupportView extends StatelessWidget {
     return Scaffold(
       backgroundColor: context.colors.screenBG,
       appBar: GenericAppBar(
-        title: LocaleKeys.support_title.tr(),
+        title: LocaleKeys.support_title.tr(context: context),
         centerTitle: false,
       ),
       body: Column(
@@ -40,7 +40,7 @@ class SupportView extends StatelessWidget {
               child: Column(
                 children: [
                   ProfileTile(
-                    title: LocaleKeys.support_faq.tr(),
+                    title: LocaleKeys.support_faq.tr(context: context),
                     icon: AppAssets.question,
                     onTap: () {
                       context.pushNamed(Routes.faqs);
@@ -48,7 +48,7 @@ class SupportView extends StatelessWidget {
                   ),
                   SizedBox(height: sh(12)),
                   ProfileTile(
-                    title: LocaleKeys.support_complaint_log.tr(),
+                    title: LocaleKeys.support_complaint_log.tr(context: context),
                     icon: AppAssets.documentCopy,
                     onTap: () {
                       context.pushNamed(Routes.complainsRecord);
@@ -56,7 +56,7 @@ class SupportView extends StatelessWidget {
                   ),
                   SizedBox(height: sh(12)),
                   // ProfileTile(
-                  //   title: LocaleKeys.support_whatsapp_contact.tr(),
+                  //   title: LocaleKeys.support_whatsapp_contact.tr(context: context),
                   //   icon: AppAssets.whatsapp,
                   //   alreadyColoredIcon: true,
                   //   onTap: () {

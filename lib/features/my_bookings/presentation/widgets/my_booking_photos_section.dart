@@ -49,9 +49,9 @@ class MyBookingPhotosSection extends StatelessWidget {
 
       String stageLabel = '';
       if (stage == 'BEFORE') {
-        stageLabel = LocaleKeys.bookings_before_washing.tr();
+        stageLabel = LocaleKeys.bookings_before_washing.tr(context: context);
       } else if (stage == 'AFTER') {
-        stageLabel = LocaleKeys.bookings_after_washing.tr();
+        stageLabel = LocaleKeys.bookings_after_washing.tr(context: context);
       } else {
         stageLabel = p.stage ?? '';
       }
@@ -69,13 +69,13 @@ class MyBookingPhotosSection extends StatelessWidget {
           text: TextSpan(
             children: [
               TextSpan(
-                text: LocaleKeys.bookings_car_images.tr(),
+                text: LocaleKeys.bookings_car_images.tr(context: context),
                 style: AppTextStyles.regular16.copyWith(
                   color: context.colors.textPrimary,
                 ),
               ),
               TextSpan(
-                text: ' (${LocaleKeys.bookings_before_and_after_washing.tr()})',
+                text: ' (${LocaleKeys.bookings_before_and_after_washing.tr(context: context)})',
                 style: AppTextStyles.regular12.copyWith(
                   color: context.colors.contentDisabled,
                 ),

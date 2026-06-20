@@ -29,7 +29,7 @@ class MyBookingLocationSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          LocaleKeys.bookings_car_location.tr(),
+          LocaleKeys.bookings_car_location.tr(context: context),
           style: AppTextStyles.regular16.copyWith(
             color: context.colors.textPrimary,
           ),
@@ -87,7 +87,7 @@ class MyBookingLocationSection extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            LocaleKeys.address_access_notes_label.tr(),
+                            LocaleKeys.address_access_notes_label.tr(context: context),
                             style: AppTextStyles.regular12.copyWith(
                               color: context.colors.contentDisabled,
                             ),

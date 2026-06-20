@@ -31,14 +31,14 @@ class RatingSuccessAlertBox extends StatelessWidget {
         SizedBox(height: height * 0.02),
 
         Text(
-          LocaleKeys.bookings_rating_submitted.tr(),
+          LocaleKeys.bookings_rating_submitted.tr(context: context),
           style: AppTextStyles.medium16,
         ),
         const SizedBox(height: 4),
 
         // Description
         Text(
-          LocaleKeys.bookings_rating_submitted_desc.tr(),
+          LocaleKeys.bookings_rating_submitted_desc.tr(context: context),
           textAlign: TextAlign.center,
           style: AppTextStyles.regular16.copyWith(
             color: context.colors.textSecondary,
@@ -49,7 +49,7 @@ class RatingSuccessAlertBox extends StatelessWidget {
 
         // OK Button
         CustomButton(
-          text: LocaleKeys.go_to_home.tr(),
+          text: LocaleKeys.go_to_home.tr(context: context),
           onPressed: () => context.pushNamed(Routes.layout),
         ),
       ],

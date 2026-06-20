@@ -18,7 +18,7 @@ class MyCarsListView extends StatelessWidget {
       children: [
         const SizedBox(height: 8),
         CustomButton(
-          text: LocaleKeys.my_cars_add_car.tr(),
+          text: LocaleKeys.my_cars_add_car.tr(context: context),
           preWidget: const Icon(Icons.add),
           onPressed: () {
             context.pushNamed(Routes.addVehicle).then((val) {

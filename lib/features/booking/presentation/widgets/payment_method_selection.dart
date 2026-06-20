@@ -46,7 +46,7 @@ class _PaymentMethodSelectionState extends State<PaymentMethodSelection> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          LocaleKeys.bookings_pay_through.tr(),
+          LocaleKeys.bookings_pay_through.tr(context: context),
           style: AppTextStyles.regular16.copyWith(
             color: context.colors.textPrimary,
           ),
@@ -55,14 +55,14 @@ class _PaymentMethodSelectionState extends State<PaymentMethodSelection> {
         _buildPaymentMethodItem(
           context,
           method: PaymentMethod.applePay,
-          title: LocaleKeys.bookings_apple_pay.tr(),
+          title: LocaleKeys.bookings_apple_pay.tr(context: context),
           iconPaths: [AppAssets.applePay],
         ),
         const SizedBox(height: 8),
         _buildPaymentMethodItem(
           context,
           method: PaymentMethod.creditCard,
-          title: LocaleKeys.bookings_credit_card.tr(),
+          title: LocaleKeys.bookings_credit_card.tr(context: context),
           iconPaths: [
             AppAssets.visaPay,
             AppAssets.mastercardPay,

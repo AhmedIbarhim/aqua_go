@@ -26,7 +26,7 @@ class PackageSubscribtionBottomSheet extends StatefulWidget {
     final subscriptionsCubit = context.read<SubscriptionsCubit>();
     return CustomBottomSheet.show<T>(
       context: context,
-      title: LocaleKeys.booking_package_package_details.tr(),
+      title: LocaleKeys.booking_package_package_details.tr(context: context),
       child: BlocProvider.value(
         value: subscriptionsCubit,
         child: PackageSubscribtionBottomSheet(packageModel: packageModel),
