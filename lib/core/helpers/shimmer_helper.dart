@@ -1,27 +1,7 @@
-import 'package:carousel_slider/carousel_controller.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:skeletonizer/skeletonizer.dart';
-
-// Models
-import '../../features/home/data/models/banner_model.dart';
-import '../../features/home/data/models/package_model.dart';
-import '../../features/home/data/models/service_model.dart';
-import '../../features/home/data/models/offer_model.dart';
-import '../../features/my_cars/data/models/my_car_model.dart';
-import '../../features/my_cars/data/models/vehicle_make_model.dart';
-import '../../features/my_cars/data/models/vehicle_model_model.dart';
-import '../../features/address/data/models/address_model.dart';
-
-// Cards / Widgets
-import '../../features/home/presentation/widgets/home_banners_carosal.dart';
-import '../../features/home/presentation/widgets/package_card.dart';
-import '../../features/home/presentation/widgets/service_card.dart';
-import '../../features/home/presentation/widgets/offer_card.dart';
-import '../../features/my_cars/presentation/widgets/my_car_card.dart';
-import '../../features/address/presentation/widgets/my_address_card.dart';
-import '../../features/booking/presentation/widgets/car_selection_list.dart';
-import '../../features/booking/presentation/widgets/location_selection_card.dart';
-import '../utils/app_assets.dart';
+import 'package:shimmer/shimmer.dart';
+import '../extentions/context_extentions.dart';
 
 class ShimmerHelper extends StatelessWidget {
   final Widget child;
@@ -31,217 +11,323 @@ class ShimmerHelper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Skeletonizer(enabled: enabled, child: child);
+    if (!enabled) return child;
+    final isDark = context.isDarkTheme;
+    return Shimmer.fromColors(
+      baseColor: isDark ? const Color(0xFF262626) : const Color(0xFFE2E8F0),
+      highlightColor: isDark
+          ? const Color(0xFF3F3F3F)
+          : const Color(0xFFF1F5F9),
+      child: child,
+    );
   }
 
-  // 1. Shimmer list/carousel for banners loading
-  static Widget banners({CarouselSliderController? controller}) {
-    final activeBanners = [
-      BannerModel(
-        id: 'shimmer1',
-        locale: 'ar',
-        imageUrl: 'assets/images/banner_demo.png',
-        ctaType: 'NONE',
-        sortOrder: 1,
-      ),
-      BannerModel(
-        id: 'shimmer2',
-        locale: 'ar',
-        imageUrl: 'assets/images/banner_demo.png',
-        ctaType: 'NONE',
-        sortOrder: 2,
-      ),
-    ];
-    return Skeletonizer(
-      enabled: true,
-      child: HomeBannersCarosal(
-        carouselController: controller ?? CarouselSliderController(),
-        banners: activeBanners,
+  // Unified card for home items (packages, services, offers, etc.)
+  static Widget homeItemCard(
+    BuildContext context, {
+    double? width,
+    double? height,
+  }) {
+    final isDark = context.isDarkTheme;
+    final baseColor = isDark
+        ? const Color(0xFF262626)
+        : const Color(0xFFE2E8F0);
+    final highlightColor = isDark
+        ? const Color(0xFF3F3F3F)
+        : const Color(0xFFF1F5F9);
+
+    return Shimmer.fromColors(
+      baseColor: baseColor,
+      highlightColor: highlightColor,
+      child: Container(
+        width: width,
+        height: height,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1C1C1C) : Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isDark ? const Color(0xFF262626) : const Color(0xFFE2E8F0),
+            width: 1,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                Container(
+                  width: 60,
+                  height: 18,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(100),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 120,
+                        height: 16,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Container(
+                        width: double.infinity,
+                        height: 12,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Container(
+                  width: 50,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  static List<PackageModel> getDummyPackages() {
-    return List.generate(
-      3,
-      (index) => PackageModel(
-        id: 'shimmer_pkg_$index',
-        nameAr: 'باقة اكوا بريميوم النموذجية',
-        nameEn: 'Model Aqua Premium Package',
-        descriptionAr:
-            'هذا الوصف تجريبي لتجربة التحميل الشيمر لباقات أكوا غو المميزة',
-        descriptionEn:
-            'This description is for testing packages shimmer loading',
-        numWashes: 10,
-        validityDays: 30,
-        priceMinor: 99999,
-        currency: 'SAR',
-        maxActivePerCustomer: 1,
-        allowScheduleLater: true,
-        active: true,
-        addons: [],
-        bundledServiceIds: const [],
-        createdAt: '',
-        updatedAt: '',
-        version: 1,
-        imageUrl: 'assets/images/gift_demo.png',
-        isPopular: true,
-        carsPerWash: 1,
-        effectiveFromAt: '',
-      ),
+  // 1. Shimmer list/carousel for banners loading
+  static Widget banners({CarouselSliderController? controller}) {
+    return Builder(
+      builder: (context) {
+        final isDark = context.isDarkTheme;
+        final baseColor = isDark
+            ? const Color(0xFF262626)
+            : const Color(0xFFE2E8F0);
+        final highlightColor = isDark
+            ? const Color(0xFF3F3F3F)
+            : const Color(0xFFF1F5F9);
+        final height = MediaQuery.sizeOf(context).height;
+        return Shimmer.fromColors(
+          baseColor: baseColor,
+          highlightColor: highlightColor,
+          child: Column(
+            children: [
+              CarouselSlider.builder(
+                carouselController: controller ?? CarouselSliderController(),
+                itemCount: 3,
+                itemBuilder: (context, index, realIndex) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  );
+                },
+                options: CarouselOptions(
+                  height: context.isTablet
+                      ? height * 0.22
+                      : height * 0.18,
+                  viewportFraction: context.isTablet ? 0.6 : 0.75,
+                  initialPage: 0,
+                  enableInfiniteScroll: true,
+                  autoPlay: false,
+                  enlargeCenterPage: true,
+                  enlargeFactor: 0.2,
+                  scrollDirection: Axis.horizontal,
+                  enlargeStrategy: CenterPageEnlargeStrategy.scale,
+                ),
+              ),
+              SizedBox(height: height * 0.012),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(
+                  3,
+                  (index) => Container(
+                    width: 6,
+                    height: 6,
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
   // 2. Shimmer list for packages in HomeView
   static Widget packages({double? height}) {
-    final dummyPackages = getDummyPackages();
-
-    return Skeletonizer(
-      enabled: true,
-      child: SizedBox(
-        height: height ?? 140,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          itemCount: dummyPackages.length,
-          separatorBuilder: (context, index) => const SizedBox(width: 16),
-          itemBuilder: (context, index) =>
-              PackageCard(packageModel: dummyPackages[index], atHome: true),
-        ),
-      ),
+    return Builder(
+      builder: (context) {
+        final h = height ?? 140.0;
+        return SizedBox(
+          height: h,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            itemCount: 3,
+            separatorBuilder: (context, index) => const SizedBox(width: 16),
+            itemBuilder: (context, index) =>
+                homeItemCard(context, width: 280, height: h),
+          ),
+        );
+      },
     );
   }
 
   // 3. Shimmer card for services in HomeView
   static Widget serviceCard({double? height}) {
-    final dummyService = ServiceModel(
-      id: 'shimmer_service',
-      code: 'SHIMMER',
-      refNumber: 'SHIMMER',
-      rawName: const ServiceName(
-        nameAr: 'غسيل واش سوبر تجريبي شيمر',
-        nameEn: 'Shimmer Dummy Service Super Wash',
-      ),
-      rawDescription: const ServiceDescription(
-        descAr:
-            'هذا الوصف تجريبي لخدمات شيمر الجميلة، غسيل داخلي وخارجي للسيارة مع تلميع الإطارات',
-        descEn:
-            'This is a description for testing services shimmer, full interior and exterior cleaning with tire polish.',
-      ),
-      active: true,
-      addons: const [],
-      priceMinor: 15000,
-      vatMinor: 2250,
-    );
-
-    return Skeletonizer(
-      enabled: true,
-      child: SizedBox(
-        height: height ?? 120,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: ServiceCard(serviceModel: dummyService),
-        ),
-      ),
+    return Builder(
+      builder: (context) {
+        final h = height ?? 120.0;
+        return SizedBox(
+          height: h,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: homeItemCard(context, width: double.infinity, height: h),
+          ),
+        );
+      },
     );
   }
 
   // 4. Shimmer list for offers in HomeView
   static Widget offers({double? height}) {
-    final dummyOffers = List.generate(
-      3,
-      (index) => OfferModel(image: "assets/images/offer_demo.png"),
-    );
-
-    return Skeletonizer(
-      enabled: true,
-      child: SizedBox(
-        height: height ?? 180,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          itemCount: dummyOffers.length,
-          separatorBuilder: (context, index) => const SizedBox(width: 16),
-          itemBuilder: (context, index) =>
-              OfferCard(offerModel: dummyOffers[index], atHome: true),
-        ),
-      ),
+    return Builder(
+      builder: (context) {
+        final h = height ?? 180.0;
+        return SizedBox(
+          height: h,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            itemCount: 3,
+            separatorBuilder: (context, index) => const SizedBox(width: 16),
+            itemBuilder: (context, index) =>
+                homeItemCard(context, width: h * 1.8, height: h),
+          ),
+        );
+      },
     );
   }
 
   // 5. Shimmer list for my cars
   static Widget cars() {
-    final dummyCars = List.generate(
-      3,
-      (index) => MyCarModel(
-        id: 'shimmer_car_$index',
-        makeId: 'shimmer_brand',
-        modelId: 'shimmer_model',
-        modelYear: DateTime.now().year,
-        color: '#CCCCCC',
-        plateNumber: 'أ ب ج ١٢٣٤',
-        logoUrl: "assets/images/logo_demo.png",
-        carMake: const VehicleMakeModel(
-          id: 'brand',
-          vehicleMakeName: MakeName(
-            nameAr: 'تويوتا نموذج',
-            nameEn: 'Toyota Dummy',
-          ),
-          active: true,
-          version: 1,
-        ),
-        carModel: const VehicleModelModel(
-          id: 'model',
-          makeId: 'brand',
-          vehicleModelName: ModelName(
-            nameAr: 'لاند كروزر',
-            nameEn: 'Land Cruiser',
-          ),
-          active: true,
-          version: 1,
-        ),
-      ),
-    );
+    return Builder(
+      builder: (context) {
+        final isDark = context.isDarkTheme;
+        final baseColor = isDark
+            ? const Color(0xFF262626)
+            : const Color(0xFFE2E8F0);
+        final highlightColor = isDark
+            ? const Color(0xFF3F3F3F)
+            : const Color(0xFFF1F5F9);
 
-    return Skeletonizer(
-      enabled: true,
-      child: ListView.separated(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: dummyCars.length,
-        separatorBuilder: (context, index) => const SizedBox(height: 16),
-        itemBuilder: (context, index) =>
-            MyCarCard(car: dummyCars[index], onEdit: null, onDelete: null),
-      ),
+        return Shimmer.fromColors(
+          baseColor: baseColor,
+          highlightColor: highlightColor,
+          child: ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: 3,
+            separatorBuilder: (context, index) => const SizedBox(height: 16),
+            itemBuilder: (context, index) => Container(
+              height: 100,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
   // 6. Shimmer list for my addresses
   static Widget addresses() {
-    final dummyAddresses = List.generate(
-      3,
-      (index) => AddressModel(
-        id: 'shimmer_address_$index',
-        label: 'المنزل الافتراضي للشيمر',
-        details: 'شارع الملك فهد، حي الصحافة، الرياض، المملكة العربية السعودية',
-        lat: 24.7136,
-        lng: 46.6753,
-      ),
-    );
+    return Builder(
+      builder: (context) {
+        final isDark = context.isDarkTheme;
+        final baseColor = isDark
+            ? const Color(0xFF262626)
+            : const Color(0xFFE2E8F0);
+        final highlightColor = isDark
+            ? const Color(0xFF3F3F3F)
+            : const Color(0xFFF1F5F9);
 
-    return Skeletonizer(
-      enabled: true,
-      child: ListView.separated(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: dummyAddresses.length,
-        separatorBuilder: (context, index) => const SizedBox(height: 16),
-        itemBuilder: (context, index) => MyAddressCard(
-          address: dummyAddresses[index],
-          onEdit: () {},
-          onDelete: () {},
-        ),
-      ),
+        return Shimmer.fromColors(
+          baseColor: baseColor,
+          highlightColor: highlightColor,
+          child: ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: 3,
+            separatorBuilder: (context, index) => const SizedBox(height: 16),
+            itemBuilder: (context, index) => Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 100,
+                    height: 14,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    width: double.infinity,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -251,44 +337,64 @@ class ShimmerHelper extends StatelessWidget {
     Function(int)? onCarSelected,
     VoidCallback? onAddCar,
   }) {
-    final dummyCars = List.generate(
-      3,
-      (index) => MyCarModel(
-        id: 'shimmer_car_$index',
-        makeId: 'shimmer_brand',
-        modelId: 'shimmer_model',
-        logoUrl: "assets/images/logo_demo.png",
+    return Builder(
+      builder: (context) {
+        final width = MediaQuery.sizeOf(context).width;
+        final height = MediaQuery.sizeOf(context).height;
+        final isDark = context.isDarkTheme;
+        final baseColor = isDark
+            ? const Color(0xFF262626)
+            : const Color(0xFFE2E8F0);
+        final highlightColor = isDark
+            ? const Color(0xFF3F3F3F)
+            : const Color(0xFFF1F5F9);
 
-        color: '#CCCCCC',
-        modelYear: DateTime.now().year,
-        plateNumber: '١٢٣٤',
-        carMake: const VehicleMakeModel(
-          id: 'brand',
-          vehicleMakeName: MakeName(
-            nameAr: 'تويوتا نموذج',
-            nameEn: 'Toyota Dummy',
+        return SizedBox(
+          height: height * 0.14,
+          child: Shimmer.fromColors(
+            baseColor: baseColor,
+            highlightColor: highlightColor,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: 4,
+              separatorBuilder: (context, index) =>
+                  SizedBox(width: width * 0.02),
+              itemBuilder: (context, index) {
+                return Container(
+                  width: width * 0.28,
+                  padding: EdgeInsets.all(width * 0.03),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: height * 0.055,
+                        height: height * 0.055,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      SizedBox(height: height * 0.01),
+                      Container(
+                        width: 60,
+                        height: 12,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
           ),
-          active: true,
-          version: 1,
-        ),
-        carModel: const VehicleModelModel(
-          id: 'model',
-          makeId: 'brand',
-          vehicleModelName: ModelName(nameAr: 'كامري', nameEn: 'Camry'),
-          active: true,
-          version: 1,
-        ),
-      ),
-    );
-
-    return Skeletonizer(
-      enabled: true,
-      child: CarSelectionList(
-        cars: dummyCars,
-        selectedCarIndex: selectedCarIndex,
-        onCarSelected: onCarSelected ?? (index) {},
-        onAddCar: onAddCar ?? () {},
-      ),
+        );
+      },
     );
   }
 
@@ -297,40 +403,94 @@ class ShimmerHelper extends StatelessWidget {
     int? selectedAddressIndex,
     Function(int)? onAddressSelected,
   }) {
-    final dummyAddresses = List.generate(
-      3,
-      (index) => AddressModel(
-        id: 'shimmer_address_$index',
-        label: 'عنوان افتراضي $index',
-        details: 'شارع التخصصي، الرياض، المملكة العربية السعودية',
-        lat: 24.7136,
-        lng: 46.6753,
-      ),
-    );
+    return Builder(
+      builder: (context) {
+        final isDark = context.isDarkTheme;
+        final baseColor = isDark
+            ? const Color(0xFF262626)
+            : const Color(0xFFE2E8F0);
+        final highlightColor = isDark
+            ? const Color(0xFF3F3F3F)
+            : const Color(0xFFF1F5F9);
 
-    return Skeletonizer(
-      enabled: true,
-      child: ListView.builder(
-        physics: const NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        itemCount: dummyAddresses.length,
-        padding: EdgeInsets.zero,
-        itemBuilder: (context, index) {
-          final address = dummyAddresses[index];
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: LocationSelectionCard(
-              icon: AppAssets.location,
-              title: address.label,
-              subtitle: address.details,
-              isSelected: selectedAddressIndex == index + 1,
-              onTap: onAddressSelected != null
-                  ? () => onAddressSelected(index + 1)
-                  : () {},
-            ),
-          );
-        },
-      ),
+        return Shimmer.fromColors(
+          baseColor: baseColor,
+          highlightColor: highlightColor,
+          child: ListView.builder(
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            itemCount: 3,
+            padding: EdgeInsets.zero,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 24,
+                        height: 24,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 100,
+                              height: 14,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Container(
+                              width: double.infinity,
+                              height: 12,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  // Unified list in all packages page
+  static Widget packagesList({int itemCount = 3}) {
+    return Builder(
+      builder: (context) {
+        return ListView.separated(
+          padding: const EdgeInsets.all(16),
+          itemCount: itemCount,
+          separatorBuilder: (context, index) => const SizedBox(height: 24),
+          itemBuilder: (context, index) =>
+              homeItemCard(context, width: double.infinity),
+        );
+      },
     );
   }
 }

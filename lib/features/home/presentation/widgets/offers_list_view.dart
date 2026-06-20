@@ -7,7 +7,7 @@ import '../../../../generated/locale_keys.g.dart';
 import '../../data/models/offer_model.dart';
 import 'offer_card.dart';
 import '../views/offers_view.dart';
-import 'package:skeletonizer/skeletonizer.dart';
+import '../../../../core/helpers/shimmer_helper.dart';
 
 class OffersListView extends StatefulWidget {
   final bool isLoading;
@@ -27,9 +27,29 @@ class _OffersListViewState extends State<OffersListView> {
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.sizeOf(context).height;
-    return Skeletonizer(
-      enabled: widget.isLoading,
-      child: Column(
+    if (widget.isLoading) {
+      return Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  LocaleKeys.home_best_offers.tr(context: context),
+                  style: !context.isTablet
+                      ? AppTextStyles.bold16
+                      : AppTextStyles.bold18,
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: height * 0.012),
+          ShimmerHelper.offers(height: height * 0.21),
+        ],
+      );
+    }
+    return Column(
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -97,7 +117,6 @@ class _OffersListViewState extends State<OffersListView> {
           ),
         ),
       ],
-    ),
-  );
-}
+    );
+  }
 }

@@ -132,6 +132,11 @@ class _HomeViewState extends State<HomeView> {
                               final isLoading =
                                   state is BannersLoading ||
                                   state is BannersInitial;
+                              if (isLoading) {
+                                return ShimmerHelper.banners(
+                                  controller: _carouselController,
+                                );
+                              }
                               List<BannerModel> activeBanners = [];
                               if (state is BannersLoaded) {
                                 activeBanners = state.banners;
@@ -139,12 +144,9 @@ class _HomeViewState extends State<HomeView> {
                               if (activeBanners.isEmpty) {
                                 return const SizedBox.shrink();
                               }
-                              return ShimmerHelper(
-                                enabled: isLoading,
-                                child: HomeBannersCarosal(
-                                  carouselController: _carouselController,
-                                  banners: activeBanners,
-                                ),
+                              return HomeBannersCarosal(
+                                carouselController: _carouselController,
+                                banners: activeBanners,
                               );
                             },
                           ),

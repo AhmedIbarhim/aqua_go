@@ -10,8 +10,6 @@ import '../../data/models/package_model.dart';
 import '../controllers/packages_controller/packages_cubit.dart';
 import 'package_card.dart';
 
-import 'package:skeletonizer/skeletonizer.dart';
-
 class PackagesListView extends StatelessWidget {
   const PackagesListView({super.key});
 
@@ -29,9 +27,7 @@ class PackagesListView extends StatelessWidget {
         }
 
         final List<PackageModel> displayPackages;
-        if (isLoading) {
-          displayPackages = ShimmerHelper.getDummyPackages();
-        } else if (state is PackagesLoaded) {
+        if (state is PackagesLoaded) {
           displayPackages = state.packages;
         } else {
           displayPackages = [];
@@ -41,28 +37,25 @@ class PackagesListView extends StatelessWidget {
           return const SizedBox.shrink();
         }
 
-        return Skeletonizer(
-          enabled: isLoading,
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      LocaleKeys.home_available_packages.tr(context: context),
-                      style: !context.isTablet
-                          ? AppTextStyles.bold16
-                          : AppTextStyles.bold18,
-                    ),
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    LocaleKeys.home_available_packages.tr(context: context),
+                    style: !context.isTablet
+                        ? AppTextStyles.bold16
+                        : AppTextStyles.bold18,
+                  ),
+                  if (!isLoading)
                     GestureDetector(
-                      onTap: isLoading
-                          ? null
-                          : () {
-                              context.pushNamed(Routes.packages);
-                            },
+                      onTap: () {
+                        context.pushNamed(Routes.packages);
+                      },
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
@@ -96,24 +89,27 @@ class PackagesListView extends StatelessWidget {
                         ],
                       ),
                     ),
-                  ],
-                ),
+                ],
               ),
-              SizedBox(height: height * 0.012),
-              SizedBox(
-                height: context.isMobile ? width * 0.37 : height * 0.175,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  itemCount: displayPackages.length,
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(width: 16),
-                  itemBuilder: (context, index) =>
-                      PackageCard(packageModel: displayPackages[index]),
-                ),
-              ),
-            ],
-          ),
+            ),
+            SizedBox(height: height * 0.012),
+            isLoading
+                ? ShimmerHelper.packages(
+                    height: context.isMobile ? width * 0.37 : height * 0.175,
+                  )
+                : SizedBox(
+                    height: context.isMobile ? width * 0.37 : height * 0.175,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      itemCount: displayPackages.length,
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(width: 16),
+                      itemBuilder: (context, index) =>
+                          PackageCard(packageModel: displayPackages[index]),
+                    ),
+                  ),
+          ],
         );
       },
     );

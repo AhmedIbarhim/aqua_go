@@ -2,7 +2,6 @@ import 'package:aqua_go/features/home/data/models/package_model.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../../core/components/generic_app_bar.dart';
 import '../../../../core/extentions/context_extentions.dart';
@@ -40,16 +39,15 @@ class PackagesView extends StatelessWidget {
               );
             }
 
-            final List<PackageModel> displayPackages;
             if (isLoading) {
-              displayPackages = ShimmerHelper.getDummyPackages();
-            } else if (state is PackagesLoaded) {
-              displayPackages = state.packages;
-            } else {
-              displayPackages = [];
+              return ShimmerHelper.packagesList();
             }
 
-            if (!isLoading && displayPackages.isEmpty) {
+            final List<PackageModel> displayPackages = state is PackagesLoaded
+                ? state.packages
+                : <PackageModel>[];
+
+            if (displayPackages.isEmpty) {
               return Center(
                 child: Text(
                   LocaleKeys.home_available_packages.tr(context: context),
@@ -58,17 +56,14 @@ class PackagesView extends StatelessWidget {
               );
             }
 
-            return Skeletonizer(
-              enabled: isLoading,
-              child: ListView.separated(
-                padding: const EdgeInsets.all(16),
-                itemCount: displayPackages.length,
-                separatorBuilder: (context, index) =>
-                    const SizedBox(height: 24),
-                itemBuilder: (context, index) => PackageCard(
-                  packageModel: displayPackages[index],
-                  atHome: false,
-                ),
+            return ListView.separated(
+              padding: const EdgeInsets.all(16),
+              itemCount: displayPackages.length,
+              separatorBuilder: (context, index) =>
+                  const SizedBox(height: 24),
+              itemBuilder: (context, index) => PackageCard(
+                packageModel: displayPackages[index],
+                atHome: false,
               ),
             );
           },

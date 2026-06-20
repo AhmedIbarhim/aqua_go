@@ -86,10 +86,16 @@ class _AddAddressBottomSheetState extends State<AddAddressBottomSheet> {
       _addressNameController.text = widget.existingAddress!.label;
       _accessNotesController.text = widget.existingAddress!.arrivalNotes ?? '';
     }
+    _addressNameController.addListener(_onAddressNameChanged);
+  }
+
+  void _onAddressNameChanged() {
+    setState(() {});
   }
 
   @override
   void dispose() {
+    _addressNameController.removeListener(_onAddressNameChanged);
     _addressController.dispose();
     _addressNameController.dispose();
     _accessNotesController.dispose();
@@ -190,7 +196,9 @@ class _AddAddressBottomSheetState extends State<AddAddressBottomSheet> {
             CustomTextFormField(
               controller: _addressNameController,
               label: LocaleKeys.address_address_name_label.tr(context: context),
-              hintText: LocaleKeys.address_address_name_example.tr(context: context),
+              hintText: LocaleKeys.address_address_name_example.tr(
+                context: context,
+              ),
               prefixIcon: Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: Icon(
@@ -209,7 +217,9 @@ class _AddAddressBottomSheetState extends State<AddAddressBottomSheet> {
             ),
             SizedBox(height: height * 0.03),
 
-            _buildSectionLabel(LocaleKeys.address_access_notes_label.tr(context: context)),
+            _buildSectionLabel(
+              LocaleKeys.address_access_notes_label.tr(context: context),
+            ),
             SizedBox(height: height * 0.01),
             CustomTextFormField(
               controller: _accessNotesController,
@@ -227,9 +237,8 @@ class _AddAddressBottomSheetState extends State<AddAddressBottomSheet> {
                     text: widget.existingAddress == null
                         ? LocaleKeys.address_save_address.tr(context: context)
                         : LocaleKeys.profile_save_changes.tr(context: context),
+                    enabled: _addressNameController.text.trim().isNotEmpty,
                     onPressed: () {
-                      if (_addressNameController.text.trim().isEmpty) return;
-
                       final newAddress = AddressModel(
                         id: widget.existingAddress?.id,
                         label: _addressNameController.text.trim(),

@@ -25,188 +25,204 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
     return ValueListenableBuilder(
       valueListenable: currentUser,
       builder: (context, user, _) {
-    final userName = FetchUserData.getUserName();
-    final isGuest = user == null;
+        final userName = FetchUserData.getUserName();
+        final isGuest = user == null;
 
-    return SafeArea(
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: sw(16), vertical: sh(16)),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
+        return SafeArea(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: sw(16), vertical: sh(16)),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                  width: context.isMobile ? sw(40) : sw(30),
-                  height: context.isMobile ? sw(40) : sw(30),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: context.colors.primary, width: 1),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(sw(40)),
-                    child: user?.imageUrl != null && user!.imageUrl!.isNotEmpty
-                        ? CachedNetworkImage(
-                            imageUrl: user.imageUrl!,
-                            fit: BoxFit.cover,
-                            placeholder: (context, url) => Center(
-                              child: SizedBox(
-                                width: sw(16),
-                                height: sw(16),
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
+                Row(
+                  children: [
+                    Container(
+                      width: context.isMobile ? sw(40) : sw(30),
+                      height: context.isMobile ? sw(40) : sw(30),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: context.colors.primary,
+                          width: 1,
+                        ),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(sw(40)),
+                        child:
+                            user?.imageUrl != null && user!.imageUrl!.isNotEmpty
+                            ? CachedNetworkImage(
+                                imageUrl: user.imageUrl!,
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) => Center(
+                                  child: SizedBox(
+                                    width: sw(16),
+                                    height: sw(16),
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: context.colors.primary,
+                                    ),
+                                  ),
+                                ),
+                                errorWidget: (context, url, error) => Icon(
+                                  Icons.person,
                                   color: context.colors.primary,
                                 ),
-                              ),
-                            ),
-                            errorWidget: (context, url, error) => Icon(
-                              Icons.person,
-                              color: context.colors.primary,
-                            ),
-                          )
-                        : Icon(
-                            Icons.person,
-                            color: context.colors.primary,
-                          ),
-                  ),
-                ),
-                SizedBox(width: sw(8)),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      '${LocaleKeys.layout_welcome.tr(context: context)} $userName.',
-                      style: AppTextStyles.regular12.copyWith(
-                        color: context.colors.textSecondary,
+                              )
+                            : Icon(Icons.person, color: context.colors.primary),
                       ),
                     ),
-                    Row(
+                    SizedBox(width: sw(8)),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          LocaleKeys.layout_ready_to_serve.tr(context: context),
-                          style: AppTextStyles.medium14,
+                          '${LocaleKeys.layout_welcome.tr(context: context)} $userName.',
+                          style: AppTextStyles.regular12.copyWith(
+                            color: context.colors.textSecondary,
+                          ),
                         ),
-                        SizedBox(width: sw(4)),
-                        Image.asset(
-                          AppAssets.wavingHand,
-                          width: sw(16),
-                          height: sw(16),
+                        Row(
+                          children: [
+                            Text(
+                              LocaleKeys.layout_ready_to_serve.tr(
+                                context: context,
+                              ),
+                              style: AppTextStyles.medium14,
+                            ),
+                            SizedBox(width: sw(4)),
+                            Image.asset(
+                              AppAssets.wavingHand,
+                              width: sw(16),
+                              height: sw(16),
+                            ),
+                          ],
                         ),
                       ],
                     ),
                   ],
                 ),
-              ],
-            ),
 
-            // Left Side: Gift and Notifications
-            Row(
-              children: [
-                BlocProvider(
-                  create: (context) {
-                    final cubit = locator<NotificationsCubit>();
-                    if (!isGuest) {
-                      cubit.fetchUnreadCount();
-                    }
-                    return cubit;
-                  },
-                  child: BlocBuilder<NotificationsCubit, NotificationsState>(
-                    builder: (context, state) {
-                      final int unreadCount = state is NotificationsSuccess
-                          ? state.unreadCount
-                          : 0;
-                      return Stack(
-                        children: [
-                          GestureDetector(
-                            onTap: () async {
-                              if (isGuest) {
-                                FetchUserData.promptGuestToLogin(context);
-                              } else {
-                                await context.pushNamed(Routes.notification);
-                                if (context.mounted) {
-                                  context
-                                      .read<NotificationsCubit>()
-                                      .fetchUnreadCount();
-                                }
-                              }
-                            },
-                            child: Container(
-                              padding: EdgeInsets.all(sw(8)),
-                              decoration: BoxDecoration(
-                                color: Colors.transparent,
-                                borderRadius: BorderRadius.circular(sw(8)),
-                              ),
-                              child: SvgPicture.asset(
-                                AppAssets.notification,
-                                width: sw(24),
-                                height: sw(24),
-                                placeholderBuilder: (context) =>
-                                    SizedBox(width: sw(24), height: sw(24)),
-                                colorFilter: ColorFilter.mode(
-                                  context.colors.textPrimary,
-                                  BlendMode.srcIn,
-                                ),
-                              ),
-                            ),
-                          ),
-                          if (unreadCount > 0)
-                            Positioned(
-                              left: context.isEn ? sw(8) : null,
-                              right: context.isAr ? sw(8) : null,
-                              top: sw(4),
-                              child: Container(
-                                padding: EdgeInsets.all(sw(2)),
-                                decoration: BoxDecoration(
-                                  color: context.colors.warning,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: context.colors.screenBG,
-                                    width: 1.5,
-                                  ),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    unreadCount > 99 ? '99+' : '$unreadCount',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: sw(9),
-                                      fontWeight: FontWeight.bold,
-                                      height: 1.0,
+                // Left Side: Gift and Notifications
+                Row(
+                  children: [
+                    BlocProvider(
+                      create: (context) {
+                        final cubit = locator<NotificationsCubit>();
+                        if (!isGuest) {
+                          cubit.fetchUnreadCount();
+                        }
+                        return cubit;
+                      },
+                      child:
+                          BlocBuilder<NotificationsCubit, NotificationsState>(
+                            builder: (context, state) {
+                              final int unreadCount =
+                                  state is NotificationsSuccess
+                                  ? state.unreadCount
+                                  : 0;
+                              return Stack(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () async {
+                                      if (isGuest) {
+                                        FetchUserData.promptGuestToLogin(
+                                          context,
+                                        );
+                                      } else {
+                                        await context.pushNamed(
+                                          Routes.notification,
+                                        );
+                                        if (context.mounted) {
+                                          context
+                                              .read<NotificationsCubit>()
+                                              .fetchUnreadCount();
+                                        }
+                                      }
+                                    },
+                                    child: Container(
+                                      padding: EdgeInsets.all(sw(8)),
+                                      decoration: BoxDecoration(
+                                        color: Colors.transparent,
+                                        borderRadius: BorderRadius.circular(
+                                          sw(8),
+                                        ),
+                                      ),
+                                      child: SvgPicture.asset(
+                                        AppAssets.notification,
+                                        width: sw(24),
+                                        height: sw(24),
+                                        placeholderBuilder: (context) =>
+                                            SizedBox(
+                                              width: sw(24),
+                                              height: sw(24),
+                                            ),
+                                        colorFilter: ColorFilter.mode(
+                                          context.colors.textPrimary,
+                                          BlendMode.srcIn,
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ),
-                            ),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-                SizedBox(width: sw(8)),
-                GestureDetector(
-                  onTap: () {},
-                  child: Container(
-                    padding: EdgeInsets.all(sw(8)),
-                    decoration: BoxDecoration(
-                      color: Colors.transparent,
-                      borderRadius: BorderRadius.circular(sw(8)),
+                                  if (unreadCount > 0)
+                                    Positioned(
+                                      left: context.isEn ? sw(8) : null,
+                                      right: context.isAr ? sw(8) : null,
+                                      top: sw(4),
+                                      child: Container(
+                                        padding: EdgeInsets.all(sw(2)),
+                                        decoration: BoxDecoration(
+                                          color: context.colors.warning,
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                            color: context.colors.screenBG,
+                                            width: 1.5,
+                                          ),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            unreadCount > 99
+                                                ? '99+'
+                                                : '$unreadCount',
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: sw(9),
+                                              fontWeight: FontWeight.bold,
+                                              height: 1.0,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              );
+                            },
+                          ),
                     ),
-                    child: SvgPicture.asset(
-                      AppAssets.gift,
-                      width: sw(24),
-                      height: sw(24),
-                      placeholderBuilder: (context) =>
-                          SizedBox(width: sw(24), height: sw(24)),
-                    ),
-                  ),
+                    // SizedBox(width: sw(8)),
+                    // GestureDetector(
+                    //   onTap: () {},
+                    //   child: Container(
+                    //     padding: EdgeInsets.all(sw(8)),
+                    //     decoration: BoxDecoration(
+                    //       color: Colors.transparent,
+                    //       borderRadius: BorderRadius.circular(sw(8)),
+                    //     ),
+                    //     child: SvgPicture.asset(
+                    //       AppAssets.gift,
+                    //       width: sw(24),
+                    //       height: sw(24),
+                    //       placeholderBuilder: (context) =>
+                    //           SizedBox(width: sw(24), height: sw(24)),
+                    //     ),
+                    //   ),
+                    // ),
+                  ],
                 ),
               ],
             ),
-          ],
-        ),
-      ),
-    );
+          ),
+        );
       },
     );
   }
