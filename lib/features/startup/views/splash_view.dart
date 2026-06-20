@@ -41,7 +41,7 @@ class _SplashViewState extends State<SplashView> {
     await Future.delayed(const Duration(seconds: 2));
     if (!mounted) return;
 
-    // TASK 2 — install-marker gate: SharedPrefs is wiped on reinstall but
+    // install-marker gate: SharedPrefs is wiped on reinstall but
     // Keychain survives, so an absent marker means any stored token is stale.
     final installed = CacheClient.getBool(kSessionInstallMarker);
     if (!installed) {
@@ -52,7 +52,7 @@ class _SplashViewState extends State<SplashView> {
       return;
     }
 
-    // TASK 4 — server-validated routing.
+    // server-validated routing.
     final token = await SecureStorage.getSecuredString(kAccessToken);
     if (token == null || token.isEmpty) {
       if (!mounted) return;
@@ -85,10 +85,7 @@ class _SplashViewState extends State<SplashView> {
         if (_isProfileComplete(user)) {
           context.pushReplacementNamed(Routes.layout);
         } else {
-          context.pushReplacementNamed(
-            Routes.profileData,
-            arguments: true,
-          );
+          context.pushReplacementNamed(Routes.profileData, arguments: true);
         }
       },
     );

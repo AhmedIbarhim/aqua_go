@@ -73,7 +73,7 @@ class _OnboardingViewState extends State<OnboardingView> {
 
           Column(
             children: [
-              SizedBox(height: MediaQuery.sizeOf(context).height * 0.2),
+              SizedBox(height: MediaQuery.sizeOf(context).height * 0.1),
               Expanded(
                 child: OnboardingPageView(pageController: _pageController),
               ),
