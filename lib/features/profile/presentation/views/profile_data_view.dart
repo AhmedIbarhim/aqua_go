@@ -118,7 +118,9 @@ class _ProfileDataViewState extends State<ProfileDataView> {
                         child: Column(
                           children: [
                             CustomTextField(
-                              label: LocaleKeys.profile_full_name.tr(context: context),
+                              label: LocaleKeys.profile_full_name.tr(
+                                context: context,
+                              ),
                               hint: '',
                               controller: _nameController,
                               isRequired: isEditing,
@@ -134,7 +136,9 @@ class _ProfileDataViewState extends State<ProfileDataView> {
                             ),
                             const SizedBox(height: 24),
                             CustomTextField(
-                              label: LocaleKeys.profile_dob.tr(context: context),
+                              label: LocaleKeys.profile_dob.tr(
+                                context: context,
+                              ),
                               hint: '',
                               controller: _dobController,
                               isRequired: isEditing,
@@ -187,7 +191,7 @@ class _ProfileDataViewState extends State<ProfileDataView> {
   Future<void> _selectDate() async {
     final DateTime now = DateTime.now();
     final DateTime lastDate = now.subtract(const Duration(days: 16 * 365));
-    final DateTime firstDate = DateTime(now.year - 90);
+    final DateTime firstDate = DateTime(now.year - 89);
 
     DateTime initialDate = _birthDate ?? DateTime(1990);
     if (initialDate.isBefore(firstDate)) {

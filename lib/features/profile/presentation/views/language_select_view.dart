@@ -60,7 +60,7 @@ class LanguageSelectView extends StatelessWidget {
                 child: Column(
                   children: [
                     _LanguageItem(
-                      title: LocaleKeys.language_arabic.tr(context: context),
+                      title: ('العربية'),
                       flag: AppAssets.ksaFlag,
                       isSelected: currentLocale.languageCode == kArabicLang,
                       onTap: () {
@@ -74,7 +74,7 @@ class LanguageSelectView extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     _LanguageItem(
-                      title: LocaleKeys.language_english.tr(context: context),
+                      title: ('English'),
                       flag: AppAssets.usFlag,
                       isSelected: currentLocale.languageCode == kEnglishLang,
                       onTap: () {
