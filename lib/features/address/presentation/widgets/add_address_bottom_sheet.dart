@@ -265,7 +265,7 @@ class _AddAddressBottomSheetState extends State<AddAddressBottomSheet> {
                     onPressed: () => Navigator.pop(context),
                     text: LocaleKeys.cancel.tr(context: context),
                     color: Colors.transparent,
-                    textColor: context.colors.textPrimary,
+                    textColor: context.colors.primary,
                     borderColor: context.colors.borderSecondary,
                   ),
                 ),

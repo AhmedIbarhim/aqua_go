@@ -14,6 +14,7 @@ import '../../../core/config/controllers/language_controller/language_cubit.dart
 import '../../../core/themes/app_text_styles.dart';
 import '../widgets/language_widget.dart';
 import '../widgets/onboarding_page_view.dart';
+import '../widgets/onboarding_steps_widget.dart';
 
 class OnboardingView extends StatefulWidget {
   const OnboardingView({super.key});
@@ -73,13 +74,23 @@ class _OnboardingViewState extends State<OnboardingView> {
 
           Column(
             children: [
-              SizedBox(height: MediaQuery.sizeOf(context).height * 0.1),
+              SizedBox(height: MediaQuery.sizeOf(context).height * 0.2),
               Expanded(
                 child: OnboardingPageView(pageController: _pageController),
               ),
               _buildBottomContainer(context, isSmallScreen),
             ],
           ),
+
+          if (currentPage == 0)
+            Positioned(
+              top: MediaQuery.sizeOf(context).height * 0.06,
+              left: 0,
+              right: 0,
+              height: MediaQuery.sizeOf(context).height * 0.40,
+              child: const OnboardingStepsWidget(),
+            ),
+
           Positioned(top: 48, left: 24, child: LanguageWidget()),
         ],
       ),

@@ -115,6 +115,7 @@ abstract class AppAssets {
   static const String logout = 'assets/svg/logout.svg';
   static const String login = 'assets/svg/login.svg';
   static const String loginAlert = 'assets/svg/login_alert.svg';
+  static const String verified = 'assets/svg/verified.svg';
 
   // Address
   static const String mapOutlined = 'assets/svg/map.svg';
