@@ -103,12 +103,22 @@ class BookingRepository {
   /// Pay-before-create step 2: re-validate the quote + soft-hold the slot.
   /// Returns the amount + deterministic Moyasar `given_id` + metadata the SDK
   /// needs to open the on-device purchase.
+  ///
+  /// [scheduledAt] — bare ISO-8601 Saudi time (no offset) from
+  ///   [DayTimeModel.toScheduledAtString].
+  /// [vehicles] — 1-element list in the same shape as
+  ///   [ServiceBookingRequestModel.toJson] vehicles field (savedVehicleId XOR
+  ///   denormalised fields). Must be non-empty — backend @Size(min=1).
   Future<Either<Failure, PaymentInitModel>> bookingPaymentInit({
     required String quoteId,
+    required String scheduledAt,
+    required List<Map<String, dynamic>> vehicles,
   }) async {
     try {
       final response = await bookingsRemoteDataSource.bookingPaymentInit(
         quoteId: quoteId,
+        scheduledAt: scheduledAt,
+        vehicles: vehicles,
         idempotencyKey: 'booking-payment-init:$quoteId',
       );
       return response.fold((failure) => left(failure), (data) {

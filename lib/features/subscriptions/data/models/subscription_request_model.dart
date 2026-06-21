@@ -16,6 +16,13 @@ class SubscriptionRequestModel {
   /// discarded the chosen method; it now rides the create request.
   final PaymentMethod? paymentMethod;
 
+  /// Client-generated nonce included in the idempotency key
+  /// `subscription-subscribe:{customerId}:{packageId}:{nonce}`.
+  /// Also sent as `idempotencyNonce` in the request body (backend @NotBlank).
+  /// Generated as a UUID v4 at the point the request is built; reused across
+  /// retries of the same subscription attempt.
+  final String? idempotencyNonce;
+
   SubscriptionRequestModel({
     required this.packageId,
     this.vehicleId,
@@ -23,11 +30,13 @@ class SubscriptionRequestModel {
     this.initialSchedule,
     this.moyasarPaymentId,
     this.paymentMethod,
+    this.idempotencyNonce,
   });
 
   SubscriptionRequestModel copyWith({
     String? moyasarPaymentId,
     PaymentMethod? paymentMethod,
+    String? idempotencyNonce,
   }) {
     return SubscriptionRequestModel(
       packageId: packageId,
@@ -36,6 +45,7 @@ class SubscriptionRequestModel {
       initialSchedule: initialSchedule,
       moyasarPaymentId: moyasarPaymentId ?? this.moyasarPaymentId,
       paymentMethod: paymentMethod ?? this.paymentMethod,
+      idempotencyNonce: idempotencyNonce ?? this.idempotencyNonce,
     );
   }
 
@@ -53,6 +63,7 @@ class SubscriptionRequestModel {
 
     return {
       'packageId': packageId,
+      if (idempotencyNonce != null) 'idempotencyNonce': idempotencyNonce,
       if (moyasarPaymentId != null) 'moyasarPaymentId': moyasarPaymentId,
       if (paymentMethod != null) 'paymentMethod': paymentMethod!.name,
       if (finalSchedule != null)

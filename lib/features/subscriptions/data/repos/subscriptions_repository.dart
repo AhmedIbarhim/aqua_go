@@ -1,3 +1,4 @@
+import 'package:aqua_go/core/helpers/fetch_user_data_helper.dart';
 import 'package:aqua_go/core/helpers/idempotency_key_helper.dart';
 import 'package:dartz/dartz.dart';
 import 'package:aqua_go/core/config/networking/exceptions/failure.dart';
@@ -124,10 +125,14 @@ class SubscriptionsRepository {
     SubscriptionRequestModel subscriptionRequest,
   ) async {
     final body = subscriptionRequest.toJson();
-    // Deterministic pay-before-create key: a retried create against the same
-    // verified Moyasar payment replays the same subscription (spec §9.5).
+    // Deterministic pay-before-create key per CLAUDE.md §10:
+    // subscription-subscribe:{customerId}:{packageId}:{nonce}
+    // The nonce is generated client-side and stored on the request model so the
+    // same nonce is used across retries of the same subscription attempt.
+    final customerId = FetchUserData.getUserId() ?? '';
+    final nonce = subscriptionRequest.idempotencyNonce ?? '';
     final idempotencyKey =
-        'subscription-create:${subscriptionRequest.moyasarPaymentId}';
+        'subscription-subscribe:$customerId:${subscriptionRequest.packageId}:$nonce';
 
     final result = await _subscriptionsDataSource.subscribe(
       body,

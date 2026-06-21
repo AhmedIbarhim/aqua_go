@@ -6,6 +6,7 @@ import '../../../home/data/models/service_model.dart';
 import '../../domain/configs/booking_flow_config.dart';
 import '../../data/models/quote_model.dart';
 import '../../data/models/payment_init_model.dart';
+import '../../data/models/day_time_model.dart';
 import '../../data/repos/booking_repository.dart';
 import '../../../../core/enums/payment_method_enum.dart';
 import '../../domain/strategies/booking_submit_strategy.dart';
@@ -411,6 +412,11 @@ class BookingCubit extends Cubit<BookingState> {
   /// Pay-before-create step 2 for normal bookings (spec §4.2): re-validate the
   /// quote + soft-hold the slot, then expose the {amount, givenId, metadata}
   /// the Moyasar SDK needs.
+  ///
+  /// Builds `scheduledAt` (bare ISO-8601 Saudi time) and the `vehicles` list
+  /// from the cubit state so the backend can run the same slot/lead/car checks
+  /// it runs at create time (B1 fix — PaymentInitRequest requires all three
+  /// fields: quoteId, scheduledAt, vehicles).
   Future<PaymentInitModel?> initiatePayment() async {
     final quoteId = state.quote?.quoteId;
     if (quoteId == null) {
@@ -423,8 +429,59 @@ class BookingCubit extends Cubit<BookingState> {
       return null;
     }
 
+    // Build scheduledAt in the exact format DayTimeModel produces (matches
+    // ServiceBookingRequestModel.toJson and the backend bare-ISO-8601 contract).
+    final scheduledAt = (state.selectedDate != null && state.selectedTime != null)
+        ? DayTimeModel(
+            date: state.selectedDate!,
+            rawTime: state.selectedTime!,
+          ).toScheduledAtString()
+        : null;
+
+    if (scheduledAt == null) {
+      emit(
+        state.copyWith(
+          paymentPhase: PaymentPhase.declined,
+          errorMessage: 'Missing booking date/time — please select a slot.',
+        ),
+      );
+      return null;
+    }
+
+    // Build the vehicles list in the same shape as ServiceBookingRequestModel.toJson.
+    final car = state.selectedCar;
+    if (car == null) {
+      emit(
+        state.copyWith(
+          paymentPhase: PaymentPhase.declined,
+          errorMessage: 'Missing vehicle — please select a car.',
+        ),
+      );
+      return null;
+    }
+
+    final Map<String, dynamic> vehicleEntry;
+    if (car.id.isNotEmpty) {
+      vehicleEntry = {'savedVehicleId': car.id};
+    } else {
+      vehicleEntry = {
+        'plateText': car.plateNumber,
+        if (car.carMake?.vehicleMakeName.nameEn != null)
+          'vehicleMake': car.carMake!.vehicleMakeName.nameEn,
+        if (car.carModel?.vehicleModelName.nameEn != null)
+          'vehicleModel': car.carModel!.vehicleModelName.nameEn,
+        'vehicleColor': car.color,
+        'vehicleYear': car.modelYear,
+      };
+    }
+    final vehicles = [vehicleEntry];
+
     emit(state.copyWith(paymentPhase: PaymentPhase.initiated));
-    final result = await _bookingRepo.bookingPaymentInit(quoteId: quoteId);
+    final result = await _bookingRepo.bookingPaymentInit(
+      quoteId: quoteId,
+      scheduledAt: scheduledAt,
+      vehicles: vehicles,
+    );
 
     return result.fold(
       (failure) {

@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../../../core/components/custom_bottom_sheet.dart';
 import '../../../../core/enums/payment_method_enum.dart';
@@ -103,7 +104,15 @@ class _PackageSubscribtionBottomSheetState
   }
 
   /// Pay-before-create: payment-init → Moyasar SDK → create subscription.
+  ///
+  /// The nonce is generated once here and reused across retries: it rides
+  /// the idempotency key `subscription-subscribe:{customerId}:{packageId}:{nonce}`
+  /// and the `idempotencyNonce` body field (B2/B3 fix).
   Future<void> _handleConfirm(BuildContext sheetContext) async {
+    // Generate a stable nonce for this subscription attempt. A UUID v4 keeps
+    // the nonce unique per attempt and within the backend's 100-char limit.
+    final nonce = const Uuid().v4();
+
     final cubit = sheetContext.read<SubscriptionsCubit>();
     final PaymentInitModel? init =
         await cubit.initiateSubscriptionPayment(
@@ -140,6 +149,7 @@ class _PackageSubscribtionBottomSheetState
       SubscriptionRequestModel(
         packageId: widget.packageModel.id,
         paymentMethod: paymentMethod,
+        idempotencyNonce: nonce,
       ),
     );
   }

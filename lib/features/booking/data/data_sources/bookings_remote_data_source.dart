@@ -53,13 +53,24 @@ class BookingsRemoteDataSource {
 
   /// Pay-before-create step 2: re-validates the quote, soft-holds the slot,
   /// and returns {amountMinor, givenId, metadata} for the Moyasar SDK.
+  ///
+  /// `scheduledAt` is the bare ISO-8601 Saudi time string (no offset) matching
+  /// the format produced by [DayTimeModel.toScheduledAtString].
+  /// `vehicles` is the 1-element list matching the shape in
+  /// [ServiceBookingRequestModel.toJson] (savedVehicleId XOR denormalised fields).
   Future<Either<Failure, dynamic>> bookingPaymentInit({
     required String quoteId,
+    required String scheduledAt,
+    required List<Map<String, dynamic>> vehicles,
     required String idempotencyKey,
   }) {
     return _apiClient.post(
       Endpoints.bookingsPaymentInit,
-      data: {'quoteId': quoteId},
+      data: {
+        'quoteId': quoteId,
+        'scheduledAt': scheduledAt,
+        'vehicles': vehicles,
+      },
       options: Options(headers: {'Idempotency-Key': idempotencyKey}),
     );
   }
