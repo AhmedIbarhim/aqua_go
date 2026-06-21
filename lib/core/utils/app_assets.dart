@@ -14,7 +14,8 @@ abstract class AppAssets {
   static const String notificationsEmpty = 'assets/svg/notifications_empty.svg';
   // Home
   static const String homeLightHeader = 'assets/images/home_light_header.png';
-  static const String carDemo = 'assets/images/car_demo.png';
+  static const String baseServiceDark = 'assets/images/base_service_dark.png';
+  static const String baseServiceLight = 'assets/images/base_service_light.png';
 
   // Empty Screens
   static const String emptyCars = 'assets/svg/empty_folder.svg';
