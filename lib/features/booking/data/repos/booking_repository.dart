@@ -9,6 +9,7 @@ import '../models/service_reschedule_request_model.dart';
 import '../models/package_booking_request_model.dart';
 import '../models/package_reschedule_request_model.dart';
 import '../models/quote_model.dart';
+import '../models/payment_init_model.dart';
 import '../models/availability_response_model.dart';
 import '../data_sources/bookings_remote_data_source.dart';
 
@@ -99,13 +100,51 @@ class BookingRepository {
     }
   }
 
+  /// Pay-before-create step 2: re-validate the quote + soft-hold the slot.
+  /// Returns the amount + deterministic Moyasar `given_id` + metadata the SDK
+  /// needs to open the on-device purchase.
+  ///
+  /// [scheduledAt] — bare ISO-8601 Saudi time (no offset) from
+  ///   [DayTimeModel.toScheduledAtString].
+  /// [vehicles] — 1-element list in the same shape as
+  ///   [ServiceBookingRequestModel.toJson] vehicles field (savedVehicleId XOR
+  ///   denormalised fields). Must be non-empty — backend @Size(min=1).
+  Future<Either<Failure, PaymentInitModel>> bookingPaymentInit({
+    required String quoteId,
+    required String scheduledAt,
+    required List<Map<String, dynamic>> vehicles,
+  }) async {
+    try {
+      final response = await bookingsRemoteDataSource.bookingPaymentInit(
+        quoteId: quoteId,
+        scheduledAt: scheduledAt,
+        vehicles: vehicles,
+        idempotencyKey: 'booking-payment-init:$quoteId',
+      );
+      return response.fold((failure) => left(failure), (data) {
+        if (data != null) {
+          try {
+            return right(
+              PaymentInitModel.fromJson(data as Map<String, dynamic>),
+            );
+          } catch (e) {
+            return left(ServerFailure('Parsing error: $e'));
+          }
+        }
+        return left(ServerFailure('Failed to initialize payment'));
+      });
+    } catch (error) {
+      return left(ServerFailure(error.toString()));
+    }
+  }
+
   Future<Either<Failure, BookingResponseModel>> createBooking(
     ServiceBookingRequestModel booking,
   ) async {
     try {
-      final idempotencyKey = IdempotencyKeyHelper.generate(
-        userId: FetchUserData.getUserId() ?? '',
-      );
+      // Deterministic pay-before-create key: a retried create against the
+      // same verified Moyasar payment replays the same booking (spec §9.5).
+      final idempotencyKey = 'booking-create:${booking.moyasarPaymentId}';
 
       final response = await bookingsRemoteDataSource.createBooking(
         bookingData: booking.toJson(),

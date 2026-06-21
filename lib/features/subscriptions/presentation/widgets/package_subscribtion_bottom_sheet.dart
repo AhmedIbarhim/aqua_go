@@ -1,10 +1,15 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../../../core/components/custom_bottom_sheet.dart';
+import '../../../../core/config/payment/payment_sdk_config_service.dart';
+import '../../../../core/enums/payment_method_enum.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../generated/locale_keys.g.dart';
+import '../../../booking/data/models/payment_init_model.dart';
+import '../../../booking/presentation/views/moyasar_payment_view.dart';
 import '../../../home/data/models/package_model.dart';
 import '../controllers/subscriptions_controller/subscriptions_cubit.dart';
 import '../../data/models/subscription_request_model.dart';
@@ -42,6 +47,7 @@ class PackageSubscribtionBottomSheet extends StatefulWidget {
 class _PackageSubscribtionBottomSheetState
     extends State<PackageSubscribtionBottomSheet> {
   PackageSubscribtionStep _currentStep = PackageSubscribtionStep.details;
+  PaymentMethod? _selectedPaymentMethod;
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +62,10 @@ class _PackageSubscribtionBottomSheetState
             subscriptionId: state.subscription.id,
           );
         } else if (state is SubscriptionsError) {
+          context.showErrorSnackBar(state.message);
+        } else if (state is SubscriptionPaymentCancelled) {
+          // User dismissed the Moyasar sheet — stay on the payment step.
+        } else if (state is SubscriptionPaymentRefundPending) {
           context.showErrorSnackBar(state.message);
         }
       },
@@ -80,16 +90,70 @@ class _PackageSubscribtionBottomSheetState
                   key: const ValueKey('payment'),
                   packageModel: widget.packageModel,
                   isLoading: isLoading,
+                  onPaymentMethodChanged: (method) {
+                    setState(() {
+                      _selectedPaymentMethod = method;
+                    });
+                  },
                   onConfirm: (validContext) {
-                    context.read<SubscriptionsCubit>().subscribeToPackage(
-                      SubscriptionRequestModel(
-                        packageId: widget.packageModel.id,
-                      ),
-                    );
+                    _handleConfirm(validContext);
                   },
                 ),
         );
       },
+    );
+  }
+
+  /// Pay-before-create: payment-init → Moyasar SDK → create subscription.
+  ///
+  /// The nonce is generated once here and reused across retries: it rides
+  /// the idempotency key `subscription-subscribe:{customerId}:{packageId}:{nonce}`
+  /// and the `idempotencyNonce` body field (B2/B3 fix).
+  Future<void> _handleConfirm(BuildContext sheetContext) async {
+    // Generate a stable nonce for this subscription attempt. A UUID v4 keeps
+    // the nonce unique per attempt and within the backend's 100-char limit.
+    final nonce = const Uuid().v4();
+
+    final cubit = sheetContext.read<SubscriptionsCubit>();
+    final PaymentInitModel? init =
+        await cubit.initiateSubscriptionPayment(
+          packageId: widget.packageModel.id,
+        );
+    if (init == null || !sheetContext.mounted) return;
+    await PaymentSdkConfigService.instance.ensureLoaded();
+    if (!sheetContext.mounted) return;
+
+    final paymentMethod =
+        _selectedPaymentMethod ?? PaymentMethod.creditCard;
+
+    final String? paymentId = await Navigator.of(sheetContext).push<String>(
+      MaterialPageRoute(
+        builder: (_) => MoyasarPaymentView(
+          args: MoyasarPaymentArgs(
+            init: init,
+            paymentMethod: paymentMethod,
+            description: sheetContext.isAr
+                ? 'اشتراك أكوا جو'
+                : 'Aqua Go subscription',
+          ),
+        ),
+      ),
+    );
+
+    if (!sheetContext.mounted) return;
+
+    if (paymentId == null) {
+      cubit.onSubscriptionPaymentCancelled();
+      return;
+    }
+
+    await cubit.completeSubscriptionAfterPayment(
+      paymentId,
+      SubscriptionRequestModel(
+        packageId: widget.packageModel.id,
+        paymentMethod: paymentMethod,
+        idempotencyNonce: nonce,
+      ),
     );
   }
 }

@@ -2,6 +2,7 @@ import 'package:aqua_go/core/helpers/fetch_user_data_helper.dart';
 import 'package:aqua_go/core/helpers/idempotency_key_helper.dart';
 import 'package:dartz/dartz.dart';
 import 'package:aqua_go/core/config/networking/exceptions/failure.dart';
+import 'package:aqua_go/features/booking/data/models/payment_init_model.dart';
 import '../models/subscription_response_model/subscription_response_model.dart';
 import '../models/subscription_request_model.dart';
 import '../data_sources/subscriptions_remote_data_source.dart';
@@ -64,19 +65,74 @@ class SubscriptionsRepository {
     });
   }
 
+  /// Pay-before-create step 1 for subscriptions (spec §4.3): re-validates the
+  /// package + customer and returns the SDK payload. No PSP call.
+  /// Idempotency key: `subscription-payment-init:{customerId}:{packageId}`.
+  Future<Either<Failure, PaymentInitModel>> subscriptionPaymentInit({
+    required String packageId,
+    required String customerId,
+  }) async {
+    final idempotencyKey = 'subscription-payment-init:$customerId:$packageId';
+    final result = await _subscriptionsDataSource.subscriptionPaymentInit(
+      packageId: packageId,
+      customerId: customerId,
+      idempotencyKey: idempotencyKey,
+    );
+    return result.fold((failure) => Left(failure), (data) {
+      if (data != null) {
+        try {
+          return Right(
+            PaymentInitModel.fromJson(data as Map<String, dynamic>),
+          );
+        } catch (e) {
+          return Left(ServerFailure('Parsing error: $e'));
+        }
+      }
+      return const Left(ServerFailure('Failed to initialize subscription payment'));
+    });
+  }
+
+  /// Pay-before-confirm step 1 for wash add-ons (spec §4.4 / A2): computes the
+  /// payable add-on delta and returns the SDK payload. No PSP call.
+  /// Idempotency key: `wash-addon-payment-init:{washId}`.
+  Future<Either<Failure, PaymentInitModel>> washAddonPaymentInit({
+    required String subscriptionId,
+    required String washId,
+    required Map<String, dynamic> scheduleBody,
+  }) async {
+    final idempotencyKey = 'wash-addon-payment-init:$washId';
+    final result = await _subscriptionsDataSource.washAddonPaymentInit(
+      subscriptionId: subscriptionId,
+      washId: washId,
+      body: scheduleBody,
+      idempotencyKey: idempotencyKey,
+    );
+    return result.fold((failure) => Left(failure), (data) {
+      if (data != null) {
+        try {
+          return Right(
+            PaymentInitModel.fromJson(data as Map<String, dynamic>),
+          );
+        } catch (e) {
+          return Left(ServerFailure('Parsing error: $e'));
+        }
+      }
+      return const Left(ServerFailure('Failed to initialize wash add-on payment'));
+    });
+  }
+
   Future<Either<Failure, SubscriptionResponseModel>> createSubscription(
     SubscriptionRequestModel subscriptionRequest,
   ) async {
-    final cleanNonce =
-        subscriptionRequest.nonce ?? DateTime.now().millisecondsSinceEpoch.toString();
-
     final body = subscriptionRequest.toJson();
-    final idempotencyKey = IdempotencyKeyHelper.generate(
-      prefix: 'subscription-subscribe',
-      userId: FetchUserData.getUserId() ?? '',
-      requestId: subscriptionRequest.packageId,
-      index: cleanNonce,
-    );
+    // Deterministic pay-before-create key per CLAUDE.md §10:
+    // subscription-subscribe:{customerId}:{packageId}:{nonce}
+    // The nonce is generated client-side and stored on the request model so the
+    // same nonce is used across retries of the same subscription attempt.
+    final customerId = FetchUserData.getUserId() ?? '';
+    final nonce = subscriptionRequest.idempotencyNonce ?? '';
+    final idempotencyKey =
+        'subscription-subscribe:$customerId:${subscriptionRequest.packageId}:$nonce';
 
     final result = await _subscriptionsDataSource.subscribe(
       body,

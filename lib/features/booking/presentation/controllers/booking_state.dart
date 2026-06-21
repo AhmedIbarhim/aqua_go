@@ -4,11 +4,36 @@ import '../../../my_cars/data/models/my_car_model.dart';
 import '../../../home/data/models/service_model.dart';
 import '../../../../core/enums/payment_method_enum.dart';
 import '../../data/models/quote_model.dart';
+import '../../data/models/payment_init_model.dart';
 import '../../data/models/availability_response_model.dart';
 import '../../domain/configs/booking_flow_config.dart';
 import '../../../my_bookings/data/models/booking_response_model/booking_response_model.dart';
 
 enum BookingStatus { initial, loading, success, failure }
+
+/// The on-device pay-before-create phase (spec §10). `none` is the resting
+/// state outside a payment attempt.
+enum PaymentPhase {
+  none,
+
+  /// payment-init in flight (re-validate quote + soft-hold slot).
+  initiated,
+
+  /// the verified-paid payment is being sent to create the row.
+  verifying,
+
+  /// server is creating the booking after a verified payment.
+  paidCreating,
+
+  /// card declined / payment failed — retry in place.
+  declined,
+
+  /// user dismissed the SDK sheet.
+  cancelled,
+
+  /// paid but create failed → server auto-refund in progress.
+  refundPending,
+}
 
 class BookingState extends Equatable {
   final BookingStatus status;
@@ -34,6 +59,10 @@ class BookingState extends Equatable {
   final Set<String> includedAddonIds;
   /// IDs of addons that are purely optional (always paid).
   final Set<String> optionalAddonIds;
+  /// Current pay-before-create phase.
+  final PaymentPhase paymentPhase;
+  /// The payment-init result driving the SDK purchase (null when not paying).
+  final PaymentInitModel? paymentInit;
 
   const BookingState({
     this.status = BookingStatus.initial,
@@ -58,6 +87,8 @@ class BookingState extends Equatable {
     this.washId,
     this.includedAddonIds = const {},
     this.optionalAddonIds = const {},
+    this.paymentPhase = PaymentPhase.none,
+    this.paymentInit,
   });
 
   BookingState copyWith({
@@ -81,9 +112,12 @@ class BookingState extends Equatable {
     String? washId,
     Set<String>? includedAddonIds,
     Set<String>? optionalAddonIds,
+    PaymentPhase? paymentPhase,
+    PaymentInitModel? paymentInit,
     bool clearSelectedDate = false,
     bool clearSelectedTime = false,
     bool clearError = false,
+    bool clearPaymentInit = false,
   }) {
     return BookingState(
       status: status ?? (clearError ? BookingStatus.initial : this.status),
@@ -108,6 +142,8 @@ class BookingState extends Equatable {
       washId: washId ?? this.washId,
       includedAddonIds: includedAddonIds ?? this.includedAddonIds,
       optionalAddonIds: optionalAddonIds ?? this.optionalAddonIds,
+      paymentPhase: paymentPhase ?? this.paymentPhase,
+      paymentInit: clearPaymentInit ? null : (paymentInit ?? this.paymentInit),
     );
   }
 
@@ -133,5 +169,7 @@ class BookingState extends Equatable {
     washId,
     includedAddonIds,
     optionalAddonIds,
+    paymentPhase,
+    paymentInit,
   ];
 }

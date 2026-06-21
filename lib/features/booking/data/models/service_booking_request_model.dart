@@ -17,6 +17,11 @@ class ServiceBookingRequestModel {
   final PaymentMethod? paymentMethod;
   final QuoteModel? quote;
 
+  /// The Moyasar payment id returned by the on-device SDK purchase. The
+  /// backend verifies this `paid` payment, then creates the booking
+  /// (pay-before-create). Required on the create call.
+  final String? moyasarPaymentId;
+
   ServiceBookingRequestModel({
     this.service,
     this.car,
@@ -27,7 +32,23 @@ class ServiceBookingRequestModel {
     this.workerNotes = const [],
     this.paymentMethod,
     this.quote,
+    this.moyasarPaymentId,
   });
+
+  ServiceBookingRequestModel copyWith({String? moyasarPaymentId}) {
+    return ServiceBookingRequestModel(
+      service: service,
+      car: car,
+      address: address,
+      date: date,
+      time: time,
+      serviceAddOns: serviceAddOns,
+      workerNotes: workerNotes,
+      paymentMethod: paymentMethod,
+      quote: quote,
+      moyasarPaymentId: moyasarPaymentId ?? this.moyasarPaymentId,
+    );
+  }
 
   bool get isComplete =>
       service != null &&
@@ -83,6 +104,7 @@ class ServiceBookingRequestModel {
       if (serviceAddOns.isNotEmpty)
         'addOns': serviceAddOns.map((e) => {'addonId': e.id}).toList(),
       if (paymentMethod != null) 'paymentMethod': paymentMethod!.name,
+      if (moyasarPaymentId != null) 'moyasarPaymentId': moyasarPaymentId,
     };
   }
 }

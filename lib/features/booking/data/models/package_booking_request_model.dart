@@ -10,6 +10,11 @@ class PackageBookingRequestModel {
   final List<AddOnModel> serviceAddOns;
   final List<String> workerNotes;
 
+  /// For a subscription wash carrying a payable add-on (A2): the verified
+  /// on-device Moyasar payment id for the add-on-only purchase. Null when the
+  /// wash is fully covered (no add-on charge).
+  final String? moyasarPaymentId;
+
   PackageBookingRequestModel({
     this.address,
     this.date,
@@ -17,6 +22,7 @@ class PackageBookingRequestModel {
     this.vehicleIds = const [],
     this.serviceAddOns = const [],
     this.workerNotes = const [],
+    this.moyasarPaymentId,
   });
 
   Map<String, dynamic> toJson() {
@@ -47,6 +53,7 @@ class PackageBookingRequestModel {
       if (serviceAddOns.isNotEmpty)
         'addOns': serviceAddOns.map((e) => {'addonId': e.id}).toList(),
       if (workerNotes.isNotEmpty) 'workerNotes': workerNotes,
+      if (moyasarPaymentId != null) 'moyasarPaymentId': moyasarPaymentId,
     };
   }
 }

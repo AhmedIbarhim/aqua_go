@@ -17,6 +17,7 @@ class ServiceBookingSubmit implements BookingSubmitStrategy {
   Future<Either<Failure, BookingResponseModel>> submit({
     required BookingRepository repo,
     required BookingState state,
+    String? moyasarPaymentId,
   }) async {
     // Build add-ons list
     final List<AddOnModel> addonsList = [];
@@ -56,6 +57,7 @@ class ServiceBookingSubmit implements BookingSubmitStrategy {
       workerNotes: notesList,
       paymentMethod: state.paymentMethod,
       quote: state.quote,
+      moyasarPaymentId: moyasarPaymentId,
     );
 
     return repo.createBooking(booking);

@@ -16,6 +16,7 @@ class ServiceRescheduleBookingSubmit implements BookingSubmitStrategy {
   Future<Either<Failure, BookingResponseModel>> submit({
     required BookingRepository repo,
     required BookingState state,
+    String? moyasarPaymentId,
   }) async {
     final List<String> vehicleIds = [];
     if (state.selectedCar != null) {
