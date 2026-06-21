@@ -24,15 +24,48 @@ abstract class AppAssets {
   // Auth
   static const String logo = 'assets/images/app_logo.png';
   static const String logoTransparent = 'assets/images/logo_transparent.png';
+  static const String authBackImage = 'assets/images/auth_background.png';
+  static const String ksaFlag = 'assets/svg/ksa.svg';
+  static const String usFlag = 'assets/svg/us.svg';
+  static const String offline = 'assets/svg/offline.svg';
+
+  // Onboarding
   static const String onboarding1 = 'assets/images/onboarding_1.png';
   static const String onboarding2 = 'assets/images/onboarding_2.png';
   static const String onboarding3 = 'assets/images/onboarding_3.png';
   static const String onboardingShadowTop =
       'assets/images/onboarding_shadow_top.png';
-  static const String authBackImage = 'assets/images/auth_background.png';
-  static const String ksaFlag = 'assets/svg/ksa.svg';
-  static const String usFlag = 'assets/svg/us.svg';
-  static const String offline = 'assets/svg/offline.svg';
+  static const String onPOneIOneEn = 'assets/images/on_pOne_iOne_en.png';
+  static const String onPOneITwoEn = 'assets/images/on_pOne_iTwo_en.png';
+  static const String onPOneIThreeEn = 'assets/images/on_pOne_iThree_en.png';
+  static const String onPOneIFourEn = 'assets/images/on_pOne_iFour_en.png';
+  static const String onPOneIFiveEn = 'assets/images/on_pOne_iFive_en.png';
+
+  static const String onPTwoIOneEn = 'assets/images/on_pTwo_iOne_en.png';
+  static const String onPTwoITwoEn = 'assets/images/on_pTwo_iTwo_en.png';
+  static const String onPTwoIThreeEn = 'assets/images/on_pTwo_iThree_en.png';
+  static const String onPTwoIFourEn = 'assets/images/on_pTwo_iFour_en.png';
+
+  static const String onPThreeIOneEn = 'assets/images/on_pThree_iOne_en.png';
+  static const String onPThreeITwoEn = 'assets/images/on_pThree_iTwo_en.png';
+  static const String onPThreeIThreeEn =
+      'assets/images/on_pThree_iThree_en.png';
+
+  static const String onPOneIOneAr = 'assets/images/on_pOne_iOne_ar.png';
+  static const String onPOneITwoAr = 'assets/images/on_pOne_iTwo_ar.png';
+  static const String onPOneIThreeAr = 'assets/images/on_pOne_iThree_ar.png';
+  static const String onPOneIFourAr = 'assets/images/on_pOne_iFour_ar.png';
+  static const String onPOneIFiveAr = 'assets/images/on_pOne_iFive_ar.png';
+
+  static const String onPTwoIOneAr = 'assets/images/on_pTwo_iOne_ar.png';
+  static const String onPTwoITwoAr = 'assets/images/on_pTwo_iTwo_ar.png';
+  static const String onPTwoIThreeAr = 'assets/images/on_pTwo_iThree_ar.png';
+  static const String onPTwoIFourAr = 'assets/images/on_pTwo_iFour_ar.png';
+
+  static const String onPThreeIOneAr = 'assets/images/on_pThree_iOne_ar.png';
+  static const String onPThreeITwoAr = 'assets/images/on_pThree_iTwo_ar.png';
+  static const String onPThreeIThreeAr =
+      'assets/images/on_pThree_iThree_ar.png';
 
   // Bottom Navigation Bar Icons
   static const String homeEnabled = 'assets/svg/home_enabled.svg';
