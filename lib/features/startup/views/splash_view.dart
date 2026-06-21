@@ -25,9 +25,11 @@ class _SplashViewState extends State<SplashView> {
   }
 
   bool _isProfileComplete(UserModel u) {
-    return (u.name?.trim().isNotEmpty ?? false) &&
-        (u.gender?.trim().isNotEmpty ?? false) &&
-        u.birthdate != null;
+    return (u.name?.trim().isNotEmpty ?? false)
+    //  &&
+    //     (u.gender?.trim().isNotEmpty ?? false) &&
+    //     u.birthdate != null
+    ;
   }
 
   void _goToPreAuth() {

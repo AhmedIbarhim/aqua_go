@@ -18,6 +18,24 @@ class RefreshTokenInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
+    final path = err.requestOptions.path;
+    final isAuthRequest =
+        path.contains(Endpoints.sendOtp) ||
+        path.contains(Endpoints.verifyOtp) ||
+        path.contains(Endpoints.refreshToken);
+
+    if (isAuthRequest) {
+      return handler.next(err);
+    }
+
+    final accessToken = await SecureStorage.getSecuredString(kAccessToken);
+    final refreshToken = await SecureStorage.getSecuredString(kRefreshToken);
+    if ((accessToken == null || accessToken.isEmpty) &&
+        (refreshToken == null || refreshToken.isEmpty)) {
+      await _clearSessionAndRedirect();
+      return handler.next(err);
+    }
+
     // Only attempt token refresh on 401 Unauthorized
     if (err.response?.statusCode != 401) {
       return handler.next(err);
