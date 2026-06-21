@@ -9,7 +9,6 @@ import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../../data/models/service_model.dart';
-
 import '../../../../core/config/session/session_state.dart';
 import '../../../../core/helpers/fetch_user_data_helper.dart';
 
@@ -27,9 +26,6 @@ class _ServiceCardState extends State<ServiceCard> {
 
   ServiceModel get serviceModel => widget.serviceModel;
 
-  /// Heuristic: a description long enough to be clipped at 2 lines should
-  /// offer a read-more affordance. The exact 2-line clip is decided by the
-  /// renderer; this guards against showing the toggle for short text.
   bool _isDescriptionLong(String description) => description.length > 60;
 
   @override
@@ -66,7 +62,6 @@ class _ServiceCardState extends State<ServiceCard> {
                   top: 0,
                   left: context.isAr ? 0 : null,
                   right: context.isAr ? null : 0,
-
                   child: Transform.flip(
                     flipX: context.isEn,
                     child: Image.asset(

@@ -57,7 +57,8 @@ class MyBookingDetailsView extends StatelessWidget {
     return BlocBuilder<MyBookingDetailsCubit, MyBookingDetailsState>(
       builder: (context, state) {
         final bool isLoading =
-            state is MyBookingDetailsLoading || state is MyBookingDetailsInitial;
+            state is MyBookingDetailsLoading ||
+            state is MyBookingDetailsInitial;
         final bool isFailure = state is MyBookingDetailsFailure;
         final activeBooking = state is MyBookingDetailsSuccess
             ? state.booking
@@ -82,9 +83,7 @@ class MyBookingDetailsView extends StatelessWidget {
                       context.pushNamedAndRemoveUntil(Routes.layout);
                     },
                   )
-                else if (!isLoading &&
-                    !isFailure &&
-                    !activeBooking.isUpcoming)
+                else if (!isLoading && !isFailure && !activeBooking.isUpcoming)
                   IconButton(
                     onPressed: () => MyBookingProceduresBottomSheet.show(
                       context,
@@ -122,7 +121,9 @@ class MyBookingDetailsView extends StatelessWidget {
                                     booking: activeBooking,
                                   ),
                                   const SizedBox(height: 16),
-                                  if (_showsBikerCard(activeBooking.status)) ...[
+                                  if (_showsBikerCard(
+                                    activeBooking.status,
+                                  )) ...[
                                     BookingDetailsBikerCard(
                                       booking: activeBooking,
                                     ),
@@ -133,7 +134,8 @@ class MyBookingDetailsView extends StatelessWidget {
                                   ),
                                   if (activeBooking.workerNotes != null &&
                                       activeBooking
-                                          .workerNotes!.isNotEmpty) ...[
+                                          .workerNotes!
+                                          .isNotEmpty) ...[
                                     const SizedBox(height: 16),
                                     BookingDetailsWorkerNotesCard(
                                       booking: activeBooking,
@@ -159,9 +161,10 @@ class MyBookingDetailsView extends StatelessWidget {
                                       rating: activeBooking.rating!,
                                     ),
                                   ],
-                                  const SizedBox(height: 16),
-                                  _buildInvoicesLink(context, activeBooking),
-                                  const SizedBox(height: 24),
+                                  const SizedBox(height: 32),
+                                  // const SizedBox(height: 16),
+                                  // _buildInvoicesLink(context, activeBooking),
+                                  // const SizedBox(height: 24),
                                 ],
                               ),
                             ),
@@ -185,11 +188,7 @@ class MyBookingDetailsView extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.error_outline,
-              size: 56,
-              color: context.colors.error,
-            ),
+            Icon(Icons.error_outline, size: 56, color: context.colors.error),
             const SizedBox(height: 16),
             Text(
               message.isNotEmpty
@@ -206,9 +205,9 @@ class MyBookingDetailsView extends StatelessWidget {
             CustomButton(
               text: LocaleKeys.retry.tr(context: context),
               onPressed: () {
-                context
-                    .read<MyBookingDetailsCubit>()
-                    .fetchBookingDetails(booking.id ?? '');
+                context.read<MyBookingDetailsCubit>().fetchBookingDetails(
+                  booking.id ?? '',
+                );
               },
             ),
           ],
@@ -233,52 +232,52 @@ class MyBookingDetailsView extends StatelessWidget {
     }
   }
 
-  Widget _buildInvoicesLink(
-    BuildContext context,
-    BookingResponseModel booking,
-  ) {
-    if (booking.invoice == null) {
-      return const SizedBox.shrink();
-    }
-    return InkWell(
-      onTap: () {
-        if (booking.invoice?.pdfUrl != null) {
-          // TODO: Open the PDF URL (requires url_launcher package or similar)
-          context.showSuccessSnackBar(booking.invoice!.pdfUrl!);
-        } else {
-          context.showWarningSnackBar(
-            context.isAr
-                ? "رابط الفاتورة غير متوفر حالياً"
-                : "Invoice PDF URL is not available yet.",
-          );
-        }
-      },
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: context.colors.themeColor,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              LocaleKeys.bookings_go_to_invoice_list.tr(context: context),
-              style: AppTextStyles.medium14.copyWith(
-                color: context.colors.primary,
-              ),
-            ),
-            Icon(
-              Icons.arrow_forward_ios,
-              color: context.colors.primary,
-              size: 16,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  // Widget _buildInvoicesLink(
+  //   BuildContext context,
+  //   BookingResponseModel booking,
+  // ) {
+  //   if (booking.invoice == null) {
+  //     return const SizedBox.shrink();
+  //   }
+  //   return InkWell(
+  //     onTap: () {
+  //       if (booking.invoice?.pdfUrl != null) {
+  //         // TODO: Open the PDF URL (requires url_launcher package or similar)
+  //         context.showSuccessSnackBar(booking.invoice!.pdfUrl!);
+  //       } else {
+  //         context.showWarningSnackBar(
+  //           context.isAr
+  //               ? "رابط الفاتورة غير متوفر حالياً"
+  //               : "Invoice PDF URL is not available yet.",
+  //         );
+  //       }
+  //     },
+  //     borderRadius: BorderRadius.circular(12),
+  //     child: Container(
+  //       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+  //       decoration: BoxDecoration(
+  //         color: context.colors.themeColor,
+  //         borderRadius: BorderRadius.circular(12),
+  //       ),
+  //       child: Row(
+  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //         children: [
+  //           Text(
+  //             LocaleKeys.bookings_go_to_invoice_list.tr(context: context),
+  //             style: AppTextStyles.medium14.copyWith(
+  //               color: context.colors.primary,
+  //             ),
+  //           ),
+  //           Icon(
+  //             Icons.arrow_forward_ios,
+  //             color: context.colors.primary,
+  //             size: 16,
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _buildActionSheet(BuildContext context, BookingResponseModel booking) {
     return BottomActionSheetContainer(
