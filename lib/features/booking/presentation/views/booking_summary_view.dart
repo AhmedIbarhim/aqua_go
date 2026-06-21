@@ -17,6 +17,7 @@ import '../controllers/booking_state.dart';
 import 'moyasar_payment_view.dart';
 import 'package:aqua_go/core/enums/payment_method_enum.dart';
 import 'package:aqua_go/features/booking/data/models/payment_init_model.dart';
+import 'package:aqua_go/core/config/payment/payment_sdk_config_service.dart';
 import 'package:aqua_go/core/route/routes.dart';
 import 'package:aqua_go/features/my_bookings/presentation/views/my_booking_deatails_view.dart';
 import 'package:aqua_go/features/my_bookings/data/models/booking_summary_model.dart';
@@ -284,6 +285,8 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
             init = await cubit.initiatePayment();
           }
           if (init == null || !context.mounted) return;
+          await PaymentSdkConfigService.instance.ensureLoaded();
+          if (!context.mounted) return;
           final PaymentInitModel resolvedInit = init;
           final paymentId = await Navigator.of(context).push<String>(
             MaterialPageRoute(

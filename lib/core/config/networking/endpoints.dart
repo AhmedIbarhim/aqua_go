@@ -133,6 +133,11 @@ abstract class Endpoints {
   static const String walletTopup = 'me/wallet/topup';
   static const String walletLedger = 'me/wallet/ledger';
 
+  // Payments Endpoints
+  /// Server-supplied Moyasar publishable key + Apple Pay config.
+  /// Loaded at runtime so the key is never compiled into the binary.
+  static const String paymentSdkConfig = 'payments/sdk-config';
+
   // Saved Cards Endpoints
   static const String savedCards = 'me/saved-cards';
   static String deleteSavedCard(String cardId) => 'me/saved-cards/$cardId';

@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/components/custom_bottom_sheet.dart';
+import '../../../../core/config/payment/payment_sdk_config_service.dart';
 import '../../../../core/enums/payment_method_enum.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../generated/locale_keys.g.dart';
@@ -119,6 +120,8 @@ class _PackageSubscribtionBottomSheetState
           packageId: widget.packageModel.id,
         );
     if (init == null || !sheetContext.mounted) return;
+    await PaymentSdkConfigService.instance.ensureLoaded();
+    if (!sheetContext.mounted) return;
 
     final paymentMethod =
         _selectedPaymentMethod ?? PaymentMethod.creditCard;
