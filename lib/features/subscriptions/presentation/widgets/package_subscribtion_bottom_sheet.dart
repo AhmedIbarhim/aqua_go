@@ -126,7 +126,7 @@ class _PackageSubscribtionBottomSheetState
     final paymentMethod =
         _selectedPaymentMethod ?? PaymentMethod.creditCard;
 
-    final String? paymentId = await Navigator.of(sheetContext).push<String>(
+    final result = await Navigator.of(sheetContext).push<MoyasarPaymentResult>(
       MaterialPageRoute(
         builder: (_) => MoyasarPaymentView(
           args: MoyasarPaymentArgs(
@@ -142,18 +142,29 @@ class _PackageSubscribtionBottomSheetState
 
     if (!sheetContext.mounted) return;
 
-    if (paymentId == null) {
-      cubit.onSubscriptionPaymentCancelled();
-      return;
+    switch (result?.status) {
+      case MoyasarPaymentStatus.paid:
+        await cubit.completeSubscriptionAfterPayment(
+          result!.paymentId!,
+          SubscriptionRequestModel(
+            packageId: widget.packageModel.id,
+            paymentMethod: paymentMethod,
+            idempotencyNonce: nonce,
+          ),
+        );
+        break;
+      case MoyasarPaymentStatus.failed:
+        cubit.onSubscriptionPaymentCancelled();
+        if (sheetContext.mounted) {
+          sheetContext.showErrorSnackBar(sheetContext.isAr
+              ? 'فشلت عملية الدفع. يرجى المحاولة مرة أخرى.'
+              : 'Payment failed. Please try again.');
+        }
+        break;
+      case MoyasarPaymentStatus.cancelled:
+      case null:
+        cubit.onSubscriptionPaymentCancelled();
+        break;
     }
-
-    await cubit.completeSubscriptionAfterPayment(
-      paymentId,
-      SubscriptionRequestModel(
-        packageId: widget.packageModel.id,
-        paymentMethod: paymentMethod,
-        idempotencyNonce: nonce,
-      ),
-    );
   }
 }

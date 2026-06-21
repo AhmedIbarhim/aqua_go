@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:uuid/uuid.dart';
 import '../../../address/data/models/address_model.dart';
 import '../../../my_cars/data/models/my_car_model.dart';
 import '../../../home/data/models/service_model.dart';
@@ -476,11 +477,13 @@ class BookingCubit extends Cubit<BookingState> {
     }
     final vehicles = [vehicleEntry];
 
+    final attemptNonce = const Uuid().v4();
     emit(state.copyWith(paymentPhase: PaymentPhase.initiated));
     final result = await _bookingRepo.bookingPaymentInit(
       quoteId: quoteId,
       scheduledAt: scheduledAt,
       vehicles: vehicles,
+      attemptNonce: attemptNonce,
     );
 
     return result.fold(
@@ -537,11 +540,13 @@ class BookingCubit extends Cubit<BookingState> {
       if (addOns.isNotEmpty) 'addOns': addOns,
     };
 
+    final attemptNonce = const Uuid().v4();
     emit(state.copyWith(paymentPhase: PaymentPhase.initiated));
     final result = await _subscriptionsRepo.washAddonPaymentInit(
       subscriptionId: subscriptionId,
       washId: washId,
       scheduleBody: body,
+      attemptNonce: attemptNonce,
     );
 
     return result.fold(

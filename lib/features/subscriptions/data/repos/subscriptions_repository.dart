@@ -71,12 +71,15 @@ class SubscriptionsRepository {
   Future<Either<Failure, PaymentInitModel>> subscriptionPaymentInit({
     required String packageId,
     required String customerId,
+    required String attemptNonce,
   }) async {
-    final idempotencyKey = 'subscription-payment-init:$customerId:$packageId';
+    final idempotencyKey =
+        'subscription-payment-init:$customerId:$packageId:$attemptNonce';
     final result = await _subscriptionsDataSource.subscriptionPaymentInit(
       packageId: packageId,
       customerId: customerId,
       idempotencyKey: idempotencyKey,
+      attemptNonce: attemptNonce,
     );
     return result.fold((failure) => Left(failure), (data) {
       if (data != null) {
@@ -99,13 +102,15 @@ class SubscriptionsRepository {
     required String subscriptionId,
     required String washId,
     required Map<String, dynamic> scheduleBody,
+    required String attemptNonce,
   }) async {
-    final idempotencyKey = 'wash-addon-payment-init:$washId';
+    final idempotencyKey = 'wash-addon-payment-init:$washId:$attemptNonce';
     final result = await _subscriptionsDataSource.washAddonPaymentInit(
       subscriptionId: subscriptionId,
       washId: washId,
       body: scheduleBody,
       idempotencyKey: idempotencyKey,
+      attemptNonce: attemptNonce,
     );
     return result.fold((failure) => Left(failure), (data) {
       if (data != null) {

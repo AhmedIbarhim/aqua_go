@@ -53,10 +53,11 @@ class SubscriptionsRemoteDataSource {
     required String packageId,
     required String customerId,
     required String idempotencyKey,
+    required String attemptNonce,
   }) {
     return _apiClient.post(
       Endpoints.subscriptionsPaymentInit,
-      data: {'packageId': packageId},
+      data: {'packageId': packageId, 'attemptNonce': attemptNonce},
       options: Options(
         headers: {'Idempotency-Key': idempotencyKey},
       ),
@@ -71,10 +72,11 @@ class SubscriptionsRemoteDataSource {
     required String washId,
     required Map<String, dynamic> body,
     required String idempotencyKey,
+    required String attemptNonce,
   }) {
     return _apiClient.post(
       Endpoints.washAddonPaymentInit(subscriptionId, washId),
-      data: body,
+      data: {...body, 'attemptNonce': attemptNonce},
       options: Options(
         headers: {'Idempotency-Key': idempotencyKey},
       ),

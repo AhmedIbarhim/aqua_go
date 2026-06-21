@@ -113,13 +113,15 @@ class BookingRepository {
     required String quoteId,
     required String scheduledAt,
     required List<Map<String, dynamic>> vehicles,
+    required String attemptNonce,
   }) async {
     try {
       final response = await bookingsRemoteDataSource.bookingPaymentInit(
         quoteId: quoteId,
         scheduledAt: scheduledAt,
         vehicles: vehicles,
-        idempotencyKey: 'booking-payment-init:$quoteId',
+        idempotencyKey: 'booking-payment-init:$quoteId:$attemptNonce',
+        attemptNonce: attemptNonce,
       );
       return response.fold((failure) => left(failure), (data) {
         if (data != null) {

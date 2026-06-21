@@ -288,7 +288,7 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
           await PaymentSdkConfigService.instance.ensureLoaded();
           if (!context.mounted) return;
           final PaymentInitModel resolvedInit = init;
-          final paymentId = await Navigator.of(context).push<String>(
+          final result = await Navigator.of(context).push<MoyasarPaymentResult>(
             MaterialPageRoute(
               builder: (_) => MoyasarPaymentView(
                 args: MoyasarPaymentArgs(
@@ -302,11 +302,24 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
               ),
             ),
           );
-          if (paymentId == null) {
-            cubit.onPaymentCancelled();
-            return;
+          if (!context.mounted) return;
+          switch (result?.status) {
+            case MoyasarPaymentStatus.paid:
+              await cubit.completeBookingAfterPayment(result!.paymentId!);
+              break;
+            case MoyasarPaymentStatus.failed:
+              cubit.onPaymentCancelled();
+              if (context.mounted) {
+                context.showErrorSnackBar(context.isAr
+                    ? 'فشلت عملية الدفع. يرجى المحاولة مرة أخرى.'
+                    : 'Payment failed. Please try again.');
+              }
+              break;
+            case MoyasarPaymentStatus.cancelled:
+            case null:
+              cubit.onPaymentCancelled();
+              break;
           }
-          await cubit.completeBookingAfterPayment(paymentId);
         },
       ),
     );

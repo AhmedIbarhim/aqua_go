@@ -63,6 +63,7 @@ class BookingsRemoteDataSource {
     required String scheduledAt,
     required List<Map<String, dynamic>> vehicles,
     required String idempotencyKey,
+    required String attemptNonce,
   }) {
     return _apiClient.post(
       Endpoints.bookingsPaymentInit,
@@ -70,6 +71,7 @@ class BookingsRemoteDataSource {
         'quoteId': quoteId,
         'scheduledAt': scheduledAt,
         'vehicles': vehicles,
+        'attemptNonce': attemptNonce,
       },
       options: Options(headers: {'Idempotency-Key': idempotencyKey}),
     );

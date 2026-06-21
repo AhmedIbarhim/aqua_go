@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:aqua_go/core/helpers/fetch_user_data_helper.dart';
 import 'package:aqua_go/features/booking/data/models/payment_init_model.dart';
+import 'package:uuid/uuid.dart';
 import '../../../data/models/subscription_response_model/subscription_response_model.dart';
 
 import '../../../data/models/subscription_request_model.dart';
@@ -54,10 +55,12 @@ class SubscriptionsCubit extends Cubit<SubscriptionsState> {
     required String packageId,
   }) async {
     final customerId = FetchUserData.getUserId() ?? '';
+    final attemptNonce = const Uuid().v4();
     emit(SubscriptionsLoading());
     final result = await _subscriptionsRepository.subscriptionPaymentInit(
       packageId: packageId,
       customerId: customerId,
+      attemptNonce: attemptNonce,
     );
     return result.fold(
       (failure) {

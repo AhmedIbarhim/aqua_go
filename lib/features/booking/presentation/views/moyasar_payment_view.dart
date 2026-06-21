@@ -10,6 +10,18 @@ import 'package:aqua_go/core/enums/payment_method_enum.dart';
 import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/features/booking/data/models/payment_init_model.dart';
 
+enum MoyasarPaymentStatus { paid, failed, cancelled }
+
+/// Outcome returned (via Navigator.pop) by [MoyasarPaymentView] to its caller.
+class MoyasarPaymentResult {
+  final MoyasarPaymentStatus status;
+  final String? paymentId; // non-null only when status == paid
+  const MoyasarPaymentResult._(this.status, this.paymentId);
+  const MoyasarPaymentResult.paid(String id) : this._(MoyasarPaymentStatus.paid, id);
+  const MoyasarPaymentResult.failed() : this._(MoyasarPaymentStatus.failed, null);
+  const MoyasarPaymentResult.cancelled() : this._(MoyasarPaymentStatus.cancelled, null);
+}
+
 /// Arguments for the on-device Moyasar purchase step (pay-before-create).
 class MoyasarPaymentArgs {
   final PaymentInitModel init;
@@ -84,28 +96,21 @@ class _MoyasarPaymentViewState extends State<MoyasarPaymentView>
     if (result is moyasar.PaymentResponse) {
       switch (result.status) {
         case moyasar.PaymentStatus.paid:
-          Navigator.of(context).pop(result.id);
+          Navigator.of(context).pop(MoyasarPaymentResult.paid(result.id));
           break;
         case moyasar.PaymentStatus.failed:
-          context.showErrorSnackBar(
-            context.isAr
-                ? 'فشلت عملية الدفع. يرجى المحاولة مرة أخرى.'
-                : 'Payment failed. Please try again.',
-          );
+          Navigator.of(context).pop(const MoyasarPaymentResult.failed());
           break;
         case moyasar.PaymentStatus.initiated:
         case moyasar.PaymentStatus.authorized:
         case moyasar.PaymentStatus.captured:
-          break;
+          break; // interim — SDK still handling 3DS; do not pop
       }
     } else if (result is moyasar.PaymentCanceledError) {
-      Navigator.of(context).pop(null);
+      Navigator.of(context).pop(const MoyasarPaymentResult.cancelled());
     } else {
-      context.showErrorSnackBar(
-        context.isAr
-            ? 'تعذّر إتمام عملية الدفع.'
-            : 'Could not complete the payment.',
-      );
+      // ApiError / unknown — treat as a failed attempt, return to method selection.
+      Navigator.of(context).pop(const MoyasarPaymentResult.failed());
     }
   }
 
