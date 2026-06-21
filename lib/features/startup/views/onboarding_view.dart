@@ -82,14 +82,19 @@ class _OnboardingViewState extends State<OnboardingView> {
             ],
           ),
 
-          if (currentPage == 0)
-            Positioned(
-              top: MediaQuery.sizeOf(context).height * 0.06,
-              left: 0,
-              right: 0,
-              height: MediaQuery.sizeOf(context).height * 0.40,
-              child: const OnboardingStepsWidget(),
+          Positioned(
+            top: MediaQuery.sizeOf(context).height * 0.12,
+            left: 0,
+            right: 0,
+            height: MediaQuery.sizeOf(context).height * 0.40,
+            child: OnboardingStepsWidget(
+              key: ValueKey(
+                'steps_${currentPage}_${Localizations.localeOf(context).languageCode}',
+              ),
+              enImages: OnboardingPageView.getEnStepImagesForPage(currentPage),
+              arImages: OnboardingPageView.getArStepImagesForPage(currentPage),
             ),
+          ),
 
           Positioned(top: 48, left: 24, child: LanguageWidget()),
         ],
