@@ -184,7 +184,7 @@ abstract class  LocaleKeys {
   static const bookings_car_plate = 'bookings.car_plate';
   static const bookings_car_images = 'bookings.car_images';
   static const bookings_before_and_after_washing = 'bookings.before_and_after_washing';
-  static const bookings_go_to_invoice_list = 'bookings.go_to_invoice_list';
+  static const bookings_view_receipt = 'bookings.view_receipt';
   static const bookings_edit_booking = 'bookings.edit_booking';
   static const bookings_worker_name = 'bookings.worker_name';
   static const bookings_add_image = 'bookings.add_image';

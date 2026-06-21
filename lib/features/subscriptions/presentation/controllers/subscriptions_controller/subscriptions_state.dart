@@ -46,3 +46,18 @@ final class SubscriptionsError extends SubscriptionsState {
   @override
   List<Object?> get props => [message];
 }
+
+/// Emitted when the subscription payment is cancelled (user dismissed
+/// the Moyasar SDK sheet without paying).
+final class SubscriptionPaymentCancelled extends SubscriptionsState {}
+
+/// Emitted after the SDK returned a verified payment and the
+/// subscription create call failed (server auto-refunds).
+final class SubscriptionPaymentRefundPending extends SubscriptionsState {
+  final String message;
+
+  const SubscriptionPaymentRefundPending(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}

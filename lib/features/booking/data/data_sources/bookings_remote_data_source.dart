@@ -51,6 +51,19 @@ class BookingsRemoteDataSource {
     );
   }
 
+  /// Pay-before-create step 2: re-validates the quote, soft-holds the slot,
+  /// and returns {amountMinor, givenId, metadata} for the Moyasar SDK.
+  Future<Either<Failure, dynamic>> bookingPaymentInit({
+    required String quoteId,
+    required String idempotencyKey,
+  }) {
+    return _apiClient.post(
+      Endpoints.bookingsPaymentInit,
+      data: {'quoteId': quoteId},
+      options: Options(headers: {'Idempotency-Key': idempotencyKey}),
+    );
+  }
+
   Future<Either<Failure, dynamic>> createBooking({
     required Map<String, dynamic> bookingData,
     required String idempotencyKey,

@@ -2,6 +2,7 @@ import 'package:aqua_go/core/config/local_storage/shared_prefs.dart';
 import 'package:aqua_go/core/constants.dart';
 import 'package:easy_localization/easy_localization.dart';
 
+import '../../../../../core/enums/payment_status_enum.dart';
 import '../../enums/booking_status_enum.dart';
 import '../../enums/booking_type_enum.dart';
 import 'assigned_worker.dart';
@@ -47,18 +48,15 @@ class BookingResponseModel {
   String? quoteId;
   int? totalAmountMinor;
   String? currency;
-  String? paymentStatus;
+  PaymentStatus? paymentStatus;
   bool? isSubscription;
-  String? paymentIntentId;
+  String? moyasarPaymentId;
   String? invoiceId;
-  String? paymentVoidedAt;
-  String? paymentStuckDetectedAt;
   int? cancellationFeeMinor;
   bool? cancellationFeeWaived;
   int? reschedulesUsed;
   String? rescheduledAt;
   CancellationPolicy? cancellationPolicy;
-  String? pspRedirectUrl;
   List<Photos>? photos;
   AssignedWorker? assignedWorker;
   String? plate;
@@ -96,16 +94,13 @@ class BookingResponseModel {
     this.currency,
     this.paymentStatus,
     this.isSubscription,
-    this.paymentIntentId,
+    this.moyasarPaymentId,
     this.invoiceId,
-    this.paymentVoidedAt,
-    this.paymentStuckDetectedAt,
     this.cancellationFeeMinor,
     this.cancellationFeeWaived,
     this.reschedulesUsed,
     this.rescheduledAt,
     this.cancellationPolicy,
-    this.pspRedirectUrl,
     this.photos,
     this.assignedWorker,
     this.plate,
@@ -146,12 +141,10 @@ class BookingResponseModel {
     quoteId = json['quoteId'];
     totalAmountMinor = json['totalAmountMinor'];
     currency = json['currency'];
-    paymentStatus = json['paymentStatus'];
+    paymentStatus = PaymentStatus.fromString(json['paymentStatus']);
     isSubscription = json['isSubscription'];
-    paymentIntentId = json['paymentIntentId'];
+    moyasarPaymentId = json['moyasarPaymentId'];
     invoiceId = json['invoiceId'];
-    paymentVoidedAt = json['paymentVoidedAt'];
-    paymentStuckDetectedAt = json['paymentStuckDetectedAt'];
     cancellationFeeMinor = json['cancellationFeeMinor'];
     cancellationFeeWaived = json['cancellationFeeWaived'];
     reschedulesUsed = json['reschedulesUsed'];
@@ -159,7 +152,6 @@ class BookingResponseModel {
     cancellationPolicy = json['cancellationPolicy'] != null
         ? CancellationPolicy.fromJson(json['cancellationPolicy'])
         : null;
-    pspRedirectUrl = json['pspRedirectUrl'];
     if (json['photos'] != null) {
       photos = <Photos>[];
       json['photos'].forEach((v) {

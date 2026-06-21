@@ -15,11 +15,16 @@ class PackageSubscribtionPaymentContent extends StatefulWidget {
   final bool isLoading;
   final void Function(BuildContext context) onConfirm;
 
+  /// Optional callback invoked when the user selects a payment method. Used
+  /// by the parent sheet to track the selection for the async payment flow.
+  final void Function(PaymentMethod method)? onPaymentMethodChanged;
+
   const PackageSubscribtionPaymentContent({
     super.key,
     required this.packageModel,
     required this.onConfirm,
     this.isLoading = false,
+    this.onPaymentMethodChanged,
   });
 
   @override
@@ -42,6 +47,7 @@ class _PackageSubscribtionPaymentContentState
             setState(() {
               _selectedMethod = method;
             });
+            widget.onPaymentMethodChanged?.call(method);
           },
         ),
         const SizedBox(height: 24),

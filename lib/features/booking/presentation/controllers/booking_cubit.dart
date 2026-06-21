@@ -5,6 +5,7 @@ import '../../../my_cars/data/models/my_car_model.dart';
 import '../../../home/data/models/service_model.dart';
 import '../../domain/configs/booking_flow_config.dart';
 import '../../data/models/quote_model.dart';
+import '../../data/models/payment_init_model.dart';
 import '../../data/repos/booking_repository.dart';
 import '../../../../core/enums/payment_method_enum.dart';
 import '../../domain/strategies/booking_submit_strategy.dart';
@@ -402,6 +403,143 @@ class BookingCubit extends Cubit<BookingState> {
         state.copyWith(
           status: BookingStatus.success,
           createdBooking: bookingResponse,
+        ),
+      ),
+    );
+  }
+
+  /// Pay-before-create step 2 for normal bookings (spec §4.2): re-validate the
+  /// quote + soft-hold the slot, then expose the {amount, givenId, metadata}
+  /// the Moyasar SDK needs.
+  Future<PaymentInitModel?> initiatePayment() async {
+    final quoteId = state.quote?.quoteId;
+    if (quoteId == null) {
+      emit(
+        state.copyWith(
+          paymentPhase: PaymentPhase.declined,
+          errorMessage: 'Missing quote — please re-confirm the booking.',
+        ),
+      );
+      return null;
+    }
+
+    emit(state.copyWith(paymentPhase: PaymentPhase.initiated));
+    final result = await _bookingRepo.bookingPaymentInit(quoteId: quoteId);
+
+    return result.fold(
+      (failure) {
+        emit(
+          state.copyWith(
+            paymentPhase: PaymentPhase.declined,
+            errorMessage: failure.message,
+          ),
+        );
+        return null;
+      },
+      (init) {
+        emit(state.copyWith(paymentPhase: PaymentPhase.none, paymentInit: init));
+        return init;
+      },
+    );
+  }
+
+  /// Pay-before-confirm step 1 for subscription wash add-ons (spec §4.4 / A2):
+  /// sends the selected add-on ids + vehicle to the server, receives the payable
+  /// delta as a Moyasar SDK payload. Only valid in [BookingFlowType.package]
+  /// flow when the total add-on cost is > 0.
+  Future<PaymentInitModel?> initiateWashAddonPayment() async {
+    final subscriptionId = state.subscriptionId;
+    final washId = state.washId;
+    if (subscriptionId == null || washId == null) {
+      emit(
+        state.copyWith(
+          paymentPhase: PaymentPhase.declined,
+          errorMessage: 'Missing subscription/wash context.',
+        ),
+      );
+      return null;
+    }
+
+    // Build the body matching ScheduleWashRequest (same shape as the schedule
+    // endpoint, minus scheduledAt which the server ignores for payment-init).
+    final availableAddons = state.selectedService?.addons ?? [];
+    final List<Map<String, dynamic>> addOns = [];
+    for (final idx in state.selectedServiceIndices) {
+      if (idx < availableAddons.length) {
+        final id = availableAddons[idx].id;
+        if (id != null) addOns.add({'addonId': id});
+      }
+    }
+
+    final vehicleId = state.selectedCar?.id;
+    final body = <String, dynamic>{
+      // scheduledAt is required by the backend record but not used for
+      // payment-init; send a sentinel to pass @NotNull validation.
+      'scheduledAt': DateTime.now().toUtc().toIso8601String(),
+      if (vehicleId != null) 'vehicleIds': [vehicleId],
+      if (addOns.isNotEmpty) 'addOns': addOns,
+    };
+
+    emit(state.copyWith(paymentPhase: PaymentPhase.initiated));
+    final result = await _subscriptionsRepo.washAddonPaymentInit(
+      subscriptionId: subscriptionId,
+      washId: washId,
+      scheduleBody: body,
+    );
+
+    return result.fold(
+      (failure) {
+        emit(
+          state.copyWith(
+            paymentPhase: PaymentPhase.declined,
+            errorMessage: failure.message,
+          ),
+        );
+        return null;
+      },
+      (init) {
+        emit(state.copyWith(paymentPhase: PaymentPhase.none, paymentInit: init));
+        return init;
+      },
+    );
+  }
+
+  /// The user dismissed the SDK sheet without paying.
+  void onPaymentCancelled() {
+    emit(state.copyWith(paymentPhase: PaymentPhase.cancelled));
+  }
+
+  /// Pay-before-create step 4 (spec §4.2): the SDK returned a verified `paid`
+  /// payment; create the booking with idempotency `booking-create:{id}`. On a
+  /// 409 slot-race the server auto-refunds and the UI reflects [refundPending].
+  Future<void> completeBookingAfterPayment(String moyasarPaymentId) async {
+    emit(
+      state.copyWith(
+        paymentPhase: PaymentPhase.paidCreating,
+        status: BookingStatus.loading,
+      ),
+    );
+
+    final result = await _submitStrategy.submit(
+      repo: _bookingRepo,
+      state: state,
+      moyasarPaymentId: moyasarPaymentId,
+    );
+
+    result.fold(
+      (failure) => emit(
+        state.copyWith(
+          status: BookingStatus.failure,
+          paymentPhase: PaymentPhase.refundPending,
+          errorMessage: failure.message,
+        ),
+      ),
+      (bookingResponse) => emit(
+        state.copyWith(
+          status: BookingStatus.success,
+          paymentPhase: PaymentPhase.none,
+          createdBooking: bookingResponse,
+          clearPaymentInit: true,
         ),
       ),
     );

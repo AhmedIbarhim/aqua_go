@@ -43,7 +43,13 @@ abstract class Endpoints {
   //  Bookings & Quotes Endpoints
   static const String quotes = 'quotes';
   static const String bookings = 'bookings';
+  // Pay-before-create: re-validates the quote + soft-holds the slot, returns
+  // {amountMinor, givenId, metadata} for the on-device Moyasar SDK purchase.
+  static const String bookingsPaymentInit = 'bookings/payment-init';
   static String bookingDetail(String bookingId) => 'bookings/$bookingId';
+  // Server-rendered receipt PDF (opened via url_launcher; no in-app render).
+  static String bookingReceiptPdf(String bookingId) =>
+      'bookings/$bookingId/receipt.pdf';
   static String cancelBooking(String bookingId) => 'bookings/$bookingId/cancel';
   static String rescheduleBooking(String bookingId) =>
       'bookings/$bookingId/reschedule';
@@ -65,6 +71,8 @@ abstract class Endpoints {
   //  Packages & Subscriptions Endpoints
   static const String packages = 'subscription-packages';
   static const String subscriptions = 'subscriptions';
+  // Pay-before-create for subscriptions (mirrors bookings/payment-init).
+  static const String subscriptionsPaymentInit = 'subscriptions/payment-init';
   static String subscriptionDetail(String subscriptionId) =>
       'subscriptions/$subscriptionId';
   static String cancelSubscription(String subscriptionId) =>
@@ -75,6 +83,11 @@ abstract class Endpoints {
       'subscriptions/$subscriptionId/washes';
   static String subscriptionWashDetail(String subscriptionId, String washId) =>
       'subscriptions/$subscriptionId/washes/$washId';
+  // Pay-before-confirm for subscription wash add-ons (Stage 5c2): validates
+  // the payable add-on delta and returns {amountMinor, givenId, metadata}
+  // for the on-device Moyasar SDK purchase. Idempotency-Key: wash-addon-payment-init:{washId}.
+  static String washAddonPaymentInit(String subscriptionId, String washId) =>
+      'subscriptions/$subscriptionId/washes/$washId/addons/payment-init';
   static String previewScheduleSubscriptionWash(String subscriptionId, String washId) =>
       'subscriptions/$subscriptionId/washes/$washId/schedule/preview';
   static String scheduleSubscriptionWash(String subscriptionId, String washId) =>

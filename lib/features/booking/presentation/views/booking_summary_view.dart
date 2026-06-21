@@ -14,6 +14,9 @@ import '../widgets/payment_summary_card.dart';
 import '../widgets/payment_method_selection.dart';
 import '../controllers/booking_cubit.dart';
 import '../controllers/booking_state.dart';
+import 'moyasar_payment_view.dart';
+import 'package:aqua_go/core/enums/payment_method_enum.dart';
+import 'package:aqua_go/features/booking/data/models/payment_init_model.dart';
 import 'package:aqua_go/core/route/routes.dart';
 import 'package:aqua_go/features/my_bookings/presentation/views/my_booking_deatails_view.dart';
 import 'package:aqua_go/features/my_bookings/data/models/booking_summary_model.dart';
@@ -258,8 +261,49 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
       child: CustomButton(
         text: LocaleKeys.bookings_confirm_booking.tr(context: context),
         enabled: isEnabled,
-        onPressed: () {
-          context.read<BookingCubit>().submitBooking();
+        onPressed: () async {
+          final cubit = context.read<BookingCubit>();
+          final needsPayment = config.requiresPaymentMethod || total > 0;
+          // Covered / zero-total (NOT_REQUIRED): no on-device payment — the
+          // backend creates the booking directly.
+          if (!needsPayment) {
+            cubit.submitBooking();
+            return;
+          }
+
+          // Branch: package flow (subscription wash with payable add-ons) uses
+          // wash-addon-payment-init; service flow uses booking-payment-init.
+          final PaymentInitModel? init;
+          if (config.isPackage) {
+            // Pay-before-confirm (spec §4.4 / A2): addon-payment-init →
+            // Moyasar SDK → schedule with moyasarPaymentId.
+            init = await cubit.initiateWashAddonPayment();
+          } else {
+            // Pay-before-create (spec §4.2): booking-payment-init →
+            // Moyasar SDK → verify + create.
+            init = await cubit.initiatePayment();
+          }
+          if (init == null || !context.mounted) return;
+          final PaymentInitModel resolvedInit = init;
+          final paymentId = await Navigator.of(context).push<String>(
+            MaterialPageRoute(
+              builder: (_) => MoyasarPaymentView(
+                args: MoyasarPaymentArgs(
+                  init: resolvedInit,
+                  paymentMethod:
+                      bookingState.paymentMethod ?? PaymentMethod.creditCard,
+                  description: context.isAr
+                      ? 'غسلة أكوا جو'
+                      : 'Aqua Go car wash',
+                ),
+              ),
+            ),
+          );
+          if (paymentId == null) {
+            cubit.onPaymentCancelled();
+            return;
+          }
+          await cubit.completeBookingAfterPayment(paymentId);
         },
       ),
     );
