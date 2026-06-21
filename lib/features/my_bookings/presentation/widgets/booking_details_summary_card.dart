@@ -60,8 +60,11 @@ class BookingDetailsSummaryCard extends StatelessWidget {
               _buildSummaryRow(
                 context,
                 title: LocaleKeys.bookings_total_amount.tr(context: context),
-                value: booking.isCoveredBySubscription
-                    ? LocaleKeys.bookings_covered_by_subscription.tr(context: context)
+                value:
+                    booking.isCoveredBySubscription && booking.totalAmount == 0
+                    ? LocaleKeys.bookings_covered_by_subscription.tr(
+                        context: context,
+                      )
                     : '${booking.totalAmount.toStringAsFixed(2)} ${booking.currency ?? "SAR"}',
                 icon: AppAssets.currency,
               ),

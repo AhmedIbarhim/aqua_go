@@ -51,17 +51,17 @@ class PackageSubscribtionSuccessAlert extends StatelessWidget {
         SizedBox(height: height * 0.02),
 
         // Title
-        Text(LocaleKeys.success.tr(context: context), style: AppTextStyles.medium16),
-        if (referenceNumber != null) ...[
-          const SizedBox(height: 4),
-          Text(
-            referenceNumber!,
-            style: AppTextStyles.medium14.copyWith(
-              color: context.colors.primary,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
+        // Text(LocaleKeys.success.tr(context: context), style: AppTextStyles.medium16),
+        // if (referenceNumber != null) ...[
+        //   const SizedBox(height: 4),
+        //   Text(
+        //     referenceNumber!,
+        //     style: AppTextStyles.medium14.copyWith(
+        //       color: context.colors.primary,
+        //       fontWeight: FontWeight.bold,
+        //     ),
+        //   ),
+        // ],
         const SizedBox(height: 8),
 
         // Description

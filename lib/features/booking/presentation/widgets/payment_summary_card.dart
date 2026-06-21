@@ -14,18 +14,6 @@ class PaymentSummaryCard extends StatelessWidget {
   final double vat;
   final double total;
 
-  /// When true, every line item (service + add-ons) is shown VAT-inclusive and
-  /// the VAT row is rendered as an informational "VAT 15% included" note instead
-  /// of an additive numeric line, so the breakdown reconciles (sum of line items
-  /// == total).
-  final bool vatInclusive;
-
-  /// When true, the wash is pre-paid by an active subscription. The per-wash
-  /// total is meaningless (0 / NOT_REQUIRED), so the money sub-rows (service,
-  /// add-ons, subtotal, VAT) are suppressed and the grand-total value reads as
-  /// the localized "Covered by subscription" text instead of a bare "0.00".
-  final bool isCoveredBySubscription;
-
   const PaymentSummaryCard({
     super.key,
     required this.serviceName,
@@ -34,21 +22,10 @@ class PaymentSummaryCard extends StatelessWidget {
     required this.subtotal,
     required this.vat,
     required this.total,
-    this.vatInclusive = false,
-    this.isCoveredBySubscription = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    if (isCoveredBySubscription) {
-      // The subscription covers the base wash only. Any optional add-ons the
-      // customer picked are still payable, so surface them with their total
-      // instead of a blanket "Covered by subscription".
-      if (additionalItems.isEmpty) {
-        return _buildCoveredRow(context);
-      }
-      return _buildCoveredWithAddons(context);
-    }
     return Column(
       children: [
         _buildPaymentRow(context, label: serviceName, value: servicePrice),
@@ -66,27 +43,22 @@ class PaymentSummaryCard extends StatelessWidget {
             ],
           ),
         ),
-        if (!vatInclusive) ...[
-          const SizedBox(height: 12),
-          const Divider(height: 1, thickness: 0.5),
-          const SizedBox(height: 12),
-          _buildPaymentRow(
-            context,
-            label: LocaleKeys.bookings_subtotal.tr(context: context),
-            value: subtotal,
-          ),
-        ],
         const SizedBox(height: 12),
         const Divider(height: 1, thickness: 0.5),
         const SizedBox(height: 12),
-        if (vatInclusive)
-          _buildVatIncludedRow(context)
-        else
-          _buildPaymentRow(
-            context,
-            label: LocaleKeys.bookings_vat.tr(context: context),
-            value: vat,
-          ),
+        _buildPaymentRow(
+          context,
+          label: LocaleKeys.bookings_subtotal.tr(context: context),
+          value: subtotal,
+        ),
+        const SizedBox(height: 12),
+        const Divider(height: 1, thickness: 0.5),
+        const SizedBox(height: 12),
+        _buildPaymentRow(
+          context,
+          label: LocaleKeys.bookings_vat.tr(context: context),
+          value: vat,
+        ),
         const SizedBox(height: 12),
         const Divider(height: 1, thickness: 1, color: Colors.white),
         const SizedBox(height: 12),
@@ -95,99 +67,6 @@ class PaymentSummaryCard extends StatelessWidget {
           label: LocaleKeys.bookings_total_amount.tr(context: context),
           value: total,
           isTotal: true,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCoveredRow(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          LocaleKeys.bookings_total_amount.tr(context: context),
-          style: AppTextStyles.medium16.copyWith(
-            color: context.colors.textPrimary,
-          ),
-        ),
-        Text(
-          LocaleKeys.bookings_covered_by_subscription.tr(context: context),
-          style: AppTextStyles.medium16.copyWith(
-            color: context.colors.textPrimary,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCoveredWithAddons(BuildContext context) {
-    final addonsTotal = additionalItems.fold<double>(
-      0.0,
-      (sum, item) => sum + (item['price'] as num).toDouble(),
-    );
-    return Column(
-      children: [
-        _buildCoveredLabelRow(context, serviceName),
-        ...additionalItems.map(
-          (item) => Column(
-            children: [
-              const SizedBox(height: 12),
-              const Divider(height: 1, thickness: 0.5),
-              const SizedBox(height: 12),
-              _buildPaymentRow(
-                context,
-                label: item['name'],
-                value: item['price'],
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 12),
-        const Divider(height: 1, thickness: 0.5),
-        const SizedBox(height: 12),
-        _buildVatIncludedRow(context),
-        const SizedBox(height: 12),
-        const Divider(height: 1, thickness: 1, color: Colors.white),
-        const SizedBox(height: 12),
-        _buildPaymentRow(
-          context,
-          label: LocaleKeys.bookings_total_amount.tr(context: context),
-          value: addonsTotal,
-          isTotal: true,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCoveredLabelRow(BuildContext context, String label) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: AppTextStyles.regular16.copyWith(
-            color: context.colors.textSecondary,
-          ),
-        ),
-        Text(
-          LocaleKeys.bookings_covered_by_subscription.tr(context: context),
-          style: AppTextStyles.regular16.copyWith(
-            color: context.colors.textSecondary,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildVatIncludedRow(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          LocaleKeys.bookings_vat_included.tr(context: context),
-          style: AppTextStyles.regular16.copyWith(
-            color: context.colors.textSecondary,
-          ),
         ),
       ],
     );
