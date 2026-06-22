@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/components/custom_button.dart';
 import '../../../../core/components/generic_app_bar.dart';
 import '../../../../core/config/di/service_locator.dart';
+import '../../../../core/config/session/session_state.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_text_styles.dart';
@@ -14,6 +15,7 @@ import '../../../auth/presentation/controllers/auth_cubit/auth_cubit.dart';
 
 class PrivacyPolicyView extends StatelessWidget {
   const PrivacyPolicyView({super.key});
+  bool get isGuest => currentUser.value == null;
 
   @override
   Widget build(BuildContext context) {
@@ -89,44 +91,53 @@ class PrivacyPolicyView extends StatelessWidget {
                         style: AppTextStyles.medium16.copyWith(height: 1.5),
                       ),
                       const SizedBox(height: 48),
-                      BlocConsumer<AuthCubit, AuthState>(
-                        listener: (context, state) {
-                          if (state is DeleteAccountLoading) {
-                            context.showLoadingOverlay();
-                          } else {
-                            context.hideLoadingOverlay();
-                          }
+                      if (!isGuest)
+                        BlocConsumer<AuthCubit, AuthState>(
+                          listener: (context, state) {
+                            if (state is DeleteAccountLoading) {
+                              context.showLoadingOverlay();
+                            } else {
+                              context.hideLoadingOverlay();
+                            }
 
-                          if (state is DeleteAccountError) {
-                            context.showErrorSnackBar(state.message);
-                          }
-                          if (state is DeleteAccountSuccess) {
-                            context.showWarningSnackBar(
-                              LocaleKeys.auth_delete_account_success.tr(context: context),
-                            );
-                            context.pushNamedAndRemoveUntil(Routes.onboarding);
-                          }
-                        },
-                        builder: (context, state) {
-                          return CustomButton(
-                            text: LocaleKeys.auth_delete_account.tr(context: context),
-                            color: context.colors.error,
-                            textColor: lightAppColors.themeColor,
-                            borderColor: context.colors.error,
-                            onPressed: () {
-                              context.showWarningAlert(
-                                title: LocaleKeys.auth_delete_account.tr(context: context),
-                                message: LocaleKeys
-                                    .auth_delete_account_confirmation
-                                    .tr(context: context),
-                                onPrimaryPressed: () {
-                                  context.read<AuthCubit>().deleteAccount();
-                                },
+                            if (state is DeleteAccountError) {
+                              context.showErrorSnackBar(state.message);
+                            }
+                            if (state is DeleteAccountSuccess) {
+                              context.showWarningSnackBar(
+                                LocaleKeys.auth_delete_account_success.tr(
+                                  context: context,
+                                ),
                               );
-                            },
-                          );
-                        },
-                      ),
+                              context.pushNamedAndRemoveUntil(
+                                Routes.onboarding,
+                              );
+                            }
+                          },
+                          builder: (context, state) {
+                            return CustomButton(
+                              text: LocaleKeys.auth_delete_account.tr(
+                                context: context,
+                              ),
+                              color: context.colors.error,
+                              textColor: lightAppColors.themeColor,
+                              borderColor: context.colors.error,
+                              onPressed: () {
+                                context.showWarningAlert(
+                                  title: LocaleKeys.auth_delete_account.tr(
+                                    context: context,
+                                  ),
+                                  message: LocaleKeys
+                                      .auth_delete_account_confirmation
+                                      .tr(context: context),
+                                  onPrimaryPressed: () {
+                                    context.read<AuthCubit>().deleteAccount();
+                                  },
+                                );
+                              },
+                            );
+                          },
+                        ),
                       const SizedBox(height: 48),
                     ],
                   ),

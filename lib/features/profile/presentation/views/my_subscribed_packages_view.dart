@@ -1,3 +1,4 @@
+import 'package:aqua_go/core/components/custom_button.dart';
 import 'package:aqua_go/core/components/custom_loading_indicator.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -140,7 +141,9 @@ class _MySubscribedPackagesViewState extends State<MySubscribedPackagesView> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _buildSectionTitle(
-                              LocaleKeys.bookings_package_name.tr(context: context),
+                              LocaleKeys.bookings_package_name.tr(
+                                context: context,
+                              ),
                               context,
                             ),
                             SizedBox(height: sh(8)),
@@ -148,7 +151,9 @@ class _MySubscribedPackagesViewState extends State<MySubscribedPackagesView> {
                             SizedBox(height: sh(20)),
 
                             _buildSectionTitle(
-                              LocaleKeys.booking_package_package_details.tr(context: context),
+                              LocaleKeys.booking_package_package_details.tr(
+                                context: context,
+                              ),
                               context,
                             ),
                             SizedBox(height: sh(8)),
@@ -178,7 +183,9 @@ class _MySubscribedPackagesViewState extends State<MySubscribedPackagesView> {
                             if (sub.includedAllowances.isNotEmpty) ...[
                               SizedBox(height: sh(20)),
                               _buildSectionTitle(
-                                LocaleKeys.bookings_additional_services.tr(context: context),
+                                LocaleKeys.bookings_additional_services.tr(
+                                  context: context,
+                                ),
                                 context,
                               ),
                               SizedBox(height: sh(8)),
@@ -442,7 +449,8 @@ class _MySubscribedPackagesViewState extends State<MySubscribedPackagesView> {
         top: 16,
         bottom: MediaQuery.paddingOf(context).bottom + 16,
       ),
-      child: ElevatedButton(
+      child: CustomButton(
+        enabled: package.remainingWashes > 0,
         onPressed: () {
           context.pushNamed(
             Routes.bookingLocation,
@@ -455,19 +463,7 @@ class _MySubscribedPackagesViewState extends State<MySubscribedPackagesView> {
             ),
           );
         },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: context.colors.primary,
-          foregroundColor: Colors.black,
-          minimumSize: const Size(double.infinity, 54),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          elevation: 0,
-        ),
-        child: Text(
-          LocaleKeys.home_use_package.tr(context: context),
-          style: AppTextStyles.bold16.copyWith(color: Colors.black),
-        ),
+        text: LocaleKeys.home_use_package.tr(context: context),
       ),
     );
   }
