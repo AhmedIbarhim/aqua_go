@@ -31,21 +31,25 @@ class MyBookingProceduresBottomSheet extends StatelessWidget {
         _buildActionItem(
           context,
           title: LocaleKeys.bookings_rate_service.tr(context: context),
-          onTap: () {
-            Navigator.pop(context);
-            RatingBottomSheet.show(context, booking);
-          },
+          onTap: booking.rating == null
+              ? () {
+                  Navigator.pop(context);
+                  RatingBottomSheet.show(context, booking);
+                }
+              : null,
         ),
         SizedBox(height: height * 0.015),
         _buildActionItem(
           context,
           title: LocaleKeys.bookings_submit_complaint.tr(context: context),
-          onTap: () {
-            context.pushNamed(
-              Routes.complain,
-              arguments: ComplaintArgs(booking: booking),
-            );
-          },
+          onTap: booking.complaintId == null
+              ? () {
+                  context.pushNamed(
+                    Routes.complain,
+                    arguments: ComplaintArgs(booking: booking),
+                  );
+                }
+              : null,
         ),
         SizedBox(height: height * 0.04),
       ],
@@ -55,7 +59,7 @@ class MyBookingProceduresBottomSheet extends StatelessWidget {
   Widget _buildActionItem(
     BuildContext context, {
     required String title,
-    required VoidCallback onTap,
+    required VoidCallback? onTap,
   }) {
     final width = MediaQuery.sizeOf(context).width;
     return GestureDetector(
@@ -74,7 +78,9 @@ class MyBookingProceduresBottomSheet extends StatelessWidget {
         child: Text(
           title,
           style: AppTextStyles.regular16.copyWith(
-            color: context.colors.textPrimary,
+            color: onTap != null
+                ? context.colors.textPrimary
+                : context.colors.contentDisabled,
           ),
         ),
       ),

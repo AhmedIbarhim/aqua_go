@@ -73,6 +73,7 @@ class BookingResponseModel {
   Breakdown? breakdown;
   BookingAddress? address;
   BookingRatingModel? rating;
+  String? complaintId;
 
   BookingResponseModel({
     this.id,
@@ -117,6 +118,7 @@ class BookingResponseModel {
     this.breakdown,
     this.address,
     this.rating,
+    this.complaintId,
   });
 
   BookingResponseModel.fromJson(Map<String, dynamic> json) {
@@ -201,6 +203,7 @@ class BookingResponseModel {
     rating = json['rating'] != null
         ? BookingRatingModel.fromJson(json['rating'])
         : null;
+    complaintId = json['complaintId'];
   }
 
   // --- UI Compatibility Helpers ---

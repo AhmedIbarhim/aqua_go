@@ -86,7 +86,10 @@ class MyBookingDetailsView extends StatelessWidget {
                       context.pushNamedAndRemoveUntil(Routes.layout);
                     },
                   )
-                else if (!isLoading && !isFailure && !activeBooking.isUpcoming)
+                else if (!isLoading &&
+                    !isFailure &&
+                    !activeBooking.isUpcoming &&
+                    activeBooking.status != BookingStatus.CANCELLED) ...[
                   IconButton(
                     onPressed: () => MyBookingProceduresBottomSheet.show(
                       context,
@@ -94,6 +97,7 @@ class MyBookingDetailsView extends StatelessWidget {
                     ),
                     icon: const Icon(Icons.more_vert),
                   ),
+                ],
               ],
             ),
             body: isFailure
