@@ -57,7 +57,86 @@ class MyBookingPhotosSection extends StatelessWidget {
       }
 
       if (angle != null && angle.isNotEmpty) {
-        return '$stageLabel ($angle)';
+        final String translatedAngle;
+        final normalizedAngle = angle
+            .toLowerCase()
+            .replaceAll('-', '_')
+            .replaceAll(' ', '_');
+        switch (normalizedAngle) {
+          case 'front':
+            translatedAngle = LocaleKeys.bookings_angles_front.tr(
+              context: context,
+            );
+            break;
+          case 'back':
+            translatedAngle = LocaleKeys.bookings_angles_back.tr(
+              context: context,
+            );
+            break;
+          // case 'left':
+          //   translatedAngle = LocaleKeys.bookings_angles_left.tr(
+          //     context: context,
+          //   );
+          //   break;
+          // case 'right':
+          //   translatedAngle = LocaleKeys.bookings_angles_right.tr(
+          //     context: context,
+          //   );
+          //   break;
+          case 'front_right':
+            translatedAngle = LocaleKeys.bookings_angles_front_right.tr(
+              context: context,
+            );
+            break;
+          case 'front_left':
+            translatedAngle = LocaleKeys.bookings_angles_front_left.tr(
+              context: context,
+            );
+            break;
+          case 'back_right':
+            translatedAngle = LocaleKeys.bookings_angles_back_right.tr(
+              context: context,
+            );
+            break;
+          case 'back_left':
+            translatedAngle = LocaleKeys.bookings_angles_back_left.tr(
+              context: context,
+            );
+            break;
+          case 'left_front':
+            translatedAngle = LocaleKeys.bookings_angles_left_front.tr(
+              context: context,
+            );
+            break;
+          case 'left_back':
+            translatedAngle = LocaleKeys.bookings_angles_left_back.tr(
+              context: context,
+            );
+            break;
+          case 'right_front':
+            translatedAngle = LocaleKeys.bookings_angles_right_front.tr(
+              context: context,
+            );
+            break;
+          case 'right_back':
+            translatedAngle = LocaleKeys.bookings_angles_right_back.tr(
+              context: context,
+            );
+            break;
+          // case 'roof':
+          //   translatedAngle = LocaleKeys.bookings_angles_roof.tr(
+          //     context: context,
+          //   );
+          //   break;
+          // case 'interior':
+          //   translatedAngle = LocaleKeys.bookings_angles_interior.tr(
+          //     context: context,
+          //   );
+          // break;
+          default:
+            translatedAngle = p.angle ?? '';
+        }
+        return '$stageLabel ($translatedAngle)';
       }
       return stageLabel;
     }).toList();
@@ -75,7 +154,8 @@ class MyBookingPhotosSection extends StatelessWidget {
                 ),
               ),
               TextSpan(
-                text: ' (${LocaleKeys.bookings_before_and_after_washing.tr(context: context)})',
+                text:
+                    ' (${LocaleKeys.bookings_before_and_after_washing.tr(context: context)})',
                 style: AppTextStyles.regular12.copyWith(
                   color: context.colors.contentDisabled,
                 ),

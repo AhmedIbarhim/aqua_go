@@ -100,6 +100,8 @@ class MyBookingDetailsView extends StatelessWidget {
                 ? _buildErrorState(context, state.errMessage)
                 : Column(
                     children: [
+                      if (state is MyBookingDetailsLoading)
+                        const LinearProgressIndicator(),
                       Expanded(
                         child: RefreshIndicator(
                           color: context.colors.primary,
@@ -145,13 +147,17 @@ class MyBookingDetailsView extends StatelessWidget {
                                     ),
                                   ],
                                   const SizedBox(height: 16),
-                                  MyBookingLocationSection(
-                                    address: activeBooking.location,
-                                    latitude: activeBooking.latitude,
-                                    longitude: activeBooking.longitude,
-                                    arrivalNotes:
-                                        activeBooking.addressArrivalNotes,
-                                  ),
+                                  if (activeBooking.status !=
+                                          BookingStatus.COMPLETED &&
+                                      activeBooking.status !=
+                                          BookingStatus.CANCELLED) ...[
+                                    const SizedBox(height: 16),
+                                    MyBookingLocationSection(
+                                      address: activeBooking.location,
+                                      latitude: activeBooking.latitude,
+                                      longitude: activeBooking.longitude,
+                                    ),
+                                  ],
                                   const SizedBox(height: 16),
                                   if (activeBooking.status ==
                                       BookingStatus.COMPLETED)
@@ -245,10 +251,7 @@ class MyBookingDetailsView extends StatelessWidget {
             booking.paymentStatus == PaymentStatus.PARTIALLY_REFUNDED);
   }
 
-  Widget _buildReceiptLink(
-    BuildContext context,
-    BookingResponseModel booking,
-  ) {
+  Widget _buildReceiptLink(BuildContext context, BookingResponseModel booking) {
     if (!_showsReceipt(booking) || booking.id == null) {
       return const SizedBox.shrink();
     }
@@ -257,15 +260,10 @@ class MyBookingDetailsView extends StatelessWidget {
         final uri = Uri.parse(
           Endpoints.baseUrl + Endpoints.bookingReceiptPdf(booking.id!),
         );
-        final ok = await launchUrl(
-          uri,
-          mode: LaunchMode.externalApplication,
-        );
+        final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
         if (!ok && context.mounted) {
           context.showWarningSnackBar(
-            context.isAr
-                ? 'تعذّر فتح الإيصال.'
-                : 'Could not open the receipt.',
+            context.isAr ? 'تعذّر فتح الإيصال.' : 'Could not open the receipt.',
           );
         }
       },

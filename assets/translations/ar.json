@@ -219,6 +219,22 @@
         "before_washing": "قبل الغسيل",
         "after_washing": "بعد الغسيل",
         "photo_gallery": "معرض الصور",
+        "angles": {
+            "front": "الأمام",
+            "back": "الخلف",
+            "left": "اليسار",
+            "right": "اليمين",
+            "front_right": "أمام يمين",
+            "front_left": "أمام يسار",
+            "back_right": "خلف يمين",
+            "back_left": "خلف يسار",
+            "left_front": "أمام يسار",
+            "left_back": "خلف يسار",
+            "right_front": "أمام يمين",
+            "right_back": "خلف يمين",
+            "roof": "السقف",
+            "interior": "الداخلية"
+        },
         "reschedule_booking": "تعديل الحجز",
         "confirm_reschedule": "تأكيد تعديل الحجز",
         "reschedule_success": "تم تعديل الحجز بنجاح"

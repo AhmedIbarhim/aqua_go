@@ -219,6 +219,22 @@
         "before_washing": "Before Washing",
         "after_washing": "After Washing",
         "photo_gallery": "Photo Gallery",
+        "angles": {
+            "front": "Front",
+            "back": "Back",
+            "left": "Left",
+            "right": "Right",
+            "front_right": "Front Right",
+            "front_left": "Front Left",
+            "back_right": "Back Right",
+            "back_left": "Back Left",
+            "left_front": "Left Front",
+            "left_back": "Left Back",
+            "right_front": "Right Front",
+            "right_back": "Right Back",
+            "roof": "Roof",
+            "interior": "Interior"
+        },
         "reschedule_booking": "Edit Booking",
         "confirm_reschedule": "Confirm Booking Changes",
         "reschedule_success": "Booking has been updated successfully"
