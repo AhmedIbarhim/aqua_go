@@ -148,9 +148,7 @@ class MyBookingDetailsView extends StatelessWidget {
                                   ],
                                   const SizedBox(height: 16),
                                   if (activeBooking.status !=
-                                          BookingStatus.COMPLETED &&
-                                      activeBooking.status !=
-                                          BookingStatus.CANCELLED) ...[
+                                      BookingStatus.COMPLETED) ...[
                                     const SizedBox(height: 16),
                                     MyBookingLocationSection(
                                       address: activeBooking.location,

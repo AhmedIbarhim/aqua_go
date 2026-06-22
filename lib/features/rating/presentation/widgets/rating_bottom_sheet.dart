@@ -12,6 +12,7 @@ import '../../../../core/config/di/service_locator.dart';
 import '../controllers/rating_cubit/rating_cubit.dart';
 import '../controllers/rating_cubit/rating_state.dart';
 import '../../../../core/components/custom_network_image.dart';
+import 'package:aqua_go/core/components/custom_text_field.dart';
 import 'rating_success_alert_box.dart';
 
 class RatingBottomSheet extends StatefulWidget {
@@ -36,6 +37,13 @@ class RatingBottomSheet extends StatefulWidget {
 class _RatingBottomSheetState extends State<RatingBottomSheet> {
   int _rating = 4;
   final List<String> _selectedReasons = [];
+  final TextEditingController _commentController = TextEditingController();
+
+  @override
+  void dispose() {
+    _commentController.dispose();
+    super.dispose();
+  }
 
   final Map<String, String> _reasonsMap = {
     'DELIVERY_DELAY': LocaleKeys.bookings_rating_reasons_delivery_delay.tr(),
@@ -102,10 +110,18 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
                 flex: 2,
                 child: CustomButton(
                   onPressed: () {
+                    final reasons = _rating < 5
+                        ? _selectedReasons.where((r) => r != 'OTHER_REASON').toList()
+                        : null;
+                    final comment = _rating < 5 && _selectedReasons.contains('OTHER_REASON')
+                        ? _commentController.text.trim()
+                        : null;
+
                     context.read<RatingCubit>().submitRating(
                       bookingId: widget.booking.id ?? '',
                       score: _rating,
-                      reasons: _rating < 5 ? _selectedReasons : null,
+                      reasons: reasons,
+                      comment: comment,
                     );
                   },
                   text: LocaleKeys.submit.tr(context: context),
@@ -270,6 +286,9 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
                 setState(() {
                   if (isSelected) {
                     _selectedReasons.remove(reasonKey);
+                    if (reasonKey == 'OTHER_REASON') {
+                      _commentController.clear();
+                    }
                   } else {
                     _selectedReasons.add(reasonKey);
                   }
@@ -301,6 +320,16 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
             );
           }).toList(),
         ),
+        if (_selectedReasons.contains('OTHER_REASON')) ...[
+          const SizedBox(height: 16),
+          CustomTextField(
+            label: LocaleKeys.bookings_rating_reasons_other_reason.tr(),
+            hint: context.isEn ? "Write your reason here..." : "اكتب السبب هنا...",
+            controller: _commentController,
+            maxLines: 3,
+            minLines: 3,
+          ),
+        ],
       ],
     );
   }
