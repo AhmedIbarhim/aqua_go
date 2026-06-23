@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui' as ui;
 import 'package:aqua_go/core/themes/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -10,16 +11,20 @@ import '../themes/app_text_styles.dart';
 import '../utils/app_assets.dart';
 import 'custom_button.dart';
 
-class CustomAlertBox extends StatelessWidget {
+class CustomAlertBox extends StatefulWidget {
   final Widget child;
   final EdgeInsets? padding;
   final EdgeInsets? margin;
+  final bool autoDismiss;
+  final Duration dismissDuration;
 
   const CustomAlertBox({
     super.key,
     required this.child,
     this.padding,
     this.margin,
+    this.autoDismiss = false,
+    this.dismissDuration = const Duration(seconds: 3),
   });
 
   static Future<T?> show<T>({
@@ -27,6 +32,8 @@ class CustomAlertBox extends StatelessWidget {
     required Widget child,
     EdgeInsets? padding,
     EdgeInsets? margin,
+    bool autoDismiss = false,
+    Duration dismissDuration = const Duration(seconds: 3),
   }) {
     return showGeneralDialog<T>(
       context: context,
@@ -36,7 +43,13 @@ class CustomAlertBox extends StatelessWidget {
       pageBuilder: (context, animation, secondaryAnimation) {
         return BackdropFilter(
           filter: ui.ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
-          child: CustomAlertBox(padding: padding, margin: margin, child: child),
+          child: CustomAlertBox(
+            padding: padding,
+            margin: margin,
+            autoDismiss: autoDismiss,
+            dismissDuration: dismissDuration,
+            child: child,
+          ),
         );
       },
       transitionBuilder: (context, animation, secondaryAnimation, child) {
@@ -52,6 +65,31 @@ class CustomAlertBox extends StatelessWidget {
   }
 
   @override
+  State<CustomAlertBox> createState() => _CustomAlertBoxState();
+}
+
+class _CustomAlertBoxState extends State<CustomAlertBox> {
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.autoDismiss) {
+      _timer = Timer(widget.dismissDuration, () {
+        if (mounted && Navigator.canPop(context)) {
+          Navigator.pop(context);
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final width = context.screenWidth;
     return GestureDetector(
@@ -63,13 +101,15 @@ class CustomAlertBox extends StatelessWidget {
             onTap: () {}, // Prevent tap from bubbling up to background
             child: Container(
               width: double.infinity,
-              margin: margin ?? EdgeInsets.symmetric(horizontal: width * 0.06),
-              padding: padding ?? EdgeInsets.all(width * 0.04),
+              margin:
+                  widget.margin ??
+                  EdgeInsets.symmetric(horizontal: width * 0.06),
+              padding: widget.padding ?? EdgeInsets.all(width * 0.04),
               decoration: BoxDecoration(
                 color: context.colors.cardBackGround,
                 borderRadius: BorderRadius.circular(24),
               ),
-              child: child,
+              child: widget.child,
             ),
           ),
         ),
@@ -100,16 +140,18 @@ class SuccessAlertBox extends StatelessWidget {
     String? message,
     String? buttonText,
     String? iconPath,
-    // VoidCallback? onPressed,
+    bool autoDismiss = true,
+    Duration dismissDuration = const Duration(seconds: 3),
   }) {
     return CustomAlertBox.show<T>(
       context: context,
+      autoDismiss: autoDismiss,
+      dismissDuration: dismissDuration,
       child: SuccessAlertBox(
         title: title,
         message: message,
         buttonText: buttonText,
         iconPath: iconPath,
-        // onPressed: onPressed,
       ),
     );
   }

@@ -79,18 +79,22 @@ class _ComplaintViewState extends State<ComplaintView> {
         }
 
         if (state is ComplaintSubmitSuccess) {
-          context.showSuccessAlert(
-            title: LocaleKeys.success.tr(context: context),
-            message: LocaleKeys.bookings_complaint_submitted.tr(context: context),
-          ).then((_) {
-            AppRouter.navigatorKey.currentState?.pushNamedAndRemoveUntil(
-              Routes.myBookingDetails,
-              (route) => route.settings.name == Routes.layout || route.isFirst,
-              arguments: MyBookingDetailsArgs(
-                booking: BookingSummaryModel.fromDetails(widget.booking),
-              ),
-            );
-          });
+          context
+              .showSuccessAlert(
+                title: LocaleKeys.bookings_complaint_submitted.tr(
+                  context: context,
+                ),
+              )
+              .then((_) {
+                AppRouter.navigatorKey.currentState?.pushNamedAndRemoveUntil(
+                  Routes.myBookingDetails,
+                  (route) =>
+                      route.settings.name == Routes.layout || route.isFirst,
+                  arguments: MyBookingDetailsArgs(
+                    booking: BookingSummaryModel.fromDetails(widget.booking),
+                  ),
+                );
+              });
         } else if (state is ComplaintSubmitFailure) {
           context.showErrorSnackBar(state.message);
         }

@@ -6,12 +6,16 @@ extension AlertDialogExtension on BuildContext {
     required Widget child,
     EdgeInsets? padding,
     EdgeInsets? margin,
+    bool autoDismiss = false,
+    Duration dismissDuration = const Duration(seconds: 3),
   }) {
     return CustomAlertBox.show<T>(
       context: this,
       child: child,
       padding: padding,
       margin: margin,
+      autoDismiss: autoDismiss,
+      dismissDuration: dismissDuration,
     );
   }
 
@@ -20,6 +24,8 @@ extension AlertDialogExtension on BuildContext {
     String? message,
     String? buttonText,
     String? iconPath,
+    bool autoDismiss = true,
+    Duration dismissDuration = const Duration(seconds: 3),
   }) {
     return SuccessAlertBox.show<T>(
       context: this,
@@ -27,6 +33,8 @@ extension AlertDialogExtension on BuildContext {
       message: message,
       buttonText: buttonText,
       iconPath: iconPath,
+      autoDismiss: autoDismiss,
+      dismissDuration: dismissDuration,
     );
   }
 

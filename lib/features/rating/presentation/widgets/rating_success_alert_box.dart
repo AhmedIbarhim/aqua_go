@@ -12,8 +12,16 @@ import '../../../../generated/locale_keys.g.dart';
 class RatingSuccessAlertBox extends StatelessWidget {
   const RatingSuccessAlertBox({super.key});
 
-  static Future<T?> show<T>(BuildContext context) {
-    return context.showCustomAlert<T>(child: const RatingSuccessAlertBox());
+  static Future<T?> show<T>(
+    BuildContext context, {
+    bool autoDismiss = true,
+    Duration dismissDuration = const Duration(seconds: 3),
+  }) {
+    return context.showCustomAlert<T>(
+      child: const RatingSuccessAlertBox(),
+      autoDismiss: autoDismiss,
+      dismissDuration: dismissDuration,
+    );
   }
 
   @override
