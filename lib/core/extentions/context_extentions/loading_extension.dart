@@ -19,13 +19,23 @@ extension LoadingExtension on BuildContext {
         ),
       ),
     );
-    Overlay.of(this).insert(_loadingOverlayEntry!);
+    final entry = _loadingOverlayEntry;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && entry == _loadingOverlayEntry && entry != null) {
+        Overlay.of(this).insert(entry);
+      }
+    });
   }
 
   void hideLoadingOverlay() {
     if (_loadingCount > 0) _loadingCount--;
     if (_loadingCount > 0) return;
-    _loadingOverlayEntry?.remove();
+    final entry = _loadingOverlayEntry;
     _loadingOverlayEntry = null;
+    if (entry != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        entry.remove();
+      });
+    }
   }
 }
