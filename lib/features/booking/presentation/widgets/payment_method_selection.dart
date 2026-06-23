@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/extentions/context_extentions.dart';
@@ -27,21 +29,29 @@ class _PaymentMethodSelectionState extends State<PaymentMethodSelection> {
   @override
   void initState() {
     super.initState();
-    _selectedMethod = widget.initialMethod;
+    final bool isIOS = !kIsWeb && Platform.isIOS;
+    _selectedMethod = (widget.initialMethod == PaymentMethod.applePay && !isIOS)
+        ? null
+        : widget.initialMethod;
   }
 
   @override
   void didUpdateWidget(covariant PaymentMethodSelection oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.initialMethod != oldWidget.initialMethod) {
+      final bool isIOS = !kIsWeb && Platform.isIOS;
       setState(() {
-        _selectedMethod = widget.initialMethod;
+        _selectedMethod =
+            (widget.initialMethod == PaymentMethod.applePay && !isIOS)
+            ? null
+            : widget.initialMethod;
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final bool isIOS = !kIsWeb && Platform.isIOS;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -52,13 +62,15 @@ class _PaymentMethodSelectionState extends State<PaymentMethodSelection> {
           ),
         ),
         const SizedBox(height: 16),
-        _buildPaymentMethodItem(
-          context,
-          method: PaymentMethod.applePay,
-          title: LocaleKeys.bookings_apple_pay.tr(context: context),
-          iconPaths: [AppAssets.applePay],
-        ),
-        const SizedBox(height: 8),
+        if (isIOS) ...[
+          _buildPaymentMethodItem(
+            context,
+            method: PaymentMethod.applePay,
+            title: LocaleKeys.bookings_apple_pay.tr(context: context),
+            iconPaths: [AppAssets.applePay],
+          ),
+          const SizedBox(height: 8),
+        ],
         _buildPaymentMethodItem(
           context,
           method: PaymentMethod.creditCard,

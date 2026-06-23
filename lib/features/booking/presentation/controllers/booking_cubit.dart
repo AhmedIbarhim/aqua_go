@@ -431,6 +431,7 @@ class BookingCubit extends Cubit<BookingState> {
     if (quoteId == null) {
       emit(
         state.copyWith(
+          status: BookingStatus.failure,
           paymentPhase: PaymentPhase.declined,
           errorMessage: 'Missing quote — please re-confirm the booking.',
         ),
@@ -440,7 +441,8 @@ class BookingCubit extends Cubit<BookingState> {
 
     // Build scheduledAt in the exact format DayTimeModel produces (matches
     // ServiceBookingRequestModel.toJson and the backend bare-ISO-8601 contract).
-    final scheduledAt = (state.selectedDate != null && state.selectedTime != null)
+    final scheduledAt =
+        (state.selectedDate != null && state.selectedTime != null)
         ? DayTimeModel(
             date: state.selectedDate!,
             rawTime: state.selectedTime!,
@@ -450,6 +452,7 @@ class BookingCubit extends Cubit<BookingState> {
     if (scheduledAt == null) {
       emit(
         state.copyWith(
+          status: BookingStatus.failure,
           paymentPhase: PaymentPhase.declined,
           errorMessage: 'Missing booking date/time — please select a slot.',
         ),
@@ -462,6 +465,7 @@ class BookingCubit extends Cubit<BookingState> {
     if (car == null) {
       emit(
         state.copyWith(
+          status: BookingStatus.failure,
           paymentPhase: PaymentPhase.declined,
           errorMessage: 'Missing vehicle — please select a car.',
         ),
@@ -486,7 +490,12 @@ class BookingCubit extends Cubit<BookingState> {
     final vehicles = [vehicleEntry];
 
     final attemptNonce = const Uuid().v4();
-    emit(state.copyWith(paymentPhase: PaymentPhase.initiated));
+    emit(
+      state.copyWith(
+        paymentPhase: PaymentPhase.initiated,
+        status: BookingStatus.loading,
+      ),
+    );
     final result = await _bookingRepo.bookingPaymentInit(
       quoteId: quoteId,
       scheduledAt: scheduledAt,
@@ -498,6 +507,7 @@ class BookingCubit extends Cubit<BookingState> {
       (failure) {
         emit(
           state.copyWith(
+            status: BookingStatus.failure,
             paymentPhase: PaymentPhase.declined,
             errorMessage: failure.message,
           ),
@@ -505,7 +515,13 @@ class BookingCubit extends Cubit<BookingState> {
         return null;
       },
       (init) {
-        emit(state.copyWith(paymentPhase: PaymentPhase.none, paymentInit: init));
+        emit(
+          state.copyWith(
+            status: BookingStatus.initial,
+            paymentPhase: PaymentPhase.none,
+            paymentInit: init,
+          ),
+        );
         return init;
       },
     );
@@ -521,6 +537,7 @@ class BookingCubit extends Cubit<BookingState> {
     if (subscriptionId == null || washId == null) {
       emit(
         state.copyWith(
+          status: BookingStatus.failure,
           paymentPhase: PaymentPhase.declined,
           errorMessage: 'Missing subscription/wash context.',
         ),
@@ -549,7 +566,12 @@ class BookingCubit extends Cubit<BookingState> {
     };
 
     final attemptNonce = const Uuid().v4();
-    emit(state.copyWith(paymentPhase: PaymentPhase.initiated));
+    emit(
+      state.copyWith(
+        paymentPhase: PaymentPhase.initiated,
+        status: BookingStatus.loading,
+      ),
+    );
     final result = await _subscriptionsRepo.washAddonPaymentInit(
       subscriptionId: subscriptionId,
       washId: washId,
@@ -561,6 +583,7 @@ class BookingCubit extends Cubit<BookingState> {
       (failure) {
         emit(
           state.copyWith(
+            status: BookingStatus.failure,
             paymentPhase: PaymentPhase.declined,
             errorMessage: failure.message,
           ),
@@ -568,7 +591,13 @@ class BookingCubit extends Cubit<BookingState> {
         return null;
       },
       (init) {
-        emit(state.copyWith(paymentPhase: PaymentPhase.none, paymentInit: init));
+        emit(
+          state.copyWith(
+            status: BookingStatus.initial,
+            paymentPhase: PaymentPhase.none,
+            paymentInit: init,
+          ),
+        );
         return init;
       },
     );
