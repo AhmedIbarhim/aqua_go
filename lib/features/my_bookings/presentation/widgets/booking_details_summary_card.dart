@@ -45,9 +45,8 @@ class BookingDetailsSummaryCard extends StatelessWidget {
                 value: booking.formattedDateTime,
                 icon: AppAssets.date,
               ),
-              if (!booking.isCoveredBySubscription &&
-                  booking.addOns != null &&
-                  booking.addOns!.isNotEmpty)
+              // if (!booking.isCoveredBySubscription &&
+              if (booking.addOns != null && booking.addOns!.isNotEmpty)
                 ...booking.addOns!.map(
                   (addon) => _buildSummaryRow(
                     context,

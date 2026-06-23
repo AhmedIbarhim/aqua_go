@@ -38,6 +38,7 @@ import '../widgets/booking_details_biker_card.dart';
 import '../widgets/booking_details_summary_card.dart';
 import '../widgets/booking_details_worker_notes_cart.dart';
 import '../widgets/booking_details_rating_card.dart';
+import '../widgets/booking_details_complaint_card.dart';
 
 class MyBookingDetailsArgs {
   final BookingSummaryModel booking;
@@ -125,6 +126,19 @@ class MyBookingDetailsView extends StatelessWidget {
                                   BookingDetailsNumberCard(
                                     booking: activeBooking,
                                   ),
+                                  if (activeBooking.complaintId != null &&
+                                      activeBooking
+                                          .complaintId!
+                                          .isNotEmpty) ...[
+                                    const SizedBox(height: 16),
+                                    BookingDetailsComplaintCard(
+                                      key: ValueKey(
+                                        activeBooking.updatedAt ??
+                                            activeBooking.complaintId,
+                                      ),
+                                      complaintId: activeBooking.complaintId!,
+                                    ),
+                                  ],
                                   const SizedBox(height: 16),
                                   BookingDetailsVehicleCard(
                                     booking: activeBooking,
