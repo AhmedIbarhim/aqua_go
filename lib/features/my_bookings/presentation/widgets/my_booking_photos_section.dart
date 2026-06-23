@@ -15,33 +15,41 @@ class MyBookingPhotosSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Filter the photos to find BEFORE stage and FRONT angle
-    final beforePhoto = photos?.firstWhere(
+    final allPhotos =
+        photos?.where((p) => p.url != null && p.url!.isNotEmpty).toList() ?? [];
+
+    final beforeIndex = allPhotos.indexWhere(
       (p) =>
           p.stage?.toUpperCase() == 'BEFORE' &&
           p.angle?.toUpperCase() == 'FRONT',
-      orElse: () => Photos(),
     );
+    Photos? beforePhotoItem;
+    if (beforeIndex != -1) {
+      beforePhotoItem = allPhotos.removeAt(beforeIndex);
+    }
 
-    // Filter the photos to find AFTER stage and FRONT angle
-    final afterPhoto = photos?.firstWhere(
+    final afterIndex = allPhotos.indexWhere(
       (p) =>
           p.stage?.toUpperCase() == 'AFTER' &&
           p.angle?.toUpperCase() == 'FRONT',
-      orElse: () => Photos(),
     );
+    Photos? afterPhotoItem;
+    if (afterIndex != -1) {
+      afterPhotoItem = allPhotos.removeAt(afterIndex);
+    }
+
+    if (afterPhotoItem != null) {
+      allPhotos.insert(0, afterPhotoItem);
+    }
+    if (beforePhotoItem != null) {
+      allPhotos.insert(0, beforePhotoItem);
+    }
 
     final List<String> imageUrls = [
-      (beforePhoto?.url != null && beforePhoto!.url!.isNotEmpty)
-          ? beforePhoto.url!
-          : '',
-      (afterPhoto?.url != null && afterPhoto!.url!.isNotEmpty)
-          ? afterPhoto.url!
-          : '',
+      beforePhotoItem?.url ?? '',
+      afterPhotoItem?.url ?? '',
     ];
 
-    final allPhotos =
-        photos?.where((p) => p.url != null && p.url!.isNotEmpty).toList() ?? [];
     final allImageUrls = allPhotos.map((p) => p.url!).toList();
     final allLabels = allPhotos.map((p) {
       final stage = p.stage?.toUpperCase();
@@ -57,21 +65,25 @@ class MyBookingPhotosSection extends StatelessWidget {
       }
 
       if (angle != null && angle.isNotEmpty) {
-        final String translatedAngle;
+        final String? translatedAngle;
         final normalizedAngle = angle
             .toLowerCase()
             .replaceAll('-', '_')
             .replaceAll(' ', '_');
         switch (normalizedAngle) {
           case 'front':
-            translatedAngle = LocaleKeys.bookings_angles_front.tr(
-              context: context,
-            );
+            translatedAngle = null;
+
+            // LocaleKeys.bookings_angles_front.tr(
+            //   context: context,
+            // );
             break;
           case 'back':
-            translatedAngle = LocaleKeys.bookings_angles_back.tr(
-              context: context,
-            );
+            translatedAngle = null;
+
+            // LocaleKeys.bookings_angles_back.tr(
+            //   context: context,
+            // );
             break;
           // case 'left':
           //   translatedAngle = LocaleKeys.bookings_angles_left.tr(
@@ -136,7 +148,9 @@ class MyBookingPhotosSection extends StatelessWidget {
           default:
             translatedAngle = p.angle ?? '';
         }
-        return '$stageLabel ($translatedAngle)';
+        return translatedAngle == null
+            ? stageLabel
+            : '$stageLabel ($translatedAngle)';
       }
       return stageLabel;
     }).toList();

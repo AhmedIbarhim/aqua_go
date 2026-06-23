@@ -20,7 +20,12 @@ class GalleryView extends StatefulWidget {
   final int initialIndex;
   final List<String>? labels;
 
-  const GalleryView({super.key, required this.images, this.initialIndex = 0, this.labels});
+  const GalleryView({
+    super.key,
+    required this.images,
+    this.initialIndex = 0,
+    this.labels,
+  });
 
   @override
   State<GalleryView> createState() => _GalleryViewState();
@@ -131,7 +136,7 @@ class _GalleryViewState extends State<GalleryView> {
               },
               child: CustomNetworkImage(
                 widget.images[index],
-                fit: BoxFit.contain,
+                fit: BoxFit.cover,
               ),
             ),
           ),
