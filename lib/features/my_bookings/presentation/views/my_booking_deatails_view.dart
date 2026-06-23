@@ -183,7 +183,7 @@ class MyBookingDetailsView extends StatelessWidget {
                           ),
                         ),
                       ),
-                      if (!isLoading && activeBooking.isUpcoming)
+                      if (!isLoading && _shouldShowActionSheet(activeBooking))
                         _buildActionSheet(context, activeBooking),
                     ],
                   ),
@@ -242,6 +242,25 @@ class MyBookingDetailsView extends StatelessWidget {
       case null:
         return false;
     }
+  }
+
+  bool _shouldShowActionSheet(BookingResponseModel booking) {
+    if (!booking.isUpcoming) return false;
+    if (booking.status == BookingStatus.ASSIGNED ||
+        booking.status == BookingStatus.STARTED ||
+        booking.status == BookingStatus.ON_THE_WAY ||
+        booking.status == BookingStatus.ARRIVED ||
+        booking.status == BookingStatus.CANCELLED) {
+      if (booking.scheduledAt == null) return false;
+      try {
+        final bookingTime = DateTime.parse(booking.scheduledAt!).toLocal();
+        final limit = DateTime.now().add(const Duration(hours: 12));
+        return bookingTime.isAfter(limit);
+      } catch (_) {
+        return false;
+      }
+    }
+    return true;
   }
 
   /// Server-rendered receipt PDF (spec §8). Opened in the device's external
