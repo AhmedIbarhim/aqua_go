@@ -24,8 +24,16 @@ import '../controllers/booking_state.dart';
 import '../../../../core/route/app_router.dart';
 import '../../../../core/helpers/shimmer_helper.dart';
 
-class BookingDetailsView extends StatelessWidget {
+class BookingDetailsView extends StatefulWidget {
   const BookingDetailsView({super.key});
+
+  @override
+  State<BookingDetailsView> createState() => _BookingDetailsViewState();
+}
+
+class _BookingDetailsViewState extends State<BookingDetailsView> {
+  bool _carJustAdded = false;
+  List<MyCarModel> _previousCars = [];
 
   /// Returns true if any currently-selected addon in a package flow requires
   /// payment (optional addons always do; included addons do when free qty = 0).
@@ -135,7 +143,28 @@ class BookingDetailsView extends StatelessWidget {
             isRequired: true,
           ),
           SizedBox(height: height * 0.02),
-          BlocBuilder<MyCarsCubit, MyCarsState>(
+          BlocConsumer<MyCarsCubit, MyCarsState>(
+            listener: (context, myCarsState) {
+              if (myCarsState is MyCarsLoaded) {
+                if (_carJustAdded) {
+                  _carJustAdded = false;
+                  MyCarModel? newCar;
+                  for (final car in myCarsState.cars) {
+                    final exists = _previousCars.any((c) => c.id == car.id);
+                    if (!exists) {
+                      newCar = car;
+                      break;
+                    }
+                  }
+                  if (newCar != null) {
+                    context.read<BookingCubit>().selectCar(newCar);
+                  } else if (myCarsState.cars.isNotEmpty) {
+                    context.read<BookingCubit>().selectCar(myCarsState.cars.last);
+                  }
+                }
+                _previousCars = myCarsState.cars;
+              }
+            },
             builder: (context, myCarsState) {
               if (myCarsState is MyCarsLoading ||
                   myCarsState is MyCarsInitial) {
@@ -143,6 +172,9 @@ class BookingDetailsView extends StatelessWidget {
                   onAddCar: () {
                     context.pushNamed(Routes.addVehicle).then((val) {
                       if (val == true && context.mounted) {
+                        setState(() {
+                          _carJustAdded = true;
+                        });
                         context.read<MyCarsCubit>().getCars();
                       }
                     });
@@ -184,6 +216,9 @@ class BookingDetailsView extends StatelessWidget {
                 onAddCar: () {
                   context.pushNamed(Routes.addVehicle).then((val) {
                     if (val == true && context.mounted) {
+                      setState(() {
+                        _carJustAdded = true;
+                      });
                       context.read<MyCarsCubit>().getCars();
                     }
                   });

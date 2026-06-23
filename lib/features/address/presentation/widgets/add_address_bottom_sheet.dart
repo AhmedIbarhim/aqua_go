@@ -116,7 +116,7 @@ class _AddAddressBottomSheetState extends State<AddAddressBottomSheet> {
         if (state is AddressesActionSuccess) {
           Navigator.pop(context); // Close bottom sheet
           if (widget.existingAddress == null) {
-            Navigator.pop(context); // Return from map view
+            Navigator.pop(context, true); // Return true from map view
           }
         }
 

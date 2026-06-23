@@ -33,6 +33,8 @@ class _BookingLocationViewState extends State<BookingLocationView> {
   late final MapsCubit _mapsCubit;
   int selectedLocationIndex = 0;
   AddressModel? selectedMapAddress;
+  bool _addressJustAdded = false;
+  List<AddressModel> _previousAddresses = [];
 
   @override
   void initState() {
@@ -121,30 +123,55 @@ class _BookingLocationViewState extends State<BookingLocationView> {
             BlocListener<AddressesCubit, AddressesState>(
               listener: (context, state) {
                 if (state is AddressesLoaded) {
-                  final selectedAddr = context
-                      .read<BookingCubit>()
-                      .state
-                      .selectedAddress;
-                  if (selectedAddr != null &&
-                      selectedAddr.id != 'current_gps' &&
-                      selectedAddr.id != 'custom_map') {
-                    final idx = state.addresses.indexWhere(
-                      (addr) =>
-                          addr.id == selectedAddr.id ||
-                          (addr.lat == selectedAddr.lat &&
-                              addr.lng == selectedAddr.lng),
-                    );
-                    if (idx != -1) {
+                  if (_addressJustAdded) {
+                    _addressJustAdded = false;
+                    AddressModel? newAddress;
+                    for (final addr in state.addresses) {
+                      final exists = _previousAddresses.any(
+                        (oldAddr) => oldAddr.id == addr.id,
+                      );
+                      if (!exists) {
+                        newAddress = addr;
+                        break;
+                      }
+                    }
+                    if (newAddress != null) {
+                      final idx = state.addresses.indexOf(newAddress);
                       setState(() {
                         selectedLocationIndex = idx + 1;
                       });
-                    } else {
+                    } else if (state.addresses.isNotEmpty) {
                       setState(() {
-                        selectedLocationIndex = -1;
-                        selectedMapAddress = selectedAddr;
+                        selectedLocationIndex = state.addresses.length;
                       });
                     }
+                  } else {
+                    final selectedAddr = context
+                        .read<BookingCubit>()
+                        .state
+                        .selectedAddress;
+                    if (selectedAddr != null &&
+                        selectedAddr.id != 'current_gps' &&
+                        selectedAddr.id != 'custom_map') {
+                      final idx = state.addresses.indexWhere(
+                        (addr) =>
+                            addr.id == selectedAddr.id ||
+                            (addr.lat == selectedAddr.lat &&
+                                addr.lng == selectedAddr.lng),
+                      );
+                      if (idx != -1) {
+                        setState(() {
+                          selectedLocationIndex = idx + 1;
+                        });
+                      } else {
+                        setState(() {
+                          selectedLocationIndex = -1;
+                          selectedMapAddress = selectedAddr;
+                        });
+                      }
+                    }
                   }
+                  _previousAddresses = state.addresses;
                 }
               },
             ),
@@ -263,8 +290,11 @@ class _BookingLocationViewState extends State<BookingLocationView> {
                                           forAddingAddress: true,
                                         ),
                                       )
-                                      .then((_) {
-                                        if (context.mounted) {
+                                      .then((val) {
+                                        if (val == true && context.mounted) {
+                                          setState(() {
+                                            _addressJustAdded = true;
+                                          });
                                           _addressCubit.getAddresses();
                                         }
                                       });
