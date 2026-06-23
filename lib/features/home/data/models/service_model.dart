@@ -103,7 +103,7 @@ class ServiceName extends Equatable {
   factory ServiceName.fromJson(dynamic json) {
     if (json is Map<String, dynamic>) {
       return ServiceName(
-        nameAr: json['ar_SA']?.toString() ?? '',
+        nameAr: json['ar']?.toString() ?? '',
         nameEn: json['en']?.toString() ?? '',
       );
     }
@@ -111,7 +111,7 @@ class ServiceName extends Equatable {
   }
 
   Map<String, dynamic> toJson() {
-    return {'ar_SA': nameAr, 'en': nameEn};
+    return {'ar': nameAr, 'en': nameEn};
   }
 
   @override
@@ -127,7 +127,7 @@ class ServiceDescription extends Equatable {
   factory ServiceDescription.fromJson(dynamic json) {
     if (json is Map<String, dynamic>) {
       return ServiceDescription(
-        descAr: json['ar_SA']?.toString() ?? '',
+        descAr: json['ar']?.toString() ?? '',
         descEn: json['en']?.toString() ?? '',
       );
     }
@@ -135,7 +135,7 @@ class ServiceDescription extends Equatable {
   }
 
   Map<String, dynamic> toJson() {
-    return {'ar_SA': descAr, 'en': descEn};
+    return {'ar': descAr, 'en': descEn};
   }
 
   @override

@@ -50,13 +50,13 @@ class ModelName extends Equatable {
 
   factory ModelName.fromJson(Map<String, dynamic> json) {
     return ModelName(
-      nameAr: json['ar_SA'] as String? ?? '',
+      nameAr: json['ar'] as String? ?? '',
       nameEn: json['en'] as String? ?? '',
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {'ar_SA': nameAr, 'en': nameEn};
+    return {'ar': nameAr, 'en': nameEn};
   }
 
   String get localizedName {

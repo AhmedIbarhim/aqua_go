@@ -72,13 +72,13 @@ class MakeName extends Equatable {
 
   factory MakeName.fromJson(dynamic json) {
     return MakeName(
-      nameAr: json['ar_SA']?.toString() ?? '',
+      nameAr: json['ar']?.toString() ?? '',
       nameEn: json['en']?.toString() ?? '',
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {'ar_SA': nameAr, 'en': nameEn};
+    return {'ar': nameAr, 'en': nameEn};
   }
 
   String get localizedName {
