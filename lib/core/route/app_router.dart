@@ -44,7 +44,6 @@ import '../../features/profile/presentation/views/terms_view.dart';
 import '../../features/profile/presentation/views/support_view.dart';
 import '../../features/support/presentation/views/faqs_view.dart';
 import '../../features/support/presentation/controllers/faqs_cubit.dart';
-
 import '../../features/my_bookings/presentation/controllers/my_booking_details_cubit.dart';
 import '../../features/subscriptions/presentation/controllers/subscriptions_controller/subscriptions_cubit.dart';
 import '../../features/profile/presentation/views/my_subscribed_packages_view.dart';
@@ -103,9 +102,7 @@ abstract class AppRouter {
               ),
               // SubscriptionsCubit is a shared lazy singleton — provide by value
               // so popping this route does not close the shared instance.
-              BlocProvider.value(
-                value: locator<SubscriptionsCubit>(),
-              ),
+              BlocProvider.value(value: locator<SubscriptionsCubit>()),
             ],
             child: const PackagesView(),
           ),
@@ -170,6 +167,8 @@ abstract class AppRouter {
                   args.service,
                   existingCar: args.existingCar,
                   existingAddress: args.existingAddress,
+                  existingDate: args.existingDate,
+                  existingTime: args.existingTime,
                   subscriptionId: args.subscriptionId,
                   washId: args.washId,
                 ),
@@ -295,6 +294,8 @@ class BookingFlowStartArgs {
   final ServiceModel? service;
   final MyCarModel? existingCar;
   final AddressModel? existingAddress;
+  final DateTime? existingDate;
+  final String? existingTime;
   final BookingFlowConfig flowConfig;
   final BookingSubmitStrategy submitStrategy;
   final String? subscriptionId;
@@ -304,6 +305,8 @@ class BookingFlowStartArgs {
     this.service,
     this.existingCar,
     this.existingAddress,
+    this.existingDate,
+    this.existingTime,
     this.flowConfig = BookingFlowConfig.normal,
     BookingSubmitStrategy? submitStrategy,
     this.subscriptionId,

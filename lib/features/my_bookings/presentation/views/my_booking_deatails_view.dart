@@ -315,6 +315,28 @@ class MyBookingDetailsView extends StatelessWidget {
     );
   }
 
+  String _formatTimeSlot(DateTime time, BuildContext context) {
+    if (context.isAr) {
+      final hour = time.hour;
+      final minute = time.minute;
+      final minStr = minute.toString().padLeft(2, '0');
+
+      String period;
+      int displayHour = hour;
+      if (hour >= 12) {
+        period = hour == 12 ? 'ظهراً' : 'مساءً';
+        if (hour > 12) displayHour = hour - 12;
+      } else {
+        period = 'صباحاً';
+        if (hour == 0) displayHour = 12;
+      }
+
+      return '$displayHour:$minStr $period';
+    } else {
+      return DateFormat('h:mm a').format(time);
+    }
+  }
+
   Widget _buildActionSheet(BuildContext context, BookingResponseModel booking) {
     return BottomActionSheetContainer(
       child: CustomButton(
@@ -357,12 +379,24 @@ class MyBookingDetailsView extends StatelessWidget {
             ),
           );
 
+          DateTime? existingDate;
+          String? existingTime;
+          if (booking.scheduledAt != null) {
+            final parsedDate = DateTime.tryParse(booking.scheduledAt!);
+            if (parsedDate != null) {
+              existingDate = parsedDate;
+              existingTime = _formatTimeSlot(parsedDate, context);
+            }
+          }
+
           context.pushNamed(
             Routes.bookingLocation,
             arguments: BookingFlowStartArgs(
               service: service,
               existingCar: existingCar,
               existingAddress: existingAddress,
+              existingDate: existingDate,
+              existingTime: existingTime,
               flowConfig: const BookingFlowConfig(
                 flowType: BookingFlowType.reschedule,
               ),

@@ -54,6 +54,11 @@ class _BookingLocationViewState extends State<BookingLocationView> {
             selectedLocationIndex = -1;
             selectedMapAddress = selectedAddr;
           });
+        } else {
+          setState(() {
+            selectedLocationIndex = -1;
+            selectedMapAddress = selectedAddr;
+          });
         }
       }
     });
@@ -124,11 +129,19 @@ class _BookingLocationViewState extends State<BookingLocationView> {
                       selectedAddr.id != 'current_gps' &&
                       selectedAddr.id != 'custom_map') {
                     final idx = state.addresses.indexWhere(
-                      (addr) => addr.id == selectedAddr.id,
+                      (addr) =>
+                          addr.id == selectedAddr.id ||
+                          (addr.lat == selectedAddr.lat &&
+                              addr.lng == selectedAddr.lng),
                     );
                     if (idx != -1) {
                       setState(() {
                         selectedLocationIndex = idx + 1;
+                      });
+                    } else {
+                      setState(() {
+                        selectedLocationIndex = -1;
+                        selectedMapAddress = selectedAddr;
                       });
                     }
                   }

@@ -38,6 +38,8 @@ class BookingCubit extends Cubit<BookingState> {
     ServiceModel? service, {
     MyCarModel? existingCar,
     AddressModel? existingAddress,
+    DateTime? existingDate,
+    String? existingTime,
     String? subscriptionId,
     String? washId,
   }) {
@@ -47,6 +49,8 @@ class BookingCubit extends Cubit<BookingState> {
         selectedService: service,
         selectedCar: existingCar,
         selectedAddress: existingAddress,
+        selectedDate: existingDate,
+        selectedTime: existingTime,
         flowConfig: _flowConfig,
         subscriptionId: subscriptionId,
         washId: washId,
@@ -55,6 +59,10 @@ class BookingCubit extends Cubit<BookingState> {
 
     if (subscriptionId != null) {
       fetchSubscriptionDetails(subscriptionId);
+    }
+
+    if (existingDate != null) {
+      fetchAvailability(targetDate: existingDate);
     }
   }
 

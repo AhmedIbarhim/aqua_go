@@ -35,15 +35,31 @@ class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
   String? selectedTime;
   late List<DateTime> dates;
 
+  List<DateTime> _generateDates(DateTime? initialDate) {
+    final now = DateTime.now();
+    final today = DateUtils.dateOnly(now);
+    final limitDate = initialDate != null ? DateUtils.dateOnly(initialDate) : today;
+    
+    int daysToGenerate = 8;
+    if (limitDate.isAfter(today)) {
+      final difference = limitDate.difference(today).inDays;
+      if (difference >= daysToGenerate) {
+        daysToGenerate = difference + 3;
+      }
+    }
+    
+    return List.generate(
+      daysToGenerate,
+      (index) => today.add(Duration(days: index)),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
     selectedDate = widget.initialDate;
     selectedTime = widget.initialTime;
-    dates = List.generate(
-      8,
-      (index) => DateTime.now().add(Duration(days: index)),
-    );
+    dates = _generateDates(selectedDate);
   }
 
   @override
@@ -55,6 +71,7 @@ class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
     if (widget.initialDate != oldWidget.initialDate) {
       selectedDate = widget.initialDate;
       selectedTime = null;
+      dates = _generateDates(selectedDate);
     }
   }
 
