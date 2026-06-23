@@ -1,7 +1,11 @@
+import 'package:aqua_go/core/config/local_storage/shared_prefs.dart';
+import 'package:aqua_go/core/constants.dart';
+import 'vehicle_localized_name.dart';
+
 class BookingVehicle {
   int? vehicleSeq;
-  String? vehicleMake;
-  String? vehicleModel;
+  VehicleLocalizedName? vehicleMake;
+  VehicleLocalizedName? vehicleModel;
   String? vehicleColor;
   int? vehicleYear;
   String? plate;
@@ -21,8 +25,16 @@ class BookingVehicle {
 
   BookingVehicle.fromJson(Map<String, dynamic> json) {
     vehicleSeq = json['vehicleSeq'];
-    vehicleMake = json['vehicleMake'];
-    vehicleModel = json['vehicleModel'];
+    vehicleMake = json['vehicleMake'] != null
+        ? (json['vehicleMake'] is Map
+            ? VehicleLocalizedName.fromJson(json['vehicleMake'])
+            : VehicleLocalizedName(en: json['vehicleMake'].toString(), ar: json['vehicleMake'].toString()))
+        : null;
+    vehicleModel = json['vehicleModel'] != null
+        ? (json['vehicleModel'] is Map
+            ? VehicleLocalizedName.fromJson(json['vehicleModel'])
+            : VehicleLocalizedName(en: json['vehicleModel'].toString(), ar: json['vehicleModel'].toString()))
+        : null;
     vehicleColor = json['vehicleColor'];
     vehicleYear = json['vehicleYear'] != null
         ? int.tryParse(json['vehicleYear'].toString())
@@ -35,8 +47,8 @@ class BookingVehicle {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['vehicleSeq'] = vehicleSeq;
-    data['vehicleMake'] = vehicleMake;
-    data['vehicleModel'] = vehicleModel;
+    data['vehicleMake'] = vehicleMake?.toJson();
+    data['vehicleModel'] = vehicleModel?.toJson();
     data['vehicleColor'] = vehicleColor;
     data['vehicleYear'] = vehicleYear;
     data['plate'] = plate;
@@ -44,4 +56,15 @@ class BookingVehicle {
     data['colorEditable'] = colorEditable;
     return data;
   }
+
+  // --- UI Helpers for Backwards Compatibility ---
+  String get makeName =>
+      CacheClient.getString(kLanguage, defaultValue: kArabicLang) == kArabicLang
+      ? (vehicleMake?.ar ?? '')
+      : (vehicleMake?.en ?? '');
+
+  String get modelName =>
+      CacheClient.getString(kLanguage, defaultValue: kArabicLang) == kArabicLang
+      ? (vehicleModel?.ar ?? '')
+      : (vehicleModel?.en ?? '');
 }

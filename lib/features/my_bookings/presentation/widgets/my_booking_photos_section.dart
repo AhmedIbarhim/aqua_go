@@ -73,28 +73,10 @@ class MyBookingPhotosSection extends StatelessWidget {
         switch (normalizedAngle) {
           case 'front':
             translatedAngle = null;
-
-            // LocaleKeys.bookings_angles_front.tr(
-            //   context: context,
-            // );
             break;
           case 'back':
             translatedAngle = null;
-
-            // LocaleKeys.bookings_angles_back.tr(
-            //   context: context,
-            // );
             break;
-          // case 'left':
-          //   translatedAngle = LocaleKeys.bookings_angles_left.tr(
-          //     context: context,
-          //   );
-          //   break;
-          // case 'right':
-          //   translatedAngle = LocaleKeys.bookings_angles_right.tr(
-          //     context: context,
-          //   );
-          //   break;
           case 'front_right':
             translatedAngle = LocaleKeys.bookings_angles_front_right.tr(
               context: context,
@@ -135,16 +117,6 @@ class MyBookingPhotosSection extends StatelessWidget {
               context: context,
             );
             break;
-          // case 'roof':
-          //   translatedAngle = LocaleKeys.bookings_angles_roof.tr(
-          //     context: context,
-          //   );
-          //   break;
-          // case 'interior':
-          //   translatedAngle = LocaleKeys.bookings_angles_interior.tr(
-          //     context: context,
-          //   );
-          // break;
           default:
             translatedAngle = p.angle ?? '';
         }

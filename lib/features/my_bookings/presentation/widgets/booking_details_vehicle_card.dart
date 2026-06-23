@@ -20,7 +20,7 @@ class BookingDetailsVehicleCard extends StatelessWidget {
 
     // Resolve Vehicle Make and Model
     String brandModelText =
-        '${vehicle?.vehicleMake ?? ""} ${vehicle?.vehicleModel ?? ""}'.trim();
+        '${vehicle?.makeName ?? ""} ${vehicle?.modelName ?? ""}'.trim();
     if (brandModelText.isEmpty) {
       brandModelText = '...';
     }

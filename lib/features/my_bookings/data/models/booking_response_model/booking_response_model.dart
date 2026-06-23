@@ -29,6 +29,7 @@ export 'invoice.dart';
 export 'package_name.dart';
 export 'photos.dart';
 export 'reschedule_policy.dart';
+export 'vehicle_localized_name.dart';
 
 class BookingResponseModel {
   String? id;
@@ -74,6 +75,14 @@ class BookingResponseModel {
   BookingAddress? address;
   BookingRatingModel? rating;
   String? complaintId;
+  String? paymentIntentId;
+  String? paymentStuckDetectedAt;
+  String? pspRedirectUrl;
+  String? startedAt;
+  String? completedAt;
+  String? cancelledAt;
+  String? completionNotes;
+  String? cantFindClientReportedAt;
 
   BookingResponseModel({
     this.id,
@@ -119,6 +128,14 @@ class BookingResponseModel {
     this.address,
     this.rating,
     this.complaintId,
+    this.paymentIntentId,
+    this.paymentStuckDetectedAt,
+    this.pspRedirectUrl,
+    this.startedAt,
+    this.completedAt,
+    this.cancelledAt,
+    this.completionNotes,
+    this.cantFindClientReportedAt,
   });
 
   BookingResponseModel.fromJson(Map<String, dynamic> json) {
@@ -204,13 +221,21 @@ class BookingResponseModel {
         ? BookingRatingModel.fromJson(json['rating'])
         : null;
     complaintId = json['complaintId'];
+    paymentIntentId = json['paymentIntentId'];
+    paymentStuckDetectedAt = json['paymentStuckDetectedAt'];
+    pspRedirectUrl = json['pspRedirectUrl'];
+    startedAt = json['startedAt'];
+    completedAt = json['completedAt'];
+    cancelledAt = json['cancelledAt'];
+    completionNotes = json['completionNotes'];
+    cantFindClientReportedAt = json['cantFindClientReportedAt'];
   }
 
   // --- UI Compatibility Helpers ---
   String get title =>
       CacheClient.getString(kLanguage, defaultValue: kArabicLang) == kArabicLang
       ? (serviceName?.ar ?? packageName?.ar ?? '')
-      : (serviceName?.ar ?? packageName?.en ?? '');
+      : (serviceName?.en ?? packageName?.en ?? '');
 
   String get location => addressLabel ?? address?.label ?? '';
 

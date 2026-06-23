@@ -126,8 +126,8 @@ class BookingSummaryModel {
       currency: details.currency,
       isSubscription: details.isSubscription,
       vehicleYear: vehicle?.vehicleYear,
-      vehicleMake: vehicle?.vehicleMake,
-      vehicleModel: vehicle?.vehicleModel,
+      vehicleMake: vehicle?.makeName,
+      vehicleModel: vehicle?.modelName,
       vehicleColor: vehicle?.vehicleColor,
       plate: vehicle?.plate ?? details.plate,
       vehicleMakeLogoUrl: vehicle?.makeLogoUrl,
@@ -161,8 +161,8 @@ class BookingSummaryModel {
       vehicles: [
         BookingVehicle(
           vehicleYear: vehicleYear,
-          vehicleMake: vehicleMake,
-          vehicleModel: vehicleModel,
+          vehicleMake: vehicleMake != null ? VehicleLocalizedName(en: vehicleMake, ar: vehicleMake) : null,
+          vehicleModel: vehicleModel != null ? VehicleLocalizedName(en: vehicleModel, ar: vehicleModel) : null,
           vehicleColor: vehicleColor,
           plate: plate,
           makeLogoUrl: vehicleMakeLogoUrl,
