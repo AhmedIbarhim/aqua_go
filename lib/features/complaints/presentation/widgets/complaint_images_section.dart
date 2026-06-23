@@ -59,7 +59,11 @@ class _ComplaintImagesSectionState extends State<ComplaintImagesSection>
                 ),
                 child: GestureDetector(
                   onTap: () async {
-                    final pickedFile = await ImagePickerHelper.pickWithCamera();
+                    final pickedFile =
+                        await ImagePickerHelper.showImageSourceDialog(
+                          context,
+                          withCropping: false,
+                        );
                     if (pickedFile != null) {
                       setState(() {
                         images.add(pickedFile);
@@ -77,7 +81,9 @@ class _ComplaintImagesSectionState extends State<ComplaintImagesSection>
                       children: [
                         SvgPicture.asset(AppAssets.addImage),
                         Text(
-                          LocaleKeys.bookings_upload_images.tr(context: context),
+                          LocaleKeys.bookings_upload_images.tr(
+                            context: context,
+                          ),
                           style: AppTextStyles.medium14,
                         ),
                       ],

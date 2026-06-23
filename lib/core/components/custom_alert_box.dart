@@ -129,7 +129,10 @@ class SuccessAlertBox extends StatelessWidget {
         SizedBox(height: width * 0.04),
 
         // Title
-        Text(title ?? LocaleKeys.success.tr(context: context), style: AppTextStyles.medium16),
+        Text(
+          title ?? LocaleKeys.success.tr(context: context),
+          style: AppTextStyles.medium16,
+        ),
         const SizedBox(height: 4),
 
         // Description
@@ -244,7 +247,8 @@ class WarningBox extends StatelessWidget {
               child: CustomButton(
                 color: mainButtonColor ?? context.colors.error,
                 borderColor: mainButtonColor ?? context.colors.error,
-                text: primaryButtonText ?? LocaleKeys.delete.tr(context: context),
+                text:
+                    primaryButtonText ?? LocaleKeys.delete.tr(context: context),
                 textColor: mainButtonTextColor ?? lightAppColors.themeColor,
                 onPressed: onPrimaryPressed ?? () => Navigator.pop(context),
               ),
@@ -253,7 +257,8 @@ class WarningBox extends StatelessWidget {
 
             Expanded(
               child: CustomButton(
-                text: secondaryButtonText ?? LocaleKeys.back.tr(context: context),
+                text:
+                    secondaryButtonText ?? LocaleKeys.back.tr(context: context),
                 color: context.colors.cardBackGround,
                 borderColor: context.colors.borderSecondary,
                 textColor: context.colors.textPrimary,
@@ -329,7 +334,8 @@ class DialogBox extends StatelessWidget {
             SizedBox(width: width * 0.02),
             Expanded(
               child: CustomButton(
-                text: secondaryButtonText ?? LocaleKeys.back.tr(context: context),
+                text:
+                    secondaryButtonText ?? LocaleKeys.back.tr(context: context),
                 color: context.colors.cardBackGround,
                 borderColor: context.colors.borderSecondary,
                 textColor: context.colors.textPrimary,

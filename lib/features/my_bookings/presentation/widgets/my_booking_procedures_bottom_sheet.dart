@@ -44,6 +44,7 @@ class MyBookingProceduresBottomSheet extends StatelessWidget {
           title: LocaleKeys.bookings_submit_complaint.tr(context: context),
           onTap: booking.complaintId == null
               ? () {
+                  Navigator.pop(context);
                   context.pushNamed(
                     Routes.complain,
                     arguments: ComplaintArgs(booking: booking),

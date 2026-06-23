@@ -42,7 +42,9 @@ class ImagePickerHelper {
               ),
               ListTile(
                 leading: const Icon(Icons.photo_library),
-                title: Text(LocaleKeys.select_from_gallery.tr(context: context)),
+                title: Text(
+                  LocaleKeys.select_from_gallery.tr(context: context),
+                ),
                 onTap: () => Navigator.of(context).pop(ImageSource.gallery),
               ),
               const SizedBox(height: 10),

@@ -54,7 +54,10 @@ class _ComplaintImageFieldState extends State<ComplaintImageField> {
             isLoading = true;
           });
           try {
-            final pickedFile = await ImagePickerHelper.pickWithCamera();
+            final pickedFile = await ImagePickerHelper.showImageSourceDialog(
+              context,
+              withCropping: false,
+            );
             if (pickedFile != null) {
               imageFile = pickedFile;
               widget.onFileChanged(imageFile);
@@ -112,7 +115,9 @@ class _ComplaintImageFieldState extends State<ComplaintImageField> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              LocaleKeys.bookings_add_image.tr(context: context),
+                              LocaleKeys.bookings_add_image.tr(
+                                context: context,
+                              ),
                               style: AppTextStyles.medium12,
                             ),
                           ],

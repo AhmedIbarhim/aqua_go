@@ -20,6 +20,10 @@ import '../../data/models/complaint_model.dart';
 import '../controllers/complaints_cubit/complaints_cubit.dart';
 import '../controllers/complaints_cubit/complaints_state.dart';
 import '../widgets/complaint_images_section.dart';
+import 'package:aqua_go/core/route/app_router.dart';
+import 'package:aqua_go/core/route/routes.dart';
+import 'package:aqua_go/features/my_bookings/presentation/views/my_booking_deatails_view.dart';
+import 'package:aqua_go/features/my_bookings/data/models/booking_summary_model.dart';
 
 class ComplaintArgs {
   final BookingResponseModel booking;
@@ -75,10 +79,18 @@ class _ComplaintViewState extends State<ComplaintView> {
         }
 
         if (state is ComplaintSubmitSuccess) {
-          context.showSuccessSnackBar(
-            LocaleKeys.bookings_complaint_submitted.tr(context: context),
-          );
-          Navigator.pop(context, true);
+          context.showSuccessAlert(
+            title: LocaleKeys.success.tr(context: context),
+            message: LocaleKeys.bookings_complaint_submitted.tr(context: context),
+          ).then((_) {
+            AppRouter.navigatorKey.currentState?.pushNamedAndRemoveUntil(
+              Routes.myBookingDetails,
+              (route) => route.settings.name == Routes.layout || route.isFirst,
+              arguments: MyBookingDetailsArgs(
+                booking: BookingSummaryModel.fromDetails(widget.booking),
+              ),
+            );
+          });
         } else if (state is ComplaintSubmitFailure) {
           context.showErrorSnackBar(state.message);
         }
@@ -103,7 +115,9 @@ class _ComplaintViewState extends State<ComplaintView> {
                       onTap: _showComplainTypes,
                       child: AbsorbPointer(
                         child: CustomTextField(
-                          label: LocaleKeys.bookings_complaint_type.tr(context: context),
+                          label: LocaleKeys.bookings_complaint_type.tr(
+                            context: context,
+                          ),
                           hint: LocaleKeys.select_here.tr(context: context),
                           controller: _typeController,
                           isRequired: true,
@@ -248,13 +262,16 @@ class _ComplaintViewState extends State<ComplaintView> {
         TextFormField(
           controller: _detailsController,
           maxLines: 5,
+          maxLength: 2000,
           textAlign: TextAlign.start,
           onChanged: (value) => setState(() {}),
           style: AppTextStyles.regular14.copyWith(
             color: context.colors.textPrimary,
           ),
           decoration: InputDecoration(
-            hintText: LocaleKeys.write_here.tr(context: context),
+            hintText: LocaleKeys.complaint_complaint_details_limit.tr(
+              context: context,
+            ),
             hintStyle: AppTextStyles.regular14.copyWith(
               color: context.colors.contentDisabled,
             ),
@@ -288,7 +305,8 @@ class _ComplaintViewState extends State<ComplaintView> {
               text: LocaleKeys.submit.tr(context: context),
               enabled:
                   _typeController.text.trim().isNotEmpty &&
-                  _detailsController.text.trim().isNotEmpty,
+                  _detailsController.text.trim().isNotEmpty &&
+                  _detailsController.text.trim().length >= 20,
               onPressed: () {
                 final category = ComplaintCategory.categoryFromTranslation(
                   _typeController.text,

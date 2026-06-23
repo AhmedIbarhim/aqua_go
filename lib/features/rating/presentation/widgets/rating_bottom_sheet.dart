@@ -14,6 +14,10 @@ import '../controllers/rating_cubit/rating_state.dart';
 import '../../../../core/components/custom_network_image.dart';
 import 'package:aqua_go/core/components/custom_text_field.dart';
 import 'rating_success_alert_box.dart';
+import 'package:aqua_go/core/route/app_router.dart';
+import 'package:aqua_go/core/route/routes.dart';
+import 'package:aqua_go/features/my_bookings/presentation/views/my_booking_deatails_view.dart';
+import 'package:aqua_go/features/my_bookings/data/models/booking_summary_model.dart';
 
 class RatingBottomSheet extends StatefulWidget {
   final BookingResponseModel booking;
@@ -67,7 +71,15 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
 
         if (state is RatingSubmitSuccess) {
           Navigator.pop(context);
-          RatingSuccessAlertBox.show(context);
+          RatingSuccessAlertBox.show(context).then((_) {
+            AppRouter.navigatorKey.currentState?.pushNamedAndRemoveUntil(
+              Routes.myBookingDetails,
+              (route) => route.settings.name == Routes.layout || route.isFirst,
+              arguments: MyBookingDetailsArgs(
+                booking: BookingSummaryModel.fromDetails(widget.booking),
+              ),
+            );
+          });
         } else if (state is RatingSubmitFailure) {
           context.showErrorSnackBar(state.message);
         }
@@ -111,9 +123,12 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
                 child: CustomButton(
                   onPressed: () {
                     final reasons = _rating < 5
-                        ? _selectedReasons.where((r) => r != 'OTHER_REASON').toList()
+                        ? _selectedReasons
+                              .where((r) => r != 'OTHER_REASON')
+                              .toList()
                         : null;
-                    final comment = _rating < 5 && _selectedReasons.contains('OTHER_REASON')
+                    final comment =
+                        _rating < 5 && _selectedReasons.contains('OTHER_REASON')
                         ? _commentController.text.trim()
                         : null;
 
@@ -324,7 +339,9 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
           const SizedBox(height: 16),
           CustomTextField(
             label: LocaleKeys.bookings_rating_reasons_other_reason.tr(),
-            hint: context.isEn ? "Write your reason here..." : "اكتب السبب هنا...",
+            hint: context.isEn
+                ? "Write your reason here..."
+                : "اكتب السبب هنا...",
             controller: _commentController,
             maxLines: 3,
             minLines: 3,
