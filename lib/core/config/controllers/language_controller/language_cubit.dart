@@ -27,7 +27,7 @@ class LanguageCubit extends Cubit<LanguageState> {
 
     if (user != null) {
       emit(LanguageLoading(state.locale));
-      final localeStr = newLocale.languageCode == 'ar' ? 'ar_SA' : 'en';
+      final localeStr = newLocale.languageCode == 'ar' ? 'ar' : 'en';
       final updatedUser = user.copyWith(locale: localeStr);
       final result = await authRepo.updateProfile(updatedUser);
       
@@ -55,7 +55,7 @@ class LanguageCubit extends Cubit<LanguageState> {
 
     if (user != null) {
       emit(LanguageLoading(state.locale));
-      final localeStr = newLocale.languageCode == 'ar' ? 'ar_SA' : 'en';
+      final localeStr = newLocale.languageCode == 'ar' ? 'ar' : 'en';
       final updatedUser = user.copyWith(locale: localeStr);
       final result = await authRepo.updateProfile(updatedUser);
 

@@ -114,20 +114,22 @@ class ServerFailure extends Failure {
     }
   }
 
-  /// Snake_case machine codes (e.g. "max_active_subscriptions_exceeded") must
-  /// never reach the UI raw. When [value] looks like a code, map it to the
-  /// localized `errors.<code>` string; if no translation exists, fall back to
-  /// the human-readable ProblemDetail `title` (or the default message) rather
-  /// than leaking the code. Plain human messages pass through unchanged.
-  static final RegExp _codePattern = RegExp(r'^[a-z][a-z0-9]*(_[a-z0-9]+)+$');
-
-  static String _localizeOrRaw(String value, Map response) {
-    if (!_codePattern.hasMatch(value)) return value;
-    final key = 'errors.$value';
-    final localized = key.tr();
-    if (localized != key) return localized;
-    final title = response['title']?.toString();
-    return (title != null && title.isNotEmpty) ? title : _defaultMessage;
+  /// Joins the server-localized `message` strings from an RFC 9457
+  /// `violations[]` array. `field`/`code` are reserved for LOGIC only and are
+  /// never surfaced as display text. Returns null when no displayable message
+  /// is present.
+  static String? _extractViolations(dynamic response) {
+    if (response is! Map) return null;
+    final violations = response['violations'];
+    if (violations is! List) return null;
+    final messages = violations
+        .whereType<Map>()
+        .map((v) => v['message'])
+        .whereType<String>()
+        .where((m) => m.isNotEmpty)
+        .toList();
+    if (messages.isEmpty) return null;
+    return messages.join('\n');
   }
 
   static String _extractErrorMessage(dynamic response) {
@@ -136,14 +138,20 @@ class ServerFailure extends Failure {
         return _defaultMessage;
       }
 
-      /// message
-      if (response['message'] != null) {
-        return _localizeOrRaw(response['message'].toString(), response);
+      /// detail (RFC 9457 — canonical localized server string; wins)
+      if (response['detail'] != null) {
+        return response['detail'].toString();
       }
 
-      /// detail (ProblemDetail — often a stable snake_case error code)
-      if (response['detail'] != null) {
-        return _localizeOrRaw(response['detail'].toString(), response);
+      /// violations[] (joined server `message` strings; logic uses code/field)
+      final violations = _extractViolations(response);
+      if (violations != null) {
+        return violations;
+      }
+
+      /// message
+      if (response['message'] != null) {
+        return response['message'].toString();
       }
 
       /// title
