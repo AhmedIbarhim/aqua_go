@@ -5,7 +5,7 @@ class VehicleLocalizedName {
   VehicleLocalizedName({this.ar, this.en});
 
   VehicleLocalizedName.fromJson(Map<String, dynamic> json) {
-    ar = json['ar'] ?? json['ar_SA'];
+    ar = json['ar'];
     en = json['en'];
   }
 

@@ -12,7 +12,6 @@ import 'booking_rating.dart';
 import 'booking_vehicle.dart';
 import 'breakdown.dart';
 import 'cancellation_policy.dart';
-import 'invoice.dart';
 import 'package_name.dart';
 import 'photos.dart';
 import 'reschedule_policy.dart';
@@ -52,7 +51,7 @@ class BookingResponseModel {
   PaymentStatus? paymentStatus;
   bool? isSubscription;
   String? moyasarPaymentId;
-  String? invoiceId;
+  // String? invoiceId;
   int? cancellationFeeMinor;
   bool? cancellationFeeWaived;
   int? reschedulesUsed;
@@ -61,7 +60,7 @@ class BookingResponseModel {
   List<Photos>? photos;
   AssignedWorker? assignedWorker;
   String? plate;
-  Invoice? invoice;
+  // Invoice? invoice;
   List<String>? workerNotes;
   String? addressArrivalNotes;
   List<BookingVehicle>? vehicles;
@@ -105,7 +104,7 @@ class BookingResponseModel {
     this.paymentStatus,
     this.isSubscription,
     this.moyasarPaymentId,
-    this.invoiceId,
+    // this.invoiceId,
     this.cancellationFeeMinor,
     this.cancellationFeeWaived,
     this.reschedulesUsed,
@@ -114,7 +113,7 @@ class BookingResponseModel {
     this.photos,
     this.assignedWorker,
     this.plate,
-    this.invoice,
+    // this.invoice,
     this.workerNotes,
     this.addressArrivalNotes,
     this.vehicles,
@@ -163,7 +162,7 @@ class BookingResponseModel {
     paymentStatus = PaymentStatus.fromString(json['paymentStatus']);
     isSubscription = json['isSubscription'];
     moyasarPaymentId = json['moyasarPaymentId'];
-    invoiceId = json['invoiceId'];
+    // invoiceId = json['invoiceId'];
     cancellationFeeMinor = json['cancellationFeeMinor'];
     cancellationFeeWaived = json['cancellationFeeWaived'];
     reschedulesUsed = json['reschedulesUsed'];
@@ -181,9 +180,9 @@ class BookingResponseModel {
         ? AssignedWorker.fromJson(json['assignedWorker'])
         : null;
     plate = json['plate'];
-    invoice = json['invoice'] != null
-        ? Invoice.fromJson(json['invoice'])
-        : null;
+    // invoice = json['invoice'] != null
+    //     ? Invoice.fromJson(json['invoice'])
+    //     : null;
     workerNotes = json['workerNotes'] != null
         ? List<String>.from(json['workerNotes'])
         : null;
