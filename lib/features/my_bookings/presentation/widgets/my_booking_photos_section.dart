@@ -193,33 +193,44 @@ class MyBookingPhotosSection extends StatelessWidget {
                     left: index == 1 ? 12 : 0,
                     right: index == 0 && imageUrls.length > 1 ? 12 : 0,
                   ),
-                  child: GestureDetector(
-                    onTap: () {
-                      final targetUrl = imageUrls[index];
-                      if (targetUrl.isEmpty) return;
+                  child: Column(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          final targetUrl = imageUrls[index];
+                          if (targetUrl.isEmpty) return;
 
-                      final galleryInitialIndex = allImageUrls.indexOf(
-                        targetUrl,
-                      );
+                          final galleryInitialIndex = allImageUrls.indexOf(
+                            targetUrl,
+                          );
 
-                      context.pushNamed(
-                        Routes.gallery,
-                        arguments: GalleryArgs(
-                          images: allImageUrls,
-                          initialIndex: galleryInitialIndex != -1
-                              ? galleryInitialIndex
-                              : 0,
-                          labels: allLabels,
+                          context.pushNamed(
+                            Routes.gallery,
+                            arguments: GalleryArgs(
+                              images: allImageUrls,
+                              initialIndex: galleryInitialIndex != -1
+                                  ? galleryInitialIndex
+                                  : 0,
+                              labels: allLabels,
+                            ),
+                          );
+                        },
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: AspectRatio(
+                            aspectRatio: 1.5,
+                            child: CustomNetworkImage(imageUrls[index]),
+                          ),
                         ),
-                      );
-                    },
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: AspectRatio(
-                        aspectRatio: 1.5,
-                        child: CustomNetworkImage(imageUrls[index]),
                       ),
-                    ),
+                      const SizedBox(height: 4),
+                      Text(
+                        allLabels[index],
+                        style: AppTextStyles.regular12.copyWith(
+                          color: context.colors.textPrimary,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               );
