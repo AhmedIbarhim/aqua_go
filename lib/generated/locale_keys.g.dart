@@ -348,6 +348,7 @@ abstract class  LocaleKeys {
   static const complaint_status_rejected = 'complaint.status_rejected';
   static const complaint_no_complaints = 'complaint.no_complaints';
   static const complaint_complaint_details_limit = 'complaint.complaint_details_limit';
+  static const complaint_complaint_details_hint = 'complaint.complaint_details_hint';
   static const complaint_resolution_note = 'complaint.resolution_note';
   static const complaint_rejection_reason = 'complaint.rejection_reason';
   static const complaint = 'complaint';

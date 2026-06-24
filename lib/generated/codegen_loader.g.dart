@@ -383,6 +383,7 @@ class CodegenLoader extends AssetLoader{
     "status_rejected": "Rejected",
     "no_complaints": "No submitted complaints yet",
     "complaint_details_limit": "Complaint details must be at least 20 characters",
+    "complaint_details_hint": "Please write more than 20 characters",
     "resolution_note": "Resolution Note",
     "rejection_reason": "Rejection Reason"
   },
@@ -774,6 +775,7 @@ static const Map<String,dynamic> _ar = {
     "status_rejected": "مرفوضة",
     "no_complaints": "لا توجد شكاوى مقدمة حالياً",
     "complaint_details_limit": "يجب أن تكون تفاصيل الشكوى 20 حرف على الأقل",
+    "complaint_details_hint": "يرجى كتابة أكثر من 20 حرفًا",
     "resolution_note": "ملاحظة الحل",
     "rejection_reason": "سبب الرفض"
   },

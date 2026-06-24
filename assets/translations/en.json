@@ -367,6 +367,7 @@
         "status_rejected": "Rejected",
         "no_complaints": "No submitted complaints yet",
         "complaint_details_limit": "Complaint details must be at least 20 characters",
+        "complaint_details_hint": "Please write more than 20 characters",
         "resolution_note": "Resolution Note",
         "rejection_reason": "Rejection Reason"
     },
