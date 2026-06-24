@@ -251,6 +251,8 @@ abstract class  LocaleKeys {
   static const address_go_to_settings = 'address.go_to_settings';
   static const address_zone_not_available = 'address.zone_not_available';
   static const address_address_name_example = 'address.address_name_example';
+  static const address_added_success = 'address.added_success';
+  static const address_updated_success = 'address.updated_success';
   static const address = 'address';
   static const profile_account_info = 'profile.account_info';
   static const profile_verified = 'profile.verified';

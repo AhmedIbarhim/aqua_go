@@ -28,4 +28,10 @@ class MyBookingsRemoteDataSource {
   Future<Either<Failure, dynamic>> getBookingDetails(String id) {
     return _apiClient.get(Endpoints.bookingDetail(id));
   }
+
+  /// Completed-but-unrated bookings inside the live 7-day rating window
+  /// (AQG-160). Returns a bare JSON array of BookingResponse, most-recent first.
+  Future<Either<Failure, dynamic>> getPendingRatings() {
+    return _apiClient.get(Endpoints.pendingRating);
+  }
 }

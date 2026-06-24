@@ -11,6 +11,11 @@ import '../controllers/services_controller/services_cubit.dart';
 import '../controllers/banners_controller/banners_cubit.dart';
 import '../controllers/packages_controller/packages_cubit.dart';
 import 'package:aqua_go/features/subscriptions/presentation/controllers/subscriptions_controller/subscriptions_cubit.dart';
+import 'package:aqua_go/features/rating/presentation/controllers/pending_ratings_cubit/pending_ratings_cubit.dart';
+import 'package:aqua_go/features/rating/presentation/controllers/pending_ratings_cubit/pending_ratings_state.dart';
+import 'package:aqua_go/features/rating/presentation/widgets/rating_bottom_sheet.dart';
+import 'package:aqua_go/features/rating/data/dismissed_ratings_store.dart';
+import 'package:aqua_go/features/my_bookings/data/models/booking_response_model/booking_response_model.dart';
 import 'package:aqua_go/core/route/routes.dart';
 import 'package:aqua_go/core/route/app_router.dart';
 import 'package:aqua_go/features/booking/domain/configs/booking_flow_config.dart';
@@ -36,6 +41,12 @@ class _HomeViewState extends State<HomeView> {
   final BannersCubit _bannersCubit = locator<BannersCubit>();
   final PackagesCubit _packagesCubit = locator<PackagesCubit>();
   final SubscriptionsCubit _subscriptionsCubit = locator<SubscriptionsCubit>();
+  final PendingRatingsCubit _pendingRatingsCubit =
+      locator<PendingRatingsCubit>();
+
+  // AQG-160: prompt the home rating popup at most once per HomeView lifecycle,
+  // so widget rebuilds / re-emits never re-open an already-handled sheet.
+  bool _ratingPromptShown = false;
 
   @override
   void initState() {
@@ -45,6 +56,8 @@ class _HomeViewState extends State<HomeView> {
     _packagesCubit.getPackages();
     if (currentUser.value != null) {
       _subscriptionsCubit.getActiveSubscriptions();
+      // Fire-and-forget: never block home rendering on the rating nudge.
+      _pendingRatingsCubit.fetchPendingRatings();
     }
     // Load subscriptions reactively when user transitions from guest to logged-in.
     currentUser.addListener(_onAuthChanged);
@@ -53,7 +66,23 @@ class _HomeViewState extends State<HomeView> {
   void _onAuthChanged() {
     if (currentUser.value != null) {
       _subscriptionsCubit.getActiveSubscriptions();
+      _pendingRatingsCubit.fetchPendingRatings();
     }
+  }
+
+  Future<void> _showRatingPopup(BookingResponseModel booking) async {
+    final bookingId = booking.id;
+    if (bookingId == null || bookingId.isEmpty) return;
+    _ratingPromptShown = true;
+
+    await RatingBottomSheet.show(context, booking, navigateOnSuccess: false);
+
+    // The sheet is now closed — whether the user rated or dismissed. Remember
+    // this booking id locally so it is never re-prompted on a later home load.
+    // (Rated bookings also drop off the endpoint naturally, so this is a safe
+    // no-cost record on the rate path and the deliberate user decision on the
+    // dismiss path.)
+    await DismissedRatingsStore.dismiss(bookingId);
   }
 
   @override
@@ -62,6 +91,7 @@ class _HomeViewState extends State<HomeView> {
     _servicesCubit.close();
     _bannersCubit.close();
     _packagesCubit.close();
+    _pendingRatingsCubit.close();
     // _subscriptionsCubit is a shared lazy singleton (see service_locator):
     // do NOT close it here, otherwise other surfaces lose their data source
     // and a post-subscribe refetch can't propagate.
@@ -76,12 +106,24 @@ class _HomeViewState extends State<HomeView> {
         BlocProvider.value(value: _bannersCubit),
         BlocProvider.value(value: _packagesCubit),
         BlocProvider.value(value: _subscriptionsCubit),
+        BlocProvider.value(value: _pendingRatingsCubit),
       ],
-      child: ValueListenableBuilder<UserModel?>(
-        valueListenable: currentUser,
-        builder: (context, user, _) {
-          final isLoggedIn = user != null;
-          return BlocBuilder<ServicesCubit, ServicesState>(
+      child: BlocListener<PendingRatingsCubit, PendingRatingsState>(
+        listener: (context, state) {
+          if (state is PendingRatingsLoaded &&
+              state.bookings.isNotEmpty &&
+              !_ratingPromptShown &&
+              currentUser.value != null &&
+              mounted) {
+            // Prompt with the most-recently-completed unrated booking.
+            _showRatingPopup(state.bookings.first);
+          }
+        },
+        child: ValueListenableBuilder<UserModel?>(
+          valueListenable: currentUser,
+          builder: (context, user, _) {
+            final isLoggedIn = user != null;
+            return BlocBuilder<ServicesCubit, ServicesState>(
             builder: (context, servicesState) {
               return BlocBuilder<PackagesCubit, PackagesState>(
                 builder: (context, packagesState) {
@@ -239,7 +281,8 @@ class _HomeViewState extends State<HomeView> {
               );
             },
           );
-        },
+          },
+        ),
       ),
     );
   }

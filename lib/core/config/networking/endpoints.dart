@@ -43,6 +43,9 @@ abstract class Endpoints {
   //  Bookings & Quotes Endpoints
   static const String quotes = 'quotes';
   static const String bookings = 'bookings';
+  // Completed-but-unrated bookings inside the live 7-day rating window
+  // (AQG-160 home rating popup). Returns a JSON array of BookingResponse.
+  static const String pendingRating = 'bookings/pending-rating';
   // Pay-before-create: re-validates the quote + soft-holds the slot, returns
   // {amountMinor, givenId, metadata} for the on-device Moyasar SDK purchase.
   static const String bookingsPaymentInit = 'bookings/payment-init';

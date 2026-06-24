@@ -259,7 +259,9 @@
         "location_disabled_message": "يرجى تفعيل خدمات الموقع لتحديد موقعك.",
         "go_to_settings": "الذهاب إلى الإعدادات",
         "zone_not_available": "نأسف، هذا الموقع خارج منطقة التغطية حالياً",
-        "address_name_example": "البيت، العمل، ... الخ"
+        "address_name_example": "البيت، العمل، ... الخ",
+        "added_success": "تمت إضافة العنوان بنجاح",
+        "updated_success": "تم تحديث العنوان بنجاح"
     },
     "profile": {
         "male": "ذكر",

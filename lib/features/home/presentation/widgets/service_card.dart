@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
 import '../../../../core/components/custom_network_image.dart';
@@ -7,7 +6,6 @@ import '../../../../core/route/routes.dart';
 import '../../../../core/route/app_router.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
-import '../../../../generated/locale_keys.g.dart';
 import '../../data/models/service_model.dart';
 import '../../../../core/config/session/session_state.dart';
 import '../../../../core/helpers/fetch_user_data_helper.dart';
@@ -22,11 +20,35 @@ class ServiceCard extends StatefulWidget {
 }
 
 class _ServiceCardState extends State<ServiceCard> {
-  bool _descriptionExpanded = false;
+  static const int _maxDescriptionChars = 80;
 
   ServiceModel get serviceModel => widget.serviceModel;
 
-  bool _isDescriptionLong(String description) => description.length > 60;
+  /// Caps the description at 80 chars, then inserts a single '\n' at the
+  /// space nearest the midpoint so the two lines balance. No ellipsis.
+  String _balanceTwoLines(String text) {
+    var s = text.trim();
+    if (s.length > _maxDescriptionChars) {
+      s = s.substring(0, _maxDescriptionChars).trim();
+    }
+    if (s.length <= 1 || !s.contains(' ')) return s; // nothing to balance
+    final mid = s.length ~/ 2;
+
+    final left = s.lastIndexOf(' ', mid); // nearest space at/left of midpoint
+    final right = s.indexOf(' ', mid); // nearest space right of midpoint
+
+    int cut;
+    if (left == -1) {
+      cut = right;
+    } else if (right == -1) {
+      cut = left;
+    } else {
+      cut = (mid - left) <= (right - mid) ? left : right;
+    }
+    if (cut <= 0) return s; // degenerate; leave as one line
+
+    return '${s.substring(0, cut)}\n${s.substring(cut + 1)}';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +56,7 @@ class _ServiceCardState extends State<ServiceCard> {
     final description = context.isEn
         ? serviceModel.rawDescription?.descEn ?? ''
         : serviceModel.rawDescription?.descAr ?? '';
+    final twoLineText = _balanceTwoLines(description);
     return ValueListenableBuilder(
       valueListenable: currentUser,
       builder: (context, user, child) => InkWell(
@@ -97,41 +120,42 @@ class _ServiceCardState extends State<ServiceCard> {
                                   overflow: TextOverflow.ellipsis,
                                 ),
                                 const SizedBox(height: 4),
-                                Text(
-                                  description,
-                                  style: AppTextStyles.regular12.copyWith(
-                                    color: context.colors.textSecondary,
-                                  ),
-                                  maxLines: _descriptionExpanded ? null : 2,
-                                  overflow: _descriptionExpanded
-                                      ? TextOverflow.visible
-                                      : TextOverflow.ellipsis,
-                                ),
-                                if (_isDescriptionLong(description)) ...[
-                                  const SizedBox(height: 4),
-                                  GestureDetector(
-                                    behavior: HitTestBehavior.opaque,
-                                    onTap: () {
-                                      setState(() {
-                                        _descriptionExpanded =
-                                            !_descriptionExpanded;
-                                      });
-                                    },
-                                    child: Text(
-                                      _descriptionExpanded
-                                          ? LocaleKeys.home_read_less.tr(
-                                              context: context,
-                                            )
-                                          : LocaleKeys.home_read_more.tr(
-                                              context: context,
+                                Builder(
+                                  builder: (context) {
+                                    final style = AppTextStyles.regular12
+                                        .copyWith(
+                                          color: context.colors.textSecondary,
+                                          height: 1.3,
+                                        );
+                                    final fontSize = style.fontSize ?? 12;
+                                    // Fixed 2-line content box: full description
+                                    // shrinks-to-fit, never truncates with "...".
+                                    final twoLineHeight =
+                                        fontSize * (style.height ?? 1.3) * 2;
+                                    return LayoutBuilder(
+                                      builder: (context, constraints) {
+                                        final boxWidth = constraints.maxWidth;
+                                        return SizedBox(
+                                          width: boxWidth,
+                                          height: twoLineHeight,
+                                          child: FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            child: SizedBox(
+                                              width: boxWidth,
+                                              child: Text(
+                                                twoLineText,
+                                                style: style,
+                                                textAlign: TextAlign.center,
+                                                softWrap: true,
+                                                maxLines: 2,
+                                              ),
                                             ),
-                                      style: AppTextStyles.regular12.copyWith(
-                                        color: context.colors.primary,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
                               ],
                             ),
                             if (serviceModel.price.isNotEmpty) ...[

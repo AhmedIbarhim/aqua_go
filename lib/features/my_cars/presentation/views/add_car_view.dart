@@ -102,7 +102,24 @@ class _AddCarViewState extends State<AddCarView> {
         }
 
         if (state is MyCarsActionSuccess) {
+          final isEdit = widget.car != null;
+          // Capture the root navigator's context BEFORE popping — this view is
+          // about to be torn down, so the success dialog must be shown on a
+          // context that survives the pop.
+          final rootContext = Navigator.of(
+            context,
+            rootNavigator: true,
+          ).context;
           context.pop(true);
+          // AQG-177: auto-dismissing (~2s) success confirmation after add/edit.
+          rootContext.showSuccessAlert(
+            message: (isEdit
+                    ? LocaleKeys.snackbar_car_updated_success
+                    : LocaleKeys.snackbar_car_added_success)
+                .tr(context: rootContext),
+            autoDismiss: true,
+            dismissDuration: const Duration(seconds: 2),
+          );
         }
 
         if (state is MyCarsActionError) {

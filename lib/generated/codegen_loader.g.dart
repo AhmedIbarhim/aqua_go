@@ -275,7 +275,9 @@ class CodegenLoader extends AssetLoader{
     "location_disabled_message": "Please enable location services to find your position.",
     "go_to_settings": "Go To Settings",
     "zone_not_available": "Sorry, this location is currently outside our service area",
-    "address_name_example": "Home, Work, ... etc."
+    "address_name_example": "Home, Work, ... etc.",
+    "added_success": "Address added successfully",
+    "updated_success": "Address updated successfully"
   },
   "profile": {
     "male": "Male",
@@ -664,7 +666,9 @@ static const Map<String,dynamic> _ar = {
     "location_disabled_message": "يرجى تفعيل خدمات الموقع لتحديد موقعك.",
     "go_to_settings": "الذهاب إلى الإعدادات",
     "zone_not_available": "نأسف، هذا الموقع خارج منطقة التغطية حالياً",
-    "address_name_example": "البيت، العمل، ... الخ"
+    "address_name_example": "البيت، العمل، ... الخ",
+    "added_success": "تمت إضافة العنوان بنجاح",
+    "updated_success": "تم تحديث العنوان بنجاح"
   },
   "profile": {
     "male": "ذكر",

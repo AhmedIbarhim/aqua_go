@@ -21,15 +21,27 @@ import 'package:aqua_go/features/my_bookings/data/models/booking_summary_model.d
 
 class RatingBottomSheet extends StatefulWidget {
   final BookingResponseModel booking;
-  const RatingBottomSheet({super.key, required this.booking});
+  final bool navigateOnSuccess;
+  const RatingBottomSheet({
+    super.key,
+    required this.booking,
+    this.navigateOnSuccess = true,
+  });
 
-  static Future<void> show(BuildContext context, BookingResponseModel booking) {
+  static Future<void> show(
+    BuildContext context,
+    BookingResponseModel booking, {
+    bool navigateOnSuccess = true,
+  }) {
     return CustomBottomSheet.show(
       context: context,
       title: LocaleKeys.bookings_rate_service.tr(context: context),
       child: BlocProvider<RatingCubit>(
         create: (_) => locator<RatingCubit>(),
-        child: RatingBottomSheet(booking: booking),
+        child: RatingBottomSheet(
+          booking: booking,
+          navigateOnSuccess: navigateOnSuccess,
+        ),
       ),
     );
   }
@@ -72,6 +84,7 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
         if (state is RatingSubmitSuccess) {
           Navigator.pop(context);
           RatingSuccessAlertBox.show(context).then((_) {
+            if (!widget.navigateOnSuccess) return;
             AppRouter.navigatorKey.currentState?.pushNamedAndRemoveUntil(
               Routes.myBookingDetails,
               (route) => route.settings.name == Routes.layout || route.isFirst,

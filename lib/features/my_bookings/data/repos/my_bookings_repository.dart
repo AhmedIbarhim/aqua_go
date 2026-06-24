@@ -32,6 +32,32 @@ class MyBookingsRepository {
     );
   }
 
+  /// Completed-but-unrated bookings inside the live 7-day rating window
+  /// (AQG-160). The endpoint returns a bare JSON array of the full booking
+  /// detail projection, so each element maps straight to [BookingResponseModel]
+  /// (the home rating popup needs the full booking incl. id + assignedWorker).
+  Future<Either<Failure, List<BookingResponseModel>>> getPendingRatings() async {
+    final result = await _remoteDataSource.getPendingRatings();
+    return result.fold(
+      (failure) => Left(failure),
+      (data) {
+        if (data is List) {
+          try {
+            final bookings = data
+                .map((e) =>
+                    BookingResponseModel.fromJson(e as Map<String, dynamic>))
+                .toList();
+            return Right(bookings);
+          } catch (e) {
+            return Left(ServerFailure('Parsing error: $e'));
+          }
+        }
+        // Treat a null/empty body as "nothing pending" rather than an error.
+        return const Right(<BookingResponseModel>[]);
+      },
+    );
+  }
+
   Future<Either<Failure, BookingResponseModel>> getBookingDetails(String id) async {
     final result = await _remoteDataSource.getBookingDetails(id);
     return result.fold(

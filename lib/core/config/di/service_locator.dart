@@ -40,6 +40,7 @@ import 'package:aqua_go/features/complaints/presentation/controllers/complaint_d
 import 'package:aqua_go/features/rating/data/data_sources/rating_remote_data_source.dart';
 import 'package:aqua_go/features/rating/data/repos/rating_repository.dart';
 import 'package:aqua_go/features/rating/presentation/controllers/rating_cubit/rating_cubit.dart';
+import 'package:aqua_go/features/rating/presentation/controllers/pending_ratings_cubit/pending_ratings_cubit.dart';
 import 'package:aqua_go/features/support/data/data_sources/faqs_remote_data_source.dart';
 import 'package:aqua_go/features/support/data/repos/faqs_repository.dart';
 import 'package:aqua_go/features/support/presentation/controllers/faqs_cubit.dart';
@@ -214,5 +215,8 @@ Future<void> initServiceLocator() async {
     () => ComplaintDetailsCubit(locator(), locator()),
   );
   locator.registerFactory<RatingCubit>(() => RatingCubit(locator()));
+  locator.registerFactory<PendingRatingsCubit>(
+    () => PendingRatingsCubit(locator()),
+  );
   locator.registerFactory<FaqsCubit>(() => FaqsCubit(locator()));
 }

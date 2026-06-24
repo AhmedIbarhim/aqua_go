@@ -78,7 +78,10 @@ class _MyCarsViewState extends State<MyCarsView> {
         ),
         child: BlocConsumer<MyCarsCubit, MyCarsState>(
           listener: (context, state) {
-            if (state is MyCarsActionSuccess && state is! MyCarsActionAdding) {
+            // Only delete originates from this list view; add/edit now show an
+            // auto-dismissing success dialog from AddCarView (AQG-177), so we
+            // surface a snackbar for delete only to avoid duplicate feedback.
+            if (state is MyCarsActionDeleting) {
               context.showSuccessSnackBar(state.message);
             }
 

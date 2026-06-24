@@ -15,7 +15,9 @@ class RatingSuccessAlertBox extends StatelessWidget {
   static Future<T?> show<T>(
     BuildContext context, {
     bool autoDismiss = true,
-    Duration dismissDuration = const Duration(seconds: 3),
+    // AQG-160: the success confirmation auto-hides after ~2s (no manual close
+    // required on the home rating popup path).
+    Duration dismissDuration = const Duration(seconds: 2),
   }) {
     return context.showCustomAlert<T>(
       child: const RatingSuccessAlertBox(),

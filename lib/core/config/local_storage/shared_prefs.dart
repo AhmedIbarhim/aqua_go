@@ -26,6 +26,14 @@ class CacheClient {
     await _sharedPrefs.remove(key);
   }
 
+  static Future<void> setStringList(String key, List<String> value) async {
+    await _sharedPrefs.setStringList(key, value);
+  }
+
+  static List<String> getStringList(String key) {
+    return _sharedPrefs.getStringList(key) ?? const <String>[];
+  }
+
   static Future<void> clearCachedData() async {
     await _sharedPrefs.clear();
   }

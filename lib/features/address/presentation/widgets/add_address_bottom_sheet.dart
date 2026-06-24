@@ -114,10 +114,27 @@ class _AddAddressBottomSheetState extends State<AddAddressBottomSheet> {
         }
 
         if (state is AddressesActionSuccess) {
+          final isEdit = widget.existingAddress != null;
+          // Capture the root navigator's context BEFORE popping — the bottom
+          // sheet / map-view contexts are about to be torn down, so the success
+          // dialog must be shown on a context that survives the pops.
+          final rootContext = Navigator.of(
+            context,
+            rootNavigator: true,
+          ).context;
           Navigator.pop(context); // Close bottom sheet
-          if (widget.existingAddress == null) {
+          if (!isEdit) {
             Navigator.pop(context, true); // Return true from map view
           }
+          // AQG-176: auto-dismissing (~2s) success confirmation after add/edit.
+          rootContext.showSuccessAlert(
+            message: (isEdit
+                    ? LocaleKeys.address_updated_success
+                    : LocaleKeys.address_added_success)
+                .tr(context: rootContext),
+            autoDismiss: true,
+            dismissDuration: const Duration(seconds: 2),
+          );
         }
 
         if (state is AddressesActionError) {
