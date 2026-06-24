@@ -132,9 +132,9 @@ class AuthRepository {
   /// never reuses an invalid token.
   Future<void> clearSession() async {
     _cachedUser = null;
-    currentUser.value = null;
     await SecureStorage.deleteSecuredString(kAccessToken);
     await SecureStorage.deleteSecuredString(kRefreshToken);
+    currentUser.value = null;
   }
 
   /// Purges the local session (tokens + cached user) WITHOUT a network call
@@ -142,9 +142,9 @@ class AuthRepository {
   /// install marker).
   Future<void> purgeLocalSession() async {
     _cachedUser = null;
-    currentUser.value = null;
     await SecureStorage.clearSecuredData();
     await CacheClient.removeString(kUserData);
+    currentUser.value = null;
   }
 
   Future<void> saveUser(UserModel user) async {
@@ -203,10 +203,10 @@ class AuthRepository {
       // becomes absent after an OS-driven reinstall (when SharedPrefs is wiped
       // externally), which is the reinstall-detection scenario it was designed for.
       _cachedUser = null;
-      currentUser.value = null;
       await SecureStorage.clearSecuredData();
       await CacheClient.removeString(kUserData);
       await CacheClient.removeString(kIsGuest);
+      currentUser.value = null;
     }
   }
 
@@ -221,10 +221,10 @@ class AuthRepository {
       // Same targeted teardown as logout() — preserve kNotFirstUse,
       // kLanguage, kThemeMode, kSessionInstallMarker.
       _cachedUser = null;
-      currentUser.value = null;
       await SecureStorage.clearSecuredData();
       await CacheClient.removeString(kUserData);
       await CacheClient.removeString(kIsGuest);
+      currentUser.value = null;
       return Right(null);
     });
   }
