@@ -46,102 +46,107 @@ class _MyBookingsViewState extends State<MyBookingsView> {
                 titleAr: "حجوزاتك",
                 descEn:
                     "Please log in to track and view your active and past bookings.",
-                descAr: "يرجى تسجيل الدخول لمتابعة وعرض حجوزاتك الحالية والسابقة.",
+                descAr:
+                    "يرجى تسجيل الدخول لمتابعة وعرض حجوزاتك الحالية والسابقة.",
               ),
             ),
           );
         }
 
-    return BlocProvider(
-      create: (context) => locator<MyBookingsCubit>()..fetchBookings(),
-      child: Scaffold(
-        backgroundColor: context.colors.screenBG,
-        body: Container(
-          height: double.infinity,
-          width: double.infinity,
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: context.colors.background,
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-            ),
-          ),
-          child: Column(
-            children: [
-              MyBookingsTabs(
-                selectedIndex: _selectedIndex,
-                onTabChanged: (index) {
-                  setState(() {
-                    _selectedIndex = index;
-                  });
-                },
-              ),
-              const SizedBox(height: 16),
-              Expanded(
-                child: BlocBuilder<MyBookingsCubit, MyBookingsState>(
-                  builder: (context, state) {
-                    if (state is MyBookingsLoading) {
-                      return const Center(
-                        child: CustomLoadingIndicator(size: 80),
-                      );
-                    } else if (state is MyBookingsFailure) {
-                      return ErrorRetryWidget(
-                        errorMessage: state.errMessage,
-                        onRetry: () =>
-                            context.read<MyBookingsCubit>().fetchBookings(),
-                      );
-                    } else if (state is MyBookingsSuccess) {
-                      final filteredBookings = state.bookings
-                          .where(
-                            (booking) => _selectedIndex == 0
-                                ? booking.isUpcoming
-                                : !booking.isUpcoming,
-                          )
-                          .toList();
-
-                      if (filteredBookings.isEmpty) {
-                        return RefreshIndicator(
-                          color: context.colors.primary,
-                          onRefresh: () async {
-                            await context.read<MyBookingsCubit>().fetchBookings(
-                              isRefresh: true,
-                            );
-                          },
-                          child: const EmptyBookingsWidget(),
-                        );
-                      }
-
-                      return RefreshIndicator(
-                        color: context.colors.primary,
-                        onRefresh: () async {
-                          await context.read<MyBookingsCubit>().fetchBookings(
-                            isRefresh: true,
-                          );
-                        },
-                        child: NotificationListener<ScrollNotification>(
-                          onNotification: (ScrollNotification scrollInfo) {
-                            if (scrollInfo.metrics.pixels >=
-                                scrollInfo.metrics.maxScrollExtent - 200) {
-                              context
-                                  .read<MyBookingsCubit>()
-                                  .loadMoreBookings();
-                            }
-                            return false;
-                          },
-                          child: MyBookingsListView(bookings: filteredBookings),
-                        ),
-                      );
-                    }
-                    return const SizedBox.shrink();
-                  },
+        return BlocProvider(
+          create: (context) => locator<MyBookingsCubit>()..fetchBookings(),
+          child: Scaffold(
+            backgroundColor: context.colors.screenBG,
+            body: Container(
+              height: double.infinity,
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: context.colors.background,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
                 ),
               ),
-            ],
+              child: Column(
+                children: [
+                  MyBookingsTabs(
+                    selectedIndex: _selectedIndex,
+                    onTabChanged: (index) {
+                      setState(() {
+                        _selectedIndex = index;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: BlocBuilder<MyBookingsCubit, MyBookingsState>(
+                      builder: (context, state) {
+                        if (state is MyBookingsLoading) {
+                          return const Center(
+                            child: CustomLoadingIndicator(size: 80),
+                          );
+                        } else if (state is MyBookingsFailure) {
+                          return ErrorRetryWidget(
+                            errorMessage: state.errMessage,
+                            onRetry: () =>
+                                context.read<MyBookingsCubit>().fetchBookings(),
+                          );
+                        } else if (state is MyBookingsSuccess) {
+                          final filteredBookings = state.bookings
+                              .where(
+                                (booking) => _selectedIndex == 0
+                                    ? booking.isUpcoming
+                                    : !booking.isUpcoming,
+                              )
+                              .toList();
+
+                          if (filteredBookings.isEmpty) {
+                            return RefreshIndicator(
+                              color: context.colors.primary,
+                              onRefresh: () async {
+                                await context
+                                    .read<MyBookingsCubit>()
+                                    .fetchBookings(isRefresh: true);
+                              },
+                              child: EmptyBookingsWidget(
+                                showBookNowButton: state.bookings.isEmpty,
+                              ),
+                            );
+                          }
+
+                          return RefreshIndicator(
+                            color: context.colors.primary,
+                            onRefresh: () async {
+                              await context
+                                  .read<MyBookingsCubit>()
+                                  .fetchBookings(isRefresh: true);
+                            },
+                            child: NotificationListener<ScrollNotification>(
+                              onNotification: (ScrollNotification scrollInfo) {
+                                if (scrollInfo.metrics.pixels >=
+                                    scrollInfo.metrics.maxScrollExtent - 200) {
+                                  context
+                                      .read<MyBookingsCubit>()
+                                      .loadMoreBookings();
+                                }
+                                return false;
+                              },
+                              child: MyBookingsListView(
+                                bookings: filteredBookings,
+                              ),
+                            ),
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
-      ),
-      );
+        );
       },
     );
   }

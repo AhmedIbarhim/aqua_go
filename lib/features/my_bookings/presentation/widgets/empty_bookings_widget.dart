@@ -9,7 +9,9 @@ import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/utils/app_assets.dart';
 
 class EmptyBookingsWidget extends StatelessWidget {
-  const EmptyBookingsWidget({super.key});
+  const EmptyBookingsWidget({super.key, required this.showBookNowButton});
+
+  final bool showBookNowButton;
 
   @override
   Widget build(BuildContext context) {
@@ -38,19 +40,20 @@ class EmptyBookingsWidget extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 30),
-          SizedBox(
-            width: MediaQuery.sizeOf(context).width * 0.6,
-            child: CustomButton(
-              text: context.locale.languageCode == 'ar'
-                  ? 'احجز الآن'
-                  : 'Book now',
-              onPressed: () {
-                context.findAncestorStateOfType<MainLayoutState>()?.changeIndex(
-                  0,
-                );
-              },
+          if (showBookNowButton)
+            SizedBox(
+              width: MediaQuery.sizeOf(context).width * 0.6,
+              child: CustomButton(
+                text: context.locale.languageCode == 'ar'
+                    ? 'احجز الآن'
+                    : 'Book now',
+                onPressed: () {
+                  context
+                      .findAncestorStateOfType<MainLayoutState>()
+                      ?.changeIndex(0);
+                },
+              ),
             ),
-          ),
           const SizedBox(height: 12),
         ],
       ),
