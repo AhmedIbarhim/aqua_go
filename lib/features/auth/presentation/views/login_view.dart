@@ -13,6 +13,7 @@ class LoginView extends StatelessWidget {
     return BlocProvider(
       create: (context) => locator<AuthCubit>()..clearStaleSession(),
       child: const AuthScaffold(
+        showLanguageWidget: true,
         content: LoginContent(),
       ),
     );

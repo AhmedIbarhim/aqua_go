@@ -29,7 +29,7 @@ class _SplashViewState extends State<SplashView>
 
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2000),
+      duration: const Duration(milliseconds: 3000),
     );
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(

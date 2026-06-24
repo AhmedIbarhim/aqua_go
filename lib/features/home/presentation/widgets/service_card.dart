@@ -145,7 +145,7 @@ class _ServiceCardState extends State<ServiceCard> {
                                               child: Text(
                                                 twoLineText,
                                                 style: style,
-                                                textAlign: TextAlign.center,
+                                                textAlign: TextAlign.start,
                                                 softWrap: true,
                                                 maxLines: 2,
                                               ),

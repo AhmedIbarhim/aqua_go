@@ -1,9 +1,15 @@
 import 'package:aqua_go/core/utils/app_assets.dart';
+import 'package:aqua_go/features/startup/widgets/language_widget.dart';
 import 'package:flutter/material.dart';
 
 class AuthScaffold extends StatelessWidget {
-  const AuthScaffold({super.key, required this.content});
+  const AuthScaffold({
+    super.key,
+    required this.content,
+    this.showLanguageWidget = false,
+  });
   final Widget content;
+  final bool showLanguageWidget;
 
   @override
   Widget build(BuildContext context) {
@@ -37,12 +43,11 @@ class AuthScaffold extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: content,
-                  ),
+                  Align(alignment: Alignment.bottomCenter, child: content),
                 ],
               ),
+              if (showLanguageWidget)
+                const Positioned(top: 48, left: 24, child: LanguageWidget()),
             ],
           ),
         ),
