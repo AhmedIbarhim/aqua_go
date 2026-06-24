@@ -6,6 +6,8 @@ import 'package:aqua_go/features/address/data/repos/maps_repository.dart';
 import 'package:aqua_go/features/auth/presentation/controllers/auth_cubit/auth_cubit.dart';
 import 'package:aqua_go/features/auth/data/repos/auth_repository.dart';
 import 'package:aqua_go/features/auth/data/services/auth_service.dart';
+import 'package:aqua_go/features/auth/data/repos/device_repository.dart';
+import 'package:aqua_go/features/auth/data/services/device_service.dart';
 import 'package:aqua_go/features/my_cars/data/data_sources/cars_remote_data_source.dart';
 import 'package:aqua_go/features/my_cars/data/repos/cars_repository.dart';
 import 'package:aqua_go/features/my_cars/presentation/controllers/my_cars_cubit.dart';
@@ -65,6 +67,7 @@ Future<void> initServiceLocator() async {
   );
 
   locator.registerLazySingleton<AuthService>(() => AuthService(locator()));
+  locator.registerLazySingleton<DeviceService>(() => DeviceService(locator()));
   locator.registerLazySingleton<CarsRemoteDataSource>(
     () => CarsRemoteDataSource(locator()),
   );
@@ -137,6 +140,9 @@ Future<void> initServiceLocator() async {
 
   locator.registerLazySingleton<AuthRepository>(
     () => AuthRepository(locator()),
+  );
+  locator.registerLazySingleton<DeviceRepository>(
+    () => DeviceRepository(locator()),
   );
   locator.registerLazySingleton<ProfileRepository>(
     () => ProfileRepository(locator()),
