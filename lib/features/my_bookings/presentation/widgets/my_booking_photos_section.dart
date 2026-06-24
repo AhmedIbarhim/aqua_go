@@ -197,7 +197,13 @@ class MyBookingPhotosSection extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        allLabels[index],
+                        index == 0
+                            ? LocaleKeys.bookings_before_washing.tr(
+                                context: context,
+                              )
+                            : LocaleKeys.bookings_after_washing.tr(
+                                context: context,
+                              ),
                         style: AppTextStyles.regular12.copyWith(
                           color: context.colors.textPrimary,
                         ),
