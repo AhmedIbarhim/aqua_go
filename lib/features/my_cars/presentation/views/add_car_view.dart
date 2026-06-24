@@ -113,10 +113,12 @@ class _AddCarViewState extends State<AddCarView> {
           context.pop(true);
           // AQG-177: auto-dismissing (~2s) success confirmation after add/edit.
           rootContext.showSuccessAlert(
-            message: (isEdit
-                    ? LocaleKeys.snackbar_car_updated_success
-                    : LocaleKeys.snackbar_car_added_success)
-                .tr(context: rootContext),
+            title: '',
+            message:
+                (isEdit
+                        ? LocaleKeys.snackbar_car_updated_success
+                        : LocaleKeys.snackbar_car_added_success)
+                    .tr(context: rootContext),
             autoDismiss: true,
             dismissDuration: const Duration(seconds: 2),
           );
@@ -182,7 +184,9 @@ class _AddCarViewState extends State<AddCarView> {
                           ),
                           const SizedBox(height: 16),
                           CustomDropdownField(
-                            label: LocaleKeys.my_cars_manufacturing_year.tr(context: context),
+                            label: LocaleKeys.my_cars_manufacturing_year.tr(
+                              context: context,
+                            ),
                             hint: LocaleKeys.select_here.tr(context: context),
                             value: _selectedYear,
                             onChanged: (val) =>
@@ -196,7 +200,9 @@ class _AddCarViewState extends State<AddCarView> {
                           const SizedBox(height: 16),
                           CustomTextField(
                             mustCapitalize: true,
-                            label: LocaleKeys.my_cars_plate_number.tr(context: context),
+                            label: LocaleKeys.my_cars_plate_number.tr(
+                              context: context,
+                            ),
                             hint: LocaleKeys.write_here.tr(context: context),
                             controller: _plateNumberController,
                             isRequired: true,

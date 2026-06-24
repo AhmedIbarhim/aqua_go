@@ -128,10 +128,12 @@ class _AddAddressBottomSheetState extends State<AddAddressBottomSheet> {
           }
           // AQG-176: auto-dismissing (~2s) success confirmation after add/edit.
           rootContext.showSuccessAlert(
-            message: (isEdit
-                    ? LocaleKeys.address_updated_success
-                    : LocaleKeys.address_added_success)
-                .tr(context: rootContext),
+            title: '',
+            message:
+                (isEdit
+                        ? LocaleKeys.address_updated_success
+                        : LocaleKeys.address_added_success)
+                    .tr(context: rootContext),
             autoDismiss: true,
             dismissDuration: const Duration(seconds: 2),
           );
