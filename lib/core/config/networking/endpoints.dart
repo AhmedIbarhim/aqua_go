@@ -1,6 +1,6 @@
 abstract class Endpoints {
-  static const String baseUrl = 'https://api.aquago.sa/api/customer/';
-  // static const String baseUrl = 'https://qa-api.aquago.sa/api/customer/';
+  static const String host = 'api.aquago.sa';
+  static const String baseUrl = 'https://$host/api/customer/';
 
   //  Auth Endpoints
   static const String sendOtp = 'login/otp';

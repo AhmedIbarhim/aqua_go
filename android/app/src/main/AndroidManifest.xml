@@ -3,6 +3,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <application
         android:label="Aqua Go"
         android:name="${applicationName}"
@@ -40,6 +41,8 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@drawable/ic_stat_name"/>
+        <meta-data android:name="com.google.firebase.messaging.default_notification_channel_id" android:value="aqua_go_customer"/>
         <meta-data android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCBWbLd9irc4PCEchf4WEMdIY8Io-PnScc"/>
     </application>

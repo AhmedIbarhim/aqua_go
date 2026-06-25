@@ -3,8 +3,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
 
-import '../../../../core/components/custom_button.dart';
-import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../../generated/locale_keys.g.dart';
@@ -54,12 +52,6 @@ class RatingSuccessAlertBox extends StatelessWidget {
             color: context.colors.textSecondary,
             height: 1.5,
           ),
-        ),
-        SizedBox(height: height * 0.03),
-
-        CustomButton(
-          text: LocaleKeys.go_to_home.tr(context: context),
-          onPressed: () => context.pushNamed(Routes.layout),
         ),
       ],
     );

@@ -358,16 +358,26 @@ class _BookingLocationViewState extends State<BookingLocationView> {
                   }
 
                   if (address != null) {
+                    final cubit = context.read<BookingCubit>();
                     context.showLoadingOverlay();
-                    final isAvailable = await context
-                        .read<BookingCubit>()
-                        .checkZone(address.lat, address.lng);
+                    final isAvailable = await cubit.checkZone(
+                      address.lat,
+                      address.lng,
+                    );
                     if (!context.mounted) return;
                     context.hideLoadingOverlay();
 
                     if (!isAvailable) {
+                      // checkZone stores failure.message in state.errorMessage on
+                      // failure; surface the backend reason and fall back to the
+                      // generic localized zone-not-available message.
+                      final reason = cubit.state.errorMessage;
                       context.showErrorSnackBar(
-                        LocaleKeys.address_zone_not_available.tr(context: context),
+                        (reason != null && reason.isNotEmpty)
+                            ? reason
+                            : LocaleKeys.address_zone_not_available.tr(
+                                context: context,
+                              ),
                       );
                       return;
                     }

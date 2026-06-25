@@ -295,6 +295,13 @@ class _ComplaintViewState extends State<ComplaintView> {
             ),
           ),
         ),
+        if (_detailsController.text.trim().length < 20)
+          Text(
+            LocaleKeys.complaint_complaint_details_hint.tr(context: context),
+            style: AppTextStyles.regular12.copyWith(
+              color: context.colors.textSecondary,
+            ),
+          ),
       ],
     );
   }

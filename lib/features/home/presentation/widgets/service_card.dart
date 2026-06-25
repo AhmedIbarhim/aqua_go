@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
 import '../../../../core/components/custom_network_image.dart';
@@ -24,30 +25,14 @@ class _ServiceCardState extends State<ServiceCard> {
 
   ServiceModel get serviceModel => widget.serviceModel;
 
-  /// Caps the description at 80 chars, then inserts a single '\n' at the
-  /// space nearest the midpoint so the two lines balance. No ellipsis.
-  String _balanceTwoLines(String text) {
-    var s = text.trim();
+  /// Caps the description at 80 chars (no ellipsis). AutoSizeText then wraps
+  /// and shrinks the full capped text to fit the fixed 2-line box.
+  String _capDescription(String text) {
+    final s = text.trim();
     if (s.length > _maxDescriptionChars) {
-      s = s.substring(0, _maxDescriptionChars).trim();
+      return s.substring(0, _maxDescriptionChars).trim();
     }
-    if (s.length <= 1 || !s.contains(' ')) return s; // nothing to balance
-    final mid = s.length ~/ 2;
-
-    final left = s.lastIndexOf(' ', mid); // nearest space at/left of midpoint
-    final right = s.indexOf(' ', mid); // nearest space right of midpoint
-
-    int cut;
-    if (left == -1) {
-      cut = right;
-    } else if (right == -1) {
-      cut = left;
-    } else {
-      cut = (mid - left) <= (right - mid) ? left : right;
-    }
-    if (cut <= 0) return s; // degenerate; leave as one line
-
-    return '${s.substring(0, cut)}\n${s.substring(cut + 1)}';
+    return s;
   }
 
   @override
@@ -56,7 +41,7 @@ class _ServiceCardState extends State<ServiceCard> {
     final description = context.isEn
         ? serviceModel.rawDescription?.descEn ?? ''
         : serviceModel.rawDescription?.descAr ?? '';
-    final twoLineText = _balanceTwoLines(description);
+    final twoLineText = _capDescription(description);
     return ValueListenableBuilder(
       valueListenable: currentUser,
       builder: (context, user, child) => InkWell(
@@ -128,31 +113,25 @@ class _ServiceCardState extends State<ServiceCard> {
                                           height: 1.3,
                                         );
                                     final fontSize = style.fontSize ?? 12;
-                                    // Fixed 2-line content box: full description
-                                    // shrinks-to-fit, never truncates with "...".
+                                    // Fixed 2-line content box so all cards align.
+                                    // AutoSizeText shrinks the full (80-char-capped)
+                                    // description to fit exactly 2 wrapped lines —
+                                    // never clips mid-word, never truncates with "...".
                                     final twoLineHeight =
                                         fontSize * (style.height ?? 1.3) * 2;
-                                    return LayoutBuilder(
-                                      builder: (context, constraints) {
-                                        final boxWidth = constraints.maxWidth;
-                                        return SizedBox(
-                                          width: boxWidth,
-                                          height: twoLineHeight,
-                                          child: FittedBox(
-                                            fit: BoxFit.scaleDown,
-                                            child: SizedBox(
-                                              width: boxWidth,
-                                              child: Text(
-                                                twoLineText,
-                                                style: style,
-                                                textAlign: TextAlign.start,
-                                                softWrap: true,
-                                                maxLines: 2,
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                      },
+                                    return SizedBox(
+                                      width: double.infinity,
+                                      height: twoLineHeight,
+                                      child: AutoSizeText(
+                                        twoLineText,
+                                        style: style,
+                                        maxLines: 2,
+                                        minFontSize: 8,
+                                        stepGranularity: 0.5,
+                                        wrapWords: true,
+                                        textAlign: TextAlign.start,
+                                        overflow: TextOverflow.visible,
+                                      ),
                                     );
                                   },
                                 ),

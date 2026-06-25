@@ -54,6 +54,18 @@ class BookingState extends Equatable {
   final BookingResponseModel? createdBooking;
   final String? subscriptionId;
   final String? washId;
+  /// The package's included (bundled) services resolved to full [ServiceModel]s
+  /// via the services catalog. Only populated in [BookingFlowType.package].
+  final List<ServiceModel> packageServices;
+  /// The single included service the customer picked for this wash. Its [id]
+  /// is sent to the backend as the wash service. Only used in the package flow.
+  final ServiceModel? selectedPackageService;
+  /// True when resolving the package's bundled services against the catalog
+  /// failed. Lets the picker surface an inline error + retry instead of being
+  /// silently hidden (which would let a wash submit with serviceId=null).
+  final bool packageServicesLoadFailed;
+  /// True while the bundled-services resolve is in flight.
+  final bool packageServicesLoading;
   /// IDs of addons that are INCLUDED in the subscription but whose free
   /// quota has been exhausted — selecting them requires payment.
   final Set<String> includedAddonIds;
@@ -85,6 +97,10 @@ class BookingState extends Equatable {
     this.createdBooking,
     this.subscriptionId,
     this.washId,
+    this.packageServices = const [],
+    this.selectedPackageService,
+    this.packageServicesLoadFailed = false,
+    this.packageServicesLoading = false,
     this.includedAddonIds = const {},
     this.optionalAddonIds = const {},
     this.paymentPhase = PaymentPhase.none,
@@ -110,6 +126,10 @@ class BookingState extends Equatable {
     BookingResponseModel? createdBooking,
     String? subscriptionId,
     String? washId,
+    List<ServiceModel>? packageServices,
+    ServiceModel? selectedPackageService,
+    bool? packageServicesLoadFailed,
+    bool? packageServicesLoading,
     Set<String>? includedAddonIds,
     Set<String>? optionalAddonIds,
     PaymentPhase? paymentPhase,
@@ -140,6 +160,13 @@ class BookingState extends Equatable {
       createdBooking: createdBooking ?? this.createdBooking,
       subscriptionId: subscriptionId ?? this.subscriptionId,
       washId: washId ?? this.washId,
+      packageServices: packageServices ?? this.packageServices,
+      selectedPackageService:
+          selectedPackageService ?? this.selectedPackageService,
+      packageServicesLoadFailed:
+          packageServicesLoadFailed ?? this.packageServicesLoadFailed,
+      packageServicesLoading:
+          packageServicesLoading ?? this.packageServicesLoading,
       includedAddonIds: includedAddonIds ?? this.includedAddonIds,
       optionalAddonIds: optionalAddonIds ?? this.optionalAddonIds,
       paymentPhase: paymentPhase ?? this.paymentPhase,
@@ -167,6 +194,10 @@ class BookingState extends Equatable {
     createdBooking,
     subscriptionId,
     washId,
+    packageServices,
+    selectedPackageService,
+    packageServicesLoadFailed,
+    packageServicesLoading,
     includedAddonIds,
     optionalAddonIds,
     paymentPhase,

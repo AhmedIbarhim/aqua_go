@@ -6,6 +6,7 @@ import 'package:aqua_go/core/constants.dart';
 import 'package:aqua_go/core/config/networking/exceptions/failure.dart';
 import 'package:aqua_go/features/auth/data/models/user_model.dart';
 import 'package:aqua_go/features/auth/data/services/auth_service.dart';
+import 'package:aqua_go/features/auth/data/services/device_token_sync.dart';
 import 'package:aqua_go/core/helpers/idempotency_key_helper.dart';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
@@ -56,6 +57,8 @@ class AuthRepository {
               profileData,
             ).copyWith(phone: phone);
             await saveUser(profileUser);
+            // Fire-and-forget: register FCM token now that the user is known.
+            syncDeviceToken();
             return Right(profileUser);
           }
           return const Left(
@@ -189,6 +192,9 @@ class AuthRepository {
   }
 
   Future<void> logout() async {
+    // Deregister FCM token before wiping auth state so the stored device id
+    // is still readable during deregistration.
+    await deregisterStoredDevice();
     try {
       final refreshToken = await SecureStorage.getSecuredString(kRefreshToken);
       if (refreshToken != null && refreshToken.isNotEmpty) {
@@ -218,6 +224,8 @@ class AuthRepository {
       idempotencyKey: idempotencyKey,
     );
     return result.fold((failure) => Left(failure), (_) async {
+      // Deregister FCM token before wiping auth state.
+      await deregisterStoredDevice();
       // Same targeted teardown as logout() — preserve kNotFirstUse,
       // kLanguage, kThemeMode, kSessionInstallMarker.
       _cachedUser = null;

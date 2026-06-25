@@ -1,4 +1,5 @@
 import '../../../my_bookings/data/models/booking_response_model/breakdown.dart';
+import '../../../my_bookings/data/models/booking_response_model/quote_line.dart';
 
 class QuoteModel {
   final String quoteId;
@@ -9,6 +10,7 @@ class QuoteModel {
   final String? promoCode;
   final int promoDiscountMinor;
   final Breakdown? breakdown;
+  final List<QuoteLine> lines;
 
   QuoteModel({
     required this.quoteId,
@@ -19,6 +21,7 @@ class QuoteModel {
     this.promoCode,
     required this.promoDiscountMinor,
     this.breakdown,
+    this.lines = const [],
   });
 
   factory QuoteModel.fromJson(Map<String, dynamic> json) => QuoteModel(
@@ -32,6 +35,7 @@ class QuoteModel {
     breakdown: json['breakdown'] != null
         ? Breakdown.fromJson(json['breakdown'] as Map<String, dynamic>)
         : null,
+    lines: QuoteLine.listFromJson(json['lines']),
   );
 
   Map<String, dynamic> toJson() => {
@@ -43,5 +47,6 @@ class QuoteModel {
     if (promoCode != null) 'promoCode': promoCode,
     'promoDiscountMinor': promoDiscountMinor,
     if (breakdown != null) 'breakdown': breakdown!.toJson(),
+    'lines': lines.map((e) => e.toJson()).toList(),
   };
 }

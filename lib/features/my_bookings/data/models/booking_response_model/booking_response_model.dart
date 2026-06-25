@@ -14,6 +14,7 @@ import 'breakdown.dart';
 import 'cancellation_policy.dart';
 import 'package_name.dart';
 import 'photos.dart';
+import 'quote_line.dart';
 import 'reschedule_policy.dart';
 import 'service_name.dart';
 export 'assigned_worker.dart';
@@ -27,6 +28,7 @@ export 'cancellation_policy.dart';
 export 'invoice.dart';
 export 'package_name.dart';
 export 'photos.dart';
+export 'quote_line.dart';
 export 'reschedule_policy.dart';
 export 'vehicle_localized_name.dart';
 
@@ -70,6 +72,7 @@ class BookingResponseModel {
   String? customerName;
   String? customerPhone;
   List<BookingAddon>? addOns;
+  List<QuoteLine>? lines;
   Breakdown? breakdown;
   BookingAddress? address;
   BookingRatingModel? rating;
@@ -123,6 +126,7 @@ class BookingResponseModel {
     this.customerName,
     this.customerPhone,
     this.addOns,
+    this.lines,
     this.breakdown,
     this.address,
     this.rating,
@@ -210,6 +214,7 @@ class BookingResponseModel {
         addOns!.add(BookingAddon.fromJson(v));
       });
     }
+    lines = QuoteLine.listFromJson(json['lines']);
     breakdown = json['breakdown'] != null
         ? Breakdown.fromJson(json['breakdown'])
         : null;

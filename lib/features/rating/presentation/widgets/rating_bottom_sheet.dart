@@ -56,7 +56,26 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
   final TextEditingController _commentController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    // Re-evaluate the Submit gate live as the "Other reason" text changes.
+    _commentController.addListener(_onCommentChanged);
+  }
+
+  void _onCommentChanged() {
+    if (mounted) setState(() {});
+  }
+
+  // Block submission when "Other" is chosen on a low rating but no reason text
+  // was entered — the backend rejects an empty Other reason as unparseable.
+  bool get _otherReasonMissing =>
+      _rating < 5 &&
+      _selectedReasons.contains('OTHER_REASON') &&
+      _commentController.text.trim().isEmpty;
+
+  @override
   void dispose() {
+    _commentController.removeListener(_onCommentChanged);
     _commentController.dispose();
     super.dispose();
   }
@@ -134,6 +153,7 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
               Expanded(
                 flex: 2,
                 child: CustomButton(
+                  enabled: !_otherReasonMissing,
                   onPressed: () {
                     final reasons = _rating < 5
                         ? _selectedReasons

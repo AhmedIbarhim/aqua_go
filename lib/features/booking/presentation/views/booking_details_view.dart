@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/core/route/routes.dart';
 import 'package:aqua_go/features/my_cars/presentation/controllers/my_cars_cubit.dart';
@@ -16,6 +18,7 @@ import '../../../../core/components/bottom_action_sheet_container.dart';
 import '../../../../core/config/di/service_locator.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../widgets/car_selection_list.dart';
+import '../widgets/package_service_selection_list.dart';
 import '../widgets/add_ons_grid.dart';
 import '../widgets/date_time_picker.dart';
 import '../widgets/package_addon_payment_bottom_sheet.dart';
@@ -34,6 +37,49 @@ class BookingDetailsView extends StatefulWidget {
 class _BookingDetailsViewState extends State<BookingDetailsView> {
   bool _carJustAdded = false;
   List<MyCarModel> _previousCars = [];
+
+  /// Debounce for the price-lock quote refresh fired on each add-on toggle.
+  Timer? _quoteDebounce;
+
+  /// Guards the one-shot initial quote fetch so it runs once per screen mount.
+  bool _initialQuoteRequested = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Lock the price at booking INITIATION: as soon as the priced details
+    // screen mounts, capture a fresh server quote that freezes BOTH the service
+    // total and every selected add-on. The displayed total reads from this
+    // quote only — never from the (potentially stale) live catalog snapshot —
+    // so later admin price edits affect only NEW bookings.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final cubit = context.read<BookingCubit>();
+      final state = cubit.state;
+      if (state.flowConfig.requiresQuote && !_initialQuoteRequested) {
+        _initialQuoteRequested = true;
+        cubit.fetchQuote();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _quoteDebounce?.cancel();
+    super.dispose();
+  }
+
+  /// Re-locks the price after an add-on toggle. Debounced so rapid toggles
+  /// collapse into a single quote refresh. Service flow only — the package
+  /// flow uses the wash charge-preview path, not the service quote.
+  void _scheduleQuoteRefresh(BookingState state) {
+    if (!state.flowConfig.requiresQuote) return;
+    _quoteDebounce?.cancel();
+    _quoteDebounce = Timer(const Duration(milliseconds: 350), () {
+      if (!mounted) return;
+      context.read<BookingCubit>().fetchQuote();
+    });
+  }
 
   /// Returns true if any currently-selected addon in a package flow requires
   /// payment (optional addons always do; included addons do when free qty = 0).
@@ -226,6 +272,32 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
               );
             },
           ),
+          if (config.isPackage &&
+              (bookingState.packageServices.length > 1 ||
+                  bookingState.packageServicesLoading ||
+                  bookingState.packageServicesLoadFailed)) ...[
+            SizedBox(height: height * 0.03),
+            _buildSectionTitle(
+              LocaleKeys.bookings_choose_service.tr(context: context),
+              isRequired: true,
+            ),
+            SizedBox(height: height * 0.02),
+            if (bookingState.packageServicesLoading)
+              SizedBox(
+                height: height * 0.14,
+                child: const Center(child: CircularProgressIndicator()),
+              )
+            else if (bookingState.packageServicesLoadFailed)
+              _buildServicesLoadError(context, width)
+            else
+              PackageServiceSelectionList(
+                services: bookingState.packageServices,
+                selectedServiceId: bookingState.selectedPackageService?.id,
+                onServiceSelected: (service) {
+                  context.read<BookingCubit>().selectPackageService(service);
+                },
+              ),
+          ],
           if (config.showAddOns &&
               bookingState.selectedService != null &&
               bookingState.selectedService!.addons.isNotEmpty) ...[
@@ -237,6 +309,8 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
               selectedIndices: bookingState.selectedServiceIndices,
               onServiceToggled: (index) {
                 context.read<BookingCubit>().toggleService(index);
+                // Re-lock the price for the new add-on selection (service flow).
+                _scheduleQuoteRefresh(bookingState);
               },
               isPackageFlow: config.isPackage,
             ),
@@ -276,6 +350,46 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
     );
   }
 
+  /// Inline error + retry shown when the package's bundled services failed to
+  /// resolve against the catalog. Replaces the previously-silent hidden picker
+  /// (which let a wash submit with serviceId=null).
+  Widget _buildServicesLoadError(BuildContext context, double width) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(width * 0.04),
+      decoration: BoxDecoration(
+        color: context.colors.cardBackGround,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            LocaleKeys.bookings_services_load_failed.tr(context: context),
+            style: AppTextStyles.regular14.copyWith(
+              color: context.colors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Align(
+            alignment: AlignmentDirectional.centerEnd,
+            child: TextButton(
+              onPressed: () {
+                context.read<BookingCubit>().retryPackageServices();
+              },
+              child: Text(
+                LocaleKeys.retry.tr(context: context),
+                style: AppTextStyles.medium14.copyWith(
+                  color: context.colors.primary,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildBottomActionSheet(
     BuildContext context,
     BookingState bookingState,
@@ -283,10 +397,18 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
     double height,
   ) {
     final config = bookingState.flowConfig;
+    // In the package flow, when the bundle has more than one included service
+    // the customer must pick one before booking. A single-service bundle is
+    // auto-selected, so no extra requirement applies there.
+    final servicePicked =
+        !config.isPackage ||
+        bookingState.packageServices.length <= 1 ||
+        bookingState.selectedPackageService != null;
     final isComplete =
         bookingState.selectedCar != null &&
         bookingState.selectedDate != null &&
-        bookingState.selectedTime != null;
+        bookingState.selectedTime != null &&
+        servicePicked;
 
     // For reschedule flow: submit directly from details view
     if (!config.showSummaryStep) {
@@ -303,16 +425,22 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
       );
     }
 
-    // For service/package flow: show pricing and navigate to summary
-    double addonsTotal = 0.0;
-    final availableAddons = bookingState.selectedService?.addons ?? [];
-    for (final idx in bookingState.selectedServiceIndices) {
-      if (idx < availableAddons.length) {
-        addonsTotal += availableAddons[idx].price;
-      }
-    }
-
-    final total = bookingState.selectedService!.priceDouble + addonsTotal;
+    // For service/package flow: show pricing and navigate to summary.
+    //
+    // PRICE LOCK: the displayed total comes ONLY from the server quote captured
+    // at booking initiation (quote.breakdown.gross) — it freezes both the
+    // service price and every selected add-on. We do NOT fall back to the live
+    // catalog (selectedService.priceDouble + live add-on prices), so admin price
+    // edits made mid-session never change this booking's total. No client-side
+    // VAT/price math: the amount is the backend-rendered gross.
+    final double? lockedTotal = config.showPricingInDetails
+        ? bookingState.quote?.breakdown?.gross
+        : null;
+    // Block "Book now" on the service flow until the price is locked, so we can
+    // never navigate to summary on a live (unlocked) amount.
+    final bool priceLocked =
+        !config.showPricingInDetails || lockedTotal != null;
+    final bool canProceed = isComplete && priceLocked;
 
     return BottomActionSheetContainer(
       child: Column(
@@ -328,22 +456,34 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
                   ),
                 ),
                 const Spacer(),
-                Text(total.toStringAsFixed(2), style: AppTextStyles.medium24),
-                const SizedBox(width: 4),
-                SvgPicture.asset(
-                  AppAssets.currency,
-                  width: width * 0.06,
-                  colorFilter: ColorFilter.mode(
-                    context.colors.textPrimary,
-                    BlendMode.srcIn,
+                if (lockedTotal == null)
+                  Text(
+                    LocaleKeys.bookings_calculating_price.tr(context: context),
+                    style: AppTextStyles.regular14.copyWith(
+                      color: context.colors.textSecondary,
+                    ),
+                  )
+                else ...[
+                  Text(
+                    lockedTotal.toStringAsFixed(2),
+                    style: AppTextStyles.medium24,
                   ),
-                ),
+                  const SizedBox(width: 4),
+                  SvgPicture.asset(
+                    AppAssets.currency,
+                    width: width * 0.06,
+                    colorFilter: ColorFilter.mode(
+                      context.colors.textPrimary,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                ],
               ],
             ),
           CustomButton(
             text: LocaleKeys.bookings_book_now.tr(context: context),
-            enabled: isComplete,
-            onPressed: isComplete
+            enabled: canProceed,
+            onPressed: canProceed
                 ? () async {
                     // For package flow with payable addons, collect payment
                     // method before proceeding to the summary screen.

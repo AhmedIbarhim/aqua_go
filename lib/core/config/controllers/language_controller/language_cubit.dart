@@ -1,9 +1,12 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:async';
+
 import 'package:aqua_go/core/config/di/service_locator.dart';
 import 'package:aqua_go/core/config/local_storage/shared_prefs.dart';
 import 'package:aqua_go/core/constants.dart';
 import 'package:aqua_go/features/auth/data/repos/auth_repository.dart';
+import 'package:aqua_go/features/auth/data/services/device_token_sync.dart';
 import 'package:bloc/bloc.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:equatable/equatable.dart';
@@ -38,12 +41,20 @@ class LanguageCubit extends Cubit<LanguageState> {
         (_) async {
           await CacheClient.setString(kLanguage, newLocale.languageCode);
           await context.setLocale(newLocale);
+          // Re-register the device token so the backend renders future
+          // notifications in the new locale. No-op when not logged in / no
+          // token yet (syncDeviceToken guards on getIsLoggedIn()).
+          unawaited(syncDeviceToken());
           emit(LanguageChanged(newLocale));
         },
       );
     } else {
       await CacheClient.setString(kLanguage, newLocale.languageCode);
       await context.setLocale(newLocale);
+      // Re-register the device token so the backend renders future
+      // notifications in the new locale. No-op when not logged in / no
+      // token yet (syncDeviceToken guards on getIsLoggedIn()).
+      unawaited(syncDeviceToken());
       emit(LanguageChanged(newLocale));
     }
   }
@@ -66,12 +77,20 @@ class LanguageCubit extends Cubit<LanguageState> {
         (_) async {
           await CacheClient.setString(kLanguage, newLocale.languageCode);
           await context.setLocale(newLocale);
+          // Re-register the device token so the backend renders future
+          // notifications in the new locale. No-op when not logged in / no
+          // token yet (syncDeviceToken guards on getIsLoggedIn()).
+          unawaited(syncDeviceToken());
           emit(LanguageChanged(newLocale));
         },
       );
     } else {
       await CacheClient.setString(kLanguage, newLocale.languageCode);
       await context.setLocale(newLocale);
+      // Re-register the device token so the backend renders future
+      // notifications in the new locale. No-op when not logged in / no
+      // token yet (syncDeviceToken guards on getIsLoggedIn()).
+      unawaited(syncDeviceToken());
       emit(LanguageChanged(newLocale));
     }
   }

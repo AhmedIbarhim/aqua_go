@@ -77,7 +77,6 @@ class _ComplaintTypesState extends State<ComplaintTypes> {
                           style: AppTextStyles.medium14.copyWith(
                             color: context.colors.textPrimary,
                           ),
-                          textAlign: TextAlign.right,
                         ),
                       ),
                       CustomRadioWidget(isSelected: _selectedValue == type),

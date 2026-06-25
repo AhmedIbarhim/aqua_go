@@ -37,6 +37,11 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
       final config = context.read<BookingCubit>().state.flowConfig;
       if (config.requiresQuote) {
         context.read<BookingCubit>().fetchQuote();
+      } else if (config.isPackage) {
+        // Subscription wash: fetch the read-only charge preview so the summary
+        // shows the real payable total (e.g. 8 SAR add-on) instead of 0.00 and
+        // the Confirm gate routes a paid wash through addon-payment-init.
+        context.read<BookingCubit>().fetchWashChargePreview();
       }
     });
   }
@@ -114,27 +119,58 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
   ) {
     final config = bookingState.flowConfig;
 
-    // Add-on prices from the catalog are VAT-inclusive (gross).
-    final List<Map<String, dynamic>> selectedAddons = [];
-    double addonsGross = 0.0;
-    double addonsNet = 0.0;
-
+    // Backend-rendered per-line breakdown (quote.lines) is the source of truth
+    // for displayed amounts — no client-side VAT/base math. Each line carries a
+    // NET (VAT-exclusive) netMinor; per Option B we render one row per line at
+    // its NET amount so the line rows sum to the net subtotal (breakdown.net),
+    // labelling the SERVICE line with the selected service name and each ADDON
+    // by mapping its refId to the selected add-on's localized name.
+    // Package wash: show the CHOSEN included service (selectedPackageService);
+    // fall back to selectedService — which holds the PACKAGE name — only when
+    // the bundle has a single service (no picker, so package name is the wash
+    // name). Mirrors package_addon_payment_bottom_sheet. The service flow keeps
+    // selectedService (the real chosen service) unchanged.
+    final serviceName = _resolveServiceName(context, bookingState);
     final availableAddons = bookingState.selectedService?.addons ?? [];
-    for (final idx in bookingState.selectedServiceIndices) {
-      if (idx < availableAddons.length) {
-        final addon = availableAddons[idx];
-        final title = context.isAr
-            ? (addon.nameAr ?? addon.nameEn ?? '')
-            : (addon.nameEn ?? addon.nameAr ?? '');
-        selectedAddons.add({'name': title, 'price': addon.price});
-        addonsGross += addon.price;
-        addonsNet += (addon.priceMinor ?? 0) / 100;
+
+    final lines = bookingState.quote?.lines ?? const [];
+
+    // Service row (label + gross price) and add-on rows for the summary card.
+    double servicePrice;
+    final List<Map<String, dynamic>> selectedAddons = [];
+
+    if (lines.isNotEmpty) {
+      // Per-line rows render NET (line.net = netMinor/100); add-on rows come
+      // from ADDON lines, each labelled by refId → catalog add-on name. Line
+      // rows sum to the net subtotal (breakdown.net) — no client-side math.
+      final serviceLine = lines.where((l) => l.isService).firstOrNull;
+      servicePrice = serviceLine?.net ?? 0.0;
+      for (final line in lines.where((l) => l.isAddon)) {
+        final addon = availableAddons
+            .where((a) => a.id == line.refId)
+            .firstOrNull;
+        final title = addon == null
+            ? ''
+            : (context.isAr
+                  ? (addon.nameAr ?? addon.nameEn ?? '')
+                  : (addon.nameEn ?? addon.nameAr ?? ''));
+        selectedAddons.add({'name': title, 'price': line.net});
       }
+    } else {
+      // No quote/lines yet (still loading / fetch failed / expired). Do NOT
+      // render a live catalog price — show 0.00 and let the Confirm gate block.
+      // The covered-wash zero-total path also lands here and correctly shows 0.
+      servicePrice = 0.0;
     }
 
     final quoteBreakdown = bookingState.quote?.breakdown;
 
-    final double basePrice;
+    // PRICE LOCK: subtotal/vat/total come STRAIGHT from the backend quote
+    // breakdown frozen at booking initiation — never from the live catalog.
+    // When the quote is absent (still loading / fetch failed / expired) we
+    // render zeros and the Confirm gate below blocks, rather than silently
+    // falling back to live selectedService prices (which would mismatch the
+    // eventual charge and break the locked-at-initiation guarantee).
     final double subtotal;
     final double vat;
     final double total;
@@ -143,12 +179,10 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
       subtotal = quoteBreakdown.net;
       vat = quoteBreakdown.vat;
       total = quoteBreakdown.gross;
-      basePrice = subtotal - addonsNet;
     } else {
-      basePrice = bookingState.selectedService?.basePriceDouble ?? 0.0;
-      subtotal = basePrice + addonsNet;
-      vat = (bookingState.selectedService?.vatDouble ?? 0.0);
-      total = (bookingState.selectedService?.priceDouble ?? 0.0) + addonsGross;
+      subtotal = 0.0;
+      vat = 0.0;
+      total = 0.0;
     }
 
     return Container(
@@ -163,9 +197,7 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
             ),
             const SizedBox(height: 16),
             BookingSummaryCard(
-              serviceName: context.isAr
-                  ? (bookingState.selectedService?.rawName?.nameAr ?? '')
-                  : (bookingState.selectedService?.rawName?.nameEn ?? ''),
+              serviceName: serviceName,
               carName:
                   '${bookingState.selectedCar!.carMake!.vehicleMakeName.localizedName} ${bookingState.selectedCar!.carModel!.vehicleModelName.localizedName}',
               location: bookingState.selectedAddress?.details ?? '',
@@ -207,10 +239,8 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
             ),
             const SizedBox(height: 16),
             PaymentSummaryCard(
-              serviceName: context.isAr
-                  ? (bookingState.selectedService?.rawName?.nameAr ?? '')
-                  : (bookingState.selectedService?.rawName?.nameEn ?? ''),
-              servicePrice: basePrice,
+              serviceName: serviceName,
+              servicePrice: servicePrice,
               additionalItems: selectedAddons,
               subtotal: subtotal,
               vat: vat,
@@ -223,6 +253,34 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
     );
   }
 
+  /// Service name shown on BOTH the Booking-Summary and Payment-Summary cards.
+  /// For a multi-service package the customer PICKED a specific service, so show
+  /// that chosen service (selectedPackageService); fall back to selectedService
+  /// (which holds the PACKAGE name) only for a single-service bundle / the
+  /// non-package service flow where selectedService is the real chosen service.
+  String _resolveServiceName(BuildContext context, BookingState state) {
+    final chosen = state.flowConfig.isPackage
+        ? (state.selectedPackageService ??
+            (state.packageServices.length <= 1
+                ? state.selectedService
+                : null))
+        : state.selectedService;
+    return context.isAr
+        ? (chosen?.rawName?.nameAr ?? '')
+        : (chosen?.rawName?.nameEn ?? '');
+  }
+
+  /// True when a multi-service package REQUIRES a service pick that hasn't been
+  /// made yet (or the picker failed to load) — Confirm is blocked in that state
+  /// so a paid wash can never silently submit serviceId=null. Mirrors the
+  /// booking_details_view `servicePicked` gate.
+  bool _servicePicked(BookingState state) {
+    final config = state.flowConfig;
+    return !config.isPackage ||
+        state.packageServices.length <= 1 ||
+        state.selectedPackageService != null;
+  }
+
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
@@ -232,20 +290,39 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
     );
   }
 
-  double _calculateTotal(BookingState state) {
-    double addonsGross = 0.0;
-    final availableAddons = state.selectedService?.addons ?? [];
+  /// Load-bearing safety net (spec Fix B): true when the package wash carries
+  /// at least one PAYABLE add-on (optional add-ons always pay; included add-ons
+  /// pay when their free allowance is exhausted) — mirrors
+  /// booking_details_view._requiresPayment. ORed into the Confirm gate so a
+  /// paid wash can NEVER bare-submit (→ backend 422), even if the charge
+  /// preview is slow or failed.
+  bool _hasPayableAddon(BookingState state) {
+    if (!state.flowConfig.isPackage) return false;
+    final addons = state.selectedService?.addons ?? [];
+    final optionalIds = state.optionalAddonIds;
+    final includedIds = state.includedAddonIds;
     for (final idx in state.selectedServiceIndices) {
-      if (idx < availableAddons.length) {
-        addonsGross += availableAddons[idx].price;
-      }
+      if (idx >= addons.length) continue;
+      final addon = addons[idx];
+      final id = addon.id ?? '';
+      if (optionalIds.contains(id)) return true;
+      if (includedIds.contains(id) && (addon.freeQty ?? 0) <= 0) return true;
     }
+    return false;
+  }
+
+  double _calculateTotal(BookingState state) {
+    // Total used only to gate "needs payment". Backend breakdown.gross already
+    // includes every add-on — NO client-side add-on summing (that double-added
+    // the add-on amounts on top of the gross total). No client math at all.
+    // No live-catalog fallback: when the quote is absent we return 0.0 so the
+    // covered-wash zero-total path stays enabled while the service flow is held
+    // by the explicit quote-presence gate below.
     final quoteBreakdown = state.quote?.breakdown;
     if (quoteBreakdown != null) {
-      return quoteBreakdown.gross + addonsGross;
-    } else {
-      return (state.selectedService?.priceDouble ?? 0.0) + addonsGross;
+      return quoteBreakdown.gross;
     }
+    return 0.0;
   }
 
   Widget _buildBottomActionSheet(
@@ -254,9 +331,24 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
   ) {
     final config = bookingState.flowConfig;
     final total = _calculateTotal(bookingState);
-    final isEnabled = (config.requiresPaymentMethod || total > 0)
-        ? bookingState.paymentMethod != null
-        : true;
+    // hasPayableAddon is the safety net: a paid package wash needs payment even
+    // before/without the charge preview (total may still be 0 if it failed).
+    final hasPayableAddon = _hasPayableAddon(bookingState);
+    final needsPayment =
+        config.requiresPaymentMethod || total > 0 || hasPayableAddon;
+    // PRICE LOCK gate: the service flow must have a locked quote before Confirm
+    // so a failed/expired quote fetch can never charge a live (unlocked) amount.
+    // The package flow does not require the service quote (it uses the wash
+    // charge-preview + hasPayableAddon safety net), so it is not blocked here —
+    // preserving the covered-wash zero-total path.
+    final priceLocked = !config.requiresQuote || bookingState.quote != null;
+    // Multi-service package gate: a required service pick must be made before
+    // Confirm — never silently submit serviceId=null when the picker failed to
+    // load or no service is selected.
+    final servicePicked = _servicePicked(bookingState);
+    final isEnabled = priceLocked &&
+        servicePicked &&
+        (needsPayment ? bookingState.paymentMethod != null : true);
 
     return BottomActionSheetContainer(
       child: CustomButton(
@@ -264,7 +356,16 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
         enabled: isEnabled,
         onPressed: () async {
           final cubit = context.read<BookingCubit>();
-          final needsPayment = config.requiresPaymentMethod || total > 0;
+          // Hard block: a required package service must be chosen before any
+          // submit/charge — never bare-submit serviceId=null.
+          if (!_servicePicked(bookingState)) {
+            context.showErrorSnackBar(
+              LocaleKeys.bookings_service_selection_required.tr(
+                context: context,
+              ),
+            );
+            return;
+          }
           // Covered / zero-total (NOT_REQUIRED): no on-device payment — the
           // backend creates the booking directly.
           if (!needsPayment) {
@@ -280,6 +381,26 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
             // Moyasar SDK → schedule with moyasarPaymentId.
             init = await cubit.initiateWashAddonPayment();
           } else {
+            // PRICE LOCK / 15-min TTL: if the locked quote has expired, re-quote
+            // before charging. If the refreshed total differs, surface the
+            // "prices refreshed" notice and abort so the customer reviews the
+            // new amount rather than being silently charged a changed total.
+            final existing = cubit.state.quote;
+            if (existing != null &&
+                DateTime.now().isAfter(existing.expiresAt)) {
+              final previousGross = existing.breakdown?.gross;
+              final refreshed = await cubit.fetchQuote();
+              if (!context.mounted) return;
+              if (refreshed == null) return; // fetch failed → cubit set error
+              final newGross = refreshed.breakdown?.gross;
+              if (previousGross != newGross) {
+                context.showErrorSnackBar(
+                  LocaleKeys.bookings_price_updated.tr(context: context),
+                );
+                return;
+              }
+            }
+            if (!context.mounted) return;
             // Pay-before-create (spec §4.2): booking-payment-init →
             // Moyasar SDK → verify + create.
             init = await cubit.initiatePayment();
