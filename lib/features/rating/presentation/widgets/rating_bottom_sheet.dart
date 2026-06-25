@@ -156,9 +156,7 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
                   enabled: !_otherReasonMissing,
                   onPressed: () {
                     final reasons = _rating < 5
-                        ? _selectedReasons
-                              .where((r) => r != 'OTHER_REASON')
-                              .toList()
+                        ? _selectedReasons.toList()
                         : null;
                     final comment =
                         _rating < 5 && _selectedReasons.contains('OTHER_REASON')
