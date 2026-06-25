@@ -35,18 +35,47 @@ class _GalleryViewState extends State<GalleryView> {
   late PageController _pageController;
   late int _currentIndex;
   double _currentScale = 1.0;
+  late ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
     _currentIndex = widget.initialIndex;
     _pageController = PageController(initialPage: widget.initialIndex);
+    _scrollController = ScrollController();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToIndex(_currentIndex, animate: false);
+    });
   }
 
   @override
   void dispose() {
     _pageController.dispose();
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  void _scrollToIndex(int index, {bool animate = true}) {
+    if (!mounted || !_scrollController.hasClients) return;
+
+    final double itemWidth = 136.0 + 12.0; // 136 width + 12 horizontal margin
+    final double itemCenter = index * itemWidth + 24.0 + 6.0 + (136.0 / 2);
+    final double viewportWidth =
+        context.screenWidth - 48.0; // Container has 24 margin on each side
+    double targetOffset = itemCenter - (viewportWidth / 2);
+
+    final double maxScroll = _scrollController.position.maxScrollExtent;
+    targetOffset = targetOffset.clamp(0.0, maxScroll);
+
+    if (animate) {
+      _scrollController.animateTo(
+        targetOffset,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    } else {
+      _scrollController.jumpTo(targetOffset);
+    }
   }
 
   String _getImageLabel(int index) {
@@ -88,6 +117,7 @@ class _GalleryViewState extends State<GalleryView> {
                           setState(() {
                             _currentIndex = index;
                           });
+                          _scrollToIndex(index);
                         },
                         itemBuilder: (context, index) {
                           return Padding(
@@ -189,6 +219,7 @@ class _GalleryViewState extends State<GalleryView> {
 
   Widget _buildThumbnails() {
     return SingleChildScrollView(
+      controller: _scrollController,
       scrollDirection: Axis.horizontal,
       physics: const BouncingScrollPhysics(),
       child: Padding(
