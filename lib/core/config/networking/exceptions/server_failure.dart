@@ -71,8 +71,8 @@ class ServerFailure extends Failure {
       final title = response['title']?.toString();
       final type = response['type']?.toString();
       if (title == 'Address outside service area' ||
-          // type == 'https://qa-api.aquago.sa/errors/address-outside-service-area'
-          type == 'https://api.aquago.sa/errors/address-outside-service-area'
+          // host-agnostic: match the error-type URI suffix regardless of the API host
+          (type?.endsWith('/errors/address-outside-service-area') ?? false)
       ) {
         return const ServerFailure(
           'address-outside-service-area',

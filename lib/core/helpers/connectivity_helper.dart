@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:aqua_go/core/config/networking/endpoints.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/widgets.dart';
 
@@ -22,7 +23,7 @@ class ConnectivityHelper with WidgetsBindingObserver {
   /// Host probed for real internet reachability. The connectivity_plus stream
   /// only reports interface state and can MISS the reconnect transition on
   /// iOS/simulator — so we confirm with an actual DNS lookup of the API host.
-  static const String _probeHost = 'api.aquago.sa';
+  static const String _probeHost = Endpoints.host;
 
   /// While OFFLINE we poll reachability on this cadence to recover a missed
   /// stream event within seconds. The timer is cancelled the moment we are
