@@ -26,24 +26,22 @@ class CustomBottomSheet extends StatelessWidget {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => Scaffold(
+        resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
         body: BackdropFilter(
           filter: ui.ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
-          child: SizedBox(
-            height: MediaQuery.sizeOf(context).height,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () => Navigator.pop(context),
-                    child: const SizedBox.expand(),
-                  ),
-                ),
-                CustomBottomSheet(title: title, padding: padding, child: child),
-              ],
-            ),
+          child: Stack(
+            children: [
+              GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () => Navigator.pop(context),
+                child: const SizedBox.expand(),
+              ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: CustomBottomSheet(title: title, padding: padding, child: child),
+              ),
+            ],
           ),
         ),
       ),
@@ -65,14 +63,16 @@ class CustomBottomSheet extends StatelessWidget {
       ),
       child: SafeArea(
         child: Padding(
-          padding:
-              padding ??
-              EdgeInsets.only(
-                top: height * 0.03,
-                left: width * 0.06,
-                right: width * 0.06,
-                bottom: MediaQuery.viewInsetsOf(context).bottom + 5,
-              ),
+          padding: (padding ??
+                  EdgeInsets.only(
+                    top: height * 0.03,
+                    left: width * 0.06,
+                    right: width * 0.06,
+                  ))
+              .copyWith(
+            bottom: MediaQuery.viewInsetsOf(context).bottom +
+                (padding?.bottom ?? 5),
+          ),
           child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,

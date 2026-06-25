@@ -150,147 +150,155 @@ class _AddAddressBottomSheetState extends State<AddAddressBottomSheet> {
         }
       },
       builder: (context, state) {
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildSectionLabel(
-              LocaleKeys.address_address_label.tr(context: context),
-              isRequired: true,
-            ),
-            SizedBox(height: height * 0.01),
-            CustomTextFormField(
-              controller: _addressController,
-              label: LocaleKeys.address_address_label.tr(context: context),
-              readOnly: true,
-              maxLines: 1,
-              prefixIcon: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: SvgPicture.asset(
-                  AppAssets.location,
-                  width: 24,
-                  height: 24,
-                  colorFilter: ColorFilter.mode(
-                    context.colors.textSecondary,
-                    BlendMode.srcIn,
+        return SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildSectionLabel(
+                LocaleKeys.address_address_label.tr(context: context),
+                isRequired: true,
+              ),
+              SizedBox(height: height * 0.01),
+              CustomTextFormField(
+                controller: _addressController,
+                label: LocaleKeys.address_address_label.tr(context: context),
+                readOnly: true,
+                maxLines: 1,
+                prefixIcon: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: SvgPicture.asset(
+                    AppAssets.location,
+                    width: 24,
+                    height: 24,
+                    colorFilter: ColorFilter.mode(
+                      context.colors.textSecondary,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                ),
+                onTap: () async {
+                  final result = await context.pushNamed(
+                    Routes.newAddressMap,
+                    arguments: NewAddressMapArgs(
+                      forAddingAddress: false,
+                      address:
+                          widget.existingAddress ??
+                          AddressModel(
+                            id: null,
+                            label: _addressNameController.text.trim(),
+                            details: _addressController.text.trim(),
+                            lat: _lat,
+                            lng: _lng,
+                          ),
+                    ),
+                  );
+
+                  if (result != null && result is Map<String, dynamic>) {
+                    final newAddressName = result['address'] as String;
+                    final newLat = result['lat'] as double;
+                    final newLng = result['lng'] as double;
+                    setState(() {
+                      _addressController.text = newAddressName;
+                      _lat = newLat;
+                      _lng = newLng;
+                    });
+                  }
+                },
+              ),
+              SizedBox(height: height * 0.03),
+
+              _buildSectionLabel(
+                LocaleKeys.address_address_name_label.tr(context: context),
+                isRequired: true,
+              ),
+              SizedBox(height: height * 0.01),
+              CustomTextFormField(
+                controller: _addressNameController,
+                label: LocaleKeys.address_address_name_label.tr(
+                  context: context,
+                ),
+                hintText: LocaleKeys.address_address_name_example.tr(
+                  context: context,
+                ),
+                prefixIcon: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Icon(
+                    Icons.label_outline,
+                    size: 24,
+                    color: context.colors.textSecondary,
                   ),
                 ),
               ),
-              onTap: () async {
-                final result = await context.pushNamed(
-                  Routes.newAddressMap,
-                  arguments: NewAddressMapArgs(
-                    forAddingAddress: false,
-                    address:
-                        widget.existingAddress ??
-                        AddressModel(
-                          id: null,
-                          label: _addressNameController.text.trim(),
-                          details: _addressController.text.trim(),
-                          lat: _lat,
-                          lng: _lng,
-                        ),
-                  ),
-                );
-
-                if (result != null && result is Map<String, dynamic>) {
-                  final newAddressName = result['address'] as String;
-                  final newLat = result['lat'] as double;
-                  final newLng = result['lng'] as double;
-                  setState(() {
-                    _addressController.text = newAddressName;
-                    _lat = newLat;
-                    _lng = newLng;
-                  });
-                }
-              },
-            ),
-            SizedBox(height: height * 0.03),
-
-            _buildSectionLabel(
-              LocaleKeys.address_address_name_label.tr(context: context),
-              isRequired: true,
-            ),
-            SizedBox(height: height * 0.01),
-            CustomTextFormField(
-              controller: _addressNameController,
-              label: LocaleKeys.address_address_name_label.tr(context: context),
-              hintText: LocaleKeys.address_address_name_example.tr(
-                context: context,
-              ),
-              prefixIcon: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Icon(
-                  Icons.label_outline,
-                  size: 24,
+              SizedBox(height: height * 0.008),
+              Text(
+                LocaleKeys.address_address_name_helper.tr(context: context),
+                style: AppTextStyles.regular12.copyWith(
                   color: context.colors.textSecondary,
                 ),
               ),
-            ),
-            SizedBox(height: height * 0.008),
-            Text(
-              LocaleKeys.address_address_name_helper.tr(context: context),
-              style: AppTextStyles.regular12.copyWith(
-                color: context.colors.textSecondary,
+              SizedBox(height: height * 0.03),
+
+              _buildSectionLabel(
+                LocaleKeys.address_access_notes_label.tr(context: context),
               ),
-            ),
-            SizedBox(height: height * 0.03),
+              SizedBox(height: height * 0.01),
+              CustomTextFormField(
+                controller: _accessNotesController,
+                label: LocaleKeys.address_access_notes_label.tr(
+                  context: context,
+                ),
+                keyboardType: TextInputType.multiline,
+                minLines: 3,
+              ),
+              SizedBox(height: height * 0.04),
 
-            _buildSectionLabel(
-              LocaleKeys.address_access_notes_label.tr(context: context),
-            ),
-            SizedBox(height: height * 0.01),
-            CustomTextFormField(
-              controller: _accessNotesController,
-              label: LocaleKeys.address_access_notes_label.tr(context: context),
-              keyboardType: TextInputType.multiline,
-              minLines: 3,
-            ),
-            SizedBox(height: height * 0.04),
-
-            Row(
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: CustomButton(
-                    text: widget.existingAddress == null
-                        ? LocaleKeys.address_save_address.tr(context: context)
-                        : LocaleKeys.profile_save_changes.tr(context: context),
-                    enabled: _addressNameController.text.trim().isNotEmpty,
-                    onPressed: () {
-                      final newAddress = AddressModel(
-                        id: widget.existingAddress?.id,
-                        label: _addressNameController.text.trim(),
-                        arrivalNotes: _accessNotesController.text.trim(),
-                        details: _addressController.text.trim(),
-                        lat: _lat,
-                        lng: _lng,
-                      );
-
-                      if (widget.existingAddress == null) {
-                        context.read<AddressesCubit>().addAddress(newAddress);
-                      } else {
-                        context.read<AddressesCubit>().updateAddress(
-                          newAddress,
+              Row(
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: CustomButton(
+                      text: widget.existingAddress == null
+                          ? LocaleKeys.address_save_address.tr(context: context)
+                          : LocaleKeys.profile_save_changes.tr(
+                              context: context,
+                            ),
+                      enabled: _addressNameController.text.trim().isNotEmpty,
+                      onPressed: () {
+                        final newAddress = AddressModel(
+                          id: widget.existingAddress?.id,
+                          label: _addressNameController.text.trim(),
+                          arrivalNotes: _accessNotesController.text.trim(),
+                          details: _addressController.text.trim(),
+                          lat: _lat,
+                          lng: _lng,
                         );
-                      }
-                    },
+
+                        if (widget.existingAddress == null) {
+                          context.read<AddressesCubit>().addAddress(newAddress);
+                        } else {
+                          context.read<AddressesCubit>().updateAddress(
+                            newAddress,
+                          );
+                        }
+                      },
+                    ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  flex: 1,
-                  child: CustomButton(
-                    onPressed: () => Navigator.pop(context),
-                    text: LocaleKeys.cancel.tr(context: context),
-                    color: Colors.transparent,
-                    textColor: context.colors.primary,
-                    borderColor: context.colors.borderSecondary,
+                  const SizedBox(width: 8),
+                  Expanded(
+                    flex: 1,
+                    child: CustomButton(
+                      onPressed: () => Navigator.pop(context),
+                      text: LocaleKeys.cancel.tr(context: context),
+                      color: Colors.transparent,
+                      textColor: context.colors.primary,
+                      borderColor: context.colors.borderSecondary,
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         );
       },
     );
