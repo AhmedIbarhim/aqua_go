@@ -261,9 +261,9 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
   String _resolveServiceName(BuildContext context, BookingState state) {
     final chosen = state.flowConfig.isPackage
         ? (state.selectedPackageService ??
-            (state.packageServices.length <= 1
-                ? state.selectedService
-                : null))
+              (state.packageServices.length <= 1
+                  ? state.selectedService
+                  : null))
         : state.selectedService;
     return context.isAr
         ? (chosen?.rawName?.nameAr ?? '')
@@ -346,7 +346,8 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
     // Confirm — never silently submit serviceId=null when the picker failed to
     // load or no service is selected.
     final servicePicked = _servicePicked(bookingState);
-    final isEnabled = priceLocked &&
+    final isEnabled =
+        priceLocked &&
         servicePicked &&
         (needsPayment ? bookingState.paymentMethod != null : true);
 
@@ -416,9 +417,7 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
                   init: resolvedInit,
                   paymentMethod:
                       bookingState.paymentMethod ?? PaymentMethod.creditCard,
-                  description: context.isAr
-                      ? 'غسلة أكوا جو'
-                      : 'Aqua Go car wash',
+                  description: context.isAr ? 'أكوا جو' : 'Aqua Go',
                 ),
               ),
             ),
@@ -431,9 +430,11 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
             case MoyasarPaymentStatus.failed:
               cubit.onPaymentCancelled();
               if (context.mounted) {
-                context.showErrorSnackBar(context.isAr
-                    ? 'فشلت عملية الدفع. يرجى المحاولة مرة أخرى.'
-                    : 'Payment failed. Please try again.');
+                context.showErrorSnackBar(
+                  context.isAr
+                      ? 'فشلت عملية الدفع. يرجى المحاولة مرة أخرى.'
+                      : 'Payment failed. Please try again.',
+                );
               }
               break;
             case MoyasarPaymentStatus.cancelled:

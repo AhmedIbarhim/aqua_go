@@ -70,7 +70,7 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
   // was entered — the backend rejects an empty Other reason as unparseable.
   bool get _otherReasonMissing =>
       _rating < 5 &&
-      _selectedReasons.contains('OTHER_REASON') &&
+      _selectedReasons.contains('OTHER') &&
       _commentController.text.trim().isEmpty;
 
   @override
@@ -85,7 +85,7 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
     'DAMAGE': LocaleKeys.bookings_rating_reasons_damage.tr(),
     'STAFF_BEHAVIOR': LocaleKeys.bookings_rating_reasons_staff_behavior.tr(),
     'POOR_QUALITY': LocaleKeys.bookings_rating_reasons_poor_quality.tr(),
-    'OTHER_REASON': LocaleKeys.bookings_rating_reasons_other_reason.tr(),
+    'OTHER': LocaleKeys.bookings_rating_reasons_other_reason.tr(),
   };
 
   @override
@@ -159,7 +159,7 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
                         ? _selectedReasons.toList()
                         : null;
                     final comment =
-                        _rating < 5 && _selectedReasons.contains('OTHER_REASON')
+                        _rating < 5 && _selectedReasons.contains('OTHER')
                         ? _commentController.text.trim()
                         : null;
 
@@ -332,7 +332,7 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
                 setState(() {
                   if (isSelected) {
                     _selectedReasons.remove(reasonKey);
-                    if (reasonKey == 'OTHER_REASON') {
+                    if (reasonKey == 'OTHER') {
                       _commentController.clear();
                     }
                   } else {
@@ -366,7 +366,7 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
             );
           }).toList(),
         ),
-        if (_selectedReasons.contains('OTHER_REASON')) ...[
+        if (_selectedReasons.contains('OTHER')) ...[
           const SizedBox(height: 16),
           CustomTextField(
             label: LocaleKeys.bookings_rating_reasons_other_reason.tr(),

@@ -16,7 +16,7 @@ class BookingDetailsRatingCard extends StatelessWidget {
     'DAMAGE': LocaleKeys.bookings_rating_reasons_damage.tr(),
     'STAFF_BEHAVIOR': LocaleKeys.bookings_rating_reasons_staff_behavior.tr(),
     'POOR_QUALITY': LocaleKeys.bookings_rating_reasons_poor_quality.tr(),
-    'OTHER_REASON': LocaleKeys.bookings_rating_reasons_other_reason.tr(),
+    'OTHER': LocaleKeys.bookings_rating_reasons_other_reason.tr(),
   };
 
   String _readableReason(String reason) {
