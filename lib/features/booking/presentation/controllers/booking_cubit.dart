@@ -6,12 +6,15 @@ import '../../../my_cars/data/models/my_car_model.dart';
 import '../../../home/data/models/service_model.dart';
 import '../../domain/configs/booking_flow_config.dart';
 import '../../data/models/quote_model.dart';
+import '../../../my_bookings/data/models/booking_response_model/breakdown.dart';
+import '../../../my_bookings/data/models/booking_response_model/quote_line.dart';
 import '../../data/models/payment_init_model.dart';
 import '../../data/models/day_time_model.dart';
 import '../../data/repos/booking_repository.dart';
 import '../../../../core/enums/payment_method_enum.dart';
 import '../../domain/strategies/booking_submit_strategy.dart';
 import 'booking_state.dart';
+import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:aqua_go/features/home/data/models/add_on_model.dart';
 import 'package:aqua_go/features/subscriptions/data/repos/subscriptions_repository.dart';
 import 'package:aqua_go/features/subscriptions/data/models/subscription_response_model/subscription_wash.dart';
@@ -191,8 +194,66 @@ class BookingCubit extends Cubit<BookingState> {
             optionalAddonIds: optionalIds,
           ),
         );
+
+        // Resolve the package's bundled (included) services so the customer can
+        // pick which one to wash. Sourced from the catalog-resolved
+        // bundledServices field (incl. inactive services) — no /services join.
+        _resolvePackageServices(detailedPackage.packageInfo.bundledServices);
       },
     );
+  }
+
+  /// Populates the service picker from the catalog-resolved [bundledServices]
+  /// (already carrying id + bilingual name + active, in bundle order) so the
+  /// customer can pick one included service per wash. Renders EVERY bundled
+  /// service — including inactive ones — because an inactive-but-bundled service
+  /// is still a valid pick (the schedule call validates membership in the frozen
+  /// bundle, not active-ness). Auto-selects when the bundle has exactly one
+  /// service (no needless step).
+  ///
+  /// No longer joins against the active-only /services feed: that dropped
+  /// inactive ids and forced the picker into a load-failed error state for any
+  /// package whose bundled services had been deactivated.
+  Future<void> _resolvePackageServices(List<ServiceModel> bundledServices) async {
+    if (bundledServices.isEmpty) {
+      // Genuine data error: the backend returned an empty bundledServices list.
+      // Surface the inline error + retry rather than a hidden picker (which
+      // would submit serviceId=null and let the backend pick unseen).
+      emit(
+        state.copyWith(
+          packageServicesLoading: false,
+          packageServicesLoadFailed: true,
+        ),
+      );
+      return;
+    }
+
+    emit(
+      state.copyWith(
+        packageServices: bundledServices,
+        packageServicesLoading: false,
+        packageServicesLoadFailed: false,
+        // Auto-select when exactly one included service exists.
+        selectedPackageService: bundledServices.length == 1
+            ? bundledServices.first
+            : null,
+      ),
+    );
+  }
+
+  /// Retries resolving the package's bundled services after a load failure by
+  /// re-running the subscription detail fetch (which re-derives the resolved
+  /// bundledServices list). No-op outside the package flow. Reachable only when
+  /// the backend genuinely returns an empty bundledServices list.
+  Future<void> retryPackageServices() async {
+    final subscriptionId = state.subscriptionId;
+    if (subscriptionId == null) return;
+    await fetchSubscriptionDetails(subscriptionId);
+  }
+
+  /// Records the customer's chosen included service for a package wash.
+  void selectPackageService(ServiceModel service) {
+    emit(state.copyWith(selectedPackageService: service, clearError: true));
   }
 
   void selectAddress(AddressModel address) {
@@ -304,15 +365,20 @@ class BookingCubit extends Cubit<BookingState> {
         address.lat,
         address.lng,
       );
-      final fetchedZoneId = result.fold(
-        (failure) => null,
-        (data) => data['zoneId'] as String?,
+      final (fetchedZoneId, zoneFailure) = result.fold(
+        (failure) => (null, failure),
+        (data) => (data['zoneId'] as String?, null),
       );
       if (fetchedZoneId == null) {
+        // Surface the backend zone/out-of-area reason; fall back to a localized
+        // generic when the failure carries no message.
+        final reason = zoneFailure?.message;
         emit(
           state.copyWith(
             isAvailabilityLoading: false,
-            errorMessage: 'Failed to retrieve service zone details',
+            errorMessage: (reason != null && reason.isNotEmpty)
+                ? reason
+                : LocaleKeys.snackbar_default_error.tr(),
           ),
         );
         return;
@@ -600,6 +666,152 @@ class BookingCubit extends Cubit<BookingState> {
         );
         return init;
       },
+    );
+  }
+
+  /// Subscription-wash summary preview (UC-C13 — spec §4). Read-only dry-run of
+  /// the schedule endpoint: classifies the selected add-ons into free/paid and
+  /// returns the payable charge + VAT breakdown WITHOUT persisting or charging.
+  ///
+  /// Without this, the package summary had no quote at all, so it rendered
+  /// 0.00 everywhere and the Confirm gate bare-submitted a paid wash → the
+  /// backend rejected it with 422 SUBSCRIPTION_WASH_ADDON_PAYMENT_REQUIRED.
+  /// We map the preview into a synthetic [QuoteModel] (breakdown drives
+  /// subtotal/VAT/total; addonLines drive the per-row add-on display) and emit
+  /// it into `state.quote` so the existing summary render + Confirm gate work
+  /// unchanged. NO client-side price/VAT math — every amount comes from the
+  /// backend preview.
+  Future<QuoteModel?> fetchWashChargePreview() async {
+    final subscriptionId = state.subscriptionId;
+    final washId = state.washId;
+    if (subscriptionId == null || washId == null) return null;
+
+    emit(state.copyWith(status: BookingStatus.loading));
+
+    // Same body shape as initiateWashAddonPayment / the schedule endpoint
+    // (scheduledAt is required by the record but ignored for the read-only
+    // preview — send a sentinel to pass @NotNull validation).
+    final availableAddons = state.selectedService?.addons ?? [];
+    final List<Map<String, dynamic>> addOns = [];
+    for (final idx in state.selectedServiceIndices) {
+      if (idx < availableAddons.length) {
+        final id = availableAddons[idx].id;
+        if (id != null) addOns.add({'addonId': id});
+      }
+    }
+    final vehicleId = state.selectedCar?.id;
+    final body = <String, dynamic>{
+      'scheduledAt': DateTime.now().toUtc().toIso8601String(),
+      if (vehicleId != null) 'vehicleIds': [vehicleId],
+      if (addOns.isNotEmpty) 'addOns': addOns,
+    };
+
+    final result = await _bookingRepo.previewScheduleSubscriptionWash(
+      subscriptionId: subscriptionId,
+      washId: washId,
+      scheduleData: body,
+    );
+
+    return result.fold(
+      (failure) {
+        // Soft failure: keep the summary usable. The Confirm gate's
+        // hasPayableAddon safety net (booking_summary_view) still routes a
+        // paid wash through addon-payment-init even without a preview.
+        emit(
+          state.copyWith(
+            status: BookingStatus.initial,
+            errorMessage: failure.message,
+          ),
+        );
+        return null;
+      },
+      (data) {
+        final quote = _quoteFromWashPreview(data);
+        emit(state.copyWith(status: BookingStatus.initial, quote: quote));
+        return quote;
+      },
+    );
+  }
+
+  /// Maps a `WashChargePreview` JSON payload into a synthetic [QuoteModel].
+  ///
+  /// - `breakdown` (grossMinor/netMinor/vatMinor) → drives subtotal/VAT/total.
+  /// - paid `addonLines` → ADDON [QuoteLine]s (refId = addonId for name lookup;
+  ///   `chargedMinor` is the payable GROSS for that line). Each line's NET is
+  ///   distributed from `breakdown.netMinor` proportionally to its gross so the
+  ///   add-on rows (rendered at line.net) sum to the subtotal (breakdown.net).
+  /// The package submit path never reads quoteId, so a synthetic id is safe.
+  QuoteModel _quoteFromWashPreview(Map<String, dynamic> data) {
+    final breakdownJson = data['breakdown'] as Map<String, dynamic>?;
+    final Breakdown? breakdown = breakdownJson != null
+        ? Breakdown.fromJson(breakdownJson)
+        : null;
+    final int chargeTotalMinor = data['chargeTotalMinor'] != null
+        ? int.tryParse(data['chargeTotalMinor'].toString()) ?? 0
+        : 0;
+
+    // First pass: collect the PAYABLE add-on lines with their GROSS charge.
+    // Only payable (chargedMinor > 0) lines belong on the payment summary;
+    // covered (free) lines stay off it so rows don't imply a charge.
+    final List<({String? refId, int grossMinor})> payable = [];
+    final addonLines = data['addonLines'];
+    if (addonLines is List) {
+      for (final raw in addonLines) {
+        if (raw is! Map) continue;
+        final charged = raw['chargedMinor'] != null
+            ? int.tryParse(raw['chargedMinor'].toString()) ?? 0
+            : 0;
+        if (charged <= 0) continue;
+        payable.add((refId: raw['addonId']?.toString(), grossMinor: charged));
+      }
+    }
+
+    // Second pass: WashAddonLine carries no per-line net — only the GROSS
+    // chargedMinor — while the summary renders each add-on row at line.net and
+    // the subtotal at breakdown.net. So we DISTRIBUTE the backend-provided
+    // breakdown.netMinor across the gross add-on lines proportionally
+    // (lineNet = chargedMinor * breakdown.net / breakdown.gross), absorbing the
+    // rounding remainder into the LAST line so the rows sum EXACTLY to
+    // breakdown.netMinor. The total stays breakdown.gross (still on grossMinor).
+    // This is pure distribution of backend values — no client-side VAT math.
+    final int totalGross = payable.fold(0, (s, p) => s + p.grossMinor);
+    final int? netTotal = breakdown?.netMinor;
+    final List<QuoteLine> lines = [];
+    int netAssigned = 0;
+    for (int i = 0; i < payable.length; i++) {
+      final p = payable[i];
+      final int lineNet;
+      if (netTotal == null || totalGross <= 0) {
+        // No breakdown net to distribute (older payload / single-line edge) —
+        // fall back to the gross charge so the row still shows a sane amount.
+        lineNet = p.grossMinor;
+      } else if (i == payable.length - 1) {
+        // Last line absorbs the rounding remainder → Σ net == breakdown.netMinor.
+        lineNet = netTotal - netAssigned;
+      } else {
+        lineNet = (p.grossMinor * netTotal / totalGross).round();
+      }
+      netAssigned += lineNet;
+      lines.add(
+        QuoteLine(
+          kind: 'ADDON',
+          refId: p.refId,
+          grossMinor: p.grossMinor,
+          netMinor: lineNet,
+          vatMinor: p.grossMinor - lineNet,
+        ),
+      );
+    }
+
+    return QuoteModel(
+      quoteId: 'wash-preview',
+      totalMinor: breakdown?.grossMinor ?? chargeTotalMinor,
+      vatMinor: breakdown?.vatMinor ?? 0,
+      currency: breakdown?.currency ?? 'SAR',
+      expiresAt: DateTime.now().toUtc(),
+      promoDiscountMinor: 0,
+      breakdown: breakdown,
+      lines: lines,
     );
   }
 

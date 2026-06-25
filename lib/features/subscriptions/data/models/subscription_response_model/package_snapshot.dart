@@ -1,4 +1,5 @@
 import 'package:aqua_go/features/home/data/models/add_on_model.dart';
+import 'package:aqua_go/features/home/data/models/service_model.dart';
 
 class PackageInfo {
   final String nameAr;
@@ -8,6 +9,12 @@ class PackageInfo {
   final bool isPopular;
   final int carsPerWash;
   final List<String> bundledServiceIds;
+  // Catalog-resolved bundled services (id + bilingual name + active), preserving
+  // the order of [bundledServiceIds]. Resolved server-side so the service picker
+  // can render every bundled service — INCLUDING inactive ones — without joining
+  // against the active-only /services feed (which dropped inactive ids and forced
+  // the picker into a load-failed state).
+  final List<ServiceModel> bundledServices;
   final List<AddOnModel> addons; // all addons, split by kind below
   final List<AddOnModel> includedAddons;
   final List<AddOnModel> optionalAddons;
@@ -25,6 +32,7 @@ class PackageInfo {
     required this.isPopular,
     required this.carsPerWash,
     required this.bundledServiceIds,
+    this.bundledServices = const [],
     this.addons = const [],
     this.includedAddons = const [],
     this.optionalAddons = const [],
@@ -63,6 +71,25 @@ class PackageInfo {
               ?.map((e) => e.toString())
               .toList() ??
           [],
+      // Catalog-resolved bundled services. Each entry is {id, nameAr, nameEn,
+      // active}; an id the catalog can no longer resolve still arrives with null
+      // names + active=false so it stays selectable. Map to ServiceModel so the
+      // existing picker (name-only) renders it directly.
+      bundledServices:
+          (json['bundledServices'] as List<dynamic>?)
+              ?.whereType<Map<String, dynamic>>()
+              .map(
+                (e) => ServiceModel(
+                  id: e['id']?.toString() ?? '',
+                  rawName: ServiceName(
+                    nameAr: e['nameAr']?.toString() ?? '',
+                    nameEn: e['nameEn']?.toString() ?? '',
+                  ),
+                  active: e['active'] as bool? ?? false,
+                ),
+              )
+              .toList() ??
+          [],
       addons: parsedAddons,
       includedAddons: included,
       optionalAddons: optional,
@@ -83,6 +110,16 @@ class PackageInfo {
       'isPopular': isPopular,
       'carsPerWash': carsPerWash,
       'bundledServiceIds': bundledServiceIds,
+      'bundledServices': bundledServices
+          .map(
+            (s) => {
+              'id': s.id,
+              'nameAr': s.rawName?.nameAr ?? '',
+              'nameEn': s.rawName?.nameEn ?? '',
+              'active': s.active ?? false,
+            },
+          )
+          .toList(),
       'addons': addons.map((e) => e.toJson()).toList(),
       'includedAddons': includedAddons.map((e) => e.toJson()).toList(),
       'optionalAddons': optionalAddons.map((e) => e.toJson()).toList(),

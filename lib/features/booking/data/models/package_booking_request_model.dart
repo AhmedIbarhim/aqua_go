@@ -15,6 +15,11 @@ class PackageBookingRequestModel {
   /// wash is fully covered (no add-on charge).
   final String? moyasarPaymentId;
 
+  /// The included service the customer picked for this wash. Must be a member
+  /// of the subscription's bundled services. When null the backend defaults to
+  /// the package's first bundled service (back-compat).
+  final String? serviceId;
+
   PackageBookingRequestModel({
     this.address,
     this.date,
@@ -23,6 +28,7 @@ class PackageBookingRequestModel {
     this.serviceAddOns = const [],
     this.workerNotes = const [],
     this.moyasarPaymentId,
+    this.serviceId,
   });
 
   Map<String, dynamic> toJson() {
@@ -54,6 +60,7 @@ class PackageBookingRequestModel {
         'addOns': serviceAddOns.map((e) => {'addonId': e.id}).toList(),
       if (workerNotes.isNotEmpty) 'workerNotes': workerNotes,
       if (moyasarPaymentId != null) 'moyasarPaymentId': moyasarPaymentId,
+      if (serviceId != null) 'serviceId': serviceId,
     };
   }
 }

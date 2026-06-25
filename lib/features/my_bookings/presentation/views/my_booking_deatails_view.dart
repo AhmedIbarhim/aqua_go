@@ -351,7 +351,31 @@ class MyBookingDetailsView extends StatelessWidget {
     }
   }
 
+  /// Mirrors the backend reschedule policy (AQG-119:
+  /// reschedulePolicy.minHoursBeforeStart = 12h). Editing launches the
+  /// reschedule flow, which the server rejects (RescheduleTooLateException)
+  /// once the booking is within 12h of its scheduled start (or already past).
+  /// Gate the button client-side so the user never hits that server error.
+  ///
+  /// Defensive: if [scheduledAt] is missing or unparseable we do NOT block —
+  /// an unknown time must not break an otherwise-valid read path.
+  bool _isEditable(BookingResponseModel booking) {
+    final raw = booking.scheduledAt;
+    if (raw == null) return false;
+    final scheduled = DateTime.tryParse(raw);
+    if (scheduled == null) return true;
+    final reschedulableStatus =
+        booking.status == BookingStatus.PENDING ||
+        booking.status == BookingStatus.ASSIGNED;
+    if (!reschedulableStatus) return false;
+    return scheduled.toLocal().difference(DateTime.now()) >
+        const Duration(hours: 12);
+  }
+
   Widget _buildActionSheet(BuildContext context, BookingResponseModel booking) {
+    if (!_isEditable(booking)) {
+      return _buildEditClosedRow(context);
+    }
     return BottomActionSheetContainer(
       child: CustomButton(
         text: LocaleKeys.bookings_edit_booking.tr(context: context),
@@ -420,6 +444,47 @@ class MyBookingDetailsView extends StatelessWidget {
             ),
           );
         },
+      ),
+    );
+  }
+
+  /// Muted, non-tappable replacement for the Edit button when the 12h
+  /// reschedule window has closed. Same container + height as the active
+  /// button so the layout does not shift.
+  Widget _buildEditClosedRow(BuildContext context) {
+    return BottomActionSheetContainer(
+      child: Container(
+        width: double.infinity,
+        height: MediaQuery.sizeOf(context).height * 0.055,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          color: context.colors.brandSubtle,
+          border: Border.all(color: context.colors.borderSecondary, width: 0.5),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          spacing: 8,
+          children: [
+            Icon(
+              Icons.lock_clock_outlined,
+              size: 18,
+              color: context.colors.contentDisabled,
+            ),
+            Flexible(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  LocaleKeys.bookings_edit_closed_12h.tr(context: context),
+                  textAlign: TextAlign.center,
+                  style: AppTextStyles.regular14.copyWith(
+                    color: context.colors.contentDisabled,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

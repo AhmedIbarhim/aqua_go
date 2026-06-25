@@ -27,13 +27,18 @@ class PaymentSummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildPaymentRow(context, label: serviceName, value: servicePrice),
         ...additionalItems.map(
           (item) => Column(
             children: [
               const SizedBox(height: 12),
-              const Divider(height: 1, thickness: 0.5),
+              Divider(
+                height: 1,
+                thickness: 0.5,
+                color: context.colors.borderSecondary.withValues(alpha: 0.25),
+              ),
               const SizedBox(height: 12),
               _buildPaymentRow(
                 context,
@@ -44,7 +49,13 @@ class PaymentSummaryCard extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        const Divider(height: 1, thickness: 0.5),
+        // Distinct (slightly more visible) separator between the line items and
+        // the totals block — set apart from the subtle inter-item dividers.
+        Divider(
+          height: 1,
+          thickness: 1,
+          color: context.colors.borderSecondary.withValues(alpha: 0.6),
+        ),
         const SizedBox(height: 12),
         _buildPaymentRow(
           context,

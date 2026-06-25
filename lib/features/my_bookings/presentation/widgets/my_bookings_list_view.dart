@@ -9,6 +9,8 @@ class MyBookingsListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
+      // Bottom padding so the last card clears the floating bottom nav bar.
+      padding: const EdgeInsets.only(bottom: 100),
       itemCount: bookings.length,
       separatorBuilder: (context, index) => const SizedBox(height: 16),
       itemBuilder: (context, index) {

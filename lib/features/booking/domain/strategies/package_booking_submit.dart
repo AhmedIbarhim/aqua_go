@@ -61,6 +61,7 @@ class PackageBookingSubmit implements BookingSubmitStrategy {
       serviceAddOns: addonsList,
       workerNotes: notesList,
       moyasarPaymentId: moyasarPaymentId,
+      serviceId: state.selectedPackageService?.id,
     );
 
     return repo.scheduleSubscriptionWash(

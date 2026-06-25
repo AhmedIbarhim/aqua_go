@@ -1,0 +1,118 @@
+{
+  "project_info": {
+    "project_number": "366225132244",
+    "project_id": "aquago-b5724",
+    "storage_bucket": "aquago-b5724.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:366225132244:android:821350be34f439e2ccc941",
+        "android_client_info": {
+          "package_name": "com.example.aqua_go"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "366225132244-df2d6adkdeucsf4igc5um48stt7rjkpi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCUA3Pt-AD6KXGJUrWXAaTvmuX3-1kcVac"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "366225132244-df2d6adkdeucsf4igc5um48stt7rjkpi.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "366225132244-456dqqugoe5d54ng3171f454kil30fdb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "sa.aquago.worker"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:366225132244:android:d5084903fe8d05c4ccc941",
+        "android_client_info": {
+          "package_name": "sa.aquago.customerapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "366225132244-df2d6adkdeucsf4igc5um48stt7rjkpi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCUA3Pt-AD6KXGJUrWXAaTvmuX3-1kcVac"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "366225132244-df2d6adkdeucsf4igc5um48stt7rjkpi.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "366225132244-456dqqugoe5d54ng3171f454kil30fdb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "sa.aquago.worker"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:366225132244:android:c2079a70d6c6fde4ccc941",
+        "android_client_info": {
+          "package_name": "sa.aquago.workerapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "366225132244-df2d6adkdeucsf4igc5um48stt7rjkpi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCUA3Pt-AD6KXGJUrWXAaTvmuX3-1kcVac"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "366225132244-df2d6adkdeucsf4igc5um48stt7rjkpi.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "366225132244-456dqqugoe5d54ng3171f454kil30fdb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "sa.aquago.worker"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

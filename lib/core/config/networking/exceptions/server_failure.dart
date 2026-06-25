@@ -96,16 +96,20 @@ class ServerFailure extends Failure {
         return ServerFailure(message, type: FailureType.forbidden);
 
       case StatusCodes.notFound:
-        return const ServerFailure(
-          'Request not found',
-          type: FailureType.notFound,
-        );
+        // Surface the localized server `detail`/`title` when the body carries a
+        // ProblemDetail; otherwise `_extractErrorMessage` already returns the
+        // localized generic (`snackbar_default_error`) — no English literal.
+        return ServerFailure(message, type: FailureType.notFound);
 
       case StatusCodes.internalServerError:
       case StatusCodes.badGateway:
       case StatusCodes.serviceUnavailable:
+        // 5xx bodies are usually non-localized; keep the generic maintenance
+        // message. Only prefer the server `detail` if one is actually present.
         return ServerFailure(
-          LocaleKeys.errors_internal_error.tr(),
+          _hasProblemDetail(response)
+              ? message
+              : LocaleKeys.errors_internal_error.tr(),
           type: FailureType.server,
         );
 
@@ -130,6 +134,17 @@ class ServerFailure extends Failure {
         .toList();
     if (messages.isEmpty) return null;
     return messages.join('\n');
+  }
+
+  /// True when the response body carries a localized RFC 9457 ProblemDetail
+  /// string (`detail` or `title`), meaning `_extractErrorMessage` will return
+  /// server-localized text rather than the generic fallback.
+  static bool _hasProblemDetail(dynamic response) {
+    if (response is! Map) return false;
+    final detail = response['detail']?.toString();
+    if (detail != null && detail.isNotEmpty) return true;
+    final title = response['title']?.toString();
+    return title != null && title.isNotEmpty;
   }
 
   static String _extractErrorMessage(dynamic response) {

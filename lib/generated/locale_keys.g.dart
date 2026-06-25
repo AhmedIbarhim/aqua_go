@@ -144,13 +144,19 @@ abstract class  LocaleKeys {
   static const bookings_time = 'bookings.time';
   static const bookings_date = 'bookings.date';
   static const bookings_choose_car = 'bookings.choose_car';
+  static const bookings_choose_service = 'bookings.choose_service';
+  static const bookings_services_load_failed = 'bookings.services_load_failed';
+  static const bookings_service_selection_required = 'bookings.service_selection_required';
   static const bookings_additional_services = 'bookings.additional_services';
   static const bookings_total = 'bookings.total';
   static const bookings_book_now = 'bookings.book_now';
+  static const bookings_calculating_price = 'bookings.calculating_price';
+  static const bookings_price_updated = 'bookings.price_updated';
   static const bookings_choose_car_location = 'bookings.choose_car_location';
   static const bookings_save_car_location = 'bookings.save_car_location';
   static const bookings_booking_summary = 'bookings.booking_summary';
   static const bookings_service_name = 'bookings.service_name';
+  static const bookings_service_price = 'bookings.service_price';
   static const bookings_selected_car = 'bookings.selected_car';
   static const bookings_notes_for_biker = 'bookings.notes_for_biker';
   static const bookings_payment_summary = 'bookings.payment_summary';
@@ -158,6 +164,7 @@ abstract class  LocaleKeys {
   static const bookings_vat = 'bookings.vat';
   static const bookings_vat_included = 'bookings.vat_included';
   static const bookings_covered_by_subscription = 'bookings.covered_by_subscription';
+  static const bookings_covered_by_package = 'bookings.covered_by_package';
   static const bookings_no_available_times = 'bookings.no_available_times';
   static const bookings_confirm_booking = 'bookings.confirm_booking';
   static const bookings_confirm_payment = 'bookings.confirm_payment';
@@ -186,6 +193,7 @@ abstract class  LocaleKeys {
   static const bookings_before_and_after_washing = 'bookings.before_and_after_washing';
   static const bookings_view_receipt = 'bookings.view_receipt';
   static const bookings_edit_booking = 'bookings.edit_booking';
+  static const bookings_edit_closed_12h = 'bookings.edit_closed_12h';
   static const bookings_worker_name = 'bookings.worker_name';
   static const bookings_add_image = 'bookings.add_image';
   static const bookings_share_opinion = 'bookings.share_opinion';

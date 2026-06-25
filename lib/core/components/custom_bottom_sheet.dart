@@ -24,9 +24,11 @@ class CustomBottomSheet extends StatelessWidget {
     return showModalBottomSheet<T>(
       context: context,
       isScrollControlled: true,
+
       backgroundColor: Colors.transparent,
       builder: (context) => Scaffold(
         backgroundColor: Colors.transparent,
+        resizeToAvoidBottomInset: false,
         body: BackdropFilter(
           filter: ui.ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
           child: SizedBox(
@@ -41,7 +43,11 @@ class CustomBottomSheet extends StatelessWidget {
                     child: const SizedBox.expand(),
                   ),
                 ),
-                CustomBottomSheet(title: title, padding: padding, child: child),
+                CustomBottomSheet(
+                  title: title,
+                  padding: padding,
+                  child: child,
+                ),
               ],
             ),
           ),

@@ -2,6 +2,7 @@ import 'package:aqua_go/app.dart';
 import 'package:aqua_go/core/config/di/service_locator.dart';
 
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/config/bloc_observer.dart';
@@ -12,7 +13,10 @@ import 'core/helpers/connectivity_helper.dart';
 
 import 'core/config/local_storage/shared_prefs.dart';
 import 'core/constants.dart';
+import 'features/auth/data/services/device_token_sync.dart';
+import 'firebase_options.dart';
 import 'generated/codegen_loader.g.dart';
+import 'init_notifications.dart';
 import 'package:flutter/services.dart';
 //569123456
 void main() async {
@@ -26,6 +30,15 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
+  try {
+    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  } catch (e) { /* proceed without firebase */ }
+  try {
+    await initNotifications();
+  } catch (e) { /* proceed without push */ }
+  // Fire-and-forget: sync FCM token if user is already logged in from a
+  // previous session. No await — must not block app startup.
+  syncDeviceToken();
   final isArabic =
       CacheClient.getString(kLanguage, defaultValue: kArabicLang) ==
       kArabicLang;
