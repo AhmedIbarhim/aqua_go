@@ -27,6 +27,12 @@ class _SplashViewState extends State<SplashView>
   void initState() {
     super.initState();
 
+    _excecuteSplashAnimation();
+
+    _checkNavigation();
+  }
+
+  void _excecuteSplashAnimation() {
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 3000),
@@ -47,7 +53,6 @@ class _SplashViewState extends State<SplashView>
     );
 
     _animationController.forward();
-    _checkNavigation();
   }
 
   bool _isProfileComplete(UserModel u) {
@@ -66,7 +71,7 @@ class _SplashViewState extends State<SplashView>
   }
 
   Future<void> _checkNavigation() async {
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 3));
     if (!mounted) return;
 
     // install-marker gate: SharedPrefs is wiped on reinstall but

@@ -138,7 +138,9 @@ class ComplaintDetailsView extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  LocaleKeys.complaint_resolution_note.tr(context: context),
+                                  LocaleKeys.complaint_resolution_note.tr(
+                                    context: context,
+                                  ),
                                   style: AppTextStyles.medium14,
                                 ),
                                 const SizedBox(height: 8),
@@ -148,7 +150,9 @@ class ComplaintDetailsView extends StatelessWidget {
                                   decoration: BoxDecoration(
                                     color: context.colors.brandSubtle,
                                     borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(color: context.colors.borderSecondary),
+                                    border: Border.all(
+                                      color: context.colors.borderSecondary,
+                                    ),
                                   ),
                                   child: Text(
                                     complaint.resolutionNote!,
@@ -167,7 +171,9 @@ class ComplaintDetailsView extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  LocaleKeys.complaint_rejection_reason.tr(context: context),
+                                  LocaleKeys.complaint_rejection_reason.tr(
+                                    context: context,
+                                  ),
                                   style: AppTextStyles.medium14,
                                 ),
                                 const SizedBox(height: 8),
@@ -177,7 +183,9 @@ class ComplaintDetailsView extends StatelessWidget {
                                   decoration: BoxDecoration(
                                     color: context.colors.brandSubtle,
                                     borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(color: context.colors.borderSecondary),
+                                    border: Border.all(
+                                      color: context.colors.borderSecondary,
+                                    ),
                                   ),
                                   child: Text(
                                     complaint.rejectionReason!,
@@ -191,7 +199,9 @@ class ComplaintDetailsView extends StatelessWidget {
                           ],
                           SizedBox(height: sh(24)),
                           ComplaintDetailsPhotosCard(
-                            photos: complaint.photoObjectKeys ?? [],
+                            photos:
+                                complaint.photos?.map((e) => e.url).toList() ??
+                                [],
                           ),
                         ],
                       ),

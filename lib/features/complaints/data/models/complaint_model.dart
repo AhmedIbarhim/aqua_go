@@ -205,10 +205,10 @@ enum ComplaintCategory {
 
 class ComplaintModel {
   final String id;
-  final String? dateAr;
-  final String? dateEn;
-  final String? timeAr;
-  final String? timeEn;
+  // final String? dateAr;
+  // final String? dateEn;
+  // final String? timeAr;
+  // final String? timeEn;
   final ComplaintStatus status;
   final String? detailsAr;
   final String? detailsEn;
@@ -229,10 +229,6 @@ class ComplaintModel {
 
   const ComplaintModel({
     required this.id,
-    this.dateAr,
-    this.dateEn,
-    this.timeAr,
-    this.timeEn,
     required this.status,
     this.detailsAr,
     this.detailsEn,
@@ -323,10 +319,6 @@ class ComplaintModel {
   }) {
     return ComplaintModel(
       id: id ?? this.id,
-      dateAr: dateAr ?? this.dateAr,
-      dateEn: dateEn ?? this.dateEn,
-      timeAr: timeAr ?? this.timeAr,
-      timeEn: timeEn ?? this.timeEn,
       status: status ?? this.status,
       detailsAr: detailsAr ?? this.detailsAr,
       detailsEn: detailsEn ?? this.detailsEn,
@@ -355,7 +347,7 @@ class ComplaintModel {
         return DateFormat.yMMMMd(context.isAr ? 'ar' : 'en').format(dt);
       } catch (_) {}
     }
-    return context.isAr ? (dateAr ?? '') : (dateEn ?? '');
+    return '';
   }
 
   String getTime(BuildContext context) {
@@ -365,7 +357,7 @@ class ComplaintModel {
         return DateFormat.jm(context.isAr ? 'ar' : 'en').format(dt);
       } catch (_) {}
     }
-    return context.isAr ? (timeAr ?? '') : (timeEn ?? '');
+    return '';
   }
 
   String getDetails(BuildContext context) {
@@ -374,7 +366,6 @@ class ComplaintModel {
     }
     return context.isAr ? (detailsAr ?? '') : (detailsEn ?? '');
   }
-
 }
 
 class ComplaintPhoto {

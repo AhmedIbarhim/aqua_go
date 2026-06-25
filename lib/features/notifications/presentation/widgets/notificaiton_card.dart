@@ -25,7 +25,8 @@ class NotificationCard extends StatelessWidget {
           context.read<NotificationsCubit>().markAsRead(notification.id);
         }
         if (notification.targetId != null &&
-            notification.type == NotificationType.bookingCompleted) {
+            notification.type == NotificationType.bookingCompleted &&
+            !notification.isRead) {
           Navigator.pushNamed(
             context,
             Routes.myBookingDetails,
