@@ -5,7 +5,7 @@ import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../../data/models/notification_model.dart';
-import 'notificaion_card.dart';
+import 'notificaiton_card.dart';
 
 class NotificationsListView extends StatelessWidget {
   const NotificationsListView({super.key, required this.notifications});
