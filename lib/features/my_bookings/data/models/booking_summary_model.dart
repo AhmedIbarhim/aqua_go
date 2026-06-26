@@ -161,8 +161,12 @@ class BookingSummaryModel {
       vehicles: [
         BookingVehicle(
           vehicleYear: vehicleYear,
-          vehicleMake: vehicleMake != null ? VehicleLocalizedName(en: vehicleMake, ar: vehicleMake) : null,
-          vehicleModel: vehicleModel != null ? VehicleLocalizedName(en: vehicleModel, ar: vehicleModel) : null,
+          vehicleMake: vehicleMake != null
+              ? VehicleLocalizedName(en: vehicleMake, ar: vehicleMake)
+              : null,
+          vehicleModel: vehicleModel != null
+              ? VehicleLocalizedName(en: vehicleModel, ar: vehicleModel)
+              : null,
           vehicleColor: vehicleColor,
           plate: plate,
           makeLogoUrl: vehicleMakeLogoUrl,
