@@ -25,7 +25,7 @@ import '../../features/complaints/presentation/views/complaint_details_view.dart
 import '../../features/complaints/presentation/controllers/complaints_cubit/complaints_cubit.dart';
 import '../../features/complaints/presentation/controllers/complaint_details_cubit/complaint_details_cubit.dart';
 import '../../features/my_bookings/presentation/views/gallery_view.dart';
-import '../../features/my_bookings/presentation/views/my_booking_deatails_view.dart';
+import '../../features/my_bookings/presentation/views/my_booking_details_view.dart';
 import '../../features/my_cars/data/models/my_car_model.dart';
 import '../../features/home/data/models/service_model.dart';
 import '../../features/address/data/models/address_model.dart';

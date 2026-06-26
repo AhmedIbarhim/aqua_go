@@ -8,7 +8,7 @@ import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../../core/route/routes.dart';
 import '../../../my_bookings/data/models/booking_summary_model.dart';
-import '../../../my_bookings/presentation/views/my_booking_deatails_view.dart';
+import '../../../my_bookings/presentation/views/my_booking_details_view.dart';
 import '../controllers/notifications_cubit/notifications_cubit.dart';
 import '../../data/models/notification_model.dart';
 

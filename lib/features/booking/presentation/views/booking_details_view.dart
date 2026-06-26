@@ -4,7 +4,7 @@ import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/core/route/routes.dart';
 import 'package:aqua_go/features/my_cars/presentation/controllers/my_cars_cubit.dart';
 import 'package:aqua_go/features/my_cars/data/models/my_car_model.dart';
-import 'package:aqua_go/features/my_bookings/presentation/views/my_booking_deatails_view.dart';
+import 'package:aqua_go/features/my_bookings/presentation/views/my_booking_details_view.dart';
 import 'package:aqua_go/features/my_bookings/data/models/booking_summary_model.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -205,7 +205,9 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
                   if (newCar != null) {
                     context.read<BookingCubit>().selectCar(newCar);
                   } else if (myCarsState.cars.isNotEmpty) {
-                    context.read<BookingCubit>().selectCar(myCarsState.cars.last);
+                    context.read<BookingCubit>().selectCar(
+                      myCarsState.cars.last,
+                    );
                   }
                 }
                 _previousCars = myCarsState.cars;
@@ -302,7 +304,9 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
               bookingState.selectedService != null &&
               bookingState.selectedService!.addons.isNotEmpty) ...[
             SizedBox(height: height * 0.03),
-            _buildSectionTitle(LocaleKeys.bookings_additional_services.tr(context: context)),
+            _buildSectionTitle(
+              LocaleKeys.bookings_additional_services.tr(context: context),
+            ),
             SizedBox(height: height * 0.02),
             AddOnsGrid(
               addons: bookingState.selectedService?.addons ?? [],

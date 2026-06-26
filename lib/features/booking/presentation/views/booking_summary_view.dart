@@ -19,7 +19,7 @@ import 'package:aqua_go/core/enums/payment_method_enum.dart';
 import 'package:aqua_go/features/booking/data/models/payment_init_model.dart';
 import 'package:aqua_go/core/config/payment/payment_sdk_config_service.dart';
 import 'package:aqua_go/core/route/routes.dart';
-import 'package:aqua_go/features/my_bookings/presentation/views/my_booking_deatails_view.dart';
+import 'package:aqua_go/features/my_bookings/presentation/views/my_booking_details_view.dart';
 import 'package:aqua_go/features/my_bookings/data/models/booking_summary_model.dart';
 
 class BookingSummaryView extends StatefulWidget {

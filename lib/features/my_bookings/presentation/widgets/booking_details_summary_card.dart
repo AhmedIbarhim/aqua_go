@@ -71,13 +71,19 @@ class BookingDetailsSummaryCard extends StatelessWidget {
               // back to charged only if the backend omitted the line (read path).
               if (hasAddons)
                 ...booking.addOns!.map(
-                  (addon) => _buildSummaryRow(
-                    context,
-                    title: addon.name,
-                    value:
-                        '${_addonNet(addon).toStringAsFixed(2)} $currency',
-                    icon: AppAssets.terms,
-                  ),
+                  (addon) {
+                    final addonPrice = _addonNet(addon);
+                    return _buildSummaryRow(
+                      context,
+                      title: addon.name,
+                      value: addonPrice == 0.0
+                          ? LocaleKeys.bookings_covered_by_subscription.tr(
+                              context: context,
+                            )
+                          : '${addonPrice.toStringAsFixed(2)} $currency',
+                      icon: AppAssets.terms,
+                    );
+                  },
                 ),
               if (showNetVatSummary) ...[
                 // Totals block, bottom-up: subtotal (net) → VAT → grand total.

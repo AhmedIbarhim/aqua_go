@@ -22,7 +22,7 @@ import '../controllers/complaints_cubit/complaints_state.dart';
 import '../widgets/complaint_images_section.dart';
 import 'package:aqua_go/core/route/app_router.dart';
 import 'package:aqua_go/core/route/routes.dart';
-import 'package:aqua_go/features/my_bookings/presentation/views/my_booking_deatails_view.dart';
+import 'package:aqua_go/features/my_bookings/presentation/views/my_booking_details_view.dart';
 import 'package:aqua_go/features/my_bookings/data/models/booking_summary_model.dart';
 
 class ComplaintArgs {
