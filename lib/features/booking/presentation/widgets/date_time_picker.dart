@@ -35,21 +35,21 @@ class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
   String? selectedTime;
   late List<DateTime> dates;
 
+  /// Backend caps bookings to a rolling 7-day window
+  /// (MAX_BOOKING_HORIZON = Duration.ofDays(7) in BookingServiceImpl,
+  /// enforced by validateScheduleWindow for BOTH create and reschedule) —
+  /// the last bookable calendar day is today + 6. Offer EXACTLY that range so
+  /// no server-rejected day is ever selectable. Matches the worker app's
+  /// kUpcomingDayStripLength (worker-mobile reservations_screen.dart).
+  static const int _bookableDayCount = 7; // today .. today + 6
+
   List<DateTime> _generateDates(DateTime? initialDate) {
-    final now = DateTime.now();
-    final today = DateUtils.dateOnly(now);
-    final limitDate = initialDate != null ? DateUtils.dateOnly(initialDate) : today;
-    
-    int daysToGenerate = 8;
-    if (limitDate.isAfter(today)) {
-      final difference = limitDate.difference(today).inDays;
-      if (difference >= daysToGenerate) {
-        daysToGenerate = difference + 3;
-      }
-    }
-    
+    // A reschedule's initialDate is bound by the SAME backend window, so it can
+    // never validly exceed today + 6 — it is always inside this fixed strip.
+    // initialDate is intentionally ignored; the window is fixed, never extended.
+    final today = DateUtils.dateOnly(DateTime.now());
     return List.generate(
-      daysToGenerate,
+      _bookableDayCount,
       (index) => today.add(Duration(days: index)),
     );
   }
