@@ -8,6 +8,7 @@ import '../../../../core/components/custom_button.dart';
 import '../../../../core/components/custom_otp_field.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/route/routes.dart';
+import '../../../notifications/notification_deeplink.dart';
 import '../../../../core/themes/app_colors.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../controllers/auth_cubit/auth_cubit.dart';
@@ -128,6 +129,8 @@ class _EmailOtpContentState extends State<EmailOtpContent> {
               Routes.layout,
               (route) => false,
             );
+            // Consume a push-tap deep-link parked while logged out.
+            consumePendingDeepLink();
           }
         } else if (state is LoginError) {
           if (!state.message.contains('OTP code mismatch')) {

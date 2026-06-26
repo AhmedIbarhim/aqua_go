@@ -15,6 +15,18 @@ import '../../data/models/address_model.dart';
 import '../widgets/location_search_field.dart';
 import '../widgets/add_address_bottom_sheet.dart';
 
+/// Size of the center-pin marker. We use [Icons.location_on] — a filled
+/// Material teardrop whose POINT sits exactly at the bottom-center of its
+/// bounding box — so translating it up by half its size lands the tip on the
+/// geometric-center pixel (== camera target). We deliberately do NOT use the
+/// generic location.svg glyph: its visual point is not at the asset's bottom
+/// edge, which made the prior -_kPinSize/2 offset land ~10-15m off-target.
+const double _kPinSize = 48;
+
+/// Diameter of the tiny precise dot drawn at the exact geometric center so the
+/// chosen point is visible regardless of the pin artwork.
+const double _kCenterDot = 6;
+
 class NewAddressMapArgs {
   final bool forAddingAddress;
   final AddressModel? address;
@@ -46,7 +58,7 @@ class _NewAddressMapViewState extends State<NewAddressMapView> {
     super.initState();
     _mapsCubit = locator<MapsCubit>();
     if (widget.address != null) {
-      _mapsCubit.onMapTap(LatLng(widget.address!.lat, widget.address!.lng));
+      _mapsCubit.seedLocation(LatLng(widget.address!.lat, widget.address!.lng));
       _searchController.text = widget.address!.details;
     } else {
       _mapsCubit.determinePosition();
@@ -64,14 +76,33 @@ class _NewAddressMapViewState extends State<NewAddressMapView> {
   Widget build(BuildContext context) {
     return BlocProvider.value(
       value: _mapsCubit,
-      child: BlocListener<MapsCubit, MapsState>(
-        listenWhen: (previous, current) =>
-            previous.selectedAddressName != current.selectedAddressName,
-        listener: (context, state) {
-          if (state.selectedAddressName.isNotEmpty) {
-            _searchController.text = state.selectedAddressName;
-          }
-        },
+      child: MultiBlocListener(
+        listeners: [
+          BlocListener<MapsCubit, MapsState>(
+            listenWhen: (previous, current) =>
+                previous.selectedAddressName != current.selectedAddressName,
+            listener: (context, state) {
+              if (state.selectedAddressName.isNotEmpty) {
+                _searchController.text = state.selectedAddressName;
+              }
+            },
+          ),
+          // Recenter the camera when the cubit requests it (initial position,
+          // edit-seed, search result, my-location). onCameraIdle then re-reads
+          // the settled target and reverse-geocodes — no marker is pushed.
+          BlocListener<MapsCubit, MapsState>(
+            listenWhen: (previous, current) =>
+                previous.cameraMoveToken != current.cameraMoveToken,
+            listener: (context, state) async {
+              final target = state.cameraMoveTarget;
+              if (target == null) return;
+              final controller = await _controller.future;
+              controller.animateCamera(
+                CameraUpdate.newLatLngZoom(target, 15),
+              );
+            },
+          ),
+        ],
         child: Scaffold(
           backgroundColor: context.colors.screenBG,
           body: BlocBuilder<MapsCubit, MapsState>(
@@ -86,22 +117,66 @@ class _NewAddressMapViewState extends State<NewAddressMapView> {
                     mapType: MapType.normal,
                     initialCameraPosition: CameraPosition(
                       target: LatLng(
-                        state.currentPosition?.latitude ?? 21.5433,
-                        state.currentPosition?.longitude ?? 39.1728,
+                        state.selectedLatLng?.latitude ??
+                            state.currentPosition?.latitude ??
+                            21.5433,
+                        state.selectedLatLng?.longitude ??
+                            state.currentPosition?.longitude ??
+                            39.1728,
                       ),
                       zoom: 15,
                     ),
                     onMapCreated: (GoogleMapController controller) {
-                      _controller.complete(controller);
+                      if (!_controller.isCompleted) {
+                        _controller.complete(controller);
+                      }
                     },
-                    markers: state.markers,
-                    onTap: (latLng) {
-                      context.read<MapsCubit>().onMapTap(latLng);
+                    onCameraMove: (position) {
+                      context.read<MapsCubit>().onCameraMove(position.target);
+                    },
+                    onCameraIdle: () {
+                      context.read<MapsCubit>().onCameraIdle();
                     },
                     myLocationEnabled: true,
                     myLocationButtonEnabled: false,
                     zoomControlsEnabled: false,
-                    padding: const EdgeInsets.only(bottom: 150),
+                  ),
+
+                  // Center-pinned marker overlay. INVARIANT: pin bottom-point
+                  // pixel == map geometric center == camera target. The
+                  // GoogleMap carries NO camera padding, so the widget's
+                  // geometric center equals the camera target; the teardrop's
+                  // tip is moved onto that center pixel by translating it up
+                  // half its size. A tiny dot marks the exact center so the
+                  // chosen point is visible regardless of pin art.
+                  // IgnorePointer so it never eats map pan/zoom gestures.
+                  IgnorePointer(
+                    child: Center(
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          // The teardrop pin, tip lifted onto the center pixel.
+                          Transform.translate(
+                            offset: const Offset(0, -_kPinSize / 2),
+                            child: Icon(
+                              Icons.location_on,
+                              size: _kPinSize,
+                              color: lightAppColors.themeColor,
+                            ),
+                          ),
+                          // Exact geometric-center dot == camera target.
+                          Container(
+                            width: _kCenterDot,
+                            height: _kCenterDot,
+                            decoration: BoxDecoration(
+                              color: lightAppColors.themeColor,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 1),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
 
                   Positioned(
@@ -151,15 +226,10 @@ class _NewAddressMapViewState extends State<NewAddressMapView> {
                               context.read<MapsCubit>().clearSearch();
                             },
                             onPredictionTap: (placeId) {
-                              context.read<MapsCubit>().getPlaceDetails(
-                                placeId,
-                                onLocationFound: (latLng) async {
-                                  final controller = await _controller.future;
-                                  controller.animateCamera(
-                                    CameraUpdate.newLatLngZoom(latLng, 15),
-                                  );
-                                },
-                              );
+                              // The cubit emits the new cameraMoveTarget; the
+                              // recenter BlocListener animates the map. The
+                              // settled camera then drives onCameraIdle.
+                              context.read<MapsCubit>().getPlaceDetails(placeId);
                             },
                           ),
                         ),
@@ -254,19 +324,24 @@ class _NewAddressMapViewState extends State<NewAddressMapView> {
   }
 
   void _addAddress(BuildContext context, MapsState state) {
+    // Selected point is the camera-center pin (set on camera move/idle, seed,
+    // search result, or my-location), no longer a tapped marker.
+    final selected = state.selectedLatLng;
+    if (selected == null) return;
+
     if (widget.forAddingAddess) {
       AddAddressBottomSheet.show(
         context: context,
         address: state.selectedAddressName,
-        lat: state.markers.first.position.latitude,
-        lng: state.markers.first.position.longitude,
+        lat: selected.latitude,
+        lng: selected.longitude,
         existingAddress: widget.address,
       );
     } else {
       Navigator.pop(context, {
         'address': state.selectedAddressName,
-        'lat': state.markers.first.position.latitude,
-        'lng': state.markers.first.position.longitude,
+        'lat': selected.latitude,
+        'lng': selected.longitude,
       });
     }
   }

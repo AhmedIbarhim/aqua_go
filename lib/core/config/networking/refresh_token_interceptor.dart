@@ -11,7 +11,9 @@ class RefreshTokenInterceptor extends Interceptor {
   final Dio dio;
 
   // Cache the ongoing refresh request future to prevent concurrent refresh calls
-  Future<String?>? _refreshFuture;
+  // (single-flight). Carries the tri-state result so every concurrent waiter
+  // sees the SAME outcome (ok / auth-dead / transient).
+  Future<_RefreshResult>? _refreshFuture;
   bool _isRedirecting = false;
 
   RefreshTokenInterceptor(this.dio);
@@ -63,44 +65,55 @@ class RefreshTokenInterceptor extends Interceptor {
     }
 
     try {
-      // If a refresh is already in progress, wait for it instead of starting a new one
-      _refreshFuture ??= _refreshToken(storedRefreshToken);
-      final newAccessToken = await _refreshFuture;
+      // If a refresh is already in progress, wait for it instead of starting a
+      // new one (single-flight). Every concurrent waiter awaits the SAME future
+      // and so observes the SAME tri-state outcome — so a transient failure
+      // never logs out one waiter while another retries.
+      final refreshFuture = _refreshFuture ??= _refreshToken(storedRefreshToken);
+      final result = await refreshFuture;
 
-      if (newAccessToken == null || newAccessToken.isEmpty) {
-        await _clearSessionAndRedirect();
-        return handler.next(err);
+      switch (result) {
+        case _RefreshOk(token: final newAccessToken):
+          // Retry the original request, bumping the attempt counter.
+          final retryOptions = err.requestOptions.copyWith(
+            headers: {
+              ...err.requestOptions.headers,
+              'Authorization': 'Bearer $newAccessToken',
+            },
+            extra: {
+              ...err.requestOptions.extra,
+              'refreshAttempts': attemptsSoFar + 1,
+            },
+          );
+          final retryResponse = await dio.fetch(retryOptions);
+          return handler.resolve(retryResponse);
+        case _RefreshAuthDead():
+          // Refresh endpoint returned HTTP 401 — the refresh token is genuinely
+          // invalid/expired. This is the ONLY refresh-path logout trigger.
+          await _clearSessionAndRedirect();
+          return handler.next(err);
+        case _RefreshTransient():
+          // 5XX / 429 / timeout / network — upstream is down or rate-limited.
+          // Keep the session; surface the original error without teardown.
+          return handler.next(err);
       }
-
-      // Retry the original request, bumping the attempt counter
-      final retryOptions = err.requestOptions.copyWith(
-        headers: {
-          ...err.requestOptions.headers,
-          'Authorization': 'Bearer $newAccessToken',
-        },
-        extra: {
-          ...err.requestOptions.extra,
-          'refreshAttempts': attemptsSoFar + 1,
-        },
-      );
-
-      final retryResponse = await dio.fetch(retryOptions);
-      return handler.resolve(retryResponse);
-    } on DioException catch (_) {
-      // Refresh request itself failed → session is truly expired
-      await _clearSessionAndRedirect();
-      return handler.next(err);
     } catch (_) {
-      await _clearSessionAndRedirect();
+      // Defensive: an unexpected error retrying the resolved request must not
+      // wipe the session (the refresh itself already succeeded).
       return handler.next(err);
     }
   }
 
-  /// Performs the actual refresh request, saves the new tokens, and resets the future when finished.
-  Future<String?> _refreshToken(String storedRefreshToken) async {
+  /// Performs the actual refresh request, saves the new tokens on success, and
+  /// resets the future when finished. Returns a tri-state result so callers can
+  /// distinguish a genuinely-dead refresh token (HTTP 401 → logout) from a
+  /// transient upstream failure (5XX / 429 / timeout / network → keep session).
+  Future<_RefreshResult> _refreshToken(String storedRefreshToken) async {
     try {
-      // Use a separate Dio instance specifically for refresh
-      // to bypass interceptors and avoid circular loops
+      // Use a separate Dio instance specifically for refresh to bypass
+      // interceptors and avoid circular loops. validateStatus lets us read the
+      // status code instead of having Dio throw, so a 401 vs 5XX is classified
+      // explicitly rather than collapsing both into a thrown DioException.
       final refreshDio = Dio(
         BaseOptions(
           baseUrl: dio.options.baseUrl,
@@ -108,6 +121,7 @@ class RefreshTokenInterceptor extends Interceptor {
           receiveTimeout: const Duration(seconds: 15),
           contentType: 'application/json',
           responseType: ResponseType.json,
+          validateStatus: (_) => true,
         ),
       );
 
@@ -116,11 +130,19 @@ class RefreshTokenInterceptor extends Interceptor {
         data: {'refreshToken': storedRefreshToken},
       );
 
-      // Validate HTTP status code
-      if (refreshResponse.statusCode == null ||
-          refreshResponse.statusCode! < 200 ||
-          refreshResponse.statusCode! >= 300) {
-        return null;
+      final status = refreshResponse.statusCode;
+
+      // HTTP 401 == AUTH_DEAD on this backend (the Aqua Go refresh wrapper maps
+      // a genuinely invalid/expired refresh token to 401). This is the only
+      // status that means "log out".
+      if (status == 401) {
+        return const _RefreshAuthDead();
+      }
+
+      // Any non-2xx that is NOT 401 (5XX, 503, 429, 4xx-other) is TRANSIENT —
+      // never log out on these.
+      if (status == null || status < 200 || status >= 300) {
+        return const _RefreshTransient();
       }
 
       // Accept both camelCase and snake_case keys to be defensive against server variations
@@ -136,10 +158,17 @@ class RefreshTokenInterceptor extends Interceptor {
         if (newRefreshToken != null && newRefreshToken.isNotEmpty) {
           await SecureStorage.saveSecuredString(kRefreshToken, newRefreshToken);
         }
-        return newAccessToken;
+        return _RefreshOk(newAccessToken);
       }
 
-      return null;
+      // 2xx but no usable token in the body — treat as transient, not auth-dead.
+      return const _RefreshTransient();
+    } on DioException catch (_) {
+      // Timeout / connectionError / SocketException — transport failure, not an
+      // auth failure. Keep the session.
+      return const _RefreshTransient();
+    } catch (_) {
+      return const _RefreshTransient();
     } finally {
       // Reset the future so subsequent failures in the future can trigger a new refresh flow
       _refreshFuture = null;
@@ -163,4 +192,29 @@ class RefreshTokenInterceptor extends Interceptor {
     // Reset so a subsequent expiry (after re-login) can redirect again.
     _isRedirecting = false;
   }
+}
+
+/// Tri-state outcome of a token refresh. Lets the interceptor distinguish a
+/// genuinely-dead refresh token (HTTP 401 → logout) from a transient upstream
+/// failure (5XX / 429 / timeout / network → keep session, retry/offline).
+sealed class _RefreshResult {
+  const _RefreshResult();
+}
+
+/// Refresh succeeded; [token] is the new access token (already persisted).
+class _RefreshOk extends _RefreshResult {
+  const _RefreshOk(this.token);
+  final String token;
+}
+
+/// Refresh endpoint returned HTTP 401 — the refresh token is invalid/expired.
+/// The ONLY refresh-path condition that warrants logout.
+class _RefreshAuthDead extends _RefreshResult {
+  const _RefreshAuthDead();
+}
+
+/// Refresh failed for a non-auth reason (5XX / 503 / 429 / timeout / network /
+/// 2xx-without-token). Session must be kept.
+class _RefreshTransient extends _RefreshResult {
+  const _RefreshTransient();
 }

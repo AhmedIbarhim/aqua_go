@@ -260,19 +260,17 @@ class MyBookingDetailsView extends StatelessWidget {
 
   bool _shouldShowActionSheet(BookingResponseModel booking) {
     if (!booking.isUpcoming) return false;
-    if (booking.status == BookingStatus.ASSIGNED ||
-        booking.status == BookingStatus.STARTED ||
+    // In-progress / terminal statuses are never reschedulable — hide the sheet
+    // entirely (no locked affordance). ASSIGNED is NOT here: the backend now
+    // reschedules ASSIGNED bookings (auto-unassigns the worker + emails admin),
+    // so it must show the Edit button like PENDING. The < 12h window only
+    // LOCKS the button (handled by _isEditable → _buildEditClosedRow); it does
+    // not hide the affordance.
+    if (booking.status == BookingStatus.STARTED ||
         booking.status == BookingStatus.ON_THE_WAY ||
         booking.status == BookingStatus.ARRIVED ||
         booking.status == BookingStatus.CANCELLED) {
-      if (booking.scheduledAt == null) return false;
-      try {
-        final bookingTime = DateTime.parse(booking.scheduledAt!).toLocal();
-        final limit = DateTime.now().add(const Duration(hours: 12));
-        return bookingTime.isAfter(limit);
-      } catch (_) {
-        return false;
-      }
+      return false;
     }
     return true;
   }

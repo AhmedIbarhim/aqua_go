@@ -6,11 +6,9 @@ import 'package:svg_flutter/svg.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
-import '../../../../core/route/routes.dart';
-import '../../../my_bookings/data/models/booking_summary_model.dart';
-import '../../../my_bookings/presentation/views/my_booking_deatails_view.dart';
 import '../controllers/notifications_cubit/notifications_cubit.dart';
 import '../../data/models/notification_model.dart';
+import '../../notification_deeplink.dart';
 
 class NotificationCard extends StatelessWidget {
   const NotificationCard({super.key, required this.notification});
@@ -21,20 +19,17 @@ class NotificationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
+        // Mark-read is independent of routing.
         if (!notification.isRead) {
           context.read<NotificationsCubit>().markAsRead(notification.id);
         }
-        if (notification.targetId != null &&
-            notification.type == NotificationType.bookingCompleted &&
-            !notification.isRead) {
-          Navigator.pushNamed(
-            context,
-            Routes.myBookingDetails,
-            arguments: MyBookingDetailsArgs(
-              booking: BookingSummaryModel(id: notification.targetId),
-            ),
-          );
-        }
+        // Route every targeted type (booking / complaint / subscription),
+        // read or unread, via the shared deep-link router. Unknown/null
+        // targets are a graceful no-op.
+        routeForNotificationFields(
+          notification.targetType,
+          notification.targetId,
+        );
       },
       borderRadius: BorderRadius.circular(16),
       child: Container(

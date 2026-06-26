@@ -8,6 +8,8 @@ import 'dart:math';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+import 'features/notifications/notification_deeplink.dart';
+
 bool didInitNotifications = false;
 
 // Broadcast stream that fires whenever a push arrives while the app is
@@ -20,18 +22,22 @@ Future<void> initNotifications() async {
   if (didInitNotifications) return;
   didInitNotifications = true;
   FirebaseMessaging.instance.requestPermission();
+  // BACKGROUND tap: app is already running + authed -> route immediately.
   FirebaseMessaging.onMessageOpenedApp.listen((message) {
-    handleNotificationTap(message.data);
+    handleNotificationTap(message.data, appReady: true);
   });
+  // KILLED tap (FCM): router/auth/shell not mounted yet -> park as pending,
+  // consumed once after the splash/auth gate lands on the home layout.
   final fcmMessage = await FirebaseMessaging.instance.getInitialMessage();
   if (fcmMessage != null) {
-    handleNotificationTap(fcmMessage.data);
+    handleNotificationTap(fcmMessage.data, appReady: false);
   }
+  // KILLED tap (foreground-reshown local notification): also pre-router -> park.
   final message =
       await FlutterLocalNotificationsPlugin().getNotificationAppLaunchDetails();
   final payload = message?.notificationResponse?.payload;
   if (payload != null) {
-    handleNotificationTap(jsonDecode(payload));
+    handleNotificationTap(jsonDecode(payload), appReady: false);
   }
   const initSettings = InitializationSettings(
     android: AndroidInitializationSettings('ic_stat_name'),
@@ -39,10 +45,11 @@ Future<void> initNotifications() async {
   );
   FlutterLocalNotificationsPlugin().initialize(
     settings: initSettings,
+    // FOREGROUND-reshown tap: app is running + authed -> route immediately.
     onDidReceiveNotificationResponse: (details) {
       if (details.payload == null) return;
       final data = jsonDecode(details.payload!);
-      handleNotificationTap(data);
+      handleNotificationTap(data, appReady: true);
     },
   );
   FirebaseMessaging.onMessage.listen((event) async {
@@ -71,12 +78,4 @@ Future<void> initNotifications() async {
     );
     foregroundPushStream.add(null);
   });
-}
-
-/// Fires from all three FCM entry points (onMessageOpenedApp,
-/// getInitialMessage, local-notif onDidReceiveNotificationResponse).
-///
-/// R-15: never log payload contents (may carry ids).
-void handleNotificationTap(Map<String, dynamic> payload) {
-  // No deep-link routing wired in Phase 1.
 }

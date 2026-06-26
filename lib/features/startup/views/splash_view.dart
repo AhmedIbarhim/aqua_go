@@ -8,6 +8,7 @@ import 'package:aqua_go/core/route/routes.dart';
 import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:aqua_go/features/auth/data/models/user_model.dart';
 import 'package:aqua_go/features/auth/data/repos/auth_repository.dart';
+import 'package:aqua_go/features/notifications/notification_deeplink.dart';
 import 'package:flutter/material.dart';
 
 class SplashView extends StatefulWidget {
@@ -70,6 +71,13 @@ class _SplashViewState extends State<SplashView>
     );
   }
 
+  /// Lands on the authenticated home shell, then consumes any cold-start
+  /// push-tap deep-link parked before the router/auth gate was ready.
+  void _goToLayout() {
+    context.pushReplacementNamed(Routes.layout);
+    consumePendingDeepLink();
+  }
+
   Future<void> _checkNavigation() async {
     await Future.delayed(const Duration(seconds: 3));
     if (!mounted) return;
@@ -98,25 +106,29 @@ class _SplashViewState extends State<SplashView>
 
     result.fold(
       (failure) async {
-        if (failure.type == FailureType.network ||
-            failure.type == FailureType.timeout) {
-          // Offline grace: trust cached identity if complete.
-          final cached = locator<AuthRepository>().getUser();
-          if (cached != null && _isProfileComplete(cached)) {
-            context.pushReplacementNamed(Routes.layout);
-          } else {
-            _goToPreAuth();
-          }
-        } else {
+        // Log out ONLY on a genuine 401 (refresh already exhausted by the
+        // RefreshTokenInterceptor before refreshProfile surfaces unauthorized).
+        // Everything else — 5XX (server), forbidden, notFound, unknown, network,
+        // timeout — is TRANSIENT: keep the session and apply offline grace so a
+        // backend hiccup on cold start never logs the user out.
+        if (failure.type == FailureType.unauthorized) {
           // Broken/expired session — log out fully and go to login.
           await locator<AuthRepository>().logout();
           if (!mounted) return;
           context.pushReplacementNamed(Routes.login);
+        } else {
+          // Offline grace: trust cached identity if complete.
+          final cached = locator<AuthRepository>().getUser();
+          if (cached != null && _isProfileComplete(cached)) {
+            _goToLayout();
+          } else {
+            _goToPreAuth();
+          }
         }
       },
       (user) {
         if (_isProfileComplete(user)) {
-          context.pushReplacementNamed(Routes.layout);
+          _goToLayout();
         } else {
           context.pushReplacementNamed(Routes.profileData, arguments: true);
         }

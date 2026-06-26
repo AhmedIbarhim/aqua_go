@@ -3,7 +3,17 @@ part of 'maps_cubit.dart';
 class MapsState extends Equatable {
   final Position? currentPosition;
   final bool isLoading;
-  final Set<Marker> markers;
+
+  /// The geographic point currently under the center pin (camera target).
+  /// This is the selected-location source of truth — markers are no longer
+  /// used to carry the chosen point (center-pinned picker).
+  final LatLng? selectedLatLng;
+
+  /// Camera target to move the map to (search result / my-location).
+  /// Bumped via [cameraMoveToken] so identical successive targets still fire.
+  final LatLng? cameraMoveTarget;
+  final int cameraMoveToken;
+
   final bool showSearchResults;
   final String selectedAddressName;
   final List<PlacePredictionModel> placePredictions;
@@ -13,7 +23,9 @@ class MapsState extends Equatable {
   const MapsState({
     this.currentPosition,
     this.isLoading = false,
-    this.markers = const {},
+    this.selectedLatLng,
+    this.cameraMoveTarget,
+    this.cameraMoveToken = 0,
     this.showSearchResults = false,
     this.selectedAddressName = '',
     this.placePredictions = const [],
@@ -24,7 +36,9 @@ class MapsState extends Equatable {
   MapsState copyWith({
     Position? currentPosition,
     bool? isLoading,
-    Set<Marker>? markers,
+    LatLng? selectedLatLng,
+    LatLng? cameraMoveTarget,
+    int? cameraMoveToken,
     bool? showSearchResults,
     String? selectedAddressName,
     List<PlacePredictionModel>? placePredictions,
@@ -34,7 +48,9 @@ class MapsState extends Equatable {
     return MapsState(
       currentPosition: currentPosition ?? this.currentPosition,
       isLoading: isLoading ?? this.isLoading,
-      markers: markers ?? this.markers,
+      selectedLatLng: selectedLatLng ?? this.selectedLatLng,
+      cameraMoveTarget: cameraMoveTarget ?? this.cameraMoveTarget,
+      cameraMoveToken: cameraMoveToken ?? this.cameraMoveToken,
       showSearchResults: showSearchResults ?? this.showSearchResults,
       selectedAddressName: selectedAddressName ?? this.selectedAddressName,
       placePredictions: placePredictions ?? this.placePredictions,
@@ -48,7 +64,9 @@ class MapsState extends Equatable {
   List<Object?> get props => [
     currentPosition,
     isLoading,
-    markers,
+    selectedLatLng,
+    cameraMoveTarget,
+    cameraMoveToken,
     showSearchResults,
     selectedAddressName,
     placePredictions,

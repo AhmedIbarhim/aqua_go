@@ -73,15 +73,13 @@ class MapsCubit extends Cubit<MapsState> {
       Position position = await Geolocator.getCurrentPosition();
       final latLng = LatLng(position.latitude, position.longitude);
 
-      final markers = {
-        Marker(markerId: const MarkerId('current_location'), position: latLng),
-      };
-
       emit(
         state.copyWith(
           currentPosition: position,
           isLoading: false,
-          markers: markers,
+          selectedLatLng: latLng,
+          cameraMoveTarget: latLng,
+          cameraMoveToken: state.cameraMoveToken + 1,
         ),
       );
 
@@ -129,42 +127,48 @@ class MapsCubit extends Cubit<MapsState> {
     );
   }
 
-  Future<void> getPlaceDetails(
-    String placeId, {
-    required Function(LatLng) onLocationFound,
-  }) async {
+  Future<void> getPlaceDetails(String placeId) async {
     final result = await mapsRepository.getPlaceDetails(placeId);
 
     result.fold((failure) => debugPrint(failure.message), (address) {
       final latLng = LatLng(address.lat, address.lng);
       emit(
         state.copyWith(
-          markers: {
-            Marker(
-              markerId: const MarkerId('selected_location'),
-              position: latLng,
-            ),
-          },
+          selectedLatLng: latLng,
+          cameraMoveTarget: latLng,
+          cameraMoveToken: state.cameraMoveToken + 1,
           showSearchResults: false,
           selectedAddressName: address.formattedAddress,
         ),
       );
-      onLocationFound(latLng);
     });
   }
 
-  void onMapTap(LatLng latLng) {
+  /// Seeds the initial selected point (edit path) and recenters the camera.
+  /// Reverse-geocodes once so Confirm is valid before any pan.
+  void seedLocation(LatLng latLng) {
     emit(
       state.copyWith(
-        markers: {
-          Marker(
-            markerId: const MarkerId('selected_location'),
-            position: latLng,
-          ),
-        },
+        selectedLatLng: latLng,
+        cameraMoveTarget: latLng,
+        cameraMoveToken: state.cameraMoveToken + 1,
       ),
     );
     getAddressFromLatLng(latLng);
+  }
+
+  /// Called continuously while the map pans — cheap, no geocode.
+  /// The camera target IS the geographic point under the screen-center pin.
+  void onCameraMove(LatLng target) {
+    emit(state.copyWith(selectedLatLng: target));
+  }
+
+  /// Called once when the map stops moving — reverse-geocode the final point.
+  void onCameraIdle() {
+    final latLng = state.selectedLatLng;
+    if (latLng != null) {
+      getAddressFromLatLng(latLng);
+    }
   }
 
   void clearSearch() {
