@@ -750,9 +750,9 @@ class BookingCubit extends Cubit<BookingState> {
         ? int.tryParse(data['chargeTotalMinor'].toString()) ?? 0
         : 0;
 
-    // First pass: collect the PAYABLE add-on lines with their GROSS charge.
-    // Only payable (chargedMinor > 0) lines belong on the payment summary;
-    // covered (free) lines stay off it so rows don't imply a charge.
+    // First pass: collect all selected add-on lines with their GROSS charge.
+    // Include both payable (chargedMinor > 0) and free (chargedMinor <= 0)
+    // addons so that free/included addons are presented in the summary view.
     final List<({String? refId, int grossMinor})> payable = [];
     final addonLines = data['addonLines'];
     if (addonLines is List) {
@@ -761,7 +761,6 @@ class BookingCubit extends Cubit<BookingState> {
         final charged = raw['chargedMinor'] != null
             ? int.tryParse(raw['chargedMinor'].toString()) ?? 0
             : 0;
-        if (charged <= 0) continue;
         payable.add((refId: raw['addonId']?.toString(), grossMinor: charged));
       }
     }
@@ -771,9 +770,9 @@ class BookingCubit extends Cubit<BookingState> {
     // the subtotal at breakdown.net. So we DISTRIBUTE the backend-provided
     // breakdown.netMinor across the gross add-on lines proportionally
     // (lineNet = chargedMinor * breakdown.net / breakdown.gross), absorbing the
-    // rounding remainder into the LAST line so the rows sum EXACTLY to
-    // breakdown.netMinor. The total stays breakdown.gross (still on grossMinor).
-    // This is pure distribution of backend values — no client-side VAT math.
+    // rounding remainder into the last paid line so the rows sum EXACTLY to
+    // breakdown.netMinor. Free addons receive exactly 0 net and gross.
+    final int lastPaidIndex = payable.lastIndexWhere((p) => p.grossMinor > 0);
     final int totalGross = payable.fold(0, (s, p) => s + p.grossMinor);
     final int? netTotal = breakdown?.netMinor;
     final List<QuoteLine> lines = [];
@@ -781,17 +780,21 @@ class BookingCubit extends Cubit<BookingState> {
     for (int i = 0; i < payable.length; i++) {
       final p = payable[i];
       final int lineNet;
-      if (netTotal == null || totalGross <= 0) {
+      if (p.grossMinor <= 0) {
+        lineNet = 0;
+      } else if (netTotal == null || totalGross <= 0) {
         // No breakdown net to distribute (older payload / single-line edge) —
         // fall back to the gross charge so the row still shows a sane amount.
         lineNet = p.grossMinor;
-      } else if (i == payable.length - 1) {
-        // Last line absorbs the rounding remainder → Σ net == breakdown.netMinor.
+      } else if (i == lastPaidIndex) {
+        // Last paid line absorbs the rounding remainder → Σ net == breakdown.netMinor.
         lineNet = netTotal - netAssigned;
       } else {
         lineNet = (p.grossMinor * netTotal / totalGross).round();
       }
-      netAssigned += lineNet;
+      if (p.grossMinor > 0) {
+        netAssigned += lineNet;
+      }
       lines.add(
         QuoteLine(
           kind: 'ADDON',
