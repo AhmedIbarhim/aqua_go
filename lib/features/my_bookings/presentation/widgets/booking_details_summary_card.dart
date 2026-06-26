@@ -21,7 +21,9 @@ class BookingDetailsSummaryCard extends StatelessWidget {
     // (paid booking with add-ons). Covered subscription washes keep the single
     // "covered by subscription" total row untouched.
     final bool showNetVatSummary =
-        hasAddons && breakdown != null && !booking.isCoveredBySubscription;
+        hasAddons &&
+        breakdown != null &&
+        (!booking.isCoveredBySubscription || (breakdown.grossMinor ?? 0) != 0);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -63,22 +65,30 @@ class BookingDetailsSummaryCard extends StatelessWidget {
                 _buildSummaryRow(
                   context,
                   title: LocaleKeys.bookings_service_price.tr(context: context),
-                  value: '${_serviceNet().toStringAsFixed(2)} $currency',
+                  value: _serviceNet() == 0.0
+                      ? LocaleKeys.bookings_covered_by_subscription.tr(
+                          context: context,
+                        )
+                      : '${_serviceNet().toStringAsFixed(2)} $currency',
                   icon: AppAssets.document,
                 ),
               // Add-on rows render NET (Option B): take the matching ADDON line's
               // netMinor (matched by addonId → line.refId) — no client math. Fall
               // back to charged only if the backend omitted the line (read path).
               if (hasAddons)
-                ...booking.addOns!.map(
-                  (addon) => _buildSummaryRow(
+                ...booking.addOns!.map((addon) {
+                  final addonPrice = _addonNet(addon);
+                  return _buildSummaryRow(
                     context,
                     title: addon.name,
-                    value:
-                        '${_addonNet(addon).toStringAsFixed(2)} $currency',
+                    value: addonPrice == 0.0
+                        ? LocaleKeys.bookings_covered_by_subscription.tr(
+                            context: context,
+                          )
+                        : '${addonPrice.toStringAsFixed(2)} $currency',
                     icon: AppAssets.terms,
-                  ),
-                ),
+                  );
+                }),
               if (showNetVatSummary) ...[
                 // Totals block, bottom-up: subtotal (net) → VAT → grand total.
                 // Subtle hairline between the line items above and the net row,
@@ -124,9 +134,7 @@ class BookingDetailsSummaryCard extends StatelessWidget {
   /// falls back to the gross `charged` only when the line is absent (read path).
   double _addonNet(BookingAddon addon) {
     final lines = booking.lines ?? const <QuoteLine>[];
-    final matches = lines.where(
-      (l) => l.isAddon && l.refId == addon.addonId,
-    );
+    final matches = lines.where((l) => l.isAddon && l.refId == addon.addonId);
     return matches.isEmpty ? addon.charged : matches.first.net;
   }
 
@@ -140,8 +148,10 @@ class BookingDetailsSummaryCard extends StatelessWidget {
     if (serviceLine != null) return serviceLine.net;
     final breakdown = booking.breakdown;
     if (breakdown == null) return 0.0;
-    final addonsNet = (booking.addOns ?? const <BookingAddon>[])
-        .fold<double>(0.0, (sum, a) => sum + _addonNet(a));
+    final addonsNet = (booking.addOns ?? const <BookingAddon>[]).fold<double>(
+      0.0,
+      (sum, a) => sum + _addonNet(a),
+    );
     return breakdown.net - addonsNet;
   }
 

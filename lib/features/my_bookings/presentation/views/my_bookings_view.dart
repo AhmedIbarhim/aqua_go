@@ -110,6 +110,11 @@ class _MyBookingsViewState extends State<MyBookingsView> {
                                     .fetchBookings(isRefresh: true);
                               },
                               child: EmptyBookingsWidget(
+                                hasOnlyUpcoming: _selectedIndex == 1
+                                    ? state.bookings.every(
+                                        (booking) => booking.isUpcoming,
+                                      )
+                                    : false,
                                 showBookNowButton: state.bookings.isEmpty,
                               ),
                             );

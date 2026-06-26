@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
 
 import '../../data/models/booking_summary_model.dart';
-import '../views/my_booking_deatails_view.dart';
+import '../views/my_booking_details_view.dart';
 
 class MyBookingsCard extends StatelessWidget {
   final BookingSummaryModel booking;
@@ -79,7 +79,9 @@ class MyBookingsCard extends StatelessWidget {
                     // Location
                     _buildDetailRow(
                       context: context,
-                      title: LocaleKeys.bookings_car_location.tr(context: context),
+                      title: LocaleKeys.bookings_car_location.tr(
+                        context: context,
+                      ),
                       value: booking.location,
                       iconPath: AppAssets.location,
                     ),
@@ -87,7 +89,9 @@ class MyBookingsCard extends StatelessWidget {
                     // Date & Time
                     _buildDetailRow(
                       context: context,
-                      title: LocaleKeys.bookings_date_and_time.tr(context: context),
+                      title: LocaleKeys.bookings_date_and_time.tr(
+                        context: context,
+                      ),
                       value: booking.formattedDateTime,
                       iconPath: AppAssets.calender,
                     ),
@@ -95,7 +99,9 @@ class MyBookingsCard extends StatelessWidget {
                     // Total Amount
                     _buildDetailRow(
                       context: context,
-                      title: LocaleKeys.bookings_total_amount.tr(context: context),
+                      title: LocaleKeys.bookings_total_amount.tr(
+                        context: context,
+                      ),
                       value: booking.totalAmount.toStringAsFixed(2),
                       iconPath: AppAssets.money,
                       isAmount: true,

@@ -20,7 +20,7 @@ import '../../core/route/app_router.dart';
 import '../../core/route/routes.dart';
 import '../complaints/presentation/views/complaint_details_view.dart';
 import '../my_bookings/data/models/booking_summary_model.dart';
-import '../my_bookings/presentation/views/my_booking_deatails_view.dart';
+import '../my_bookings/presentation/views/my_booking_details_view.dart';
 
 /// A deep-link target parsed from either an inbox record or an FCM data block.
 class NotificationTarget {
