@@ -156,22 +156,28 @@ class _NewAddressMapViewState extends State<NewAddressMapView> {
                         alignment: Alignment.center,
                         children: [
                           // The teardrop pin, tip lifted onto the center pixel.
+                          // Fill = app primary (cyan/teal CTA color).
                           Transform.translate(
                             offset: const Offset(0, -_kPinSize / 2),
                             child: Icon(
                               Icons.location_on,
                               size: _kPinSize,
-                              color: lightAppColors.themeColor,
+                              color: lightAppColors.primary,
                             ),
                           ),
                           // Exact geometric-center dot == camera target.
+                          // White fill contrasts against the primary pin so the
+                          // precise target point stays visible.
                           Container(
                             width: _kCenterDot,
                             height: _kCenterDot,
                             decoration: BoxDecoration(
-                              color: lightAppColors.themeColor,
+                              color: Colors.white,
                               shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 1),
+                              border: Border.all(
+                                color: lightAppColors.primary,
+                                width: 1,
+                              ),
                             ),
                           ),
                         ],

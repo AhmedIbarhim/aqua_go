@@ -8,7 +8,7 @@ import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 import 'package:aqua_go/features/my_cars/data/models/my_car_model.dart';
 
-class CarSelectionList extends StatelessWidget {
+class CarSelectionList extends StatefulWidget {
   final int? selectedCarIndex;
   final List<MyCarModel> cars;
   final Function(int index) onCarSelected;
@@ -23,6 +23,46 @@ class CarSelectionList extends StatelessWidget {
   });
 
   @override
+  State<CarSelectionList> createState() => _CarSelectionListState();
+}
+
+class _CarSelectionListState extends State<CarSelectionList> {
+  final GlobalKey _selectedCardKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.selectedCarIndex != null) {
+      _scrollSelectedIntoView();
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant CarSelectionList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.selectedCarIndex != oldWidget.selectedCarIndex &&
+        widget.selectedCarIndex != null) {
+      _scrollSelectedIntoView();
+    }
+  }
+
+  void _scrollSelectedIntoView() {
+    // ensureVisible operates on render geometry, so it reveals the selected
+    // card correctly in both ar (RTL) and en (LTR) with no direction handling.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final ctx = _selectedCardKey.currentContext;
+      if (ctx != null) {
+        Scrollable.ensureVisible(
+          ctx,
+          alignment: 0.5,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final height = MediaQuery.sizeOf(context).height;
     final width = MediaQuery.sizeOf(context).width;
@@ -30,19 +70,20 @@ class CarSelectionList extends StatelessWidget {
       height: height * 0.14,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        itemCount: cars.length + 1,
+        itemCount: widget.cars.length + 1,
         separatorBuilder: (context, index) => SizedBox(width: width * 0.02),
         itemBuilder: (context, index) {
           if (index == 0) {
             return GestureDetector(
-              onTap: onAddCar,
+              onTap: widget.onAddCar,
               child: _buildAddCarCard(context, width, height),
             );
           }
-          final car = cars[index - 1];
-          final isSelected = selectedCarIndex == index - 1;
+          final car = widget.cars[index - 1];
+          final isSelected = widget.selectedCarIndex == index - 1;
           return GestureDetector(
-            onTap: () => onCarSelected(index - 1),
+            key: isSelected ? _selectedCardKey : null,
+            onTap: () => widget.onCarSelected(index - 1),
             child: _buildCarCard(
               context,
               car,

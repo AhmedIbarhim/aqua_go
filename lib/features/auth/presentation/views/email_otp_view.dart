@@ -49,6 +49,7 @@ class EmailOtpView extends StatelessWidget {
           }
         },
         child: AuthScaffold(
+          showBackButton: true,
           content: EmailOtpContent(email: email, otpSessionId: otpSessionId),
         ),
       ),
