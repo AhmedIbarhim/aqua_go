@@ -1,20 +1,22 @@
-import 'package:aqua_go/generated/locale_keys.g.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/components/generic_app_bar.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/themes/app_text_styles.dart';
+import 'local_texts/about_us_texts_ar.dart';
+import 'local_texts/about_us_texts_en.dart';
 
 class AboutUsView extends StatelessWidget {
   const AboutUsView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final texts = context.isAr ? aboutUsTextsAr : aboutUsTextsEn;
+
     return Scaffold(
       backgroundColor: context.colors.screenBG,
       appBar: GenericAppBar(
-        title: LocaleKeys.about_title.tr(context: context),
+        title: texts.appBarTitle,
         centerTitle: true,
       ),
       body: Column(
@@ -37,7 +39,7 @@ class AboutUsView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      LocaleKeys.about_intro_title.tr(context: context),
+                      texts.introTitle,
                       style: AppTextStyles.medium16.copyWith(
                         color: context.colors.textPrimary,
                         height: 1.5,
@@ -45,7 +47,7 @@ class AboutUsView extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      LocaleKeys.about_intro_p1.tr(context: context),
+                      texts.introP1,
                       style: AppTextStyles.regular16.copyWith(
                         color: context.colors.textSecondary,
                         height: 1.6,
@@ -53,7 +55,7 @@ class AboutUsView extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      LocaleKeys.about_intro_p2.tr(context: context),
+                      texts.introP2,
                       style: AppTextStyles.regular16.copyWith(
                         color: context.colors.textSecondary,
                         height: 1.6,
@@ -61,7 +63,7 @@ class AboutUsView extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      LocaleKeys.about_intro_p3.tr(context: context),
+                      texts.introP3,
                       style: AppTextStyles.regular16.copyWith(
                         color: context.colors.textSecondary,
                         height: 1.6,
@@ -69,15 +71,15 @@ class AboutUsView extends StatelessWidget {
                     ),
                     const SizedBox(height: 24),
                     Text(
-                      LocaleKeys.about_features_title.tr(context: context),
+                      texts.featuresTitle,
                       style: AppTextStyles.medium16.copyWith(
                         color: context.colors.textPrimary,
                         height: 1.5,
                       ),
                     ),
                     const SizedBox(height: 12),
-                    ...List.generate(6, (index) {
-                      final key = 'about.feature${index + 1}';
+                    ...List.generate(texts.features.length, (index) {
+                      final featureText = texts.features[index];
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 8),
                         child: Row(
@@ -97,7 +99,7 @@ class AboutUsView extends StatelessWidget {
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
-                                key.tr(context: context),
+                                featureText,
                                 style: AppTextStyles.regular16.copyWith(
                                   color: context.colors.textSecondary,
                                   height: 1.5,
@@ -115,7 +117,7 @@ class AboutUsView extends StatelessWidget {
                         fit: BoxFit.scaleDown,
                         alignment: Alignment.center,
                         child: Text(
-                          LocaleKeys.about_footer.tr(context: context),
+                          texts.footer,
                           style: AppTextStyles.medium16.copyWith(
                             color: context.colors.primary,
                             height: 1.5,

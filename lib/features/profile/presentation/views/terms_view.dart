@@ -1,20 +1,22 @@
-import 'package:aqua_go/generated/locale_keys.g.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/components/generic_app_bar.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/themes/app_text_styles.dart';
+import 'local_texts/terms_texts_ar.dart';
+import 'local_texts/terms_texts_en.dart';
 
 class TermsView extends StatelessWidget {
   const TermsView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final texts = context.isAr ? termsTextsAr : termsTextsEn;
+
     return Scaffold(
       backgroundColor: context.colors.screenBG,
       appBar: GenericAppBar(
-        title: LocaleKeys.settings_terms_and_conditions.tr(context: context),
+        title: texts.appBarTitle,
         centerTitle: true,
       ),
       body: Column(
@@ -37,7 +39,7 @@ class TermsView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      LocaleKeys.refund_title.tr(context: context),
+                      texts.title,
                       style: AppTextStyles.bold18.copyWith(
                         color: context.colors.textPrimary,
                       ),
@@ -45,7 +47,7 @@ class TermsView extends StatelessWidget {
                     const SizedBox(height: 16),
 
                     Text(
-                      LocaleKeys.refund_content_p1.tr(context: context),
+                      texts.contentP1,
                       style: AppTextStyles.regular16.copyWith(
                         color: context.colors.textSecondary,
                         height: 1.6,
@@ -53,7 +55,7 @@ class TermsView extends StatelessWidget {
                     ),
                     const SizedBox(height: 24),
                     Text(
-                      LocaleKeys.refund_content_p2.tr(context: context),
+                      texts.contentP2,
                       style: AppTextStyles.regular16.copyWith(
                         color: context.colors.textSecondary,
                         height: 1.6,
@@ -67,7 +69,7 @@ class TermsView extends StatelessWidget {
                         alignment: Alignment.center,
                         child: Text(
                           textAlign: TextAlign.center,
-                          LocaleKeys.refund_footer.tr(context: context),
+                          texts.footer,
                           style: AppTextStyles.medium16.copyWith(
                             color: context.colors.primary,
                             height: 1.5,

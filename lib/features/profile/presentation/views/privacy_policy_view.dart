@@ -12,6 +12,8 @@ import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../auth/presentation/controllers/auth_cubit/auth_cubit.dart';
+import 'local_texts/privacy_policy_texts_ar.dart';
+import 'local_texts/privacy_policy_texts_en.dart';
 
 class PrivacyPolicyView extends StatelessWidget {
   const PrivacyPolicyView({super.key});
@@ -19,10 +21,12 @@ class PrivacyPolicyView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final texts = context.isAr ? privacyPolicyTextsAr : privacyPolicyTextsEn;
+
     return Scaffold(
       backgroundColor: context.colors.screenBG,
       appBar: GenericAppBar(
-        title: LocaleKeys.privacy_title.tr(context: context),
+        title: texts.title,
         centerTitle: true,
       ),
       body: BlocProvider(
@@ -50,24 +54,21 @@ class PrivacyPolicyView extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        LocaleKeys.privacy_intro.tr(context: context),
+                        texts.intro,
                         style: AppTextStyles.regular14.copyWith(
                           color: context.colors.textSecondary,
                           height: 1.5,
                         ),
                       ),
                       _buildDivider(context),
-                      ...List.generate(10, (index) {
-                        final sectionIndex = index + 1;
-                        final titleKey = 'privacy.section${sectionIndex}_title';
-                        final contentKey =
-                            'privacy.section${sectionIndex}_content';
+                      ...List.generate(texts.sections.length, (index) {
+                        final section = texts.sections[index];
 
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              titleKey.tr(context: context),
+                              section.title,
                               style: AppTextStyles.medium16.copyWith(
                                 color: context.colors.textPrimary,
                                 height: 1.5,
@@ -75,19 +76,19 @@ class PrivacyPolicyView extends StatelessWidget {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              contentKey.tr(context: context),
+                              section.content,
                               style: AppTextStyles.regular16.copyWith(
                                 color: context.colors.textSecondary,
                                 height: 1.5,
                               ),
                             ),
-                            if (index < 9) _buildDivider(context),
+                            if (index < texts.sections.length - 1) _buildDivider(context),
                           ],
                         );
                       }),
                       const SizedBox(height: 24),
                       Text(
-                        LocaleKeys.privacy_footer.tr(context: context),
+                        texts.footer,
                         style: AppTextStyles.medium16.copyWith(height: 1.5),
                       ),
                       const SizedBox(height: 48),
