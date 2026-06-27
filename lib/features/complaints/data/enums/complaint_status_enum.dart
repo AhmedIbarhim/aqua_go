@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/extentions/context_extentions/theme_extension.dart';
+import '../../../../core/themes/app_colors.dart';
 import '../../../../generated/locale_keys.g.dart';
 
 enum ComplaintStatus {
@@ -60,34 +61,32 @@ enum ComplaintStatus {
   }
 
   Color getBgColor(BuildContext context) {
-    return context.colors.primary;
-    // switch (this) {
-    //   case ComplaintStatus.open:
-    //     return context.colors.primary;
-    //   case ComplaintStatus.closed:
-    //     return context.colors.errorLight;
-    //   case ComplaintStatus.resolved:
-    //     return context.colors.successLight;
-    //   case ComplaintStatus.pending:
-    //     return context.colors.defaultSubtle;
-    //   case ComplaintStatus.rejected:
-    //     return context.colors.errorLight;
-    // }
+    switch (this) {
+      case ComplaintStatus.open:
+        return context.colors.primary;
+      case ComplaintStatus.closed:
+        return context.colors.errorLight;
+      case ComplaintStatus.resolved:
+        return context.colors.successLight;
+      case ComplaintStatus.pending:
+        return context.colors.defaultSubtle;
+      case ComplaintStatus.rejected:
+        return context.colors.errorLight;
+    }
   }
 
   Color getTextColor(BuildContext context) {
-    return Colors.black;
-    // switch (this) {
-    //   case ComplaintStatus.open:
-    //     return darkAppColors.themeColor;
-    //   case ComplaintStatus.closed:
-    //     return darkAppColors.themeOpositeColor;
-    //   case ComplaintStatus.resolved:
-    //     return darkAppColors.themeColor;
-    //   case ComplaintStatus.pending:
-    //     return darkAppColors.themeOpositeColor;
-    //   case ComplaintStatus.rejected:
-    //     return darkAppColors.themeOpositeColor;
-    // }
+    switch (this) {
+      case ComplaintStatus.open:
+        return darkAppColors.themeColor;
+      case ComplaintStatus.closed:
+        return darkAppColors.themeOpositeColor;
+      case ComplaintStatus.resolved:
+        return darkAppColors.themeColor;
+      case ComplaintStatus.pending:
+        return darkAppColors.themeOpositeColor;
+      case ComplaintStatus.rejected:
+        return darkAppColors.themeOpositeColor;
+    }
   }
 }

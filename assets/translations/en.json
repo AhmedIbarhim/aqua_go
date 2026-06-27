@@ -365,7 +365,14 @@
         "title": "Technical Support & Help",
         "faq": "FAQ",
         "complaint_log": "Complaint Log",
-        "whatsapp_contact": "Contact via WhatsApp"
+        "whatsapp_contact": "Contact via WhatsApp",
+        "faq_categories": {
+            "booking": "Booking & Scheduling",
+            "payment": "Payments",
+            "quality": "Quality Assurance",
+            "service": "Our Services",
+            "coverage": "Coverage Areas"
+        }
     },
     "complaint": {
         "status_open": "Open",

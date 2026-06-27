@@ -3,10 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:svg_flutter/svg.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:url_launcher/url_launcher.dart';
-
-import 'package:aqua_go/core/config/networking/endpoints.dart';
-import 'package:aqua_go/core/enums/payment_status_enum.dart';
+// import 'package:url_launcher/url_launcher.dart';
+// import 'package:aqua_go/core/config/networking/endpoints.dart';
+// import 'package:aqua_go/core/enums/payment_status_enum.dart';
 import 'package:aqua_go/core/components/custom_button.dart';
 import 'package:aqua_go/core/components/generic_app_bar.dart';
 import 'package:aqua_go/core/themes/app_colors.dart';
@@ -186,10 +185,10 @@ class MyBookingDetailsView extends StatelessWidget {
                                       rating: activeBooking.rating!,
                                     ),
                                   ],
-                                  if (_showsReceipt(activeBooking)) ...[
-                                    const SizedBox(height: 16),
-                                    _buildReceiptLink(context, activeBooking),
-                                  ],
+                                  // if (_showsReceipt(activeBooking)) ...[
+                                  //   const SizedBox(height: 16),
+                                  //   _buildReceiptLink(context, activeBooking),
+                                  // ],
                                   const SizedBox(height: 32),
                                 ],
                               ),
@@ -278,54 +277,54 @@ class MyBookingDetailsView extends StatelessWidget {
   /// Server-rendered receipt PDF (spec §8). Opened in the device's external
   /// PDF/browser handler — never rendered in-app (Flutter Arabic/RTL PDF
   /// bugs). Shown only for completed bookings whose money actually moved.
-  bool _showsReceipt(BookingResponseModel booking) {
-    return booking.status == BookingStatus.COMPLETED &&
-        (booking.paymentStatus == PaymentStatus.PAID ||
-            booking.paymentStatus == PaymentStatus.PARTIALLY_REFUNDED);
-  }
+  // bool _showsReceipt(BookingResponseModel booking) {
+  //   return booking.status == BookingStatus.COMPLETED &&
+  //       (booking.paymentStatus == PaymentStatus.PAID ||
+  //           booking.paymentStatus == PaymentStatus.PARTIALLY_REFUNDED);
+  // }
 
-  Widget _buildReceiptLink(BuildContext context, BookingResponseModel booking) {
-    if (!_showsReceipt(booking) || booking.id == null) {
-      return const SizedBox.shrink();
-    }
-    return InkWell(
-      onTap: () async {
-        final uri = Uri.parse(
-          Endpoints.baseUrl + Endpoints.bookingReceiptPdf(booking.id!),
-        );
-        final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
-        if (!ok && context.mounted) {
-          context.showWarningSnackBar(
-            context.isAr ? 'تعذّر فتح الإيصال.' : 'Could not open the receipt.',
-          );
-        }
-      },
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: context.colors.themeColor,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              LocaleKeys.bookings_view_receipt.tr(context: context),
-              style: AppTextStyles.medium14.copyWith(
-                color: context.colors.primary,
-              ),
-            ),
-            Icon(
-              Icons.arrow_forward_ios,
-              color: context.colors.primary,
-              size: 16,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  // Widget _buildReceiptLink(BuildContext context, BookingResponseModel booking) {
+  //   if (!_showsReceipt(booking) || booking.id == null) {
+  //     return const SizedBox.shrink();
+  //   }
+  //   return InkWell(
+  //     onTap: () async {
+  //       final uri = Uri.parse(
+  //         Endpoints.baseUrl + Endpoints.bookingReceiptPdf(booking.id!),
+  //       );
+  //       final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
+  //       if (!ok && context.mounted) {
+  //         context.showWarningSnackBar(
+  //           context.isAr ? 'تعذّر فتح الإيصال.' : 'Could not open the receipt.',
+  //         );
+  //       }
+  //     },
+  //     borderRadius: BorderRadius.circular(12),
+  //     child: Container(
+  //       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+  //       decoration: BoxDecoration(
+  //         color: context.colors.themeColor,
+  //         borderRadius: BorderRadius.circular(12),
+  //       ),
+  //       child: Row(
+  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //         children: [
+  //           Text(
+  //             LocaleKeys.bookings_view_receipt.tr(context: context),
+  //             style: AppTextStyles.medium14.copyWith(
+  //               color: context.colors.primary,
+  //             ),
+  //           ),
+  //           Icon(
+  //             Icons.arrow_forward_ios,
+  //             color: context.colors.primary,
+  //             size: 16,
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   String _formatTimeSlot(DateTime time, BuildContext context) {
     if (context.isAr) {

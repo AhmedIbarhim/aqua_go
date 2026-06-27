@@ -7,6 +7,9 @@ import '../../../../core/components/custom_loading_indicator.dart';
 import '../../../../core/components/error_retry_widget.dart';
 import '../../../../core/components/generic_app_bar.dart';
 import '../../../../core/extentions/context_extentions.dart';
+import '../../../../core/themes/app_text_styles.dart';
+import '../../data/enums/faqs_categories_enum.dart';
+import '../../data/models/Faq_model.dart';
 import '../controllers/faqs_cubit.dart';
 import '../controllers/faqs_state.dart';
 import '../widgets/faq_tile.dart';
@@ -19,7 +22,7 @@ class FaqsView extends StatefulWidget {
 }
 
 class _FaqsViewState extends State<FaqsView> {
-  int? _expandedIndex = 0;
+  String? _expandedFaqId;
 
   @override
   Widget build(BuildContext context) {
@@ -62,23 +65,73 @@ class _FaqsViewState extends State<FaqsView> {
                     if (faqs.isEmpty) {
                       return const SizedBox.shrink();
                     }
+
+                    if (_expandedFaqId == null && faqs.isNotEmpty) {
+                      _expandedFaqId = faqs.first.id;
+                    }
+
+                    // Group FAQs by category
+                    final Map<FaqsCategoriesEnum, List<FaqModel>> groupedFaqs =
+                        {};
+                    for (final faq in faqs) {
+                      groupedFaqs
+                          .putIfAbsent(faq.faqCategory, () => [])
+                          .add(faq);
+                    }
+
+                    final activeCategories = FaqsCategoriesEnum.values
+                        .where(
+                          (cat) =>
+                              groupedFaqs.containsKey(cat) &&
+                              groupedFaqs[cat]!.isNotEmpty,
+                        )
+                        .toList();
+
                     return ListView.separated(
                       physics: const BouncingScrollPhysics(),
-                      itemCount: faqs.length,
+                      itemCount: activeCategories.length,
                       separatorBuilder: (context, index) =>
-                          SizedBox(height: sh(16)),
+                          SizedBox(height: sh(24)),
                       itemBuilder: (context, index) {
-                        final faq = faqs[index];
-                        final isExpanded = _expandedIndex == index;
+                        final category = activeCategories[index];
+                        final categoryFaqs = groupedFaqs[category]!;
 
-                        return FaqTile(
-                          faq: faq,
-                          isExpanded: isExpanded,
-                          onTap: () {
-                            setState(() {
-                              _expandedIndex = isExpanded ? null : index;
-                            });
-                          },
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(bottom: sh(12)),
+                              child: Text(
+                                category.localizedName,
+                                style: AppTextStyles.semiBold18.copyWith(
+                                  color: context.colors.primary,
+                                ),
+                              ),
+                            ),
+                            ListView.separated(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: categoryFaqs.length,
+                              separatorBuilder: (context, index) =>
+                                  SizedBox(height: sh(12)),
+                              itemBuilder: (context, index) {
+                                final faq = categoryFaqs[index];
+                                final isExpanded = _expandedFaqId == faq.id;
+
+                                return FaqTile(
+                                  faq: faq,
+                                  isExpanded: isExpanded,
+                                  onTap: () {
+                                    setState(() {
+                                      _expandedFaqId = isExpanded
+                                          ? null
+                                          : faq.id;
+                                    });
+                                  },
+                                );
+                              },
+                            ),
+                          ],
                         );
                       },
                     );

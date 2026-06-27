@@ -365,7 +365,14 @@
         "title": "الدعم الفني والمساعدة",
         "faq": "الأسئلة الشائعة",
         "complaint_log": "سجل الشكاوي",
-        "whatsapp_contact": "التواصل عن طريق الواتس اب"
+        "whatsapp_contact": "التواصل عن طريق الواتس اب",
+        "faq_categories": {
+            "booking": "الحجوزات والمواعيد",
+            "payment": "المدفوعات",
+            "quality": "جودة الخدمة",
+            "service": "الخدمات",
+            "coverage": "مناطق التغطية"
+        }
     },
     "complaint": {
         "status_open": "مفتوحة",

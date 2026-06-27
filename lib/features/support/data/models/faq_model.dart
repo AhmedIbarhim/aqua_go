@@ -1,3 +1,5 @@
+import '../enums/faqs_categories_enum.dart';
+
 class FaqModel {
   final String id;
   final String category;
@@ -37,6 +39,8 @@ class FaqModel {
 
   // Compatibility getter for widget title rendering
   String get question => title;
+
+  FaqsCategoriesEnum get faqCategory => FaqsCategoriesEnum.fromString(category);
 
   // Compatibility getter parsing bodyMarkdown into a list of bullet points
   List<String> get answerBullets {
