@@ -32,36 +32,36 @@ class _PhoneOtpContentState extends State<PhoneOtpContent> {
   Timer? _timer;
   int _start = 60;
   String? _otpSessionId;
-  String? _errorMessage;
+  // String? _errorMessage;
 
-  bool _isOtpValidationError(String message) {
-    final msg = message.toLowerCase();
-    if (msg.contains('timeout') ||
-        msg.contains('internet') ||
-        msg.contains('connection') ||
-        msg.contains('server error') ||
-        msg.contains('try again later') ||
-        msg.contains('canceled') ||
-        msg.contains('unexpected') ||
-        msg.contains('oops')) {
-      return false;
-    }
-    return true;
-  }
+  // bool _isOtpValidationError(String message) {
+  //   final msg = message.toLowerCase();
+  //   if (msg.contains('timeout') ||
+  //       msg.contains('internet') ||
+  //       msg.contains('connection') ||
+  //       msg.contains('server error') ||
+  //       msg.contains('try again later') ||
+  //       msg.contains('canceled') ||
+  //       msg.contains('unexpected') ||
+  //       msg.contains('oops')) {
+  //     return false;
+  //   }
+  //   return true;
+  // }
 
-  bool get _isExpiredError =>
-      _errorMessage != null &&
-      (_errorMessage!.toLowerCase().contains('expire') ||
-          _errorMessage!.contains('انتهت') ||
-          _errorMessage!.contains('منتهي'));
+  // bool get _isExpiredError =>
+  //     _errorMessage != null &&
+  //     (_errorMessage!.toLowerCase().contains('expire') ||
+  //         _errorMessage!.contains('انتهت') ||
+  //         _errorMessage!.contains('منتهي'));
 
-  String get _displayError {
-    if (_errorMessage == null) return '';
-    if (_isExpiredError) {
-      return LocaleKeys.auth_otp_expired_message.tr(context: context);
-    }
-    return LocaleKeys.auth_otp_invalid_message.tr(context: context);
-  }
+  // String get _displayError {
+  //   if (_errorMessage == null) return '';
+  //   if (_isExpiredError) {
+  //     return LocaleKeys.auth_otp_expired_message.tr(context: context);
+  //   }
+  //   return LocaleKeys.auth_otp_invalid_message.tr(context: context);
+  // }
 
   @override
   void initState() {
@@ -114,7 +114,9 @@ class _PhoneOtpContentState extends State<PhoneOtpContent> {
       listener: (context, state) {
         if (state is OtpSent) {
           _otpSessionId = state.otpSessionId;
-          context.showSuccessSnackBar(LocaleKeys.auth_otp_code_sent.tr(context: context));
+          context.showSuccessSnackBar(
+            LocaleKeys.auth_otp_code_sent.tr(context: context),
+          );
         } else if (state is LoginSuccess) {
           if (state.user.name == null || state.user.name!.isEmpty) {
             context.pushNamedAndRemoveUntil(
@@ -131,16 +133,17 @@ class _PhoneOtpContentState extends State<PhoneOtpContent> {
             consumePendingDeepLink();
           }
         } else if (state is LoginError) {
-          if (!state.message.contains('OTP code mismatch')) {
-            context.showErrorSnackBar(state.message);
-          }
-          setState(() {
-            if (_isOtpValidationError(state.message)) {
-              _errorMessage = state.message;
-            } else {
-              _errorMessage = null;
-            }
-          });
+          // if (!state.message.contains('OTP code mismatch')) {
+          context.showErrorSnackBar(state.message);
+
+          // }
+          // setState(() {
+          //   if (_isOtpValidationError(state.message)) {
+          //     _errorMessage = state.message;
+          //   } else {
+          //     _errorMessage = null;
+          //   }
+          // });
         }
       },
       builder: (context, state) {
@@ -175,7 +178,9 @@ class _PhoneOtpContentState extends State<PhoneOtpContent> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
-                      LocaleKeys.auth_enter_verification_code.tr(context: context),
+                      LocaleKeys.auth_enter_verification_code.tr(
+                        context: context,
+                      ),
                       style: AppTextStyles.regular16.copyWith(
                         color: darkAppColors.textSecondary,
                       ),
@@ -195,33 +200,33 @@ class _PhoneOtpContentState extends State<PhoneOtpContent> {
                 CustomOtpFields(
                   controllers: _controllers,
                   focusNodes: _focusNodes,
-                  hasError: _errorMessage != null,
+                  hasError: state is LoginError,
                   onChanged: (value) {
-                    setState(() {
-                      _errorMessage = null;
-                    });
+                    if (state is LoginError) {
+                      setState(() {});
+                    }
+                    // setState(() {
+                    //   _errorMessage = null;
+                    // });
                   },
                 ),
-                if (_errorMessage != null) ...[
-                  SizedBox(height: height * 0.015),
-                  Center(
-                    child: Text(
-                      _displayError,
-                      style: AppTextStyles.regular16.copyWith(
-                        color: context.colors.error,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ],
+                // if (_errorMessage != null) ...[
+                //   SizedBox(height: height * 0.015),
+                //   Center(
+                //     child: Text(
+                //       _displayError,
+                //       style: AppTextStyles.regular16.copyWith(
+                //         color: context.colors.error,
+                //       ),
+                //       textAlign: TextAlign.center,
+                //     ),
+                //   ),
+                // ],
                 SizedBox(height: height * 0.03),
                 CustomButton(
                   text: LocaleKeys.auth_verify.tr(context: context),
                   // isLoading: state is LoginLoading,
-                  onPressed:
-                      _isOtpComplete &&
-                          _otpSessionId != null &&
-                          _errorMessage == null
+                  onPressed: _isOtpComplete && _otpSessionId != null
                       ? () {
                           final otp = _controllers.map((c) => c.text).join();
                           context.read<AuthCubit>().verifyOtp(
@@ -231,10 +236,7 @@ class _PhoneOtpContentState extends State<PhoneOtpContent> {
                           );
                         }
                       : null,
-                  enabled:
-                      _isOtpComplete &&
-                      _otpSessionId != null &&
-                      _errorMessage == null,
+                  enabled: _isOtpComplete && _otpSessionId != null,
                 ),
                 SizedBox(height: height * 0.025),
                 Center(
@@ -248,7 +250,9 @@ class _PhoneOtpContentState extends State<PhoneOtpContent> {
                             context.read<AuthCubit>().login(widget.phoneNumber);
                           },
                           child: Text(
-                            LocaleKeys.auth_resend_code_button.tr(context: context),
+                            LocaleKeys.auth_resend_code_button.tr(
+                              context: context,
+                            ),
                             style: AppTextStyles.regular16.copyWith(
                               color: context.colors.primary,
                             ),

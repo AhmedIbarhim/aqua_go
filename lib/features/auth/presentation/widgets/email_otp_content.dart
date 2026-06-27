@@ -32,36 +32,36 @@ class _EmailOtpContentState extends State<EmailOtpContent> {
   Timer? _timer;
   int _start = 120;
   String? _currentOtpSessionId;
-  String? _errorMessage;
+  // String? _errorMessage;
 
-  bool _isOtpValidationError(String message) {
-    final msg = message.toLowerCase();
-    if (msg.contains('timeout') ||
-        msg.contains('internet') ||
-        msg.contains('connection') ||
-        msg.contains('server error') ||
-        msg.contains('try again later') ||
-        msg.contains('canceled') ||
-        msg.contains('unexpected') ||
-        msg.contains('oops')) {
-      return false;
-    }
-    return true;
-  }
+  // bool _isOtpValidationError(String message) {
+  //   final msg = message.toLowerCase();
+  //   if (msg.contains('timeout') ||
+  //       msg.contains('internet') ||
+  //       msg.contains('connection') ||
+  //       msg.contains('server error') ||
+  //       msg.contains('try again later') ||
+  //       msg.contains('canceled') ||
+  //       msg.contains('unexpected') ||
+  //       msg.contains('oops')) {
+  //     return false;
+  //   }
+  //   return true;
+  // }
 
-  bool get _isExpiredError =>
-      _errorMessage != null &&
-      (_errorMessage!.toLowerCase().contains('expire') ||
-          _errorMessage!.contains('انتهت') ||
-          _errorMessage!.contains('منتهي'));
+  // bool get _isExpiredError =>
+  //     _errorMessage != null &&
+  //     (_errorMessage!.toLowerCase().contains('expire') ||
+  //         _errorMessage!.contains('انتهت') ||
+  //         _errorMessage!.contains('منتهي'));
 
-  String get _displayError {
-    if (_errorMessage == null) return '';
-    if (_isExpiredError) {
-      return LocaleKeys.auth_otp_expired_message.tr(context: context);
-    }
-    return LocaleKeys.auth_otp_invalid_message.tr(context: context);
-  }
+  // String get _displayError {
+  //   if (_errorMessage == null) return '';
+  //   if (_isExpiredError) {
+  //     return LocaleKeys.auth_otp_expired_message.tr(context: context);
+  //   }
+  //   return LocaleKeys.auth_otp_invalid_message.tr(context: context);
+  // }
 
   @override
   void initState() {
@@ -116,7 +116,9 @@ class _EmailOtpContentState extends State<EmailOtpContent> {
           setState(() {
             _currentOtpSessionId = state.otpSessionId;
           });
-          context.showSuccessSnackBar(LocaleKeys.auth_otp_code_sent.tr(context: context));
+          context.showSuccessSnackBar(
+            LocaleKeys.auth_otp_code_sent.tr(context: context),
+          );
         } else if (state is LoginSuccess) {
           if (state.user.name == null || state.user.name!.isEmpty) {
             context.pushNamedAndRemoveUntil(
@@ -137,11 +139,11 @@ class _EmailOtpContentState extends State<EmailOtpContent> {
             context.showErrorSnackBar(state.message);
           }
           setState(() {
-            if (_isOtpValidationError(state.message)) {
-              _errorMessage = state.message;
-            } else {
-              _errorMessage = null;
-            }
+            // if (_isOtpValidationError(state.message)) {
+            //   _errorMessage = state.message;
+            // } else {
+            //   _errorMessage = null;
+            // }
           });
         }
       },
@@ -177,7 +179,9 @@ class _EmailOtpContentState extends State<EmailOtpContent> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
-                      LocaleKeys.auth_enter_verification_code.tr(context: context),
+                      LocaleKeys.auth_enter_verification_code.tr(
+                        context: context,
+                      ),
                       style: AppTextStyles.regular16.copyWith(
                         color: darkAppColors.textSecondary,
                       ),
@@ -199,32 +203,29 @@ class _EmailOtpContentState extends State<EmailOtpContent> {
                 CustomOtpFields(
                   controllers: _controllers,
                   focusNodes: _focusNodes,
-                  hasError: _errorMessage != null,
+                  hasError: state is LoginError,
                   onChanged: (value) {
                     setState(() {
-                      _errorMessage = null;
+                      // _errorMessage = null;
                     });
                   },
                 ),
-                if (_errorMessage != null) ...[
-                  SizedBox(height: height * 0.015),
-                  Center(
-                    child: Text(
-                      _displayError,
-                      style: AppTextStyles.regular16.copyWith(
-                        color: context.colors.error,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ],
+                // if (state is LoginError) ...[
+                //   SizedBox(height: height * 0.015),
+                //   Center(
+                //     child: Text(
+                //       _displayError,
+                //       style: AppTextStyles.regular16.copyWith(
+                //         color: context.colors.error,
+                //       ),
+                //       textAlign: TextAlign.center,
+                //     ),
+                //   ),
+                // ],
                 SizedBox(height: height * 0.03),
                 CustomButton(
                   text: LocaleKeys.auth_verify.tr(context: context),
-                  onPressed:
-                      _isOtpComplete &&
-                          _currentOtpSessionId != null &&
-                          _errorMessage == null
+                  onPressed: _isOtpComplete && _currentOtpSessionId != null
                       ? () {
                           final otp = _controllers.map((c) => c.text).join();
                           context.read<AuthCubit>().confirmEmailVerify(
@@ -234,10 +235,7 @@ class _EmailOtpContentState extends State<EmailOtpContent> {
                           );
                         }
                       : null,
-                  enabled:
-                      _isOtpComplete &&
-                      _currentOtpSessionId != null &&
-                      _errorMessage == null,
+                  enabled: _isOtpComplete && _currentOtpSessionId != null,
                 ),
                 SizedBox(height: height * 0.025),
                 Center(
@@ -246,7 +244,7 @@ class _EmailOtpContentState extends State<EmailOtpContent> {
                           onTap: () {
                             setState(() {
                               _start = 120;
-                              _errorMessage = null;
+                              // _errorMessage = null;
                             });
                             startTimer();
                             context.read<AuthCubit>().requestEmailVerify(
@@ -254,7 +252,9 @@ class _EmailOtpContentState extends State<EmailOtpContent> {
                             );
                           },
                           child: Text(
-                            LocaleKeys.auth_resend_code_button.tr(context: context),
+                            LocaleKeys.auth_resend_code_button.tr(
+                              context: context,
+                            ),
                             style: AppTextStyles.regular16.copyWith(
                               color: context.colors.primary,
                             ),
