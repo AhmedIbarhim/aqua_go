@@ -2,6 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../../../core/route/routes.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../data/models/banner_model.dart';
 
@@ -29,40 +31,44 @@ class _HomeBannersCarosalState extends State<HomeBannersCarosal> {
           carouselController: widget.carouselController,
           itemCount: widget.banners.length,
           itemBuilder: (context, index, realIndex) {
-            final bannerImage = widget.banners[index].image;
+            final banner = widget.banners[index];
+            final bannerImage = banner.image;
             final isNetworkImage =
                 bannerImage.startsWith('http') ||
                 bannerImage.startsWith('https');
 
-            return Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: isNetworkImage
-                    ? CachedNetworkImage(
-                        imageUrl: bannerImage,
-                        fit: BoxFit.fill,
-                        width: double.infinity,
-                        height: double.infinity,
-                        placeholder: (context, url) => Container(
-                          color: context.colors.defaultSubtle,
-                          // child: const Center(
-                          //   child: CircularProgressIndicator(),
-                          // ),
-                        ),
-                        errorWidget: (context, url, error) => Image.asset(
-                          "assets/images/banner_demo.png",
+            return GestureDetector(
+              onTap: () => _handleBannerTap(context, banner),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: isNetworkImage
+                      ? CachedNetworkImage(
+                          imageUrl: bannerImage,
                           fit: BoxFit.fill,
+                          width: double.infinity,
+                          height: double.infinity,
+                          placeholder: (context, url) => Container(
+                            color: context.colors.defaultSubtle,
+                            // child: const Center(
+                            //   child: CircularProgressIndicator(),
+                            // ),
+                          ),
+                          errorWidget: (context, url, error) => Image.asset(
+                            "assets/images/banner_demo.png",
+                            fit: BoxFit.fill,
+                          ),
+                        )
+                      : Image.asset(
+                          bannerImage,
+                          fit: BoxFit.fill,
+                          width: double.infinity,
+                          height: double.infinity,
                         ),
-                      )
-                    : Image.asset(
-                        bannerImage,
-                        fit: BoxFit.fill,
-                        width: double.infinity,
-                        height: double.infinity,
-                      ),
+                ),
               ),
             );
           },
@@ -120,5 +126,47 @@ class _HomeBannersCarosalState extends State<HomeBannersCarosal> {
         ],
       ],
     );
+  }
+
+  Future<void> _handleBannerTap(
+    BuildContext context,
+    BannerModel banner,
+  ) async {
+    switch (banner.ctaType) {
+      case 'URL':
+        final target = banner.ctaTarget;
+        if (target == null || target.isEmpty) return;
+        try {
+          final ok = await launchUrl(
+            Uri.parse(target),
+            mode: LaunchMode.externalApplication,
+          );
+          if (!ok && context.mounted) {
+            context.showWarningSnackBar(
+              context.isAr ? 'تعذّر فتح الرابط.' : 'Could not open the link.',
+            );
+          }
+        } catch (_) {
+          if (context.mounted) {
+            context.showWarningSnackBar(
+              context.isAr ? 'تعذّر فتح الرابط.' : 'Could not open the link.',
+            );
+          }
+        }
+        break;
+      case 'DEEPLINK':
+        switch (banner.ctaTarget) {
+          case 'packages':
+            Navigator.pushNamed(context, Routes.packages);
+            break;
+          default:
+            // Unknown deeplink target — safe no-op.
+            break;
+        }
+        break;
+      default:
+        // 'NONE' / null / unknown — no-op.
+        break;
+    }
   }
 }
