@@ -83,7 +83,7 @@ class _MoyasarPaymentViewState extends State<MoyasarPaymentView>
       metadata: widget.args.init.metadata,
       givenID: widget.args.init.givenId,
       applePay: moyasar.ApplePayConfig(
-        merchantId: MoyasarConfig.applePayMerchantId,
+        merchantId: 'merchant.sa.aquago.moysar',
         label: MoyasarConfig.applePayLabel,
         manual: false,
         saveCard: false,
@@ -92,26 +92,65 @@ class _MoyasarPaymentViewState extends State<MoyasarPaymentView>
   }
 
   void _onPaymentResult(dynamic result) {
+    debugPrint('Moyasar payment result (${result.runtimeType}): $result');
     if (!mounted) return;
     if (result is moyasar.PaymentResponse) {
       switch (result.status) {
         case moyasar.PaymentStatus.paid:
           Navigator.of(context).pop(MoyasarPaymentResult.paid(result.id));
-          break;
+          return;
         case moyasar.PaymentStatus.failed:
-          Navigator.of(context).pop(const MoyasarPaymentResult.failed());
-          break;
+          // Processor decline (e.g. "DECLINED", "INSUFFICIENT FUNDS"). Surface
+          // the reason so it isn't a silent "Payment Not Completed".
+          _failWith('${result.status.name}\n$result');
+          return;
         case moyasar.PaymentStatus.initiated:
         case moyasar.PaymentStatus.authorized:
         case moyasar.PaymentStatus.captured:
-          break; // interim — SDK still handling 3DS; do not pop
+          return; // interim — SDK still handling 3DS; do not pop
       }
-    } else if (result is moyasar.PaymentCanceledError) {
-      Navigator.of(context).pop(const MoyasarPaymentResult.cancelled());
-    } else {
-      // ApiError / unknown — treat as a failed attempt, return to method selection.
-      Navigator.of(context).pop(const MoyasarPaymentResult.failed());
     }
+    // A genuine user dismissal carries no error worth showing.
+    if (result is moyasar.PaymentCanceledError) {
+      Navigator.of(context).pop(const MoyasarPaymentResult.cancelled());
+      return;
+    }
+    // Everything else — UnprocessableTokenError (Apple Pay token Moyasar could
+    // NOT decrypt → certificate/private-key mismatch), ApiError, or any unknown
+    // error. Previously UnprocessableTokenError was swallowed as "cancelled",
+    // hiding the exact failure. Surface the error class + detail so it is
+    // diagnosable from a TestFlight build (no console access), then return a
+    // failed result to the caller.
+    _failWith('${result.runtimeType}\n$result');
+  }
+
+  /// Shows the raw failure detail in a dialog (so a TestFlight tester can read /
+  /// screenshot it), then pops with a failed result. Awaited so the dialog is
+  /// not torn down by the route pop.
+  Future<void> _failWith(String detail) async {
+    if (!mounted) return;
+    final isAr = context.isAr;
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        title: Text(isAr ? 'تعذّر إتمام الدفع' : 'Payment not completed'),
+        content: SingleChildScrollView(
+          child: Text(
+            detail,
+            style: const TextStyle(fontSize: 13, color: _ink),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(isAr ? 'حسناً' : 'OK'),
+          ),
+        ],
+      ),
+    );
+    if (!mounted) return;
+    Navigator.of(context).pop(const MoyasarPaymentResult.failed());
   }
 
   // Staggered fade + slide-up reveal driven by the single intro controller.
