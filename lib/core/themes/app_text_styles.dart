@@ -84,6 +84,9 @@ class AppTextStyles {
   static TextStyle get regular20 =>
       TextStyle(fontWeight: FontWeight.w400, fontSize: _sp(20));
 
+  static TextStyle get regular22 =>
+      TextStyle(fontWeight: FontWeight.w400, fontSize: _sp(22));
+
   // 3XL (24px)
   static TextStyle get medium24 =>
       TextStyle(fontWeight: FontWeight.w500, fontSize: _sp(24));

@@ -145,6 +145,7 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
               title: bookingState.flowConfig.isReschedule
                   ? LocaleKeys.bookings_reschedule_booking.tr(context: context)
                   : LocaleKeys.bookings_booking_details.tr(context: context),
+              titleColor: Colors.white,
               hasBackground: true,
               backgroundImage: AppAssets.bookingHeaderImage,
               centerTitle: true,

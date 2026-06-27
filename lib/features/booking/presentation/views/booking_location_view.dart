@@ -87,6 +87,7 @@ class _BookingLocationViewState extends State<BookingLocationView> {
         backgroundColor: context.colors.screenBG,
         appBar: GenericAppBar(
           title: LocaleKeys.bookings_choose_car_location.tr(context: context),
+          titleColor: Colors.white,
           hasBackground: true,
           backgroundImage: AppAssets.bookingHeaderImage,
           centerTitle: true,
@@ -108,8 +109,12 @@ class _BookingLocationViewState extends State<BookingLocationView> {
 
                 if (!state.isLocationServiceEnabled) {
                   context.showDialogBox(
-                    message: LocaleKeys.address_location_disabled_message.tr(context: context),
-                    mainButtonText: LocaleKeys.address_go_to_settings.tr(context: context),
+                    message: LocaleKeys.address_location_disabled_message.tr(
+                      context: context,
+                    ),
+                    mainButtonText: LocaleKeys.address_go_to_settings.tr(
+                      context: context,
+                    ),
                     onMainButtonPressed: () {
                       Navigator.pop(context);
                       _mapsCubit.openLocationSettings();
@@ -256,7 +261,9 @@ class _BookingLocationViewState extends State<BookingLocationView> {
                               ),
                               SizedBox(height: height * 0.03),
                               Text(
-                                LocaleKeys.address_my_addresses.tr(context: context),
+                                LocaleKeys.address_my_addresses.tr(
+                                  context: context,
+                                ),
                                 style: AppTextStyles.regular16.copyWith(
                                   color: context.colors.textPrimary,
                                 ),
@@ -281,7 +288,9 @@ class _BookingLocationViewState extends State<BookingLocationView> {
                                   color: context.colors.primary,
                                   size: width * 0.06,
                                 ),
-                                text: LocaleKeys.address_add_new_location.tr(context: context),
+                                text: LocaleKeys.address_add_new_location.tr(
+                                  context: context,
+                                ),
                                 onPressed: () {
                                   context
                                       .pushNamed(
@@ -339,13 +348,17 @@ class _BookingLocationViewState extends State<BookingLocationView> {
             return BottomActionSheetContainer(
               child: CustomButton(
                 enabled: isValid,
-                text: LocaleKeys.bookings_save_car_location.tr(context: context),
+                text: LocaleKeys.bookings_save_car_location.tr(
+                  context: context,
+                ),
                 onPressed: () async {
                   AddressModel? address;
                   if (selectedLocationIndex == 0) {
                     address = AddressModel(
                       id: 'current_gps',
-                      label: LocaleKeys.address_current_location.tr(context: context),
+                      label: LocaleKeys.address_current_location.tr(
+                        context: context,
+                      ),
                       details: mapsState.selectedAddressName,
                       lat: mapsState.currentPosition?.latitude ?? 0.0,
                       lng: mapsState.currentPosition?.longitude ?? 0.0,

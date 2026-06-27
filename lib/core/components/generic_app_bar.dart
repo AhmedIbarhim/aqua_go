@@ -1,11 +1,13 @@
+import 'package:aqua_go/core/themes/app_text_styles.dart';
 import 'package:flutter/material.dart';
 
 import '../extentions/context_extentions.dart';
 
 class GenericAppBar extends StatelessWidget implements PreferredSizeWidget {
   const GenericAppBar({
-    this.title,
     super.key,
+    this.title,
+    this.titleColor,
     this.leading,
     this.trailing,
     this.actions,
@@ -23,6 +25,7 @@ class GenericAppBar extends StatelessWidget implements PreferredSizeWidget {
   });
 
   final String? title;
+  final Color? titleColor;
   final Widget? leading;
   final Widget? trailing;
   final Widget? titleWidget;
@@ -70,12 +73,23 @@ class GenericAppBar extends StatelessWidget implements PreferredSizeWidget {
                       () {
                         Navigator.of(context).pop();
                       },
-                  icon: const Icon(Icons.arrow_back),
+                  icon: Icon(
+                    Icons.arrow_back,
+                    color: titleColor ?? context.colors.textPrimary,
+                  ),
                 )
               : null),
       title:
           titleWidget ??
-          (title != null ? Text(title!, textAlign: TextAlign.center) : null),
+          (title != null
+              ? Text(
+                  title!,
+                  textAlign: TextAlign.center,
+                  style: AppTextStyles.regular22.copyWith(
+                    color: titleColor ?? context.colors.textPrimary,
+                  ),
+                )
+              : null),
     );
   }
 

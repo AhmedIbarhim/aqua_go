@@ -73,14 +73,8 @@ class _ProfileViewState extends State<ProfileView> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          if (FetchUserData.getEmail() != null) ...[
-                            SvgPicture.asset(
-                              AppAssets.verified,
-                              width: sw(18),
-                              height: sh(18),
-                            ),
-                            SizedBox(width: sw(4)),
-                          ],
+                          if (FetchUserData.getEmail() != null)
+                            SizedBox(width: sw(22)),
 
                           Text(
                             user?.name ?? FetchUserData.getUserName(),
@@ -89,8 +83,15 @@ class _ProfileViewState extends State<ProfileView> {
                             ),
                           ),
 
-                          if (FetchUserData.getEmail() != null)
-                            SizedBox(width: sw(22)),
+                          if (FetchUserData.getEmail() != null) ...[
+                            SizedBox(width: sw(4)),
+
+                            SvgPicture.asset(
+                              AppAssets.verified,
+                              width: sw(18),
+                              height: sh(18),
+                            ),
+                          ],
                         ],
                       ),
                       if (!isGuest) ...[
