@@ -41,6 +41,7 @@ class PhoneOtpView extends StatelessWidget {
           }
         },
         child: AuthScaffold(
+          showBackButton: true,
           content: PhoneOtpContent(
             phoneNumber: phoneNumber,
             otpSessionId: otpSessionId,

@@ -20,9 +20,7 @@ class AuthScaffold extends StatelessWidget {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       extendBodyBehindAppBar: true,
-      // Transparent over the background image (body extends behind it). The
-      // AppBar's leading slot is direction-aware: the arrow sits at the start —
-      // top-right in Arabic (RTL), top-left in English (LTR) — automatically.
+
       appBar: showBackButton
           ? AppBar(
               backgroundColor: Colors.transparent,
@@ -31,7 +29,7 @@ class AuthScaffold extends StatelessWidget {
               leading: Navigator.of(context).canPop()
                   ? IconButton(
                       onPressed: () => Navigator.of(context).maybePop(),
-                      icon: const Icon(Icons.arrow_back, color: Colors.white),
+                      icon: const Icon(Icons.arrow_back, color: Colors.black),
                     )
                   : null,
             )
