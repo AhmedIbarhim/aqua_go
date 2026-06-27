@@ -66,10 +66,6 @@ class _FaqsViewState extends State<FaqsView> {
                       return const SizedBox.shrink();
                     }
 
-                    if (_expandedFaqId == null && faqs.isNotEmpty) {
-                      _expandedFaqId = faqs.first.id;
-                    }
-
                     // Group FAQs by category
                     final Map<FaqsCategoriesEnum, List<FaqModel>> groupedFaqs =
                         {};

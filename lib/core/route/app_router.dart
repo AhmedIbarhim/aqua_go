@@ -85,7 +85,8 @@ abstract class AppRouter {
         return MaterialPageRoute(builder: (_) => const AddEmailView());
 
       case Routes.layout:
-        return MaterialPageRoute(builder: (_) => const MainLayout());
+        final MainLayoutArgs? args = settings.arguments as MainLayoutArgs?;
+        return MaterialPageRoute(builder: (_) => MainLayout(args: args));
 
       case Routes.offers:
         final args = settings.arguments as OffersArgs;

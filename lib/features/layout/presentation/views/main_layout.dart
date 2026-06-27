@@ -9,15 +9,29 @@ import '../widgets/main_navigation_bar.dart';
 import '../widgets/main_app_bar.dart';
 import '../widgets/lazy_indexed_stack.dart';
 
+class MainLayoutArgs {
+  final int initialIndex;
+  final String? routeName;
+  final Object? arguments;
+  MainLayoutArgs({this.initialIndex = 0, this.routeName, this.arguments});
+}
+
 class MainLayout extends StatefulWidget {
-  const MainLayout({super.key});
+  final MainLayoutArgs? args;
+  const MainLayout({super.key, this.args});
 
   @override
   State<MainLayout> createState() => MainLayoutState();
 }
 
 class MainLayoutState extends State<MainLayout> {
-  int _currentIndex = 0;
+  late int _currentIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.args?.initialIndex ?? 0;
+  }
 
   void changeIndex(int index) {
     setState(() {
