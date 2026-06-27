@@ -17,4 +17,8 @@ class ProfileRemoteDataSource {
   ) {
     return _apiClient.patch(Endpoints.notificationPreferences, data: data);
   }
+
+  Future<Either<Failure, String>> getWhatsAppNumber() async {
+    return const Right('+966599251839');
+  }
 }

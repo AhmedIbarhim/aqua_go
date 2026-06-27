@@ -28,6 +28,7 @@ import 'package:aqua_go/features/subscriptions/presentation/controllers/subscrip
 import 'package:aqua_go/features/profile/data/data_sources/profile_remote_data_source.dart';
 import 'package:aqua_go/features/profile/data/repos/profile_repository.dart';
 import 'package:aqua_go/features/profile/presentation/controllers/notification_preferences_cubit/notification_preferences_cubit.dart';
+import 'package:aqua_go/features/profile/presentation/controllers/support_cubit/support_cubit.dart';
 import 'package:aqua_go/features/notifications/data/data_sources/notifications_remote_data_source.dart';
 import 'package:aqua_go/features/notifications/data/repos/notifications_repository.dart';
 import 'package:aqua_go/features/notifications/presentation/controllers/notifications_cubit/notifications_cubit.dart';
@@ -225,4 +226,5 @@ Future<void> initServiceLocator() async {
     () => PendingRatingsCubit(locator()),
   );
   locator.registerFactory<FaqsCubit>(() => FaqsCubit(locator()));
+  locator.registerFactory<SupportCubit>(() => SupportCubit(locator()));
 }

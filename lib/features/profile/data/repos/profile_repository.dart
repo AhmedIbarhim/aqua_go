@@ -50,4 +50,8 @@ class ProfileRepository {
       },
     );
   }
+
+  Future<Either<Failure, String>> getWhatsAppNumber() async {
+    return _remoteDataSource.getWhatsAppNumber();
+  }
 }
