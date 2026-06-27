@@ -1,8 +1,10 @@
 import 'package:aqua_go/core/themes/app_colors.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/components/custom_button.dart';
 import '../../../../core/components/generic_app_bar.dart';
@@ -25,10 +27,7 @@ class PrivacyPolicyView extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: context.colors.screenBG,
-      appBar: GenericAppBar(
-        title: texts.title,
-        centerTitle: true,
-      ),
+      appBar: GenericAppBar(title: texts.title, centerTitle: true),
       body: BlocProvider(
         create: (context) => locator<AuthCubit>(),
         child: Column(
@@ -75,14 +74,9 @@ class PrivacyPolicyView extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 8),
-                            Text(
-                              section.content,
-                              style: AppTextStyles.regular16.copyWith(
-                                color: context.colors.textSecondary,
-                                height: 1.5,
-                              ),
-                            ),
-                            if (index < texts.sections.length - 1) _buildDivider(context),
+                            _buildSectionContent(context, section.content),
+                            if (index < texts.sections.length - 1)
+                              _buildDivider(context),
                           ],
                         );
                       }),
@@ -159,5 +153,77 @@ class PrivacyPolicyView extends StatelessWidget {
         thickness: 1,
       ),
     );
+  }
+
+  Widget _buildSectionContent(BuildContext context, String content) {
+    final emailRegex = RegExp(
+      r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}',
+    );
+    final matches = emailRegex.allMatches(content);
+    if (matches.isEmpty) {
+      return Text(
+        content,
+        style: AppTextStyles.regular16.copyWith(
+          color: context.colors.textSecondary,
+          height: 1.5,
+        ),
+      );
+    }
+
+    final List<InlineSpan> spans = [];
+    int lastMatchEnd = 0;
+    for (final match in matches) {
+      if (match.start > lastMatchEnd) {
+        spans.add(
+          TextSpan(
+            text: content.substring(lastMatchEnd, match.start),
+            style: AppTextStyles.regular16.copyWith(
+              color: context.colors.textSecondary,
+              height: 1.5,
+            ),
+          ),
+        );
+      }
+      final email = match.group(0)!;
+      spans.add(
+        TextSpan(
+          text: email,
+          style: AppTextStyles.regular16.copyWith(
+            color: context.colors.primary,
+            decoration: TextDecoration.underline,
+            height: 1.5,
+          ),
+          recognizer: TapGestureRecognizer()
+            ..onTap = () async {
+              final Uri emailLaunchUri = Uri(scheme: 'mailto', path: email);
+              try {
+                await launchUrl(emailLaunchUri);
+              } catch (_) {
+                try {
+                  final fallbackUri = Uri.parse('https://$email');
+                  await launchUrl(
+                    fallbackUri,
+                    mode: LaunchMode.externalApplication,
+                  );
+                } catch (_) {}
+              }
+            },
+        ),
+      );
+      lastMatchEnd = match.end;
+    }
+    if (lastMatchEnd < content.length) {
+      spans.add(
+        TextSpan(
+          text: content.substring(lastMatchEnd),
+          style: AppTextStyles.regular16.copyWith(
+            color: context.colors.textSecondary,
+            height: 1.5,
+          ),
+        ),
+      );
+    }
+
+    return RichText(text: TextSpan(children: spans));
   }
 }
