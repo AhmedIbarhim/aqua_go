@@ -201,7 +201,10 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
               serviceName: serviceName,
               carName:
                   '${bookingState.selectedCar!.carMake!.vehicleMakeName.localizedName} ${bookingState.selectedCar!.carModel!.vehicleModelName.localizedName}',
-              location: bookingState.selectedAddress?.details ?? '',
+              location:
+                  bookingState.selectedAddress?.label ??
+                  bookingState.selectedAddress?.details ??
+                  '',
               dateTime: bookingState.selectedDate != null
                   ? '${bookingState.selectedDate!.month}/${bookingState.selectedDate!.day}/${bookingState.selectedDate!.year} - ${bookingState.selectedTime ?? ""}'
                   : '',

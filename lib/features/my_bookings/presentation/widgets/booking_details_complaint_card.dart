@@ -13,19 +13,20 @@ import 'package:aqua_go/features/complaints/data/models/complaint_model.dart';
 import 'package:aqua_go/features/complaints/data/repos/complaints_repository.dart';
 import 'package:aqua_go/features/complaints/presentation/views/complaint_details_view.dart';
 
+import '../../../complaints/data/enums/complaint_category_enum.dart';
+
 class BookingDetailsComplaintCard extends StatefulWidget {
   final String complaintId;
 
-  const BookingDetailsComplaintCard({
-    super.key,
-    required this.complaintId,
-  });
+  const BookingDetailsComplaintCard({super.key, required this.complaintId});
 
   @override
-  State<BookingDetailsComplaintCard> createState() => _BookingDetailsComplaintCardState();
+  State<BookingDetailsComplaintCard> createState() =>
+      _BookingDetailsComplaintCardState();
 }
 
-class _BookingDetailsComplaintCardState extends State<BookingDetailsComplaintCard> {
+class _BookingDetailsComplaintCardState
+    extends State<BookingDetailsComplaintCard> {
   late Future<dartz.Either<Failure, ComplaintModel>> _complaintFuture;
 
   @override
@@ -35,7 +36,9 @@ class _BookingDetailsComplaintCardState extends State<BookingDetailsComplaintCar
   }
 
   void _fetchComplaint() {
-    _complaintFuture = locator<ComplaintsRepository>().getComplaintDetail(widget.complaintId);
+    _complaintFuture = locator<ComplaintsRepository>().getComplaintDetail(
+      widget.complaintId,
+    );
   }
 
   @override
@@ -103,10 +106,7 @@ class _BookingDetailsComplaintCardState extends State<BookingDetailsComplaintCar
                   style: AppTextStyles.medium14,
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  '2026-06-23',
-                  style: AppTextStyles.regular12,
-                ),
+                Text('2026-06-23', style: AppTextStyles.regular12),
               ],
             ),
             Container(
@@ -115,10 +115,7 @@ class _BookingDetailsComplaintCardState extends State<BookingDetailsComplaintCar
                 color: Colors.grey[350],
                 borderRadius: BorderRadius.circular(100),
               ),
-              child: Text(
-                'Status',
-                style: AppTextStyles.regular12,
-              ),
+              child: Text('Status', style: AppTextStyles.regular12),
             ),
           ],
         ),
@@ -129,7 +126,9 @@ class _BookingDetailsComplaintCardState extends State<BookingDetailsComplaintCar
   Widget _buildErrorState(BuildContext context, String? errorMessage) {
     final finalMessage = errorMessage != null && errorMessage.isNotEmpty
         ? errorMessage
-        : (context.isAr ? 'فشل تحميل تفاصيل الشكوى' : 'Failed to load complaint details');
+        : (context.isAr
+              ? 'فشل تحميل تفاصيل الشكوى'
+              : 'Failed to load complaint details');
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -149,10 +148,7 @@ class _BookingDetailsComplaintCardState extends State<BookingDetailsComplaintCar
             ),
           ),
           IconButton(
-            icon: Icon(
-              Icons.refresh,
-              color: context.colors.primary,
-            ),
+            icon: Icon(Icons.refresh, color: context.colors.primary),
             onPressed: () {
               setState(() {
                 _fetchComplaint();
@@ -216,7 +212,10 @@ class _BookingDetailsComplaintCardState extends State<BookingDetailsComplaintCar
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: status.getBgColor(context),
                     borderRadius: BorderRadius.circular(100),

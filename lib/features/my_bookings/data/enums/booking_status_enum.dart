@@ -47,24 +47,25 @@ enum BookingStatus {
   }
 
   Color getStatusBg(BuildContext context) {
-    switch (this) {
-      case BookingStatus.UNSCHEDULED:
-        return Colors.grey.shade400;
-      case BookingStatus.PENDING:
-        return Colors.orange;
-      case BookingStatus.ASSIGNED:
-        return Colors.teal;
-      case BookingStatus.ON_THE_WAY:
-        return Colors.blueAccent;
-      case BookingStatus.ARRIVED:
-        return Colors.purple;
-      case BookingStatus.STARTED:
-        return Colors.blue;
-      case BookingStatus.COMPLETED:
-        return Colors.green;
-      case BookingStatus.CANCELLED:
-        return Colors.red;
-    }
+    return context.colors.warning;
+    // switch (this) {
+    //   case BookingStatus.UNSCHEDULED:
+    //     return Colors.grey.shade400;
+    //   case BookingStatus.PENDING:
+    //     return Colors.orange;
+    //   case BookingStatus.ASSIGNED:
+    //     return Colors.teal;
+    //   case BookingStatus.ON_THE_WAY:
+    //     return Colors.blueAccent;
+    //   case BookingStatus.ARRIVED:
+    //     return Colors.purple;
+    //   case BookingStatus.STARTED:
+    //     return Colors.blue;
+    //   case BookingStatus.COMPLETED:
+    //     return Colors.green;
+    //   case BookingStatus.CANCELLED:
+    //     return Colors.red;
+    // }
   }
 
   Color getStatusTextColor(BuildContext context) {

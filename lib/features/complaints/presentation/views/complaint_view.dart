@@ -16,6 +16,8 @@ import 'package:svg_flutter/svg.dart';
 
 import '../../../../core/components/bottom_action_sheet_container.dart';
 import '../../../../generated/locale_keys.g.dart';
+import '../../data/enums/complaint_category_enum.dart';
+import '../../data/enums/complaint_status_enum.dart';
 import '../../data/models/complaint_model.dart';
 import '../controllers/complaints_cubit/complaints_cubit.dart';
 import '../controllers/complaints_cubit/complaints_state.dart';
