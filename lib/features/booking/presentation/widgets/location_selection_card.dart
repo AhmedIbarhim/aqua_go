@@ -1,10 +1,10 @@
-import 'package:easy_localization/easy_localization.dart';
+// import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/themes/app_text_styles.dart';
-import '../../../../core/utils/app_assets.dart';
-import '../../../../generated/locale_keys.g.dart';
+// import '../../../../core/utils/app_assets.dart';
+// import '../../../../generated/locale_keys.g.dart';
 
 class LocationSelectionCard extends StatelessWidget {
   final String title;
@@ -59,33 +59,33 @@ class LocationSelectionCard extends StatelessWidget {
                         : context.colors.textSecondary,
                   ),
                 ),
-                if (onEdit != null)
-                  InkWell(
-                    onTap: onEdit,
-                    child: Row(
-                      children: [
-                        SvgPicture.asset(
-                          AppAssets.edit,
-                          width: 20,
-                          colorFilter: ColorFilter.mode(
-                            context.colors.primary,
-                            BlendMode.srcIn,
-                          ),
-                        ),
+                // if (onEdit != null)
+                //   InkWell(
+                //     onTap: onEdit,
+                //     child: Row(
+                //       children: [
+                //         SvgPicture.asset(
+                //           AppAssets.edit,
+                //           width: 20,
+                //           colorFilter: ColorFilter.mode(
+                //             context.colors.primary,
+                //             BlendMode.srcIn,
+                //           ),
+                //         ),
 
-                        const SizedBox(width: 4),
+                //         const SizedBox(width: 4),
 
-                        Text(
-                          LocaleKeys.edit.tr(context: context),
-                          style: AppTextStyles.medium14.copyWith(
-                            color: context.colors.primary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                else
-                  const SizedBox.shrink(),
+                //         Text(
+                //           LocaleKeys.edit.tr(context: context),
+                //           style: AppTextStyles.medium14.copyWith(
+                //             color: context.colors.primary,
+                //           ),
+                //         ),
+                //       ],
+                //     ),
+                //   )
+                // else
+                //   const SizedBox.shrink(),
               ],
             ),
             const SizedBox(height: 4),

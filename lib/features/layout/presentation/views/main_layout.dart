@@ -66,6 +66,7 @@ class MainLayoutState extends State<MainLayout> {
             appBar: _currentIndex == 3 ? null : const MainAppBar(),
             body: LazyIndexedStack(
               index: _currentIndex,
+              unloadableIndices: const [2], // 2 represents MyBookingsView
               children: List.generate(
                 _pageBuilders.length,
                 (i) => _pageBuilders[i],

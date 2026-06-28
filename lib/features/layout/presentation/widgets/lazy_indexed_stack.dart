@@ -6,6 +6,7 @@ class LazyIndexedStack extends StatefulWidget {
   final AlignmentGeometry alignment;
   final TextDirection? textDirection;
   final StackFit sizing;
+  final List<int>? unloadableIndices;
 
   const LazyIndexedStack({
     super.key,
@@ -14,6 +15,7 @@ class LazyIndexedStack extends StatefulWidget {
     this.alignment = AlignmentDirectional.topStart,
     this.textDirection,
     this.sizing = StackFit.loose,
+    this.unloadableIndices,
   });
 
   @override
@@ -35,7 +37,15 @@ class _LazyIndexedStackState extends State<LazyIndexedStack> {
   @override
   void didUpdateWidget(LazyIndexedStack oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (!_activated[widget.index]) {
+    if (widget.index != oldWidget.index) {
+      setState(() {
+        if (widget.unloadableIndices != null &&
+            widget.unloadableIndices!.contains(oldWidget.index)) {
+          _activated[oldWidget.index] = false;
+        }
+        _activated[widget.index] = true;
+      });
+    } else if (!_activated[widget.index]) {
       setState(() {
         _activated[widget.index] = true;
       });
