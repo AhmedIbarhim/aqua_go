@@ -80,7 +80,7 @@ enum BookingStatus {
       case BookingStatus.STARTED:
       case BookingStatus.COMPLETED:
       case BookingStatus.CANCELLED:
-        return Colors.white;
+        return Colors.black;
     }
   }
 }
