@@ -354,7 +354,8 @@
         "connection_timeout": "تعذر الاتصال بالخادم. يرجى المحاولة مرة أخرى",
         "default_error": "عذرا، حدث خطأ ما. يرجى المحاولة مرة أخرى لاحقًا",
         "booking_created": "تم إنشاء الحجز بنجاح",
-        "booking_rescheduled": "تم تعديل الحجز بنجاح"
+        "booking_rescheduled": "تم تعديل الحجز بنجاح",
+        "double_tap_to_exit": "اضغط رجوع مرة أخرى للخروج"
     },
     "errors": {
         "internal_error": "الموقع قيد الصيانة، سنعود قريباً"

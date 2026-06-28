@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:easy_localization/easy_localization.dart';
+import '../../../../generated/locale_keys.g.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../my_bookings/presentation/views/my_bookings_view.dart';
@@ -26,6 +29,7 @@ class MainLayout extends StatefulWidget {
 
 class MainLayoutState extends State<MainLayout> {
   late int _currentIndex;
+  DateTime? _lastPressed;
 
   @override
   void initState() {
@@ -49,40 +53,56 @@ class MainLayoutState extends State<MainLayout> {
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.sizeOf(context).height;
-    return Scaffold(
-      body: Stack(
-        children: [
-          if (_currentIndex == 0)
-            context.isLightTheme
-                ? Image.asset(
-                    AppAssets.homeLightHeader,
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                    height: height * 0.45,
-                  )
-                : SizedBox(height: height * 0.45),
-          Scaffold(
-            backgroundColor: Colors.transparent,
-            appBar: _currentIndex == 3 ? null : const MainAppBar(),
-            body: LazyIndexedStack(
-              index: _currentIndex,
-              unloadableIndices: const [2], // 2 represents MyBookingsView
-              children: List.generate(
-                _pageBuilders.length,
-                (i) => _pageBuilders[i],
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        final now = DateTime.now();
+        if (_lastPressed == null ||
+            now.difference(_lastPressed!) > const Duration(seconds: 2)) {
+          _lastPressed = now;
+          context.showWarningSnackBar(
+            LocaleKeys.snackbar_double_tap_to_exit.tr(context: context),
+          );
+        } else {
+          SystemNavigator.pop();
+        }
+      },
+      child: Scaffold(
+        body: Stack(
+          children: [
+            if (_currentIndex == 0)
+              context.isLightTheme
+                  ? Image.asset(
+                      AppAssets.homeLightHeader,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: height * 0.45,
+                    )
+                  : SizedBox(height: height * 0.45),
+            Scaffold(
+              backgroundColor: Colors.transparent,
+              appBar: _currentIndex == 3 ? null : const MainAppBar(),
+              body: LazyIndexedStack(
+                index: _currentIndex,
+                unloadableIndices: const [2], // 2 represents MyBookingsView
+                children: List.generate(
+                  _pageBuilders.length,
+                  (i) => _pageBuilders[i],
+                ),
               ),
+              bottomNavigationBar: MainNavigationBar(
+                currentIndex: _currentIndex,
+                onTap: (index) {
+                  setState(() {
+                    _currentIndex = index;
+                  });
+                },
+              ),
+              extendBody: true,
             ),
-            bottomNavigationBar: MainNavigationBar(
-              currentIndex: _currentIndex,
-              onTap: (index) {
-                setState(() {
-                  _currentIndex = index;
-                });
-              },
-            ),
-            extendBody: true,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
