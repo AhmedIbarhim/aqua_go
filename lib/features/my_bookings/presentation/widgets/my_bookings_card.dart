@@ -5,9 +5,11 @@ import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:svg_flutter/svg.dart';
 
 import '../../data/models/booking_summary_model.dart';
+import '../controllers/my_bookings_cubit.dart';
 import '../views/my_booking_details_view.dart';
 
 class MyBookingsCard extends StatelessWidget {
@@ -38,20 +40,23 @@ class MyBookingsCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 16),
-              if (booking.isUpcoming)
+              // Show the actual per-status badge (localized + colour-coded) so a
+              // refresh visibly reflects every state change — not just the
+              // terminal ones that move the booking between tabs.
+              if (booking.status != null)
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
+                    horizontal: 16,
                     vertical: 8,
                   ),
                   decoration: BoxDecoration(
-                    color: context.colors.warning,
+                    color: booking.status!.getStatusBg(context),
                     borderRadius: BorderRadius.circular(100),
                   ),
                   child: Text(
-                    LocaleKeys.bookings_upcoming.tr(context: context),
+                    booking.status!.getStatusText(context),
                     style: AppTextStyles.regular12.copyWith(
-                      color: context.colors.screenBG,
+                      color: booking.status!.getStatusTextColor(context),
                     ),
                   ),
                 ),
@@ -114,11 +119,18 @@ class MyBookingsCard extends StatelessWidget {
           const SizedBox(height: 16),
           // Actions
           GestureDetector(
-            onTap: () {
-              context.pushNamed(
+            onTap: () async {
+              // Re-fetch the list when returning from the detail so any status
+              // change made there (pull-to-refresh, cancel, reschedule, rate) is
+              // reflected — the detail has its own cubit; the list cache is
+              // otherwise never told. isRefresh keeps the list visible (no spinner).
+              await context.pushNamed(
                 Routes.myBookingDetails,
                 arguments: MyBookingDetailsArgs(booking: booking),
               );
+              if (context.mounted) {
+                context.read<MyBookingsCubit>().fetchBookings(isRefresh: true);
+              }
             },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

@@ -109,13 +109,29 @@ class _MyBookingsViewState extends State<MyBookingsView> {
                                     .read<MyBookingsCubit>()
                                     .fetchBookings(isRefresh: true);
                               },
-                              child: EmptyBookingsWidget(
-                                hasOnlyUpcoming: _selectedIndex == 1
-                                    ? state.bookings.every(
-                                        (booking) => booking.isUpcoming,
-                                      )
-                                    : false,
-                                showBookNowButton: state.bookings.isEmpty,
+                              // Make the empty state fill + scroll so the pull
+                              // gesture engages the RefreshIndicator.
+                              child: LayoutBuilder(
+                                builder: (context, constraints) =>
+                                    SingleChildScrollView(
+                                      physics:
+                                          const AlwaysScrollableScrollPhysics(),
+                                      child: ConstrainedBox(
+                                        constraints: BoxConstraints(
+                                          minHeight: constraints.maxHeight,
+                                        ),
+                                        child: EmptyBookingsWidget(
+                                          hasOnlyUpcoming: _selectedIndex == 1
+                                              ? state.bookings.every(
+                                                  (booking) =>
+                                                      booking.isUpcoming,
+                                                )
+                                              : false,
+                                          showBookNowButton:
+                                              state.bookings.isEmpty,
+                                        ),
+                                      ),
+                                    ),
                               ),
                             );
                           }
