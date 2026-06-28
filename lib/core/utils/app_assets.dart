@@ -16,6 +16,7 @@ abstract class AppAssets {
   static const String homeLightHeader = 'assets/images/home_light_header.png';
   static const String baseServiceDark = 'assets/images/base_service_dark.png';
   static const String baseServiceLight = 'assets/images/base_service_light.png';
+  static const String demoBanner = 'assets/images/banner_demo.webp';
 
   // Empty Screens
   static const String emptyCars = 'assets/svg/empty_folder.svg';
@@ -101,9 +102,7 @@ abstract class AppAssets {
   static const String colorSwatch = 'assets/svg/color_swatch.svg';
   static const String colorDropper = 'assets/images/color_dropper.png';
   static const String note = 'assets/svg/note.svg';
-  static const String myCar = 'assets/images/my_car.png';
   static const String myVehicle = 'assets/images/my_vehicle.png';
-  static const String demoLandcroser = 'assets/images/demo_landcroser.png';
 
   // Booking
   static const String packageDefault = 'assets/svg/package_default.svg';

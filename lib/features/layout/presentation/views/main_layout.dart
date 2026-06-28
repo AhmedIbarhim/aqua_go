@@ -63,6 +63,7 @@ class MainLayoutState extends State<MainLayout> {
           _lastPressed = now;
           context.showWarningSnackBar(
             LocaleKeys.snackbar_double_tap_to_exit.tr(context: context),
+            duration: const Duration(seconds: 2),
           );
         } else {
           SystemNavigator.pop();

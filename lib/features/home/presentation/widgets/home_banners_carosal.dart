@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/route/routes.dart';
 import '../../../../core/extentions/context_extentions.dart';
+import '../../../../core/utils/app_assets.dart';
 import '../../data/models/banner_model.dart';
 
 class HomeBannersCarosal extends StatefulWidget {
@@ -58,7 +59,7 @@ class _HomeBannersCarosalState extends State<HomeBannersCarosal> {
                             // ),
                           ),
                           errorWidget: (context, url, error) => Image.asset(
-                            "assets/images/banner_demo.png",
+                            AppAssets.demoBanner,
                             fit: BoxFit.fill,
                           ),
                         )
