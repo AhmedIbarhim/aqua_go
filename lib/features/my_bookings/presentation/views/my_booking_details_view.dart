@@ -246,6 +246,7 @@ class MyBookingDetailsView extends StatelessWidget {
       case BookingStatus.ASSIGNED:
       case BookingStatus.ON_THE_WAY:
       case BookingStatus.ARRIVED:
+      case BookingStatus.CANT_FIND_CLIENT:
       case BookingStatus.STARTED:
       case BookingStatus.COMPLETED:
         return true;

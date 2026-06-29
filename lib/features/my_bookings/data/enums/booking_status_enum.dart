@@ -9,6 +9,7 @@ enum BookingStatus {
   ASSIGNED,
   ON_THE_WAY,
   ARRIVED,
+  CANT_FIND_CLIENT,
   STARTED,
   COMPLETED,
   CANCELLED;
@@ -37,6 +38,8 @@ enum BookingStatus {
         return isAr ? 'العامل في الطريق' : 'On the Way';
       case BookingStatus.ARRIVED:
         return isAr ? 'وصل العامل' : 'Biker Arrived';
+      case BookingStatus.CANT_FIND_CLIENT:
+        return isAr ? 'العميل غير موجود' : 'Customer Not Found';
       case BookingStatus.STARTED:
         return isAr ? 'بدأ الغسيل' : 'Washing Started';
       case BookingStatus.COMPLETED:
@@ -77,6 +80,7 @@ enum BookingStatus {
       case BookingStatus.ASSIGNED:
       case BookingStatus.ON_THE_WAY:
       case BookingStatus.ARRIVED:
+      case BookingStatus.CANT_FIND_CLIENT:
       case BookingStatus.STARTED:
       case BookingStatus.COMPLETED:
       case BookingStatus.CANCELLED:
