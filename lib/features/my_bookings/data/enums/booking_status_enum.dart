@@ -41,7 +41,7 @@ enum BookingStatus {
       case BookingStatus.CANT_FIND_CLIENT:
         return isAr ? 'العميل غير موجود' : 'Customer Not Found';
       case BookingStatus.STARTED:
-        return isAr ? 'بدأ الغسيل' : 'Washing Started';
+        return isAr ? 'جاري الغسيل' : 'Wash in Progress';
       case BookingStatus.COMPLETED:
         return isAr ? 'مكتمل' : 'Completed';
       case BookingStatus.CANCELLED:
