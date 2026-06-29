@@ -112,34 +112,38 @@ class MainNavigationBar extends StatelessWidget {
               : context.colors.primary,
           borderRadius: BorderRadius.circular(sw(100)),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SvgPicture.asset(
-              isActive ? iconEnabled : iconDisabled,
-              width: sw(24),
-              height: sw(24),
-              colorFilter: ColorFilter.mode(
-                isActive
-                    ? context.isDarkTheme
-                          ? context.colors.primary
-                          : context.colors.themeColor
-                    : context.colors.contentDisabled,
-                BlendMode.srcIn,
-              ),
-            ),
-            if (isActive) ...[
-              SizedBox(width: sw(8)),
-              Text(
-                label,
-                style: AppTextStyles.regular14.copyWith(
-                  color: context.isDarkTheme
-                      ? context.colors.primary
-                      : context.colors.themeColor,
+        child: AnimatedSize(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SvgPicture.asset(
+                isActive ? iconEnabled : iconDisabled,
+                width: sw(24),
+                height: sw(24),
+                colorFilter: ColorFilter.mode(
+                  isActive
+                      ? context.isDarkTheme
+                            ? context.colors.primary
+                            : context.colors.themeColor
+                      : context.colors.contentDisabled,
+                  BlendMode.srcIn,
                 ),
               ),
+              if (isActive) ...[
+                SizedBox(width: sw(8)),
+                Text(
+                  label,
+                  style: AppTextStyles.regular14.copyWith(
+                    color: context.isDarkTheme
+                        ? context.colors.primary
+                        : context.colors.themeColor,
+                  ),
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );

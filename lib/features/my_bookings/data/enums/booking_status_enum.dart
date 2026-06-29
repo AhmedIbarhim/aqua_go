@@ -53,38 +53,48 @@ enum BookingStatus {
     return context.colors.warning;
 
     // switch (this) {
-
-    // case BookingStatus.UNSCHEDULED:
-    //   return Colors.grey.shade500;
-    // case BookingStatus.PENDING:
-    //   return Colors.orange;
-    // case BookingStatus.ASSIGNED:
-    //   return Colors.teal;
-    // case BookingStatus.ON_THE_WAY:
-    //   return Colors.blueAccent;
-    // case BookingStatus.ARRIVED:
-    //   return Colors.purple;
-    // case BookingStatus.STARTED:
-    //   return Colors.blue;
-    // case BookingStatus.COMPLETED:
-    //   return Colors.green;
-    // case BookingStatus.CANCELLED:
-    //   return Colors.red;
+    //   case BookingStatus.UNSCHEDULED:
+    //     return Colors.grey.shade500;
+    //   case BookingStatus.PENDING:
+    //     return Colors.orange;
+    //   case BookingStatus.ASSIGNED:
+    //     return Colors.teal;
+    //   case BookingStatus.ON_THE_WAY:
+    //     return Colors.lightBlue;
+    //   case BookingStatus.ARRIVED:
+    //     return Colors.purple;
+    //   case BookingStatus.STARTED:
+    //     return Colors.blue;
+    //   case BookingStatus.COMPLETED:
+    //     return Colors.green;
+    //   case BookingStatus.CANCELLED:
+    //     return Colors.red;
+    //   case BookingStatus.CANT_FIND_CLIENT:
+    //     return Colors.redAccent;
     // }
   }
 
   Color getStatusTextColor(BuildContext context) {
-    switch (this) {
-      case BookingStatus.UNSCHEDULED:
-      case BookingStatus.PENDING:
-      case BookingStatus.ASSIGNED:
-      case BookingStatus.ON_THE_WAY:
-      case BookingStatus.ARRIVED:
-      case BookingStatus.CANT_FIND_CLIENT:
-      case BookingStatus.STARTED:
-      case BookingStatus.COMPLETED:
-      case BookingStatus.CANCELLED:
-        return Colors.black;
-    }
+    return Colors.black;
+    // switch (this) {
+    //   case BookingStatus.UNSCHEDULED:
+    //     return Colors.black;
+    //   case BookingStatus.PENDING:
+    //     return Colors.black;
+    //   case BookingStatus.ASSIGNED:
+    //     return Colors.white;
+    //   case BookingStatus.ON_THE_WAY:
+    //     return Colors.black;
+    //   case BookingStatus.ARRIVED:
+    //     return Colors.white;
+    //   case BookingStatus.CANT_FIND_CLIENT:
+    //     return Colors.black;
+    //   case BookingStatus.STARTED:
+    //     return Colors.white;
+    //   case BookingStatus.COMPLETED:
+    //     return Colors.white;
+    //   case BookingStatus.CANCELLED:
+    //     return Colors.white;
+    // }
   }
 }
