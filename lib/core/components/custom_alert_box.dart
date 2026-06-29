@@ -187,7 +187,7 @@ class SuccessAlertBox extends StatelessWidget {
               height: 1.5,
             ),
           ),
-        SizedBox(height: width * 0.06),
+        // SizedBox(height: width * 0.06),
       ],
     );
   }

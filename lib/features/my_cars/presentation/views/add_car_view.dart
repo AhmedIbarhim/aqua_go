@@ -113,12 +113,12 @@ class _AddCarViewState extends State<AddCarView> {
           context.pop(true);
           // AQG-177: auto-dismissing (~2s) success confirmation after add/edit.
           rootContext.showSuccessAlert(
-            title: '',
-            message:
+            title:
                 (isEdit
                         ? LocaleKeys.snackbar_car_updated_success
                         : LocaleKeys.snackbar_car_added_success)
                     .tr(context: rootContext),
+
             autoDismiss: true,
             dismissDuration: const Duration(seconds: 2),
           );

@@ -63,8 +63,7 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
           );
           context
               .showSuccessAlert(
-                title: '',
-                message: LocaleKeys.bookings_booking_success_message.tr(
+                title: LocaleKeys.bookings_booking_success_message.tr(
                   context: context,
                 ),
               )
