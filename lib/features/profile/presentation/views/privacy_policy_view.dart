@@ -14,6 +14,8 @@ import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../auth/presentation/controllers/auth_cubit/auth_cubit.dart';
+import '../../../my_bookings/data/enums/booking_status_enum.dart';
+import '../../../my_bookings/data/repos/my_bookings_repository.dart';
 import 'local_texts/privacy_policy_texts_ar.dart';
 import 'local_texts/privacy_policy_texts_en.dart';
 
@@ -117,7 +119,22 @@ class PrivacyPolicyView extends StatelessWidget {
                               color: context.colors.error,
                               textColor: lightAppColors.themeColor,
                               borderColor: context.colors.error,
-                              onPressed: () {
+                              onPressed: () async {
+                                context.showLoadingOverlay();
+                                final hasActive =
+                                    await _checkForActiveBooking();
+                                if (!context.mounted) return;
+                                context.hideLoadingOverlay();
+
+                                if (hasActive) {
+                                  context.showWarningSnackBar(
+                                    LocaleKeys
+                                        .auth_delete_account_active_bookings_warning
+                                        .tr(context: context),
+                                  );
+                                  return;
+                                }
+
                                 context.showWarningAlert(
                                   title: LocaleKeys.auth_delete_account.tr(
                                     context: context,
@@ -225,5 +242,22 @@ class PrivacyPolicyView extends StatelessWidget {
     }
 
     return RichText(text: TextSpan(children: spans));
+  }
+
+  Future<bool> _checkForActiveBooking() async {
+    final result = await locator<MyBookingsRepository>().getBookings(limit: 50);
+    return result.fold((failure) => false, (response) {
+      final activeStatuses = {
+        BookingStatus.PENDING,
+        BookingStatus.ASSIGNED,
+        BookingStatus.ON_THE_WAY,
+        BookingStatus.ARRIVED,
+        BookingStatus.CANT_FIND_CLIENT,
+        BookingStatus.STARTED,
+      };
+      return response.items.any(
+        (booking) => activeStatuses.contains(booking.status),
+      );
+    });
   }
 }

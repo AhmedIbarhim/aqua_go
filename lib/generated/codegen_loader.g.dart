@@ -78,6 +78,7 @@ class CodegenLoader extends AssetLoader{
     "delete_account": "حذف الحساب",
     "delete_account_confirmation": "هل أنت متأكد من حذف الحساب؟",
     "delete_account_success": "تم حذف الحساب بنجاح",
+    "delete_account_active_bookings_warning": "لا يمكنك حذف حسابك ولديك حجوزات نشطة.",
     "otp_expired_message": "انتهت صلاحية رمز التحقق، يرجى طلب رمز جديد",
     "otp_invalid_message": "رمز التحقق غير صحيح، حاول مرة أخرى",
     "otp_code_sent": "تم ارسال رمز التحقق"
@@ -440,6 +441,7 @@ static const Map<String,dynamic> _en = {
     "delete_account": "Delete Account",
     "delete_account_confirmation": "Are you sure you want to delete your account?",
     "delete_account_success": "Account deleted successfully",
+    "delete_account_active_bookings_warning": "You cannot delete your account while you have active bookings.",
     "otp_expired_message": "Your verification code has expired, please request a new one",
     "otp_invalid_message": "Invalid verification code, please try again",
     "otp_code_sent": "Verification code has been sent"

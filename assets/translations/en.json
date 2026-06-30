@@ -62,6 +62,7 @@
         "delete_account": "Delete Account",
         "delete_account_confirmation": "Are you sure you want to delete your account?",
         "delete_account_success": "Account deleted successfully",
+        "delete_account_active_bookings_warning": "You cannot delete your account while you have active bookings.",
         "otp_expired_message": "Your verification code has expired, please request a new one",
         "otp_invalid_message": "Invalid verification code, please try again",
         "otp_code_sent": "Verification code has been sent"

@@ -63,6 +63,7 @@ abstract class  LocaleKeys {
   static const auth_delete_account = 'auth.delete_account';
   static const auth_delete_account_confirmation = 'auth.delete_account_confirmation';
   static const auth_delete_account_success = 'auth.delete_account_success';
+  static const auth_delete_account_active_bookings_warning = 'auth.delete_account_active_bookings_warning';
   static const auth_otp_expired_message = 'auth.otp_expired_message';
   static const auth_otp_invalid_message = 'auth.otp_invalid_message';
   static const auth_otp_code_sent = 'auth.otp_code_sent';
