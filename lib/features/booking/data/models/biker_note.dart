@@ -10,7 +10,7 @@ enum BikerNote {
   outsideOnly(
     key: LocaleKeys.bookings_outside_only,
     ar: 'غسيل خارجي فقط',
-    en: 'Outside only',
+    en: 'Outside wash only',
   );
 
   final String key;

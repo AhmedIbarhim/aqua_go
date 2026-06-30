@@ -31,7 +31,7 @@ enum BookingStatus {
       case BookingStatus.UNSCHEDULED:
         return isAr ? 'غير مجدول' : 'Unscheduled';
       case BookingStatus.PENDING:
-        return isAr ? 'قيد الانتظار' : 'Pending';
+        return isAr ? 'قيد الانتظار' : 'On Progress';
       case BookingStatus.ASSIGNED:
         return isAr ? 'تم تعيين العامل' : 'Biker Assigned';
       case BookingStatus.ON_THE_WAY:

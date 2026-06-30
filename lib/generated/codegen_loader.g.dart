@@ -553,7 +553,7 @@ static const Map<String,dynamic> _en = {
     "confirm_payment": "Confirm Payment",
     "package_name": "Package Name",
     "dont_call": "Don't call",
-    "outside_only": "Outside only",
+    "outside_only": "Outside wash only",
     "special_note": "Special note",
     "pay_through": "Pay through",
     "apple_pay": "Apple Pay",

@@ -16,7 +16,29 @@ class BookingDetailsWorkerNotesCard extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final notesText = booking.workerNotes!.join('\n');
+    final translatedNotes = booking.workerNotes!.map((note) {
+      if (context.isAr) {
+        if (note == "Don't call") {
+          return 'لا تتصل بالهاتف';
+        } else if (note == 'Outside wash only') {
+          return 'غسيل خارجي فقط';
+        } else {
+          return note;
+        }
+      }
+      if (context.isEn) {
+        if (note == 'لا تتصل بالهاتف') {
+          return "Don't call";
+        } else if (note == 'غسيل خارجي فقط') {
+          return 'Outside wash only';
+        } else {
+          return note;
+        }
+      }
+      return note;
+    }).toList();
+
+    final notesText = translatedNotes.join('\n');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
