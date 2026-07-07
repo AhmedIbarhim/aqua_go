@@ -179,19 +179,16 @@ class _ServiceCardState extends State<ServiceCard> {
                         flex: 5,
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(20),
-                          child: Transform.flip(
-                            flipX: context.isEn,
-                            child:
-                                serviceModel.imageUrl != null &&
-                                    serviceModel.imageUrl!.isNotEmpty
-                                ? CustomNetworkImage(serviceModel.imageUrl!)
-                                : Image.asset(
-                                    context.isDarkTheme
-                                        ? AppAssets.baseServiceDark
-                                        : AppAssets.baseServiceLight,
-                                    fit: BoxFit.fill,
-                                  ),
-                          ),
+                          child:
+                              serviceModel.imageUrl != null &&
+                                  serviceModel.imageUrl!.isNotEmpty
+                              ? CustomNetworkImage(serviceModel.imageUrl!)
+                              : Image.asset(
+                                  context.isDarkTheme
+                                      ? AppAssets.baseServiceDark
+                                      : AppAssets.baseServiceLight,
+                                  fit: BoxFit.fill,
+                                ),
                         ),
                       ),
                     ],
