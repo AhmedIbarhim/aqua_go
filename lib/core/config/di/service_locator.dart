@@ -50,15 +50,15 @@ import 'package:aqua_go/features/support/presentation/controllers/faqs_cubit.dar
 import 'package:get_it/get_it.dart';
 
 import '../../../features/address/data/services/location_service.dart';
-import 'package:aqua_go/core/config/networking/endpoints.dart';
 import '../networking/api_client.dart';
 import '../networking/dio_factory.dart';
+import 'package:aqua_go/main/app_configs.dart';
 
 final GetIt locator = GetIt.instance;
 
-Future<void> initServiceLocator() async {
+Future<void> initServiceLocator(AppConfigs configs) async {
   locator.registerLazySingleton<APIClient>(
-    () => APIClient(DioFactory.create(baseUrl: Endpoints.baseUrl)),
+    () => APIClient(DioFactory.create(baseUrl: configs.baseUrl)),
   );
 
   // Services

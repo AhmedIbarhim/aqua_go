@@ -18,11 +18,12 @@ import 'firebase_options.dart';
 import 'generated/codegen_loader.g.dart';
 import 'init_notifications.dart';
 import 'package:flutter/services.dart';
+
 //569123456
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   ConnectivityHelper().init();
-  await initServiceLocator();
+  // await initServiceLocator();
   await EasyLocalization.ensureInitialized();
   await CacheClient.init();
   Bloc.observer = AppBlocObserver();
@@ -31,11 +32,17 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
   try {
-    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  } catch (e) { /* proceed without firebase */ }
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e) {
+    /* proceed without firebase */
+  }
   try {
     await initNotifications();
-  } catch (e) { /* proceed without push */ }
+  } catch (e) {
+    /* proceed without push */
+  }
   // Fire-and-forget: sync FCM token if user is already logged in from a
   // previous session. No await — must not block app startup.
   syncDeviceToken();

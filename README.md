@@ -153,3 +153,17 @@ lib/
     ```bash
     flutter test
     ```
+*   **Build for Production Environment:**
+    ```bash
+    flutter build apk --flavor prod -t lib/main/main_prod.dart
+    ```
+
+*   **Build for QA Environment:**
+    ```bash
+    flutter build apk --flavor qa -t lib/main/main_qa.dart
+    ```
+
+*   **Build for Development Environment:**
+    ```bash
+    flutter build apk --flavor dev -t lib/main/main_dev.dart
+    ```

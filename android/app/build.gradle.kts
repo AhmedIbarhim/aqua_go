@@ -19,9 +19,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
-    }
+
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
@@ -33,6 +31,32 @@ android {
         versionCode = flutter.versionCode
         versionName = flutter.versionName
         multiDexEnabled = true
+    }
+
+    flavorDimensions += "environment"
+
+    productFlavors {
+        create("dev") {
+            dimension = "environment"
+            // applicationIdSuffix = ".dev"
+            resValue("string", "app_name", "Aqua Go (Dev)")
+            buildConfigField("String", "FLAVOR", "\"dev\"")
+        }
+        create("qa") {
+            dimension = "environment"
+            // applicationIdSuffix = ".qa"
+            resValue("string", "app_name", "Aqua Go (QA)")
+            buildConfigField("String", "FLAVOR", "\"qa\"")
+        }
+        create("prod") {
+            dimension = "environment"
+            resValue("string", "app_name", "Aqua Go")
+            buildConfigField("String", "FLAVOR", "\"prod\"")
+        }
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     buildTypes {
@@ -51,4 +75,10 @@ dependencies {
 
 flutter {
     source = "../.."
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+    }
 }
