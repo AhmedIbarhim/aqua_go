@@ -14,8 +14,14 @@ abstract class AppAssets {
   static const String notificationsEmpty = 'assets/svg/notifications_empty.svg';
   // Home
   static const String homeLightHeader = 'assets/images/home_light_header.png';
-  static const String baseServiceDark = 'assets/images/base_service_dark.png';
-  static const String baseServiceLight = 'assets/images/base_service_light.png';
+  static const String baseServiceDark =
+      'assets/images/base_service_dark_ar.png';
+  static const String baseServiceLight =
+      'assets/images/base_service_light_ar.png';
+  static const String baseServiceDarkEnverted =
+      'assets/images/base_service_dark_en.png';
+  static const String baseServiceLightEnverted =
+      'assets/images/base_service_light_en.png';
   static const String demoBanner = 'assets/images/banner_demo.webp';
 
   // Empty Screens
