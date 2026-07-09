@@ -341,5 +341,31 @@ abstract class  LocaleKeys {
   static const snackbar = 'snackbar';
   static const errors_internal_error = 'errors.internal_error';
   static const errors = 'errors';
+  static const gifts_title = 'gifts.title';
+  static const gifts_redeem_success = 'gifts.redeem_success';
+  static const gifts_redeem_failed = 'gifts.redeem_failed';
+  static const gifts_empty_title = 'gifts.empty.title';
+  static const gifts_empty_sent_desc = 'gifts.empty.sent_desc';
+  static const gifts_empty_received_desc = 'gifts.empty.received_desc';
+  static const gifts_empty_send_now = 'gifts.empty.send_now';
+  static const gifts_empty = 'gifts.empty';
+  static const gifts_tabs_sent = 'gifts.tabs.sent';
+  static const gifts_tabs_received = 'gifts.tabs.received';
+  static const gifts_tabs = 'gifts.tabs';
+  static const gifts_card_recipient_name = 'gifts.card.recipient_name';
+  static const gifts_card_mobile_number = 'gifts.card.mobile_number';
+  static const gifts_card_sent_message = 'gifts.card.sent_message';
+  static const gifts_card_sender_name = 'gifts.card.sender_name';
+  static const gifts_card_validity = 'gifts.card.validity';
+  static const gifts_card_expires = 'gifts.card.expires';
+  static const gifts_card_total = 'gifts.card.total';
+  static const gifts_card_redeem_now = 'gifts.card.redeem_now';
+  static const gifts_card = 'gifts.card';
+  static const gifts_status_received = 'gifts.status.received';
+  static const gifts_status_waiting_use = 'gifts.status.waiting_use';
+  static const gifts_status_used = 'gifts.status.used';
+  static const gifts_status_expired = 'gifts.status.expired';
+  static const gifts_status = 'gifts.status';
+  static const gifts = 'gifts';
 
 }

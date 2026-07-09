@@ -359,5 +359,36 @@
     },
     "errors": {
         "internal_error": "The site is currently under maintenance, we will be back soon"
+    },
+    "gifts": {
+        "title": "Gifts List",
+        "redeem_success": "Gift redeemed successfully",
+        "redeem_failed": "Failed to redeem gift",
+        "empty": {
+            "title": "No current gifts",
+            "sent_desc": "Sent gifts will be displayed on this page",
+            "received_desc": "Received gifts will be displayed on this page",
+            "send_now": "Send a gift now"
+        },
+        "tabs": {
+            "sent": "Sent Gifts",
+            "received": "Received Gifts"
+        },
+        "card": {
+            "recipient_name": "Recipient Name",
+            "mobile_number": "Mobile Number",
+            "sent_message": "Sent Message",
+            "sender_name": "Sender Name",
+            "validity": "Validity",
+            "expires": "Expires {}",
+            "total": "Total",
+            "redeem_now": "Redeem Now"
+        },
+        "status": {
+            "received": "Received",
+            "waiting_use": "Waiting for use",
+            "used": "Used",
+            "expired": "Expired"
+        }
     }
 }

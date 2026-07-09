@@ -11,6 +11,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:svg_flutter/svg.dart';
+import '../../../../core/config/controllers/theme_controller/theme_cubit.dart';
 import '../../../../core/config/di/service_locator.dart';
 import '../../../../core/config/session/session_state.dart';
 import '../../../../core/route/routes.dart';
@@ -118,22 +119,24 @@ class _SettingsViewState extends State<SettingsView> {
                               context.pushNamed(Routes.termsAndConditions);
                             },
                           ),
-                          // SizedBox(height: sh(8)),
-                          // BlocBuilder<ThemeCubit, ThemeState>(
-                          //   builder: (context, themeState) {
-                          //     final isDarkMode =
-                          //         themeState.themeMode == ThemeMode.dark;
-                          //     return ProfileTile(
-                          //       title: LocaleKeys.settings_dark_mode.tr(context: context),
-                          //       icon: AppAssets.darkMode,
-                          //       hasToggle: true,
-                          //       toggleValue: isDarkMode,
-                          //       onToggleChanged: (val) {
-                          //         context.read<ThemeCubit>().toggleTheme(val);
-                          //       },
-                          //     );
-                          //   },
-                          // ),
+                          SizedBox(height: sh(8)),
+                          BlocBuilder<ThemeCubit, ThemeState>(
+                            builder: (context, themeState) {
+                              final isDarkMode =
+                                  themeState.themeMode == ThemeMode.dark;
+                              return ProfileTile(
+                                title: LocaleKeys.settings_dark_mode.tr(
+                                  context: context,
+                                ),
+                                icon: AppAssets.darkMode,
+                                hasToggle: true,
+                                toggleValue: isDarkMode,
+                                onToggleChanged: (val) {
+                                  context.read<ThemeCubit>().toggleTheme(val);
+                                },
+                              );
+                            },
+                          ),
                           if (!isGuest) ...[
                             SizedBox(height: sh(24)),
                             _buildSectionTitle(

@@ -5,6 +5,7 @@ import '../../features/booking/domain/configs/booking_flow_config.dart';
 import '../../features/booking/domain/strategies/booking_submit_strategy.dart';
 import '../../features/booking/domain/strategies/service_booking_submit.dart';
 import '../../../../core/config/di/service_locator.dart';
+import '../../features/gifts/presentation/views/gifts_view.dart';
 import '../../features/subscriptions/data/repos/subscriptions_repository.dart';
 import '../../features/address/presentation/views/my_addresses_view.dart';
 import '../../features/address/presentation/views/new_address_map_view.dart';
@@ -283,6 +284,9 @@ abstract class AppRouter {
             ),
           ),
         );
+
+      case Routes.gifts:
+        return MaterialPageRoute(builder: (_) => const GiftsView());
 
       default:
         return MaterialPageRoute(builder: (_) => const Placeholder());

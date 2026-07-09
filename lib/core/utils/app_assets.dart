@@ -161,4 +161,7 @@ abstract class AppAssets {
   static const String location = 'assets/svg/location.svg';
   static const String gps = 'assets/svg/gps.svg';
   static const String noAddresses = 'assets/svg/no_addresses.svg';
+
+  // gifts
+  static const String emptyGift = 'assets/svg/empty_gifts.svg';
 }
