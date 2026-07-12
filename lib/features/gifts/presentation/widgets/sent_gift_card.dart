@@ -41,31 +41,29 @@ class SentGiftCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Status Badge
-              if (gift.status != null)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: gift.status!.getStatusBg(context),
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                  child: Text(
-                    gift.status!.getStatusText(context),
-                    style: AppTextStyles.regular12.copyWith(
-                      color: gift.status!.getStatusTextColor(context),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              const SizedBox(width: 12),
               // Title, Code and Icon
               Expanded(
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
+                    // Theme Icon Container
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: context.colors.cardBackGround,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        getThemeIcon(gift.themeIcon),
+                        color: context.colors.textPrimary,
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+
                     Expanded(
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             gift.title,
@@ -88,23 +86,29 @@ class SentGiftCard extends StatelessWidget {
                         ],
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    // Theme Icon Container
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: context.colors.cardBackGround,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        getThemeIcon(gift.themeIcon),
-                        color: context.colors.textPrimary,
-                        size: 24,
-                      ),
-                    ),
                   ],
                 ),
               ),
+
+              // Status Badge
+              if (gift.status != null)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: gift.status!.getStatusBg(context),
+                    borderRadius: BorderRadius.circular(100),
+                  ),
+                  child: Text(
+                    gift.status!.getStatusText(context),
+                    style: AppTextStyles.regular12.copyWith(
+                      color: gift.status!.getStatusTextColor(context),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
             ],
           ),
           const SizedBox(height: 16),
@@ -120,14 +124,18 @@ class SentGiftCard extends StatelessWidget {
               children: [
                 _buildInfoRow(
                   context,
-                  label: LocaleKeys.gifts_card_recipient_name.tr(context: context),
+                  label: LocaleKeys.gifts_card_recipient_name.tr(
+                    context: context,
+                  ),
                   value: gift.recipientName ?? '',
                 ),
                 if (gift.recipientPhone != null) ...[
                   const SizedBox(height: 10),
                   _buildInfoRow(
                     context,
-                    label: LocaleKeys.gifts_card_mobile_number.tr(context: context),
+                    label: LocaleKeys.gifts_card_mobile_number.tr(
+                      context: context,
+                    ),
                     value: gift.recipientPhone!,
                   ),
                 ],
@@ -135,9 +143,20 @@ class SentGiftCard extends StatelessWidget {
                   const SizedBox(height: 10),
                   _buildInfoRow(
                     context,
-                    label: LocaleKeys.gifts_card_sent_message.tr(context: context),
-                    value: '“${gift.message}”',
+                    label: LocaleKeys.gifts_card_sent_message.tr(
+                      context: context,
+                    ),
+                    value: '',
                     valueColor: context.colors.textPrimary,
+                  ),
+                  const SizedBox(height: 10),
+                  Center(
+                    child: Text(
+                      '"${gift.message}"',
+                      style: AppTextStyles.regular14.copyWith(
+                        color: context.colors.textPrimary,
+                      ),
+                    ),
                   ),
                 ],
               ],
@@ -148,6 +167,27 @@ class SentGiftCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              // Total
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    LocaleKeys.gifts_card_total.tr(context: context),
+                    style: AppTextStyles.regular12.copyWith(
+                      color: context.colors.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${gift.totalAmount.toStringAsFixed(2)} ${_getCurrency(context)}',
+                    style: AppTextStyles.medium16.copyWith(
+                      color: context.colors.textPrimary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+
               // Validity
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -168,32 +208,15 @@ class SentGiftCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        LocaleKeys.gifts_card_expires.tr(args: [gift.formattedExpiryDate], context: context),
+                        LocaleKeys.gifts_card_expires.tr(
+                          args: [gift.formattedExpiryDate],
+                          context: context,
+                        ),
                         style: AppTextStyles.regular12.copyWith(
                           color: context.colors.textSecondary,
                         ),
                       ),
                     ],
-                  ),
-                ],
-              ),
-              // Total
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    LocaleKeys.gifts_card_total.tr(context: context),
-                    style: AppTextStyles.regular12.copyWith(
-                      color: context.colors.textSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${gift.totalAmount.toStringAsFixed(2)} ﷼',
-                    style: AppTextStyles.medium16.copyWith(
-                      color: context.colors.textPrimary,
-                      fontWeight: FontWeight.bold,
-                    ),
                   ),
                 ],
               ),
@@ -213,16 +236,6 @@ class SentGiftCard extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Expanded(
-          child: Text(
-            value,
-            style: AppTextStyles.regular14.copyWith(
-              color: valueColor ?? context.colors.textSecondary,
-            ),
-            textAlign: TextAlign.start,
-          ),
-        ),
-        const SizedBox(width: 8),
         Text(
           label,
           style: AppTextStyles.regular14.copyWith(
@@ -230,7 +243,22 @@ class SentGiftCard extends StatelessWidget {
           ),
           textAlign: TextAlign.end,
         ),
+        const SizedBox(width: 8),
+
+        Expanded(
+          child: Text(
+            value,
+            style: AppTextStyles.regular14.copyWith(
+              color: valueColor ?? context.colors.textSecondary,
+            ),
+            textAlign: TextAlign.end,
+          ),
+        ),
       ],
     );
+  }
+
+  String _getCurrency(BuildContext context) {
+    return context.isAr ? '﷼' : 'SAR';
   }
 }

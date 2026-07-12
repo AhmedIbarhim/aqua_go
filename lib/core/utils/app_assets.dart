@@ -164,4 +164,6 @@ abstract class AppAssets {
 
   // gifts
   static const String emptyGift = 'assets/svg/empty_gifts.svg';
+  static const String giftSendNow = 'assets/svg/gift_send_now.svg';
+  static const String giftSendLater = 'assets/svg/gift_send_later.svg';
 }

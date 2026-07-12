@@ -366,6 +366,30 @@ abstract class  LocaleKeys {
   static const gifts_status_used = 'gifts.status.used';
   static const gifts_status_expired = 'gifts.status.expired';
   static const gifts_status = 'gifts.status';
+  static const gifts_step_choose_gift = 'gifts.step_choose_gift';
+  static const gifts_step_recipient = 'gifts.step_recipient';
+  static const gifts_step_customize = 'gifts.step_customize';
+  static const gifts_step_review_pay = 'gifts.step_review_pay';
+  static const gifts_choose_service_to_send = 'gifts.choose_service_to_send';
+  static const gifts_gift_message_label = 'gifts.gift_message_label';
+  static const gifts_gift_message_hint = 'gifts.gift_message_hint';
+  static const gifts_delivery_time = 'gifts.delivery_time';
+  static const gifts_deliver_now = 'gifts.deliver_now';
+  static const gifts_deliver_scheduled = 'gifts.deliver_scheduled';
+  static const gifts_delivery_date = 'gifts.delivery_date';
+  static const gifts_select_theme = 'gifts.select_theme';
+  static const gifts_card_type_apple_pay = 'gifts.card_type_apple_pay';
+  static const gifts_card_type_credit_card = 'gifts.card_type_credit_card';
+  static const gifts_payment_summary = 'gifts.payment_summary';
+  static const gifts_package_price = 'gifts.package_price';
+  static const gifts_vat = 'gifts.vat';
+  static const gifts_subtotal = 'gifts.subtotal';
+  static const gifts_total_price = 'gifts.total_price';
+  static const gifts_confirm_and_pay = 'gifts.confirm_and_pay';
+  static const gifts_gift_sent_success = 'gifts.gift_sent_success';
+  static const gifts_recipient_info = 'gifts.recipient_info';
+  static const gifts_recipient_name = 'gifts.recipient_name';
+  static const gifts_mobile_number = 'gifts.mobile_number';
   static const gifts = 'gifts';
 
 }

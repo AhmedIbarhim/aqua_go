@@ -389,6 +389,30 @@
             "waiting_use": "Waiting for use",
             "used": "Used",
             "expired": "Expired"
-        }
+        },
+        "step_choose_gift": "Choose Gift",
+        "step_recipient": "Recipient",
+        "step_customize": "Customize",
+        "step_review_pay": "Review & Pay",
+        "choose_service_to_send": "Choose the service to be sent",
+        "gift_message_label": "Gift Message",
+        "gift_message_hint": "Write a nice message here...",
+        "delivery_time": "Delivery Time",
+        "deliver_now": "Deliver Immediately",
+        "deliver_scheduled": "Schedule Delivery",
+        "delivery_date": "Delivery Date",
+        "select_theme": "Choose Design Theme",
+        "card_type_apple_pay": "Apple Pay",
+        "card_type_credit_card": "Credit Card",
+        "payment_summary": "Payment Summary",
+        "package_price": "Package Price",
+        "vat": "VAT",
+        "subtotal": "Subtotal",
+        "total_price": "Total Price",
+        "confirm_and_pay": "Confirm & Pay",
+        "gift_sent_success": "Gift sent successfully!",
+        "recipient_info": "Recipient Information",
+        "recipient_name": "Recipient Name",
+        "mobile_number": "Mobile Number"
     }
 }

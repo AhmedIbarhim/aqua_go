@@ -375,6 +375,61 @@ class CodegenLoader extends AssetLoader{
   },
   "errors": {
     "internal_error": "الموقع قيد الصيانة، سنعود قريباً"
+  },
+  "gifts": {
+    "title": "قائمة الهدايا",
+    "redeem_success": "تم استرداد الهدية بنجاح",
+    "redeem_failed": "فشل استرداد الهدية",
+    "empty": {
+      "title": "لا توجد هدايا حالية",
+      "sent_desc": "سيتم عرض الهدايا المرسلة في هذه الصفحة",
+      "received_desc": "سيتم عرض الهدايا المستلمة في هذه الصفحة",
+      "send_now": "ارسل هدية الان"
+    },
+    "tabs": {
+      "sent": "هدايا مُرسلة",
+      "received": "هدايا مُستلمة"
+    },
+    "card": {
+      "recipient_name": "اسم المستلم",
+      "mobile_number": "رقم الجوال",
+      "sent_message": "الرسالة المرسلة",
+      "sender_name": "اسم المرسل",
+      "validity": "الصلاحية",
+      "expires": "تنتهي {}",
+      "total": "الإجمالي",
+      "redeem_now": "استرداد الان"
+    },
+    "status": {
+      "received": "مستلمة",
+      "waiting_use": "في انتظار الاستخدام",
+      "used": "مستخدمة",
+      "expired": "منتهية"
+    },
+    "step_choose_gift": "اختر الهدية",
+    "step_recipient": "المستلم",
+    "step_customize": "تخصيص",
+    "step_review_pay": "مراجعة و دفع",
+    "choose_service_to_send": "اختر الخدمة التالي سيتم ارسالها",
+    "gift_message_label": "رسالة الهدية",
+    "gift_message_hint": "اكتب رسالة لطيفة هنا...",
+    "delivery_time": "وقت التسليم",
+    "deliver_now": "إرسال الآن",
+    "deliver_scheduled": "جدولة الإرسال",
+    "delivery_date": "تاريخ الإرسال",
+    "select_theme": "اختر ثيم البطاقة",
+    "card_type_apple_pay": "أبل باي",
+    "card_type_credit_card": "بطاقة ائتمان",
+    "payment_summary": "ملخص الدفع",
+    "package_price": "سعر الباقة",
+    "vat": "ضريبة القيمة المضافة",
+    "subtotal": "المجموع الفرعي",
+    "total_price": "السعر الإجمالي",
+    "confirm_and_pay": "تأكيد ودفع",
+    "gift_sent_success": "تم إرسال الهدية بنجاح!",
+    "recipient_info": "معلومات المستلم",
+    "recipient_name": "اسم المستلم",
+    "mobile_number": "رقم الجوال"
   }
 };
 static const Map<String,dynamic> _en = {
@@ -738,6 +793,61 @@ static const Map<String,dynamic> _en = {
   },
   "errors": {
     "internal_error": "The site is currently under maintenance, we will be back soon"
+  },
+  "gifts": {
+    "title": "Gifts List",
+    "redeem_success": "Gift redeemed successfully",
+    "redeem_failed": "Failed to redeem gift",
+    "empty": {
+      "title": "No current gifts",
+      "sent_desc": "Sent gifts will be displayed on this page",
+      "received_desc": "Received gifts will be displayed on this page",
+      "send_now": "Send a gift now"
+    },
+    "tabs": {
+      "sent": "Sent Gifts",
+      "received": "Received Gifts"
+    },
+    "card": {
+      "recipient_name": "Recipient Name",
+      "mobile_number": "Mobile Number",
+      "sent_message": "Sent Message",
+      "sender_name": "Sender Name",
+      "validity": "Validity",
+      "expires": "Expires {}",
+      "total": "Total",
+      "redeem_now": "Redeem Now"
+    },
+    "status": {
+      "received": "Received",
+      "waiting_use": "Waiting for use",
+      "used": "Used",
+      "expired": "Expired"
+    },
+    "step_choose_gift": "Choose Gift",
+    "step_recipient": "Recipient",
+    "step_customize": "Customize",
+    "step_review_pay": "Review & Pay",
+    "choose_service_to_send": "Choose the service to be sent",
+    "gift_message_label": "Gift Message",
+    "gift_message_hint": "Write a nice message here...",
+    "delivery_time": "Delivery Time",
+    "deliver_now": "Deliver Immediately",
+    "deliver_scheduled": "Schedule Delivery",
+    "delivery_date": "Delivery Date",
+    "select_theme": "Choose Design Theme",
+    "card_type_apple_pay": "Apple Pay",
+    "card_type_credit_card": "Credit Card",
+    "payment_summary": "Payment Summary",
+    "package_price": "Package Price",
+    "vat": "VAT",
+    "subtotal": "Subtotal",
+    "total_price": "Total Price",
+    "confirm_and_pay": "Confirm & Pay",
+    "gift_sent_success": "Gift sent successfully!",
+    "recipient_info": "Recipient Information",
+    "recipient_name": "Recipient Name",
+    "mobile_number": "Mobile Number"
   }
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"ar": _ar, "en": _en};

@@ -6,6 +6,8 @@ import '../../features/booking/domain/strategies/booking_submit_strategy.dart';
 import '../../features/booking/domain/strategies/service_booking_submit.dart';
 import '../../../../core/config/di/service_locator.dart';
 import '../../features/gifts/presentation/views/gifts_view.dart';
+import '../../features/gifts/presentation/views/send_gift_view.dart';
+import '../../features/gifts/presentation/controllers/send_gift_cubit.dart';
 import '../../features/subscriptions/data/repos/subscriptions_repository.dart';
 import '../../features/address/presentation/views/my_addresses_view.dart';
 import '../../features/address/presentation/views/new_address_map_view.dart';
@@ -287,6 +289,14 @@ abstract class AppRouter {
 
       case Routes.gifts:
         return MaterialPageRoute(builder: (_) => const GiftsView());
+
+      case Routes.sendGift:
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => locator<SendGiftCubit>()..fetchInitialData(),
+            child: const SendGiftView(),
+          ),
+        );
 
       default:
         return MaterialPageRoute(builder: (_) => const Placeholder());

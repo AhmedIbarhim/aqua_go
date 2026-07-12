@@ -316,7 +316,6 @@
         "yesterday": "أمس",
         "mark_all_read": "وضع علامة مقروءة للكل"
     },
-
     "support": {
         "title": "الدعم الفني والمساعدة",
         "faq": "الأسئلة الشائعة",
@@ -390,6 +389,30 @@
             "waiting_use": "في انتظار الاستخدام",
             "used": "مستخدمة",
             "expired": "منتهية"
-        }
+        },
+        "step_choose_gift": "اختر الهدية",
+        "step_recipient": "المستلم",
+        "step_customize": "تخصيص",
+        "step_review_pay": "مراجعة و دفع",
+        "choose_service_to_send": "اختر الخدمة التالي سيتم ارسالها",
+        "gift_message_label": "رسالة الهدية",
+        "gift_message_hint": "اكتب رسالة لطيفة هنا...",
+        "delivery_time": "وقت التسليم",
+        "deliver_now": "إرسال الآن",
+        "deliver_scheduled": "جدولة الإرسال",
+        "delivery_date": "تاريخ الإرسال",
+        "select_theme": "اختر ثيم البطاقة",
+        "card_type_apple_pay": "أبل باي",
+        "card_type_credit_card": "بطاقة ائتمان",
+        "payment_summary": "ملخص الدفع",
+        "package_price": "سعر الباقة",
+        "vat": "ضريبة القيمة المضافة",
+        "subtotal": "المجموع الفرعي",
+        "total_price": "السعر الإجمالي",
+        "confirm_and_pay": "تأكيد ودفع",
+        "gift_sent_success": "تم إرسال الهدية بنجاح!",
+        "recipient_info": "معلومات المستلم",
+        "recipient_name": "اسم المستلم",
+        "mobile_number": "رقم الجوال"
     }
 }
