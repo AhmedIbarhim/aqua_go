@@ -8,6 +8,7 @@ import '../../../../core/config/di/service_locator.dart';
 import '../../features/gifts/presentation/views/gifts_view.dart';
 import '../../features/gifts/presentation/views/send_gift_view.dart';
 import '../../features/gifts/presentation/controllers/send_gift_cubit.dart';
+import '../../features/my_bookings/data/models/booking_response_model/booking_response_model.dart';
 import '../../features/subscriptions/data/repos/subscriptions_repository.dart';
 import '../../features/address/presentation/views/my_addresses_view.dart';
 import '../../features/address/presentation/views/new_address_map_view.dart';
@@ -29,6 +30,7 @@ import '../../features/complaints/presentation/controllers/complaints_cubit/comp
 import '../../features/complaints/presentation/controllers/complaint_details_cubit/complaint_details_cubit.dart';
 import '../../features/my_bookings/presentation/views/gallery_view.dart';
 import '../../features/my_bookings/presentation/views/my_booking_details_view.dart';
+import '../../features/my_bookings/presentation/views/receipt_summary_view.dart';
 import '../../features/my_cars/data/models/my_car_model.dart';
 import '../../features/home/data/models/service_model.dart';
 import '../../features/address/data/models/address_model.dart';
@@ -227,6 +229,12 @@ abstract class AppRouter {
               isFromBookingFlow: args.isFromBookingFlow,
             ),
           ),
+        );
+
+      case Routes.receiptSummary:
+        final booking = settings.arguments as BookingResponseModel;
+        return MaterialPageRoute(
+          builder: (_) => ReceiptSummaryView(booking: booking),
         );
 
       case Routes.gallery:

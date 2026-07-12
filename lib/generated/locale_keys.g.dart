@@ -391,5 +391,25 @@ abstract class  LocaleKeys {
   static const gifts_recipient_name = 'gifts.recipient_name';
   static const gifts_mobile_number = 'gifts.mobile_number';
   static const gifts = 'gifts';
+  static const receipt_title = 'receipt.title';
+  static const receipt_invoice_number = 'receipt.invoice_number';
+  static const receipt_paid = 'receipt.paid';
+  static const receipt_customer_details = 'receipt.customer_details';
+  static const receipt_client_name = 'receipt.client_name';
+  static const receipt_car_location = 'receipt.car_location';
+  static const receipt_booking_details = 'receipt.booking_details';
+  static const receipt_service_name = 'receipt.service_name';
+  static const receipt_booking_date_time = 'receipt.booking_date_time';
+  static const receipt_booking_addons = 'receipt.booking_addons';
+  static const receipt_payment_method = 'receipt.payment_method';
+  static const receipt_payment_summary = 'receipt.payment_summary';
+  static const receipt_subtotal = 'receipt.subtotal';
+  static const receipt_vat = 'receipt.vat';
+  static const receipt_total_amount = 'receipt.total_amount';
+  static const receipt_download = 'receipt.download';
+  static const receipt_error_download = 'receipt.error_download';
+  static const receipt_subscription_package = 'receipt.subscription_package';
+  static const receipt_credit_card = 'receipt.credit_card';
+  static const receipt = 'receipt';
 
 }

@@ -414,5 +414,26 @@
         "recipient_info": "Recipient Information",
         "recipient_name": "Recipient Name",
         "mobile_number": "Mobile Number"
+    },
+    "receipt": {
+        "title": "Receipt Details",
+        "invoice_number": "Invoice Number",
+        "paid": "Paid",
+        "customer_details": "Customer Details",
+        "client_name": "Client Name",
+        "car_location": "Car Location",
+        "booking_details": "Booking Details",
+        "service_name": "Service Name",
+        "booking_date_time": "Booking Date & Time",
+        "booking_addons": "Booking Add-ons",
+        "payment_method": "Payment Method",
+        "payment_summary": "Payment Summary",
+        "subtotal": "Subtotal",
+        "vat": "VAT",
+        "total_amount": "Total Amount",
+        "download": "Download",
+        "error_download": "Could not open or download the receipt.",
+        "subscription_package": "Subscription Package",
+        "credit_card": "Credit Card"
     }
 }

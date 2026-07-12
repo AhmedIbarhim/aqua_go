@@ -414,5 +414,26 @@
         "recipient_info": "معلومات المستلم",
         "recipient_name": "اسم المستلم",
         "mobile_number": "رقم الجوال"
+    },
+    "receipt": {
+        "title": "تفاصيل الفاتورة",
+        "invoice_number": "رقم الفاتورة",
+        "paid": "مدفوع",
+        "customer_details": "بيانات العميل",
+        "client_name": "اسم العميل",
+        "car_location": "موقع السيارة",
+        "booking_details": "بيانات الحجز",
+        "service_name": "اسم الخدمة",
+        "booking_date_time": "تاريخ ووقت الحجز",
+        "booking_addons": "إضافات الحجز",
+        "payment_method": "طريقة الدفع",
+        "payment_summary": "ملخص الدفع",
+        "subtotal": "المجموع الفرعي",
+        "vat": "ضريبة القيمة المضافة",
+        "total_amount": "المجموع الكلي",
+        "download": "تحميل",
+        "error_download": "تعذّر فتح أو تحميل الإيصال.",
+        "subscription_package": "باقة الاشتراك",
+        "credit_card": "البطاقة الائتمانية"
     }
 }

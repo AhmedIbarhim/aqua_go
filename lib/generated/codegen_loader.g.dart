@@ -430,6 +430,27 @@ class CodegenLoader extends AssetLoader{
     "recipient_info": "معلومات المستلم",
     "recipient_name": "اسم المستلم",
     "mobile_number": "رقم الجوال"
+  },
+  "receipt": {
+    "title": "تفاصيل الفاتورة",
+    "invoice_number": "رقم الفاتورة",
+    "paid": "مدفوع",
+    "customer_details": "بيانات العميل",
+    "client_name": "اسم العميل",
+    "car_location": "موقع السيارة",
+    "booking_details": "بيانات الحجز",
+    "service_name": "اسم الخدمة",
+    "booking_date_time": "تاريخ ووقت الحجز",
+    "booking_addons": "إضافات الحجز",
+    "payment_method": "طريقة الدفع",
+    "payment_summary": "ملخص الدفع",
+    "subtotal": "المجموع الفرعي",
+    "vat": "ضريبة القيمة المضافة",
+    "total_amount": "المجموع الكلي",
+    "download": "تحميل",
+    "error_download": "تعذّر فتح أو تحميل الإيصال.",
+    "subscription_package": "باقة الاشتراك",
+    "credit_card": "البطاقة الائتمانية"
   }
 };
 static const Map<String,dynamic> _en = {
@@ -848,6 +869,27 @@ static const Map<String,dynamic> _en = {
     "recipient_info": "Recipient Information",
     "recipient_name": "Recipient Name",
     "mobile_number": "Mobile Number"
+  },
+  "receipt": {
+    "title": "Receipt Details",
+    "invoice_number": "Invoice Number",
+    "paid": "Paid",
+    "customer_details": "Customer Details",
+    "client_name": "Client Name",
+    "car_location": "Car Location",
+    "booking_details": "Booking Details",
+    "service_name": "Service Name",
+    "booking_date_time": "Booking Date & Time",
+    "booking_addons": "Booking Add-ons",
+    "payment_method": "Payment Method",
+    "payment_summary": "Payment Summary",
+    "subtotal": "Subtotal",
+    "vat": "VAT",
+    "total_amount": "Total Amount",
+    "download": "Download",
+    "error_download": "Could not open or download the receipt.",
+    "subscription_package": "Subscription Package",
+    "credit_card": "Credit Card"
   }
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"ar": _ar, "en": _en};
