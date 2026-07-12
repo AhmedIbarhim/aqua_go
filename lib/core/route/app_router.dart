@@ -53,6 +53,7 @@ import '../../features/support/presentation/controllers/faqs_cubit.dart';
 import '../../features/my_bookings/presentation/controllers/my_booking_details_cubit.dart';
 import '../../features/subscriptions/presentation/controllers/subscriptions_controller/subscriptions_cubit.dart';
 import '../../features/profile/presentation/views/my_subscribed_packages_view.dart';
+import '../../features/wallet/presentation/views/my_wallet_view.dart';
 
 import 'routes.dart';
 
@@ -305,6 +306,9 @@ abstract class AppRouter {
             child: const SendGiftView(),
           ),
         );
+
+      case Routes.myWallet:
+        return MaterialPageRoute(builder: (_) => const MyWalletView());
 
       default:
         return MaterialPageRoute(builder: (_) => const Placeholder());

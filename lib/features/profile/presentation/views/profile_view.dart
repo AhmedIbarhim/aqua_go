@@ -200,16 +200,18 @@ class _ProfileViewState extends State<ProfileView> {
                               },
                             ),
 
-                            // SizedBox(height: sh(8)),
-                            // ProfileTile(
-                            //   title: LocaleKeys.profile_my_wallet.tr(context: context),
-                            //   icon: AppAssets.wallet,
-                            //   onTap: () {
-                            //     if (isGuest) {
-                            //       _promptGuestToLogin(context);
-                            //     }
-                            //   },
-                            // ),
+                            SizedBox(height: sh(8)),
+                            ProfileTile(
+                              title: LocaleKeys.profile_my_wallet.tr(context: context),
+                              icon: AppAssets.wallet,
+                              onTap: () {
+                                if (isGuest) {
+                                  _promptGuestToLogin(context);
+                                } else {
+                                  context.pushNamed(Routes.myWallet);
+                                }
+                              },
+                            ),
                             SizedBox(height: sh(8)),
 
                             ProfileTile(

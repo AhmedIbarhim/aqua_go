@@ -435,5 +435,17 @@
         "error_download": "تعذّر فتح أو تحميل الإيصال.",
         "subscription_package": "باقة الاشتراك",
         "credit_card": "البطاقة الائتمانية"
+    },
+    "wallet": {
+        "title": "محفظتي",
+        "points_balance": "رصيد النقاط",
+        "points": "نقطة",
+        "history": "سجل النقاط",
+        "earn_rule": "تكسب نقطة لكل {} ريال يتم إنفاقها",
+        "conversion_rule": "كل {} نقطة = {} ريال خصم",
+        "conversion_subtext": "يمكنك استخدام نقاطك أثناء تأكيد الحجز",
+        "booking_number": "رقم الحجز {}",
+        "today": "اليوم",
+        "yesterday": "امس"
     }
 }

@@ -411,5 +411,16 @@ abstract class  LocaleKeys {
   static const receipt_subscription_package = 'receipt.subscription_package';
   static const receipt_credit_card = 'receipt.credit_card';
   static const receipt = 'receipt';
+  static const wallet_title = 'wallet.title';
+  static const wallet_points_balance = 'wallet.points_balance';
+  static const wallet_points = 'wallet.points';
+  static const wallet_history = 'wallet.history';
+  static const wallet_earn_rule = 'wallet.earn_rule';
+  static const wallet_conversion_rule = 'wallet.conversion_rule';
+  static const wallet_conversion_subtext = 'wallet.conversion_subtext';
+  static const wallet_booking_number = 'wallet.booking_number';
+  static const wallet_today = 'wallet.today';
+  static const wallet_yesterday = 'wallet.yesterday';
+  static const wallet = 'wallet';
 
 }

@@ -35,4 +35,5 @@ abstract class Routes {
   static const String faqs = '/faqs_view';
   static const String gifts = '/gifts_view';
   static const String sendGift = '/send_gift_view';
+  static const String myWallet = '/my_wallet_view';
 }

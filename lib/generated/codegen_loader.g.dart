@@ -451,6 +451,18 @@ class CodegenLoader extends AssetLoader{
     "error_download": "تعذّر فتح أو تحميل الإيصال.",
     "subscription_package": "باقة الاشتراك",
     "credit_card": "البطاقة الائتمانية"
+  },
+  "wallet": {
+    "title": "محفظتي",
+    "points_balance": "رصيد النقاط",
+    "points": "نقطة",
+    "history": "سجل النقاط",
+    "earn_rule": "تكسب نقطة لكل {} ريال يتم إنفاقها",
+    "conversion_rule": "كل {} نقطة = {} ريال خصم",
+    "conversion_subtext": "يمكنك استخدام نقاطك أثناء تأكيد الحجز",
+    "booking_number": "رقم الحجز {}",
+    "today": "اليوم",
+    "yesterday": "امس"
   }
 };
 static const Map<String,dynamic> _en = {
@@ -890,6 +902,18 @@ static const Map<String,dynamic> _en = {
     "error_download": "Could not open or download the receipt.",
     "subscription_package": "Subscription Package",
     "credit_card": "Credit Card"
+  },
+  "wallet": {
+    "title": "My Wallet",
+    "points_balance": "Points Balance",
+    "points": "Points",
+    "history": "Points History",
+    "earn_rule": "Earn 1 point for every {} SAR spent",
+    "conversion_rule": "Every {} points = {} SAR discount",
+    "conversion_subtext": "You can use your points during booking confirmation",
+    "booking_number": "Booking No. {}",
+    "today": "Today",
+    "yesterday": "Yesterday"
   }
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"ar": _ar, "en": _en};

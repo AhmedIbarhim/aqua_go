@@ -435,5 +435,17 @@
         "error_download": "Could not open or download the receipt.",
         "subscription_package": "Subscription Package",
         "credit_card": "Credit Card"
+    },
+    "wallet": {
+        "title": "My Wallet",
+        "points_balance": "Points Balance",
+        "points": "Points",
+        "history": "Points History",
+        "earn_rule": "Earn 1 point for every {} SAR spent",
+        "conversion_rule": "Every {} points = {} SAR discount",
+        "conversion_subtext": "You can use your points during booking confirmation",
+        "booking_number": "Booking No. {}",
+        "today": "Today",
+        "yesterday": "Yesterday"
     }
 }
