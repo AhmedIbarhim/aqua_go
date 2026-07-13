@@ -11,7 +11,10 @@ abstract class AppAssets {
   // Notifications
   static const String notification = 'assets/svg/notification.svg';
   static const String notificationActive = 'assets/svg/notification_active.svg';
-  static const String notificationsEmpty = 'assets/svg/notifications_empty.svg';
+  static const String emptyNotificationsDark =
+      'assets/svg/empty_notifications_dark.svg';
+  static const String emptyNotificationsLight =
+      'assets/svg/empty_notifications_light.svg';
   // Home
   static const String homeLightHeader = 'assets/images/home_light_header.png';
   static const String baseServiceDark =
@@ -25,8 +28,11 @@ abstract class AppAssets {
   static const String demoBanner = 'assets/images/banner_demo.webp';
 
   // Empty Screens
-  static const String emptyCars = 'assets/svg/empty_folder.svg';
-  static const String emptyBookings = 'assets/svg/empty_bookings.svg';
+  static const String emptyCarsDark = 'assets/svg/empty_cars_dark.svg';
+  static const String emptyCarsLight = 'assets/svg/empty_cars_light.svg';
+  static const String emptyBookingsDark = 'assets/svg/empty_bookings_dark.svg';
+  static const String emptyBookingsLight =
+      'assets/svg/empty_bookings_light.svg';
   static const String emptyComplaints = 'assets/svg/no_complaints.svg';
 
   // Auth
@@ -160,13 +166,27 @@ abstract class AppAssets {
   static const String mapOutlined = 'assets/svg/map.svg';
   static const String location = 'assets/svg/location.svg';
   static const String gps = 'assets/svg/gps.svg';
-  static const String noAddresses = 'assets/svg/no_addresses.svg';
+  static const String emptyAddressesDark =
+      'assets/svg/empty_addresses_dark.svg';
+  static const String emptyAddressesLight =
+      'assets/svg/empty_addresses_light.svg';
 
   // gifts
-  static const String emptyGift = 'assets/svg/empty_gifts.svg';
+  static const String emptyGiftsDark = 'assets/svg/empty_gifts_dark.svg';
+  static const String emptyGiftsLight = 'assets/svg/empty_gifts_light.svg';
   static const String giftSendNow = 'assets/svg/gift_send_now.svg';
   static const String giftSendLater = 'assets/svg/gift_send_later.svg';
 
   // wallet
   static const String points = 'assets/svg/points.svg';
+
+  // not used yet
+
+  static const String techIssueDark = 'assets/svg/tech_issue_dark.svg';
+  static const String techIssueLight = 'assets/svg/tech_issue_light.svg';
+
+  static const String accountBlockedDark =
+      'assets/svg/account_blocked_dark.svg';
+  static const String accountBlockedLight =
+      'assets/svg/account_blocked_light.svg';
 }

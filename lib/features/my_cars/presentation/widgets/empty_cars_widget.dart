@@ -20,7 +20,14 @@ class EmptyCarsWidget extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SvgPicture.asset(AppAssets.emptyCars),
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: SvgPicture.asset(
+              context.isDarkTheme
+                  ? AppAssets.emptyCarsDark
+                  : AppAssets.emptyCarsLight,
+            ),
+          ),
           const SizedBox(height: 40),
           Text(
             LocaleKeys.my_cars_empty_state.tr(context: context),

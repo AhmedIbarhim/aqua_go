@@ -42,7 +42,14 @@ class EmptyBookingsWidget extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SvgPicture.asset(AppAssets.emptyBookings),
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: SvgPicture.asset(
+              context.isDarkTheme
+                  ? AppAssets.emptyBookingsDark
+                  : AppAssets.emptyBookingsLight,
+            ),
+          ),
           const SizedBox(height: 40),
 
           Text(

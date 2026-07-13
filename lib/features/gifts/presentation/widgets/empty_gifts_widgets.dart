@@ -29,7 +29,16 @@ class EmptyGiftsWidget extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SvgPicture.asset(AppAssets.emptyGift, width: 160, height: 160),
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: SvgPicture.asset(
+              context.isDarkTheme
+                  ? AppAssets.emptyGiftsDark
+                  : AppAssets.emptyGiftsLight,
+              width: 160,
+              height: 160,
+            ),
+          ),
           const SizedBox(height: 32),
           Text(
             title,
