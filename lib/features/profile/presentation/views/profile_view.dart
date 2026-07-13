@@ -90,6 +90,10 @@ class _ProfileViewState extends State<ProfileView> {
                               AppAssets.verified,
                               width: sw(18),
                               height: sh(18),
+                              colorFilter: ColorFilter.mode(
+                                context.colors.info,
+                                BlendMode.srcIn,
+                              ),
                             ),
                           ],
                         ],
@@ -202,7 +206,9 @@ class _ProfileViewState extends State<ProfileView> {
 
                             SizedBox(height: sh(8)),
                             ProfileTile(
-                              title: LocaleKeys.profile_my_wallet.tr(context: context),
+                              title: LocaleKeys.profile_my_wallet.tr(
+                                context: context,
+                              ),
                               icon: AppAssets.wallet,
                               onTap: () {
                                 if (isGuest) {

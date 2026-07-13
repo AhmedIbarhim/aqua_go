@@ -7,11 +7,11 @@ import '../../../../core/config/session/session_state.dart';
 import '../../../../generated/locale_keys.g.dart';
 
 enum GiftStatus {
-  ISSUED,      // created, pending delivery
-  DELIVERED,   // recipient notified
-  REDEEMED,    // recipient has created a booking
-  CANCELLED,   // sender cancelled pre-delivery
-  EXPIRED;     // validity elapsed
+  ISSUED, // created, pending delivery
+  DELIVERED, // recipient notified
+  REDEEMED, // recipient has created a booking
+  CANCELLED, // sender cancelled pre-delivery
+  EXPIRED; // validity elapsed
 
   static GiftStatus? fromString(String? val) {
     if (val == null) return null;
@@ -45,7 +45,7 @@ enum GiftStatus {
       case GiftStatus.DELIVERED:
         return context.colors.warning;
       case GiftStatus.REDEEMED:
-        return context.colors.successLight;
+        return context.colors.successSecondry;
       case GiftStatus.CANCELLED:
       case GiftStatus.EXPIRED:
         return context.colors.contentDisabled;
@@ -117,16 +117,20 @@ class GiftModel {
       giftId: json['giftId'] as String? ?? json['id'] as String?,
       giftCode: json['giftCode'] as String? ?? json['code'] as String?,
       status: GiftStatus.fromString(json['status'] as String?),
-      amountMinor: json['amountMinor'] as int? ?? json['totalAmountMinor'] as int?,
-      recipientPhoneE164: json['recipientPhoneE164'] as String? ?? json['recipientPhone'] as String?,
+      amountMinor:
+          json['amountMinor'] as int? ?? json['totalAmountMinor'] as int?,
+      recipientPhoneE164:
+          json['recipientPhoneE164'] as String? ??
+          json['recipientPhone'] as String?,
       recipientName: json['recipientName'] as String?,
       themeId: json['themeId'] as String?,
       scheduledDeliveryAt: json['scheduledDeliveryAt'] as String?,
       deliveredAt: json['deliveredAt'] as String?,
-      validityEndsAt: json['validityEndsAt'] as String? ?? json['validUntil'] as String?,
+      validityEndsAt:
+          json['validityEndsAt'] as String? ?? json['validUntil'] as String?,
       redeemedAt: json['redeemedAt'] as String?,
       createdAt: json['createdAt'] as String?,
-      
+
       senderName: json['senderName'] as String?,
       senderPhone: json['senderPhone'] as String?,
       message: json['message'] as String? ?? json['messageText'] as String?,
@@ -148,14 +152,17 @@ class GiftModel {
   String get title {
     final hasPackage = (packageNameAr != null || packageNameEn != null);
     if (hasPackage) {
-      return CacheClient.getString(kLanguage, defaultValue: kArabicLang) == kArabicLang
+      return CacheClient.getString(kLanguage, defaultValue: kArabicLang) ==
+              kArabicLang
           ? (packageNameAr ?? serviceNameAr ?? '')
           : (packageNameEn ?? serviceNameEn ?? '');
     }
-    final isAr = CacheClient.getString(kLanguage, defaultValue: kArabicLang) == kArabicLang;
+    final isAr =
+        CacheClient.getString(kLanguage, defaultValue: kArabicLang) ==
+        kArabicLang;
     final amount = (amountMinor ?? 0) / 100.0;
-    return isAr 
-        ? 'بطاقة هدية بقيمة ${amount.toStringAsFixed(0)} ر.س' 
+    return isAr
+        ? 'بطاقة هدية بقيمة ${amount.toStringAsFixed(0)} ر.س'
         : 'Gift Card worth ${amount.toStringAsFixed(0)} SAR';
   }
 
@@ -164,18 +171,20 @@ class GiftModel {
   bool get isSent {
     final userPhone = currentUser.value?.phone;
     if (userPhone == null || recipientPhoneE164 == null) return true;
-    
+
     final digitsUser = userPhone.replaceAll(RegExp(r'\D'), '');
     final digitsRecipient = recipientPhoneE164!.replaceAll(RegExp(r'\D'), '');
-    
+
     if (digitsUser.isEmpty || digitsRecipient.isEmpty) return true;
-    
+
     if (digitsUser.length >= 9 && digitsRecipient.length >= 9) {
       final suffixUser = digitsUser.substring(digitsUser.length - 9);
-      final suffixRecipient = digitsRecipient.substring(digitsRecipient.length - 9);
+      final suffixRecipient = digitsRecipient.substring(
+        digitsRecipient.length - 9,
+      );
       return suffixUser != suffixRecipient;
     }
-    
+
     return digitsUser != digitsRecipient;
   }
 

@@ -34,7 +34,7 @@ class ReceiptNumberCard extends StatelessWidget {
               child: CustomPaint(
                 size: Size(sw(75), sw(75)),
                 painter: _TrianglePainter(
-                  color: context.colors.successLight,
+                  color: context.colors.successSecondry,
                   isAr: context.isAr,
                 ),
               ),

@@ -443,7 +443,7 @@ class MyBookingDetailsView extends StatelessWidget {
         height: MediaQuery.sizeOf(context).height * 0.055,
         padding: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
-          color: context.colors.brandSubtle,
+          color: context.colors.contentDisabled,
           border: Border.all(color: context.colors.borderSecondary, width: 0.5),
           borderRadius: BorderRadius.circular(12),
         ),
@@ -454,7 +454,7 @@ class MyBookingDetailsView extends StatelessWidget {
             Icon(
               Icons.lock_clock_outlined,
               size: 18,
-              color: context.colors.contentDisabled,
+              color: context.colors.textSecondary,
             ),
             Flexible(
               child: FittedBox(
@@ -463,7 +463,7 @@ class MyBookingDetailsView extends StatelessWidget {
                   LocaleKeys.bookings_edit_closed_12h.tr(context: context),
                   textAlign: TextAlign.center,
                   style: AppTextStyles.regular14.copyWith(
-                    color: context.colors.contentDisabled,
+                    color: context.colors.textSecondary,
                   ),
                 ),
               ),

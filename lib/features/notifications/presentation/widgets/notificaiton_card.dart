@@ -67,6 +67,12 @@ class NotificationCard extends StatelessWidget {
                       : AppAssets.notificationActive,
                   width: 20,
                   height: 20,
+                  colorFilter: ColorFilter.mode(
+                    !notification.serviceDone
+                        ? context.colors.themeOpositeColor
+                        : context.colors.primary,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
             ),

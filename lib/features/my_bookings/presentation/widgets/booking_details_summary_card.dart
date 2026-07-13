@@ -192,7 +192,7 @@ class BookingDetailsSummaryCard extends StatelessWidget {
               width: 24,
               height: 24,
               colorFilter: ColorFilter.mode(
-                context.colors.contentDisabled,
+                context.colors.textTertiary,
                 BlendMode.srcIn,
               ),
             ),
@@ -200,7 +200,7 @@ class BookingDetailsSummaryCard extends StatelessWidget {
             Text(
               title,
               style: AppTextStyles.regular14.copyWith(
-                color: context.colors.contentDisabled,
+                color: context.colors.textTertiary,
               ),
             ),
           ],

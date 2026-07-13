@@ -27,8 +27,8 @@ class PointsTransactionTile extends StatelessWidget {
 
     final isEarned = transaction.isEarned;
     final pointsColor = isEarned
-        ? context.colors.successLight
-        : context.colors.errorLight;
+        ? context.colors.successSecondry
+        : context.colors.errorSecondary;
     final sign = isEarned ? '+' : '-';
 
     final pointsText = '$sign${transaction.points} ';

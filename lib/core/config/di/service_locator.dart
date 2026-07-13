@@ -61,6 +61,7 @@ import 'package:aqua_go/main/app_configs.dart';
 final GetIt locator = GetIt.instance;
 
 Future<void> initServiceLocator(AppConfigs configs) async {
+  locator.registerSingleton<AppConfigs>(configs);
   locator.registerLazySingleton<APIClient>(
     () => APIClient(DioFactory.create(baseUrl: configs.baseUrl)),
   );

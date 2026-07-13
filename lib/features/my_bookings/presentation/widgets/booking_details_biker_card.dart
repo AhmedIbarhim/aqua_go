@@ -54,7 +54,7 @@ class BookingDetailsBikerCard extends StatelessWidget {
                 height: context.sw(40),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(context.sw(20)),
-                  border: Border.all(color: context.colors.borderSecondary),
+                  border: Border.all(color: context.colors.contentTertiary),
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(context.sw(20)),

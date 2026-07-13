@@ -89,7 +89,7 @@ class ProfileTile extends StatelessWidget {
                   vertical: sh(4),
                 ),
                 decoration: BoxDecoration(
-                  color: context.colors.successLight.withAlpha(25),
+                  color: context.colors.success.withAlpha(25),
                   borderRadius: BorderRadius.circular(sw(16)),
                 ),
                 child: Row(
@@ -98,13 +98,13 @@ class ProfileTile extends StatelessWidget {
                     Text(
                       LocaleKeys.profile_verified.tr(context: context),
                       style: AppTextStyles.regular12.copyWith(
-                        color: context.colors.successLight,
+                        color: context.colors.success,
                       ),
                     ),
                     SizedBox(width: sw(4)),
                     Icon(
                       Icons.check_circle,
-                      color: context.colors.successLight,
+                      color: context.colors.success,
                       size: sw(16),
                     ),
                   ],

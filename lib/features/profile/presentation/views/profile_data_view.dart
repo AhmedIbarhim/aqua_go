@@ -2,6 +2,7 @@ import 'package:aqua_go/core/components/custom_button.dart';
 import 'package:aqua_go/core/components/custom_text_field.dart';
 import 'package:aqua_go/core/components/generic_app_bar.dart';
 import 'package:aqua_go/core/extentions/context_extentions.dart';
+import 'package:aqua_go/core/themes/app_colors.dart';
 import 'package:aqua_go/core/themes/app_text_styles.dart';
 import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
@@ -222,16 +223,7 @@ class _ProfileDataViewState extends State<ProfileDataView> {
         top: 24,
         bottom: MediaQuery.paddingOf(context).bottom + 24,
       ),
-      decoration: BoxDecoration(
-        color: context.colors.screenBG,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(20),
-            blurRadius: 24,
-            offset: const Offset(0, -12),
-          ),
-        ],
-      ),
+      decoration: BoxDecoration(color: context.colors.screenBG),
       child: widget.isFirstTime
           ? CustomButton(
               text: LocaleKeys.proceed.tr(context: context),
@@ -296,7 +288,7 @@ class _ProfileDataViewState extends State<ProfileDataView> {
               postWidget: SvgPicture.asset(
                 AppAssets.edit,
                 colorFilter: ColorFilter.mode(
-                  context.colors.textTheme,
+                  darkAppColors.themeColor,
                   BlendMode.srcIn,
                 ),
               ),

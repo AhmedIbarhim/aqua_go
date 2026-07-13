@@ -53,7 +53,7 @@ class MyBookingsTabs extends StatelessWidget {
                   style: selectedIndex == 0
                       ? AppTextStyles.medium14
                       : AppTextStyles.regular14.copyWith(
-                          color: context.colors.contentDisabled,
+                          color: context.colors.textTertiary,
                         ),
                 ),
               ),
@@ -77,7 +77,7 @@ class MyBookingsTabs extends StatelessWidget {
                   style: selectedIndex == 1
                       ? AppTextStyles.medium14
                       : AppTextStyles.regular14.copyWith(
-                          color: context.colors.contentDisabled,
+                          color: context.colors.textTertiary,
                         ),
                 ),
               ),

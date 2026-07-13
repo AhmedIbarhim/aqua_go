@@ -21,6 +21,7 @@ class AppColors extends ThemeExtension<AppColors> {
   // Text Colors
   final Color textPrimary;
   final Color textSecondary;
+  final Color textTertiary;
   final Color textTheme;
 
   // Content Colors
@@ -35,8 +36,9 @@ class AppColors extends ThemeExtension<AppColors> {
   final Color success;
   final Color error;
   final Color warning;
-  final Color successLight;
-  final Color errorLight;
+  final Color successSecondry;
+  final Color errorSecondary;
+  final Color info;
 
   const AppColors({
     required this.splashColor,
@@ -52,6 +54,7 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.cardBackGround,
     required this.textPrimary,
     required this.textSecondary,
+    required this.textTertiary,
     required this.textTheme,
     required this.contentBlack,
     required this.contentPrimary,
@@ -62,8 +65,9 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.success,
     required this.error,
     required this.warning,
-    required this.successLight,
-    required this.errorLight,
+    required this.successSecondry,
+    required this.errorSecondary,
+    required this.info,
   });
 
   @override
@@ -80,6 +84,7 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? cardBackGround,
     Color? textPrimary,
     Color? textSecondary,
+    Color? textTertiary,
     Color? textDark,
     Color? contentBlack,
     Color? contentPrimary,
@@ -92,6 +97,7 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? warning,
     Color? successLight,
     Color? errorLight,
+    Color? info,
   }) {
     return AppColors(
       splashColor: splashColor,
@@ -107,6 +113,7 @@ class AppColors extends ThemeExtension<AppColors> {
       cardBackGround: cardBackGround ?? this.cardBackGround,
       textPrimary: textPrimary ?? this.textPrimary,
       textSecondary: textSecondary ?? this.textSecondary,
+      textTertiary: textTertiary ?? this.textTertiary,
       textTheme: textDark ?? textTheme,
       contentBlack: contentBlack ?? this.contentBlack,
       contentPrimary: contentPrimary ?? this.contentPrimary,
@@ -118,8 +125,9 @@ class AppColors extends ThemeExtension<AppColors> {
       success: success ?? this.success,
       error: error ?? this.error,
       warning: warning ?? this.warning,
-      successLight: successLight ?? this.successLight,
-      errorLight: errorLight ?? this.errorLight,
+      successSecondry: successLight ?? this.successSecondry,
+      errorSecondary: errorLight ?? this.errorSecondary,
+      info: info ?? this.info,
     );
   }
 
@@ -147,6 +155,7 @@ class AppColors extends ThemeExtension<AppColors> {
       cardBackGround: Color.lerp(cardBackGround, other.cardBackGround, t)!,
       textPrimary: Color.lerp(textPrimary, other.textPrimary, t)!,
       textSecondary: Color.lerp(textSecondary, other.textSecondary, t)!,
+      textTertiary: Color.lerp(textTertiary, other.textTertiary, t)!,
       textTheme: Color.lerp(textTheme, other.textTheme, t)!,
       contentBlack: Color.lerp(contentBlack, other.contentBlack, t)!,
       contentPrimary: Color.lerp(contentPrimary, other.contentPrimary, t)!,
@@ -165,19 +174,20 @@ class AppColors extends ThemeExtension<AppColors> {
       success: Color.lerp(success, other.success, t)!,
       error: Color.lerp(error, other.error, t)!,
       warning: Color.lerp(warning, other.warning, t)!,
-      successLight: Color.lerp(successLight, other.successLight, t)!,
-      errorLight: Color.lerp(errorLight, other.errorLight, t)!,
+      successSecondry: Color.lerp(successSecondry, other.successSecondry, t)!,
+      errorSecondary: Color.lerp(errorSecondary, other.errorSecondary, t)!,
+      info: Color.lerp(info, other.info, t)!,
     );
   }
 }
 
 // -----------------------------------------------------------------------------
-// Dark Theme Colors (Matching your existing AppColors)
+// Dark Theme Colors
 // -----------------------------------------------------------------------------
 const darkAppColors = AppColors(
   splashColor: Color(0xFF0D0D0D),
   primary: Color(0xFF16F7FF),
-  brandSubtle: Color(0xFF202222),
+  brandSubtle: Color(0xFF12363A),
   brandHover: Color(0xFF0F1F22),
   themeColor: Color(0xFF171717),
   themeOpositeColor: Color(0xFFFFFFFF),
@@ -187,7 +197,8 @@ const darkAppColors = AppColors(
   borderSecondary: Color(0xFF525252),
   cardBackGround: Color(0xFF1C1C1C),
   textPrimary: Color(0xFFFFFFFF),
-  textSecondary: Color(0xFFA3A3A3),
+  textSecondary: Color(0xFFE5E5E5),
+  textTertiary: Color(0xFFA3A3A3),
   textTheme: Colors.black,
   contentBlack: Color(0xFF171717),
   contentPrimary: Color(0xFF262C35),
@@ -195,40 +206,46 @@ const darkAppColors = AppColors(
   contentSecondaryLight: Color(0xFFE5E5E5),
   contentTertiary: Color(0xFF5A687D),
   contentDisabled: Color(0xFF737373),
-  success: Color(0xFF0E612C),
+  success: Color(0xFF22C55E),
   error: Color(0xFFD90421),
-  successLight: Color(0xFF22C55E),
-  errorLight: Color(0xFFEF4444),
+  successSecondry: Color(0xFF15803D),
+  errorSecondary: Color(0xFFEF4444),
   warning: Color(0xFFF59E00),
+  info: Color(0xFF3B82F6),
 );
 
 // -----------------------------------------------------------------------------
-// Light Theme Colors (Suggested placeholders, adjust as needed)
+// Light Theme Colors
 // -----------------------------------------------------------------------------
 const lightAppColors = AppColors(
   splashColor: Color(0xFF0D0D0D),
   primary: Color(0xFF00BEC3),
   brandSubtle: Color(0xFFE0F7F8),
-  brandHover: Color(0xFFBFFCFF),
-  themeColor: Color(0xFFFFFFFF), // Inverted for light mode
-  themeOpositeColor: Color(0xFF171717), // Inverted for light mode
-  background: Color(0xFFF8FAFC),
-  screenBG: Color(0xFFF3F4F6),
+  brandHover: Color(0xFFBFEFF0),
+  // primary: Color(0xFF16F7FF),
+  //  brandSubtle: Color(0xFFBEFCFF),
+  // brandHover: Color(0xFF9DFAFF),
+  themeColor: Color(0xFFFFFFFF),
+  themeOpositeColor: Color(0xFF171717),
+  background: Color(0xFFF3F4F6),
+  screenBG: Color(0xFFF8FAFC),
   defaultSubtle: Color(0xFFE2E8F0),
-  borderSecondary: Color(0xFFCBD5E1),
-  cardBackGround: Color(0xFFE1E2E3),
+  borderSecondary: Color(0xFFCCD0D7),
+  cardBackGround: Color(0xFFEFF0F2),
   textPrimary: Color(0xFF0F172A),
-  textSecondary: Color(0xFF64748B),
+  textSecondary: Color(0xFF404A59),
+  textTertiary: Color(0xFF5A687D),
   textTheme: Colors.white,
   contentBlack: Color(0xFF171717),
   contentPrimary: Color(0xFFF1F5F9),
   contentSecondary: Color(0xFFE2E8F0),
   contentSecondaryLight: Color(0xFF334155),
   contentTertiary: Color(0xFF94A3B8),
-  contentDisabled: Color(0xFF94A3B8),
-  success: Color(0xFF0E612C),
+  contentDisabled: Color(0xFFCCD0D7),
+  success: Color(0xFF15803D),
   error: Color(0xFFD90421),
-  successLight: Color(0xFF22C55E),
-  errorLight: Color(0xFFEF4444),
+  successSecondry: Color(0xFF22C55E),
+  errorSecondary: Color(0xFFEF4444),
   warning: Color(0xFFD97706),
+  info: Color(0xFF1D4ED8),
 );

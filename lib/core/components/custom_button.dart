@@ -1,4 +1,3 @@
-import 'package:aqua_go/core/themes/app_colors.dart';
 import 'package:aqua_go/core/themes/app_text_styles.dart';
 import 'package:flutter/material.dart';
 
@@ -30,7 +29,7 @@ class CustomButton extends StatelessWidget {
     return MaterialButton(
       onPressed: enabled ? onPressed : null,
       color: color ?? context.colors.primary,
-      disabledColor: darkAppColors.brandSubtle,
+      disabledColor: context.colors.brandHover,
       shape: RoundedRectangleBorder(
         side: BorderSide(
           color: enabled
@@ -40,7 +39,7 @@ class CustomButton extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(12),
       ),
-      textColor: enabled ? textColor : context.colors.contentDisabled,
+      textColor: enabled ? textColor : context.colors.contentTertiary,
 
       minWidth: double.infinity,
       height: MediaQuery.sizeOf(context).height * 0.055,

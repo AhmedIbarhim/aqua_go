@@ -65,13 +65,13 @@ enum ComplaintStatus {
       case ComplaintStatus.open:
         return context.colors.primary;
       case ComplaintStatus.closed:
-        return context.colors.errorLight;
+        return context.colors.errorSecondary;
       case ComplaintStatus.resolved:
-        return context.colors.successLight;
+        return context.colors.successSecondry;
       case ComplaintStatus.pending:
         return context.colors.defaultSubtle;
       case ComplaintStatus.rejected:
-        return context.colors.errorLight;
+        return context.colors.errorSecondary;
     }
   }
 

@@ -218,10 +218,11 @@ class _CarModelDropdownState extends State<CarModelDropdown> {
                   children: [
                     Expanded(
                       child: Text(
-                        currentDisplayValue ?? LocaleKeys.select_here.tr(context: context),
+                        currentDisplayValue ??
+                            LocaleKeys.select_here.tr(context: context),
                         style: AppTextStyles.regular14.copyWith(
                           color: currentDisplayValue == null
-                              ? context.colors.contentDisabled
+                              ? context.colors.textTertiary
                               : context.colors.textPrimary,
                         ),
                       ),

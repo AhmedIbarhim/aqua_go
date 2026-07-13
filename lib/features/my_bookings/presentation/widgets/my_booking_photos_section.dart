@@ -29,8 +29,10 @@ class MyBookingPhotosSection extends StatelessWidget {
 
     if (angle == null || angle.isEmpty) return stageLabel;
 
-    final normalizedAngle =
-        angle.toLowerCase().replaceAll('-', '_').replaceAll(' ', '_');
+    final normalizedAngle = angle
+        .toLowerCase()
+        .replaceAll('-', '_')
+        .replaceAll(' ', '_');
     String? translatedAngle;
     switch (normalizedAngle) {
       case 'front':
@@ -38,36 +40,44 @@ class MyBookingPhotosSection extends StatelessWidget {
         translatedAngle = null;
         break;
       case 'front_right':
-        translatedAngle =
-            LocaleKeys.bookings_angles_front_right.tr(context: context);
+        translatedAngle = LocaleKeys.bookings_angles_front_right.tr(
+          context: context,
+        );
         break;
       case 'front_left':
-        translatedAngle =
-            LocaleKeys.bookings_angles_front_left.tr(context: context);
+        translatedAngle = LocaleKeys.bookings_angles_front_left.tr(
+          context: context,
+        );
         break;
       case 'back_right':
-        translatedAngle =
-            LocaleKeys.bookings_angles_back_right.tr(context: context);
+        translatedAngle = LocaleKeys.bookings_angles_back_right.tr(
+          context: context,
+        );
         break;
       case 'back_left':
-        translatedAngle =
-            LocaleKeys.bookings_angles_back_left.tr(context: context);
+        translatedAngle = LocaleKeys.bookings_angles_back_left.tr(
+          context: context,
+        );
         break;
       case 'left_front':
-        translatedAngle =
-            LocaleKeys.bookings_angles_left_front.tr(context: context);
+        translatedAngle = LocaleKeys.bookings_angles_left_front.tr(
+          context: context,
+        );
         break;
       case 'left_back':
-        translatedAngle =
-            LocaleKeys.bookings_angles_left_back.tr(context: context);
+        translatedAngle = LocaleKeys.bookings_angles_left_back.tr(
+          context: context,
+        );
         break;
       case 'right_front':
-        translatedAngle =
-            LocaleKeys.bookings_angles_right_front.tr(context: context);
+        translatedAngle = LocaleKeys.bookings_angles_right_front.tr(
+          context: context,
+        );
         break;
       case 'right_back':
-        translatedAngle =
-            LocaleKeys.bookings_angles_right_back.tr(context: context);
+        translatedAngle = LocaleKeys.bookings_angles_right_back.tr(
+          context: context,
+        );
         break;
       default:
         translatedAngle = p.angle ?? '';
@@ -117,7 +127,7 @@ class MyBookingPhotosSection extends StatelessWidget {
                 text:
                     ' (${LocaleKeys.bookings_before_and_after_washing.tr(context: context)})',
                 style: AppTextStyles.regular12.copyWith(
-                  color: context.colors.contentDisabled,
+                  color: context.colors.textTertiary,
                 ),
               ),
             ],
@@ -148,10 +158,10 @@ class MyBookingPhotosSection extends StatelessWidget {
 
                           // BEFORE tile (0) opens a gallery of ONLY the before
                           // photos; AFTER tile (1) only the after photos.
-                          final stageList =
-                              index == 0 ? beforeList : afterList;
-                          final stageUrls =
-                              stageList.map((p) => p.url!).toList();
+                          final stageList = index == 0 ? beforeList : afterList;
+                          final stageUrls = stageList
+                              .map((p) => p.url!)
+                              .toList();
                           final stageLabels = stageList
                               .map((p) => _label(context, p))
                               .toList();

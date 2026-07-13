@@ -39,7 +39,7 @@ class CustomNetworkImage extends StatelessWidget {
             width: 18,
             height: 18,
             colorFilter: ColorFilter.mode(
-              context.colors.contentDisabled,
+              context.colors.contentTertiary,
               BlendMode.srcIn,
             ),
           ),

@@ -107,6 +107,7 @@ abstract class AppAssets {
   static const String shadows_3 = 'assets/images/shadows_3.png';
 
   static const String successIcon = 'assets/svg/success_icon.svg';
+  static const String cautionIcon = 'assets/svg/caution_icon.svg';
   static const String warningIcon = 'assets/svg/warning_icon.svg';
 
   // My Vehicles

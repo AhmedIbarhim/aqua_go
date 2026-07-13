@@ -118,7 +118,7 @@ class _CarSelectionListState extends State<CarSelectionList> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Opacity(
-            opacity: isSelected ? 1.0 : 0.5,
+            opacity: isSelected ? 1.0 : 0.9,
             child: VehicleMakeLogo(
               logoUrl: car.logoUrl,
               colorEditable: car.carMake?.colorEditable ?? false,
@@ -135,7 +135,7 @@ class _CarSelectionListState extends State<CarSelectionList> {
               style: AppTextStyles.regular12.copyWith(
                 color: isSelected
                     ? context.colors.textPrimary
-                    : context.colors.contentDisabled,
+                    : context.colors.textTertiary,
               ),
               textAlign: TextAlign.center,
               maxLines: 1,
