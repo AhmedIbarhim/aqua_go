@@ -62,21 +62,12 @@ class ProfileUserInfoCard extends StatelessWidget {
                       color: context.colors.textPrimary,
                     ),
                   ),
-                  Row(
-                    children: [
-                      RatingWidget(rating: FetchUserData.getUserRating()),
-                      SizedBox(width: sw(4)),
-                      Text(
-                        user == null
-                            ? ""
-                            : FetchUserData.getUserRating() == 0
-                            ? ""
-                            : '(${FetchUserData.getUserRating()})',
-                        style: AppTextStyles.regular12.copyWith(
-                          color: context.colors.textSecondary,
-                        ),
-                      ),
-                    ],
+                  RatingWidget(
+                    rating: FetchUserData.getUserRating(),
+                    showRatingValue: user != null && FetchUserData.getUserRating() > 0,
+                    ratingTextStyle: AppTextStyles.regular12.copyWith(
+                      color: context.colors.textSecondary,
+                    ),
                   ),
                 ],
               ),

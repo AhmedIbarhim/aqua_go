@@ -239,6 +239,15 @@ abstract class  LocaleKeys {
   static const bookings_reschedule_booking = 'bookings.reschedule_booking';
   static const bookings_confirm_reschedule = 'bookings.confirm_reschedule';
   static const bookings_reschedule_success = 'bookings.reschedule_success';
+  static const bookings_send_tip = 'bookings.send_tip';
+  static const bookings_pay_tip_for_biker = 'bookings.pay_tip_for_biker';
+  static const bookings_wash_biker = 'bookings.wash_biker';
+  static const bookings_tip_amount = 'bookings.tip_amount';
+  static const bookings_other_value = 'bookings.other_value';
+  static const bookings_custom_amount_label = 'bookings.custom_amount_label';
+  static const bookings_custom_amount_hint = 'bookings.custom_amount_hint';
+  static const bookings_send = 'bookings.send';
+  static const bookings_tip_success_msg = 'bookings.tip_success_msg';
   static const bookings = 'bookings';
   static const address_map = 'address.map';
   static const address_current_location = 'address.current_location';

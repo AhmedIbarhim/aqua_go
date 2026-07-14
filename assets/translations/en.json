@@ -246,7 +246,16 @@
         },
         "reschedule_booking": "Edit Booking",
         "confirm_reschedule": "Confirm Booking Changes",
-        "reschedule_success": "Booking has been updated successfully"
+        "reschedule_success": "Booking has been updated successfully",
+        "send_tip": "Send Tip",
+        "pay_tim_for_biker": "Pay tip for biker",
+        "wash_biker": "The wash biker",
+        "tip_amount": "Tip Amount",
+        "other_value": "Other Value",
+        "custom_amount_label": "Custom Amount",
+        "custom_amount_hint": "Enter amount",
+        "send": "Send",
+        "tip_success_msg": "Tip of {} submitted successfully!"
     },
     "address": {
         "map": "Map",

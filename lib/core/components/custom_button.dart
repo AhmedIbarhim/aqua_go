@@ -29,18 +29,18 @@ class CustomButton extends StatelessWidget {
     return MaterialButton(
       onPressed: enabled ? onPressed : null,
       color: color ?? context.colors.primary,
-      disabledColor: context.colors.brandHover,
+      disabledColor: context.colors.contentDisabled,
       shape: RoundedRectangleBorder(
         side: BorderSide(
           color: enabled
               ? (borderColor ?? context.colors.primary)
-              : context.colors.brandSubtle,
-          width: 0.5,
+              : context.colors.contentTertiary,
+          width: 1.0,
         ),
         borderRadius: BorderRadius.circular(12),
       ),
-      textColor: enabled ? textColor : context.colors.contentTertiary,
-
+      textColor: enabled ? textColor : context.colors.textSecondary,
+      elevation: 0,
       minWidth: double.infinity,
       height: MediaQuery.sizeOf(context).height * 0.055,
       child: Row(

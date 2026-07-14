@@ -246,7 +246,16 @@
         },
         "reschedule_booking": "تعديل الحجز",
         "confirm_reschedule": "تأكيد تعديل الحجز",
-        "reschedule_success": "تم تعديل الحجز بنجاح"
+        "reschedule_success": "تم تعديل الحجز بنجاح",
+        "send_tip": "ارسال اكرامية",
+        "pay_tip_for_biker": "ارسال اكرامية للبايكر",
+        "wash_biker": "البايكر الخاص بالغسلة",
+        "tip_amount": "مبلغ الاكرامية",
+        "other_value": "قيمة اخرى",
+        "custom_amount_label": "قيمة أخرى",
+        "custom_amount_hint": "أدخل قيمة الاكرامية",
+        "send": "ارسال",
+        "tip_success_msg": "تم إرسال إكرامية بقيمة {} بنجاح!"
     },
     "address": {
         "map": "الخريطة",

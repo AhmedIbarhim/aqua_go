@@ -8,6 +8,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../../../complaints/presentation/views/complaint_view.dart';
 
+import '../../../rating/presentation/widgets/pay_tips_bottom_sheet.dart';
 import '../../../rating/presentation/widgets/rating_bottom_sheet.dart';
 
 class MyBookingProceduresBottomSheet extends StatelessWidget {
@@ -37,6 +38,16 @@ class MyBookingProceduresBottomSheet extends StatelessWidget {
                   RatingBottomSheet.show(context, booking);
                 }
               : null,
+        ),
+        SizedBox(height: height * 0.015),
+
+        _buildActionItem(
+          context,
+          title: LocaleKeys.bookings_pay_tip_for_biker.tr(context: context),
+          onTap: () {
+            Navigator.pop(context);
+            PayTipsBottomSheet.show(context, booking);
+          },
         ),
         SizedBox(height: height * 0.015),
         _buildActionItem(
@@ -81,7 +92,7 @@ class MyBookingProceduresBottomSheet extends StatelessWidget {
           style: AppTextStyles.regular16.copyWith(
             color: onTap != null
                 ? context.colors.textPrimary
-                : context.colors.contentDisabled,
+                : context.colors.textTertiary,
           ),
         ),
       ),

@@ -185,10 +185,10 @@ class _ServiceCardState extends State<ServiceCard> {
                               ? CustomNetworkImage(serviceModel.imageUrl!)
                               : Image.asset(
                                   context.isDarkTheme
-                                      ? (context.isAr
+                                      ? (context.isEn
                                             ? AppAssets.baseServiceDark
                                             : AppAssets.baseServiceDarkEnverted)
-                                      : (context.isAr
+                                      : (context.isEn
                                             ? AppAssets.baseServiceLight
                                             : AppAssets
                                                   .baseServiceLightEnverted),

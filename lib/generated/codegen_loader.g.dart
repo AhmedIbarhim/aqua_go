@@ -262,7 +262,16 @@ class CodegenLoader extends AssetLoader{
     },
     "reschedule_booking": "تعديل الحجز",
     "confirm_reschedule": "تأكيد تعديل الحجز",
-    "reschedule_success": "تم تعديل الحجز بنجاح"
+    "reschedule_success": "تم تعديل الحجز بنجاح",
+    "send_tip": "ارسال اكرامية",
+    "pay_tip_for_biker": "ارسال اكرامية للبايكر",
+    "wash_biker": "البايكر الخاص بالغسلة",
+    "tip_amount": "مبلغ الاكرامية",
+    "other_value": "قيمة اخرى",
+    "custom_amount_label": "قيمة أخرى",
+    "custom_amount_hint": "أدخل قيمة الاكرامية",
+    "send": "ارسال",
+    "tip_success_msg": "تم إرسال إكرامية بقيمة {} بنجاح!"
   },
   "address": {
     "map": "الخريطة",
@@ -713,7 +722,16 @@ static const Map<String,dynamic> _en = {
     },
     "reschedule_booking": "Edit Booking",
     "confirm_reschedule": "Confirm Booking Changes",
-    "reschedule_success": "Booking has been updated successfully"
+    "reschedule_success": "Booking has been updated successfully",
+    "send_tip": "Send Tip",
+    "pay_tim_for_biker": "Pay tip for biker",
+    "wash_biker": "The wash biker",
+    "tip_amount": "Tip Amount",
+    "other_value": "Other Value",
+    "custom_amount_label": "Custom Amount",
+    "custom_amount_hint": "Enter amount",
+    "send": "Send",
+    "tip_success_msg": "Tip of {} submitted successfully!"
   },
   "address": {
     "map": "Map",
