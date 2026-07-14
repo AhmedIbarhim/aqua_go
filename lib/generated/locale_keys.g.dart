@@ -315,6 +315,7 @@ abstract class  LocaleKeys {
   static const support_faq = 'support.faq';
   static const support_complaint_log = 'support.complaint_log';
   static const support_whatsapp_contact = 'support.whatsapp_contact';
+  static const support_contact_us = 'support.contact_us';
   static const support_faq_categories_booking = 'support.faq_categories.booking';
   static const support_faq_categories_payment = 'support.faq_categories.payment';
   static const support_faq_categories_quality = 'support.faq_categories.quality';

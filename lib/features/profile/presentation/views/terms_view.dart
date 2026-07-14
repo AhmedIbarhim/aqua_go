@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../../core/components/generic_app_bar.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/themes/app_text_styles.dart';
-import 'local_texts/terms_texts_ar.dart';
-import 'local_texts/terms_texts_en.dart';
+import '../local_texts/terms_texts_ar.dart';
+import '../local_texts/terms_texts_en.dart';
 
 class TermsView extends StatelessWidget {
   const TermsView({super.key});
@@ -15,10 +15,7 @@ class TermsView extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: context.colors.screenBG,
-      appBar: GenericAppBar(
-        title: texts.appBarTitle,
-        centerTitle: true,
-      ),
+      appBar: GenericAppBar(title: texts.appBarTitle, centerTitle: true),
       body: Column(
         children: [
           const SizedBox(height: 16),

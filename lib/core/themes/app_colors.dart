@@ -17,6 +17,7 @@ class AppColors extends ThemeExtension<AppColors> {
   final Color defaultSubtle;
   final Color borderSecondary;
   final Color cardBackGround;
+  final Color fields;
 
   // Text Colors
   final Color textPrimary;
@@ -31,6 +32,8 @@ class AppColors extends ThemeExtension<AppColors> {
   final Color contentSecondaryLight;
   final Color contentTertiary;
   final Color contentDisabled;
+  final Color chatPrimary;
+  final Color chatSecondary;
 
   // Semantic Colors
   final Color success;
@@ -52,6 +55,7 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.defaultSubtle,
     required this.borderSecondary,
     required this.cardBackGround,
+    required this.fields,
     required this.textPrimary,
     required this.textSecondary,
     required this.textTertiary,
@@ -62,6 +66,8 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.contentSecondaryLight,
     required this.contentTertiary,
     required this.contentDisabled,
+    required this.chatPrimary,
+    required this.chatSecondary,
     required this.success,
     required this.error,
     required this.warning,
@@ -79,6 +85,7 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? white,
     Color? background,
     Color? screenBG,
+    Color? fields,
     Color? defaultSubtle,
     Color? borderSecondary,
     Color? cardBackGround,
@@ -92,8 +99,12 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? contentSecondaryLight,
     Color? contentTertiary,
     Color? contentDisabled,
+    Color? chatPrimary,
+    Color? chatSecondary,
     Color? success,
+    Color? successSecondry,
     Color? error,
+    Color? errorSecondary,
     Color? warning,
     Color? successLight,
     Color? errorLight,
@@ -108,6 +119,7 @@ class AppColors extends ThemeExtension<AppColors> {
       themeOpositeColor: white ?? themeOpositeColor,
       background: background ?? this.background,
       screenBG: screenBG ?? this.screenBG,
+      fields: fields ?? this.fields,
       defaultSubtle: defaultSubtle ?? this.defaultSubtle,
       borderSecondary: borderSecondary ?? this.borderSecondary,
       cardBackGround: cardBackGround ?? this.cardBackGround,
@@ -122,11 +134,13 @@ class AppColors extends ThemeExtension<AppColors> {
           contentSecondaryLight ?? this.contentSecondaryLight,
       contentTertiary: contentTertiary ?? this.contentTertiary,
       contentDisabled: contentDisabled ?? this.contentDisabled,
+      chatPrimary: chatPrimary ?? this.chatPrimary,
+      chatSecondary: chatSecondary ?? this.chatSecondary,
       success: success ?? this.success,
       error: error ?? this.error,
       warning: warning ?? this.warning,
-      successSecondry: successLight ?? this.successSecondry,
-      errorSecondary: errorLight ?? this.errorSecondary,
+      successSecondry: successSecondry ?? this.successSecondry,
+      errorSecondary: errorSecondary ?? this.errorSecondary,
       info: info ?? this.info,
     );
   }
@@ -149,6 +163,7 @@ class AppColors extends ThemeExtension<AppColors> {
         t,
       )!,
       background: Color.lerp(background, other.background, t)!,
+      fields: Color.lerp(fields, other.fields, t)!,
       screenBG: Color.lerp(screenBG, other.screenBG, t)!,
       defaultSubtle: Color.lerp(defaultSubtle, other.defaultSubtle, t)!,
       borderSecondary: Color.lerp(borderSecondary, other.borderSecondary, t)!,
@@ -172,6 +187,8 @@ class AppColors extends ThemeExtension<AppColors> {
       contentTertiary: Color.lerp(contentTertiary, other.contentTertiary, t)!,
       contentDisabled: Color.lerp(contentDisabled, other.contentDisabled, t)!,
       success: Color.lerp(success, other.success, t)!,
+      chatPrimary: Color.lerp(chatPrimary, other.chatPrimary, t)!,
+      chatSecondary: Color.lerp(chatSecondary, other.chatSecondary, t)!,
       error: Color.lerp(error, other.error, t)!,
       warning: Color.lerp(warning, other.warning, t)!,
       successSecondry: Color.lerp(successSecondry, other.successSecondry, t)!,
@@ -212,6 +229,9 @@ const darkAppColors = AppColors(
   errorSecondary: Color(0xFFEF4444),
   warning: Color(0xFFF59E00),
   info: Color(0xFF3B82F6),
+  fields: Color(0xFF151515),
+  chatPrimary: Color(0xFF1C1C1C),
+  chatSecondary: Color(0xFF262626),
 );
 
 // -----------------------------------------------------------------------------
@@ -227,7 +247,8 @@ const lightAppColors = AppColors(
   // brandHover: Color(0xFF9DFAFF),
   themeColor: Color(0xFFFFFFFF),
   themeOpositeColor: Color(0xFF171717),
-  background: Color(0xFFF3F4F6),
+  background: Color(0xFFF0F1F4),
+  // background: Color(0xFFF3F4F6),
   screenBG: Color(0xFFF8FAFC),
   defaultSubtle: Color(0xFFE2E8F0),
   borderSecondary: Color(0xFFCCD0D7),
@@ -248,4 +269,7 @@ const lightAppColors = AppColors(
   errorSecondary: Color(0xFFEF4444),
   warning: Color(0xFFD97706),
   info: Color(0xFF1D4ED8),
+  fields: Color(0xFFEFF0F2),
+  chatPrimary: Color(0xFFEFF0F2),
+  chatSecondary: Color(0xFFE2E8F0),
 );

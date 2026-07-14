@@ -33,6 +33,7 @@ abstract class Routes {
   static const String myAddresses = '/my_addresses_view';
   static const String complaintDetails = '/complaint_details_view';
   static const String faqs = '/faqs_view';
+  static const String supportChat = '/support_chat_view';
   static const String gifts = '/gifts_view';
   static const String sendGift = '/send_gift_view';
   static const String myWallet = '/my_wallet_view';

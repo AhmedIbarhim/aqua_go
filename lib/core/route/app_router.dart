@@ -9,6 +9,7 @@ import '../../features/gifts/presentation/views/gifts_view.dart';
 import '../../features/gifts/presentation/views/send_gift_view.dart';
 import '../../features/gifts/presentation/controllers/send_gift_cubit.dart';
 import '../../features/my_bookings/data/models/booking_response_model/booking_response_model.dart';
+import '../../features/profile/presentation/views/support_chat_view.dart';
 import '../../features/subscriptions/data/repos/subscriptions_repository.dart';
 import '../../features/address/presentation/views/my_addresses_view.dart';
 import '../../features/address/presentation/views/new_address_map_view.dart';
@@ -309,6 +310,9 @@ abstract class AppRouter {
 
       case Routes.myWallet:
         return MaterialPageRoute(builder: (_) => const MyWalletView());
+
+      case Routes.supportChat:
+        return MaterialPageRoute(builder: (_) => const SupportChatView());
 
       default:
         return MaterialPageRoute(builder: (_) => const Placeholder());

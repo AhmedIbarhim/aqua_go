@@ -1,5 +1,6 @@
 abstract class AppAssets {
   // General Icons
+  static const String chat = 'assets/svg/chat.svg';
   static const String edit = 'assets/svg/edit.svg';
   static const String remove = 'assets/svg/remove.svg';
   static const String language = 'assets/svg/lang.svg';
@@ -155,6 +156,7 @@ abstract class AppAssets {
   static const String packages = 'assets/svg/packages.svg';
   static const String whatsppOutlined = 'assets/svg/whatsapp_outlined.svg';
   static const String sms = 'assets/svg/sms.svg';
+  static const String messages = 'assets/svg/messages.svg';
   static const String whatsapp = 'assets/svg/whatsapp.svg';
   static const String question = 'assets/svg/question.svg';
   static const String documentCopy = 'assets/svg/document_copy.svg';

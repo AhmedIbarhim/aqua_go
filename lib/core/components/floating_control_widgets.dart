@@ -26,7 +26,6 @@ class DraggableFloatingWidget extends StatefulWidget {
 class _DraggableFloatingWidgetState extends State<DraggableFloatingWidget> {
   late Offset _offset;
   bool _isDragging = false;
-  bool _hasMoved = false;
   bool _isInitialized = false;
 
   @override
@@ -69,16 +68,15 @@ class _DraggableFloatingWidgetState extends State<DraggableFloatingWidget> {
       left: _offset.dx,
       top: _offset.dy,
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onPanStart: (_) {
           setState(() {
             _isDragging = true;
-            _hasMoved = false;
           });
         },
         onPanUpdate: (details) {
           setState(() {
             _offset += details.delta;
-            _hasMoved = true;
           });
         },
         onPanEnd: (_) {
@@ -86,21 +84,20 @@ class _DraggableFloatingWidgetState extends State<DraggableFloatingWidget> {
             _isDragging = false;
           });
         },
+        onPanCancel: () {
+          setState(() {
+            _isDragging = false;
+          });
+        },
+        onTap: widget.onTap,
         child: AnimatedScale(
           scale: _isDragging ? 1.15 : 1.0,
           duration: const Duration(milliseconds: 150),
-          child: GestureDetector(
-            onTap: () {
-              if (!_hasMoved) {
-                widget.onTap();
-              }
-            },
-            child: MouseRegion(
-              cursor: SystemMouseCursors.click,
-              child: Material(
-                type: MaterialType.transparency,
-                child: widget.child,
-              ),
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: Material(
+              type: MaterialType.transparency,
+              child: widget.child,
             ),
           ),
         ),
@@ -144,14 +141,14 @@ class FloatingThemeSwitcher extends StatelessWidget {
                 color: context.colors.primary.withValues(alpha: 0.4),
                 width: 1.5,
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: context.colors.primary.withValues(alpha: 0.25),
-                  blurRadius: 12,
-                  spreadRadius: 1,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+              // boxShadow: [
+              //   BoxShadow(
+              //     color: context.colors.primary.withValues(alpha: 0.25),
+              //     blurRadius: 12,
+              //     spreadRadius: 1,
+              //     offset: const Offset(0, 4),
+              //   ),
+              // ],
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(24),
@@ -223,14 +220,14 @@ class FloatingLanguageSwitcher extends StatelessWidget {
                 color: context.colors.primary.withValues(alpha: 0.4),
                 width: 1.5,
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: context.colors.primary.withValues(alpha: 0.25),
-                  blurRadius: 12,
-                  spreadRadius: 1,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+              // boxShadow: [
+              //   BoxShadow(
+              //     color: context.colors.primary.withValues(alpha: 0.25),
+              //     blurRadius: 12,
+              //     spreadRadius: 1,
+              //     offset: const Offset(0, 4),
+              //   ),
+              // ],
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(24),

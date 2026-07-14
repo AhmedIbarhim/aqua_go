@@ -346,6 +346,7 @@ class CodegenLoader extends AssetLoader{
     "faq": "الأسئلة الشائعة",
     "complaint_log": "سجل الشكاوي",
     "whatsapp_contact": "التواصل عن طريق الواتس اب",
+    "contact_us": "تواصل معنا",
     "faq_categories": {
       "booking": "الحجوزات والمواعيد",
       "payment": "المدفوعات",
@@ -806,6 +807,7 @@ static const Map<String,dynamic> _en = {
     "faq": "FAQ",
     "complaint_log": "Complaint Log",
     "whatsapp_contact": "Contact via WhatsApp",
+    "contact_us": "Contact Us",
     "faq_categories": {
       "booking": "Booking & Scheduling",
       "payment": "Payments",
