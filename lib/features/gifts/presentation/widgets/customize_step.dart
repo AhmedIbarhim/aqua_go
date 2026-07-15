@@ -67,9 +67,9 @@ class _CustomizeStepState extends State<CustomizeStep> {
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.dark(
               primary: context.colors.primary,
-              onPrimary: Colors.black,
+              onPrimary: context.colors.background,
               surface: context.colors.cardBackGround,
-              onSurface: Colors.white,
+              onSurface: context.colors.textPrimary,
             ),
           ),
           child: child!,
@@ -96,9 +96,24 @@ class _CustomizeStepState extends State<CustomizeStep> {
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.dark(
               primary: context.colors.primary,
-              onPrimary: Colors.black,
+              onPrimary: context.colors.background,
               surface: context.colors.cardBackGround,
-              onSurface: Colors.white,
+              onSurface: context.colors.textPrimary,
+            ),
+            timePickerTheme: TimePickerThemeData(
+              dayPeriodColor: WidgetStateColor.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) {
+                  return context.colors.primary;
+                }
+                return Colors.transparent;
+              }),
+              dayPeriodTextColor: WidgetStateColor.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) {
+                  return context.colors.background;
+                }
+                return context.colors.textPrimary;
+              }),
+              dayPeriodBorderSide: BorderSide(color: context.colors.primary),
             ),
           ),
           child: child!,

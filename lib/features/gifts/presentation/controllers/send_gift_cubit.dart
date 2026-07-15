@@ -6,6 +6,8 @@ import '../../../booking/data/repos/booking_repository.dart';
 import 'send_gift_state.dart';
 import '../../../home/data/models/service_model.dart';
 import '../../data/models/gift_theme_model.dart';
+import '../../data/models/purchase_gift_request_model.dart';
+import '../../../../core/enums/payment_method_enum.dart';
 
 class SendGiftCubit extends Cubit<SendGiftState> {
   final GiftsRepository _giftsRepository;
@@ -84,6 +86,7 @@ class SendGiftCubit extends Cubit<SendGiftState> {
       state.copyWith(
         selectedService: service,
         selectedAddonIds: {}, // reset addons when service changes
+        status: SendGiftStatus.initial,
         clearQuote: true,
       ),
     );
@@ -96,11 +99,23 @@ class SendGiftCubit extends Cubit<SendGiftState> {
     } else {
       updatedAddons.add(addonId);
     }
-    emit(state.copyWith(selectedAddonIds: updatedAddons, clearQuote: true));
+    emit(
+      state.copyWith(
+        selectedAddonIds: updatedAddons,
+        status: SendGiftStatus.initial,
+        clearQuote: true,
+      ),
+    );
   }
 
   void updateRecipient(String name, String phone) {
-    emit(state.copyWith(recipientName: name, recipientPhone: phone));
+    emit(
+      state.copyWith(
+        recipientName: name,
+        recipientPhone: phone,
+        status: SendGiftStatus.initial,
+      ),
+    );
   }
 
   void updateCustomization({
@@ -117,18 +132,29 @@ class SendGiftCubit extends Cubit<SendGiftState> {
         scheduledDate: date,
         scheduledTime: time,
         selectedTheme: theme,
+        status: SendGiftStatus.initial,
       ),
     );
   }
 
-  void updatePaymentMethod(String method) {
-    emit(state.copyWith(paymentMethod: method));
+  void updatePaymentMethod(PaymentMethod method) {
+    emit(
+      state.copyWith(
+        paymentMethod: method,
+        status: SendGiftStatus.initial,
+      ),
+    );
   }
 
   void nextStep() {
     if (state.step < 3) {
       final next = state.step + 1;
-      emit(state.copyWith(step: next));
+      emit(
+        state.copyWith(
+          step: next,
+          status: SendGiftStatus.initial,
+        ),
+      );
       if (next == 3) {
         fetchQuote();
       }
@@ -173,10 +199,14 @@ class SendGiftCubit extends Cubit<SendGiftState> {
     );
   }
 
-
   void previousStep() {
     if (state.step > 0) {
-      emit(state.copyWith(step: state.step - 1));
+      emit(
+        state.copyWith(
+          step: state.step - 1,
+          status: SendGiftStatus.initial,
+        ),
+      );
     }
   }
 
@@ -223,22 +253,23 @@ class SendGiftCubit extends Cubit<SendGiftState> {
       }
     }
 
-    final body = {
-      'serviceId': state.selectedService!.id,
-      'themeId': state.selectedTheme!.id,
-      'recipientPhoneE164': '+966${state.recipientPhone}',
-      'paymentMethod': state.paymentMethod,
-      'recipientName': state.recipientName,
-      'messageText': state.messageText,
-      if (scheduledDeliveryAt != null)
-        'scheduledDeliveryAt': scheduledDeliveryAt,
-      if (state.selectedAddonIds.isNotEmpty)
-        'addOnIds': state.selectedAddonIds.toList(),
-    };
+    final request = PurchaseGiftRequestModel(
+      packageId: state.selectedService!.id!,
+      themeId: state.selectedTheme!.id!,
+      recipientPhoneE164: '+966${state.recipientPhone}',
+      paymentMethod: state.paymentMethod == PaymentMethod.applePay ? 'APPLE_PAY' : 'CARD',
+      savedCardTokenId: state.savedCardTokenId,
+      recipientName: state.recipientName,
+      messageText: state.messageText,
+      scheduledDeliveryAt: scheduledDeliveryAt,
+      pointsToApply: state.pointsToApply,
+      moyasarPaymentId: state.moyasarPaymentId,
+      addOnIds: state.selectedAddonIds.isNotEmpty ? state.selectedAddonIds.toList() : null,
+    );
 
     final result = await _giftsRepository.purchaseGift(
       giftId: giftId,
-      data: body,
+      request: request,
     );
 
     result.fold(

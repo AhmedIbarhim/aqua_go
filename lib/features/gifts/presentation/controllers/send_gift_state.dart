@@ -3,6 +3,7 @@ import '../../../home/data/models/service_model.dart';
 import '../../data/models/gift_model.dart';
 import '../../data/models/gift_theme_model.dart';
 import '../../../booking/data/models/quote_model.dart';
+import '../../../../core/enums/payment_method_enum.dart';
 
 enum SendGiftStatus {
   initial,
@@ -32,7 +33,12 @@ class SendGiftState extends Equatable {
   final DateTime? scheduledDate;
   final String? scheduledTime; // e.g. "09:00 PM"
   final GiftThemeModel? selectedTheme;
-  final String paymentMethod; // 'APPLE_PAY' or 'CREDIT_CARD'
+  final PaymentMethod? paymentMethod;
+
+  // Additional optional payload parameters
+  final String? savedCardTokenId;
+  final int? pointsToApply;
+  final String? moyasarPaymentId;
 
   final GiftModel? purchasedGift;
   final QuoteModel? quote;
@@ -52,7 +58,10 @@ class SendGiftState extends Equatable {
     this.scheduledDate,
     this.scheduledTime,
     this.selectedTheme,
-    this.paymentMethod = 'APPLE_PAY',
+    this.paymentMethod,
+    this.savedCardTokenId,
+    this.pointsToApply,
+    this.moyasarPaymentId,
     this.purchasedGift,
     this.quote,
   });
@@ -72,7 +81,10 @@ class SendGiftState extends Equatable {
     DateTime? scheduledDate,
     String? scheduledTime,
     GiftThemeModel? selectedTheme,
-    String? paymentMethod,
+    PaymentMethod? paymentMethod,
+    String? savedCardTokenId,
+    int? pointsToApply,
+    String? moyasarPaymentId,
     GiftModel? purchasedGift,
     QuoteModel? quote,
     bool clearService = false,
@@ -97,6 +109,9 @@ class SendGiftState extends Equatable {
       scheduledTime: scheduledTime ?? this.scheduledTime,
       selectedTheme: clearTheme ? null : (selectedTheme ?? this.selectedTheme),
       paymentMethod: paymentMethod ?? this.paymentMethod,
+      savedCardTokenId: savedCardTokenId ?? this.savedCardTokenId,
+      pointsToApply: pointsToApply ?? this.pointsToApply,
+      moyasarPaymentId: moyasarPaymentId ?? this.moyasarPaymentId,
       purchasedGift: purchasedGift ?? this.purchasedGift,
       quote: clearQuote ? null : (quote ?? this.quote),
     );
@@ -119,8 +134,10 @@ class SendGiftState extends Equatable {
     scheduledTime,
     selectedTheme,
     paymentMethod,
+    savedCardTokenId,
+    pointsToApply,
+    moyasarPaymentId,
     purchasedGift,
     quote,
   ];
 }
-

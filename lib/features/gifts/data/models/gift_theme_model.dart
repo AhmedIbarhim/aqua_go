@@ -41,11 +41,11 @@ class GiftThemeModel extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        nameAr,
-        nameEn,
-        imageUrl,
-        displayOrder,
-        active,
-      ];
+    id,
+    nameAr,
+    nameEn,
+    imageUrl,
+    displayOrder,
+    active,
+  ];
 }

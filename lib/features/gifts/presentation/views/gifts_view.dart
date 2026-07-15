@@ -1,3 +1,4 @@
+import 'package:aqua_go/core/components/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -9,8 +10,6 @@ import '../../../../core/components/generic_app_bar.dart';
 import '../../../../core/components/guest_placeholder_widget.dart';
 import '../../../../core/config/di/service_locator.dart';
 import '../../../../core/config/session/session_state.dart';
-
-import '../../../../core/themes/app_text_styles.dart';
 import '../../data/models/gift_model.dart';
 import '../controllers/gifts_cubit.dart';
 import '../controllers/gifts_state.dart';
@@ -207,15 +206,15 @@ class _GiftsViewState extends State<GiftsView> {
 
   Widget? _buildBottomButton(BuildContext context, GiftsState state) {
     if (_selectedIndex != 0) return null;
-    if (state is! GiftsSuccess) return null;
+    // if (state is! GiftsSuccess) return null;
 
-    final hasSentGifts = state.gifts.any((gift) => gift.isSent);
-    if (!hasSentGifts) return null;
+    // final hasSentGifts = state.gifts.any((gift) => gift.isSent);
+    // if (!hasSentGifts) return null;
 
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: ElevatedButton(
+        child: CustomButton(
           onPressed: () {
             Navigator.pushNamed(context, Routes.sendGift).then((val) {
               if (val == true && context.mounted) {
@@ -223,80 +222,59 @@ class _GiftsViewState extends State<GiftsView> {
               }
             });
           },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: context.colors.primary,
-            foregroundColor: Colors.black,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            padding: const EdgeInsets.symmetric(vertical: 14),
-            elevation: 0,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                LocaleKeys.gifts_empty_send_now.tr(context: context),
-                style: AppTextStyles.medium16.copyWith(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(width: 8),
-              const Icon(Icons.add, color: Colors.black, size: 20),
-            ],
-          ),
+          text: LocaleKeys.gifts_empty_send_now.tr(context: context),
+          postWidget: Icon(Icons.add),
         ),
       ),
     );
   }
 
   List<GiftModel> mockGifts = [
-    // GiftModel(
-    //   giftId: '1',
-    //   giftCode: 'AQUA-GIFT-111',
-    //   status: GiftStatus.ISSUED,
-    //   amountMinor: 15000,
-    //   recipientName: 'خالد محمد',
-    //   recipientPhoneE164: '+966501234567',
-    //   senderName: 'أحمد إبراهيم',
-    //   senderPhone: '+966507654321',
-    //   message: 'كل عام وأنت بخير بمناسبة الترقية الجديدة!',
-    //   packageNameAr: 'الباقة الماسية',
-    //   packageNameEn: 'Diamond Package',
-    //   createdAt: '2026-07-10T12:00:00Z',
-    //   validityEndsAt: '2026-10-10T12:00:00Z',
-    // ),
-    // GiftModel(
-    //   giftId: '2',
-    //   giftCode: 'AQUA-GIFT-222',
-    //   status: GiftStatus.DELIVERED,
-    //   amountMinor: 25000,
-    //   recipientName: 'سارة أحمد',
-    //   recipientPhoneE164: '+966509876543',
-    //   senderName: 'نورة علي',
-    //   senderPhone: '+966501112223',
-    //   message: 'أتمنى لك يوماً سعيداً وسيارة نظيفة دائماً!',
-    //   packageNameAr: 'باقة التوفير الفائقة',
-    //   packageNameEn: 'Super Saver Package',
-    //   createdAt: '2026-07-09T09:00:00Z',
-    //   validityEndsAt: '2026-08-09T09:00:00Z',
-    // ),
-    // GiftModel(
-    //   giftId: '3',
-    //   giftCode: 'AQUA-GIFT-333',
-    //   status: GiftStatus.REDEEMED,
-    //   amountMinor: 10000,
-    //   recipientName: 'أحمد علي',
-    //   recipientPhoneE164: '+966502223334',
-    //   senderName: 'محمد خالد',
-    //   senderPhone: '+966503334445',
-    //   message: 'هدية بسيطة لغسيل سيارتك.',
-    //   packageNameAr: 'الباقة الفضية',
-    //   packageNameEn: 'Silver Package',
-    //   createdAt: '2026-07-01T15:30:00Z',
-    //   validityEndsAt: '2026-10-01T15:30:00Z',
-    //   redeemedAt: '2026-07-02T10:00:00Z',
-    // ),
+    GiftModel(
+      giftId: '1',
+      giftCode: 'AQUA-GIFT-111',
+      status: GiftStatus.ISSUED,
+      amountMinor: 15000,
+      recipientName: 'خالد محمد',
+      recipientPhoneE164: '+966501234567',
+      senderName: 'أحمد إبراهيم',
+      senderPhone: '+966507654321',
+      message: 'كل عام وأنت بخير بمناسبة الترقية الجديدة!',
+      packageNameAr: 'الباقة الماسية',
+      packageNameEn: 'Diamond Package',
+      createdAt: '2026-07-10T12:00:00Z',
+      validityEndsAt: '2026-10-10T12:00:00Z',
+    ),
+    GiftModel(
+      giftId: '2',
+      giftCode: 'AQUA-GIFT-222',
+      status: GiftStatus.DELIVERED,
+      amountMinor: 25000,
+      recipientName: 'سارة أحمد',
+      recipientPhoneE164: '+966509876543',
+      senderName: 'نورة علي',
+      senderPhone: '+966501112223',
+      message: 'أتمنى لك يوماً سعيداً وسيارة نظيفة دائماً!',
+      packageNameAr: 'باقة التوفير الفائقة',
+      packageNameEn: 'Super Saver Package',
+      createdAt: '2026-07-09T09:00:00Z',
+      validityEndsAt: '2026-08-09T09:00:00Z',
+    ),
+    GiftModel(
+      giftId: '3',
+      giftCode: 'AQUA-GIFT-333',
+      status: GiftStatus.REDEEMED,
+      amountMinor: 10000,
+      recipientName: 'أحمد علي',
+      recipientPhoneE164: '+966502223334',
+      senderName: 'محمد خالد',
+      senderPhone: '+966503334445',
+      message: 'هدية بسيطة لغسيل سيارتك.',
+      packageNameAr: 'الباقة الفضية',
+      packageNameEn: 'Silver Package',
+      createdAt: '2026-07-01T15:30:00Z',
+      validityEndsAt: '2026-10-01T15:30:00Z',
+      redeemedAt: '2026-07-02T10:00:00Z',
+    ),
   ];
 }

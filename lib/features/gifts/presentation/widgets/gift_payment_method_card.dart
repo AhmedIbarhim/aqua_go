@@ -3,10 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/components/custom_radio_widget.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/themes/app_text_styles.dart';
+import '../../../../core/enums/payment_method_enum.dart';
 import '../controllers/send_gift_cubit.dart';
 
 class GiftPaymentMethodCard extends StatelessWidget {
-  final String method;
+  final PaymentMethod method;
   final String title;
   final List<String> iconPaths;
   final bool isSelected;

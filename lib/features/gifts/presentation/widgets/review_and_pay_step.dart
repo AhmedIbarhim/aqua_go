@@ -10,6 +10,7 @@ import '../../../../generated/locale_keys.g.dart';
 import '../controllers/send_gift_cubit.dart';
 import '../controllers/send_gift_state.dart';
 import '../../../home/data/models/add_on_model.dart';
+import '../../../../core/enums/payment_method_enum.dart';
 import 'gift_payment_method_card.dart';
 import 'gift_invoice_row.dart';
 
@@ -240,22 +241,22 @@ class ReviewAndPayStep extends StatelessWidget {
             SizedBox(height: context.sh(12)),
             if (isIOS) ...[
               GiftPaymentMethodCard(
-                method: 'APPLE_PAY',
+                method: PaymentMethod.applePay,
                 title: LocaleKeys.bookings_apple_pay.tr(context: context),
                 iconPaths: [AppAssets.applePay],
-                isSelected: state.paymentMethod == 'APPLE_PAY',
+                isSelected: state.paymentMethod == PaymentMethod.applePay,
               ),
               SizedBox(height: context.sh(12)),
             ],
             GiftPaymentMethodCard(
-              method: 'CREDIT_CARD',
+              method: PaymentMethod.creditCard,
               title: LocaleKeys.bookings_credit_card.tr(context: context),
               iconPaths: [
                 AppAssets.visaPay,
                 AppAssets.mastercardPay,
                 AppAssets.madaPay,
               ],
-              isSelected: state.paymentMethod == 'CREDIT_CARD',
+              isSelected: state.paymentMethod == PaymentMethod.creditCard,
             ),
 
             SizedBox(height: context.sh(24)),

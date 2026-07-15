@@ -1,3 +1,4 @@
+import 'package:aqua_go/core/components/custom_loading_indicator.dart';
 import 'package:aqua_go/core/components/generic_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -35,7 +36,7 @@ class SendGiftView extends StatelessWidget {
         }
         return themeValid;
       case 3:
-        return state.paymentMethod.isNotEmpty;
+        return state.paymentMethod != null;
       default:
         return false;
     }
@@ -44,6 +45,7 @@ class SendGiftView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<SendGiftCubit, SendGiftState>(
+      listenWhen: (previous, current) => previous.status != current.status,
       listener: (context, state) {
         if (state.status == SendGiftStatus.loading) {
           context.showLoadingOverlay();
@@ -83,7 +85,7 @@ class SendGiftView extends StatelessWidget {
             ),
           ),
           body: state.status == SendGiftStatus.packagesLoading
-              ? const Center(child: CircularProgressIndicator())
+              ? const Center(child: CustomLoadingIndicator(size: 100))
               : Column(
                   children: [
                     // Outer wizard container with rounded corners and card styling

@@ -23,13 +23,13 @@ class GiftsRemoteDataSource {
   }
 
   Future<Either<Failure, dynamic>> purchaseGift({
-    required String giftId,
+    required String idempotencyKey,
     required Map<String, dynamic> data,
   }) {
     return _apiClient.post(
       Endpoints.gifts,
       data: data,
-      options: Options(headers: {'Idempotency-Key': 'gift-purchase:$giftId'}),
+      options: Options(headers: {'Idempotency-Key': idempotencyKey}),
     );
   }
 
