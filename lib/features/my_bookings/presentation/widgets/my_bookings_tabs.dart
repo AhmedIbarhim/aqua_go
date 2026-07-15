@@ -35,17 +35,17 @@ class MyBookingsTabs extends StatelessWidget {
                       ? context.colors.defaultSubtle
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(12),
-                  boxShadow: selectedIndex == 0
-                      ? [
-                          BoxShadow(
-                            color: const Color(
-                              0xFF2D3439,
-                            ).withValues(alpha: 0.04),
-                            offset: const Offset(0, 2),
-                            blurRadius: 4,
-                          ),
-                        ]
-                      : null,
+                  // boxShadow: selectedIndex == 0
+                  //     ? [
+                  //         BoxShadow(
+                  //           color: const Color(
+                  //             0xFF2D3439,
+                  //           ).withValues(alpha: 0.04),
+                  //           offset: const Offset(0, 2),
+                  //           blurRadius: 4,
+                  //         ),
+                  //       ]
+                  //     : null,
                 ),
                 alignment: Alignment.center,
                 child: Text(

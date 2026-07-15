@@ -35,17 +35,17 @@ class GiftsTabs extends StatelessWidget {
                       ? context.colors.defaultSubtle
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(12),
-                  boxShadow: selectedIndex == 0
-                      ? [
-                          BoxShadow(
-                            color: const Color(
-                              0xFF2D3439,
-                            ).withValues(alpha: 0.04),
-                            offset: const Offset(0, 2),
-                            blurRadius: 4,
-                          ),
-                        ]
-                      : null,
+                  // boxShadow: selectedIndex == 0
+                  //     ? [
+                  //         BoxShadow(
+                  //           color: const Color(
+                  //             0xFF2D3439,
+                  //           ).withValues(alpha: 0.04),
+                  //           offset: const Offset(0, 2),
+                  //           blurRadius: 4,
+                  //         ),
+                  //       ]
+                  //     : null,
                 ),
                 alignment: Alignment.center,
                 child: Text(
@@ -53,7 +53,7 @@ class GiftsTabs extends StatelessWidget {
                   style: selectedIndex == 0
                       ? AppTextStyles.medium14
                       : AppTextStyles.regular14.copyWith(
-                          color: context.colors.contentDisabled,
+                          color: context.colors.textTertiary,
                         ),
                 ),
               ),
@@ -71,17 +71,17 @@ class GiftsTabs extends StatelessWidget {
                       ? context.colors.defaultSubtle
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(12),
-                  boxShadow: selectedIndex == 1
-                      ? [
-                          BoxShadow(
-                            color: const Color(
-                              0xFF2D3439,
-                            ).withValues(alpha: 0.04),
-                            offset: const Offset(0, 2),
-                            blurRadius: 4,
-                          ),
-                        ]
-                      : null,
+                  // boxShadow: selectedIndex == 1
+                  //     ? [
+                  //         BoxShadow(
+                  //           color: const Color(
+                  //             0xFF2D3439,
+                  //           ).withValues(alpha: 0.04),
+                  //           offset: const Offset(0, 2),
+                  //           blurRadius: 4,
+                  //         ),
+                  //       ]
+                  //     : null,
                 ),
                 alignment: Alignment.center,
                 child: Text(
@@ -89,7 +89,7 @@ class GiftsTabs extends StatelessWidget {
                   style: selectedIndex == 1
                       ? AppTextStyles.medium14
                       : AppTextStyles.regular14.copyWith(
-                          color: context.colors.contentDisabled,
+                          color: context.colors.textTertiary,
                         ),
                 ),
               ),
