@@ -1,6 +1,7 @@
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:aqua_go/core/components/custom_bottom_sheet.dart';
 import 'package:aqua_go/core/components/custom_button.dart';
@@ -8,11 +9,18 @@ import 'package:aqua_go/core/components/custom_text_field.dart';
 import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/core/themes/app_text_styles.dart';
 import 'package:aqua_go/core/enums/payment_method_enum.dart';
+import 'package:aqua_go/core/config/di/service_locator.dart';
+import 'package:aqua_go/core/route/app_router.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:aqua_go/features/my_bookings/data/models/booking_response_model/booking_response_model.dart';
+import 'package:aqua_go/features/my_bookings/presentation/controllers/my_booking_details_cubit.dart';
 import 'package:aqua_go/features/booking/presentation/widgets/payment_method_selection.dart';
 import 'package:aqua_go/features/rating/presentation/widgets/tips_biker_info_section.dart';
 import 'package:aqua_go/features/rating/presentation/widgets/tip_amount_button.dart';
+import 'package:aqua_go/features/rating/presentation/controllers/paying_tips_cubit/paying_tips_cubit.dart';
+import 'package:aqua_go/features/rating/presentation/controllers/paying_tips_cubit/paying_tips_state.dart';
+import 'package:aqua_go/features/booking/presentation/views/moyasar_payment_view.dart';
+import 'package:aqua_go/core/config/payment/payment_sdk_config_service.dart';
 
 class PayTipsBottomSheet extends StatefulWidget {
   final BookingResponseModel booking;
@@ -22,7 +30,10 @@ class PayTipsBottomSheet extends StatefulWidget {
     return CustomBottomSheet.show(
       context: context,
       title: LocaleKeys.bookings_send_tip.tr(context: context),
-      child: PayTipsBottomSheet(booking: booking),
+      child: BlocProvider<PayingTipsCubit>(
+        create: (_) => locator<PayingTipsCubit>(),
+        child: PayTipsBottomSheet(booking: booking),
+      ),
     );
   }
 
@@ -94,56 +105,132 @@ class _PayTipsBottomSheetState extends State<PayTipsBottomSheet> {
     final width = MediaQuery.sizeOf(context).width;
     final height = MediaQuery.sizeOf(context).height;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        TipsBikerInfoSection(worker: widget.booking.assignedWorker),
-        SizedBox(height: height * 0.03),
-        _buildAmountSelectionSection(),
-        if (_isCustomAmountSelected) ...[
-          SizedBox(height: height * 0.02),
-          CustomTextField(
-            label: LocaleKeys.bookings_custom_amount_label.tr(context: context),
-            hint: LocaleKeys.bookings_custom_amount_hint.tr(context: context),
-            controller: _customAmountController,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          ),
-        ],
-        SizedBox(height: height * 0.03),
-        PaymentMethodSelection(
-          initialMethod: _selectedPaymentMethod,
-          onPaymentMethodChanged: (method) {
+    return BlocListener<PayingTipsCubit, PayingTipsState>(
+      listener: (context, state) async {
+        if (state is PayingTipsLoading) {
+          setState(() {
+            _isLoading = true;
+          });
+          context.showLoadingOverlay();
+        } else {
+          if (_isLoading) {
             setState(() {
-              _selectedPaymentMethod = method;
+              _isLoading = false;
             });
-          },
-        ),
-        SizedBox(height: height * 0.04),
-        Row(
-          children: [
-            Expanded(
-              flex: 2,
-              child: CustomButton(
-                enabled: _isValid && !_isLoading,
-                onPressed: _submitTip,
-                text: LocaleKeys.bookings_send.tr(context: context),
+            context.hideLoadingOverlay();
+          }
+        }
+
+        if (state is PayingTipsInitSuccess) {
+          await PaymentSdkConfigService.instance.ensureLoaded();
+          if (!context.mounted) return;
+
+          final result = await Navigator.of(context).push<MoyasarPaymentResult>(
+            MaterialPageRoute(
+              builder: (_) => MoyasarPaymentView(
+                args: MoyasarPaymentArgs(
+                  init: state.paymentInit,
+                  paymentMethod: _selectedPaymentMethod,
+                  description: context.isAr ? 'دفع بقشيش' : 'Pay tip',
+                ),
               ),
             ),
-            SizedBox(width: width * 0.02),
-            Expanded(
-              flex: 1,
-              child: CustomButton(
-                onPressed: () => Navigator.pop(context),
-                text: LocaleKeys.cancel.tr(context: context),
-                color: Colors.transparent,
-                textColor: context.colors.primary,
-                borderColor: context.colors.borderSecondary,
-              ),
+          );
+
+          if (!context.mounted) return;
+
+          switch (result?.status) {
+            case MoyasarPaymentStatus.paid:
+              final int amountMinor = ((_finalAmount ?? 0.0) * 100).toInt();
+              context.read<PayingTipsCubit>().payTip(
+                bookingId: widget.booking.id ?? '',
+                amountMinor: amountMinor,
+                paymentMethod: _selectedPaymentMethod,
+                moyasarPaymentId: result!.paymentId!,
+              );
+              break;
+            case MoyasarPaymentStatus.failed:
+              context.showErrorSnackBar(
+                context.isAr
+                    ? 'فشلت عملية الدفع. يرجى المحاولة مرة أخرى.'
+                    : 'Payment failed. Please try again.',
+              );
+              break;
+            case MoyasarPaymentStatus.cancelled:
+            case null:
+              break;
+          }
+        } else if (state is PayingTipsSuccess) {
+          final amountText = _formatAmountValue(_finalAmount ?? 0.0);
+          context.showSuccessSnackBar(
+            LocaleKeys.bookings_tip_success_msg.tr(
+              context: context,
+              args: [amountText],
+            ),
+          );
+          if (AppRouter.navigatorKey.currentContext != null) {
+            try {
+              AppRouter.navigatorKey.currentContext!
+                  .read<MyBookingDetailsCubit>()
+                  .fetchBookingDetails(widget.booking.id ?? '');
+            } catch (_) {}
+          }
+          Navigator.pop(context, state.booking);
+        } else if (state is PayingTipsFailure) {
+          context.showErrorSnackBar(state.message);
+        }
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          TipsBikerInfoSection(worker: widget.booking.assignedWorker),
+          SizedBox(height: height * 0.03),
+          _buildAmountSelectionSection(),
+          if (_isCustomAmountSelected) ...[
+            SizedBox(height: height * 0.02),
+            CustomTextField(
+              label: LocaleKeys.bookings_custom_amount_label.tr(context: context),
+              hint: LocaleKeys.bookings_custom_amount_hint.tr(context: context),
+              controller: _customAmountController,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
             ),
           ],
-        ),
-        SizedBox(height: height * 0.02),
-      ],
+          SizedBox(height: height * 0.03),
+          PaymentMethodSelection(
+            initialMethod: _selectedPaymentMethod,
+            onPaymentMethodChanged: (method) {
+              setState(() {
+                _selectedPaymentMethod = method;
+              });
+            },
+          ),
+          SizedBox(height: height * 0.04),
+          Row(
+            children: [
+              Expanded(
+                flex: 2,
+                child: CustomButton(
+                  enabled: _isValid && !_isLoading,
+                  onPressed: _submitTip,
+                  text: LocaleKeys.bookings_send.tr(context: context),
+                ),
+              ),
+              SizedBox(width: width * 0.02),
+              Expanded(
+                flex: 1,
+                child: CustomButton(
+                  onPressed: () => Navigator.pop(context),
+                  text: LocaleKeys.cancel.tr(context: context),
+                  color: Colors.transparent,
+                  textColor: context.colors.primary,
+                  borderColor: context.colors.borderSecondary,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: height * 0.02),
+        ],
+      ),
     );
   }
 
@@ -210,29 +297,15 @@ class _PayTipsBottomSheetState extends State<PayTipsBottomSheet> {
     );
   }
 
-  void _submitTip() async {
+  void _submitTip() {
     if (!_isValid) return;
-    setState(() {
-      _isLoading = true;
-    });
+    final int amountMinor = ((_finalAmount ?? 0.0) * 100).toInt();
 
-    // Simulate backend payment and tip submitting
-    await Future.delayed(const Duration(seconds: 1));
-
-    if (!mounted) return;
-    setState(() {
-      _isLoading = false;
-    });
-
-    final amountText = _formatAmountValue(_finalAmount ?? 0.0);
-    context.showSuccessSnackBar(
-      LocaleKeys.bookings_tip_success_msg.tr(
-        context: context,
-        args: [amountText],
-      ),
+    context.read<PayingTipsCubit>().initiateTipPayment(
+      bookingId: widget.booking.id ?? '',
+      amountMinor: amountMinor,
+      paymentMethod: _selectedPaymentMethod,
     );
-
-    Navigator.pop(context);
   }
 
   String _formatAmountValue(double amount) {

@@ -131,7 +131,9 @@ class _OnboardingViewState extends State<OnboardingView> {
                   ? LocaleKeys.onboarding_title2.tr(context: context)
                   : LocaleKeys.onboarding_title3.tr(context: context),
               textAlign: TextAlign.center,
-              style: AppTextStyles.semiBold24,
+              style: AppTextStyles.semiBold24.copyWith(
+                color: darkAppColors.textPrimary,
+              ),
             ),
             SizedBox(height: size.height * 0.015),
             SizedBox(
@@ -146,7 +148,7 @@ class _OnboardingViewState extends State<OnboardingView> {
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
                 style: AppTextStyles.regular16.copyWith(
-                  color: darkAppColors.contentDisabled,
+                  color: darkAppColors.textTertiary,
                 ),
               ),
             ),

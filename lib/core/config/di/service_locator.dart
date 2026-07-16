@@ -45,9 +45,12 @@ import 'package:aqua_go/features/complaints/data/repos/complaints_repository.dar
 import 'package:aqua_go/features/complaints/presentation/controllers/complaints_cubit/complaints_cubit.dart';
 import 'package:aqua_go/features/complaints/presentation/controllers/complaint_details_cubit/complaint_details_cubit.dart';
 import 'package:aqua_go/features/rating/data/data_sources/rating_remote_data_source.dart';
+import 'package:aqua_go/features/rating/data/data_sources/tips_remote_data_source.dart';
 import 'package:aqua_go/features/rating/data/repos/rating_repository.dart';
+import 'package:aqua_go/features/rating/data/repos/tips_repository.dart';
 import 'package:aqua_go/features/rating/presentation/controllers/rating_cubit/rating_cubit.dart';
 import 'package:aqua_go/features/rating/presentation/controllers/pending_ratings_cubit/pending_ratings_cubit.dart';
+import 'package:aqua_go/features/rating/presentation/controllers/paying_tips_cubit/paying_tips_cubit.dart';
 import 'package:aqua_go/features/support/data/data_sources/faqs_remote_data_source.dart';
 import 'package:aqua_go/features/support/data/repos/faqs_repository.dart';
 import 'package:aqua_go/features/support/presentation/controllers/faqs_cubit.dart';
@@ -113,6 +116,9 @@ Future<void> initServiceLocator(AppConfigs configs) async {
   locator.registerLazySingleton<RatingRemoteDataSource>(
     () => RatingRemoteDataSource(locator()),
   );
+  locator.registerLazySingleton<TipsRemoteDataSource>(
+    () => TipsRemoteDataSource(locator()),
+  );
   locator.registerLazySingleton<FaqsRemoteDataSource>(
     () => FaqsRemoteDataSource(locator()),
   );
@@ -174,6 +180,9 @@ Future<void> initServiceLocator(AppConfigs configs) async {
   );
   locator.registerLazySingleton<RatingRepository>(
     () => RatingRepository(locator()),
+  );
+  locator.registerLazySingleton<TipsRepository>(
+    () => TipsRepository(locator()),
   );
   locator.registerLazySingleton<FaqsRepository>(
     () => FaqsRepository(locator()),
@@ -244,6 +253,7 @@ Future<void> initServiceLocator(AppConfigs configs) async {
   locator.registerFactory<PendingRatingsCubit>(
     () => PendingRatingsCubit(locator()),
   );
+  locator.registerFactory<PayingTipsCubit>(() => PayingTipsCubit(locator()));
   locator.registerFactory<FaqsCubit>(() => FaqsCubit(locator()));
   locator.registerFactory<SupportCubit>(() => SupportCubit(locator()));
 }

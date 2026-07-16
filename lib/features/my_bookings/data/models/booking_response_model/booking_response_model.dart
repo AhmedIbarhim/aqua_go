@@ -2,6 +2,7 @@ import 'package:aqua_go/core/config/local_storage/shared_prefs.dart';
 import 'package:aqua_go/core/constants.dart';
 import 'package:easy_localization/easy_localization.dart';
 
+import '../../../../../core/enums/payment_method_enum.dart';
 import '../../../../../core/enums/payment_status_enum.dart';
 import '../../enums/booking_status_enum.dart';
 import '../../enums/booking_type_enum.dart';
@@ -85,6 +86,11 @@ class BookingResponseModel {
   String? cancelledAt;
   String? completionNotes;
   String? cantFindClientReportedAt;
+  String? cantFindClientNotes;
+  String? addonPaymentIntentId;
+  bool? tipPaid;
+  int? tipAmountMinor;
+  PaymentMethod? paymentMethod;
 
   BookingResponseModel({
     this.id,
@@ -139,6 +145,11 @@ class BookingResponseModel {
     this.cancelledAt,
     this.completionNotes,
     this.cantFindClientReportedAt,
+    this.cantFindClientNotes,
+    this.addonPaymentIntentId,
+    this.tipPaid,
+    this.tipAmountMinor,
+    this.paymentMethod,
   });
 
   BookingResponseModel.fromJson(Map<String, dynamic> json) {
@@ -233,6 +244,11 @@ class BookingResponseModel {
     cancelledAt = json['cancelledAt'];
     completionNotes = json['completionNotes'];
     cantFindClientReportedAt = json['cantFindClientReportedAt'];
+    cantFindClientNotes = json['cantFindClientNotes'];
+    addonPaymentIntentId = json['addonPaymentIntentId'];
+    tipPaid = json['tipPaid'];
+    tipAmountMinor = json['tipAmountMinor'];
+    paymentMethod = PaymentMethodEnumExtension.fromString(json['paymentMethod']);
   }
 
   // --- UI Compatibility Helpers ---

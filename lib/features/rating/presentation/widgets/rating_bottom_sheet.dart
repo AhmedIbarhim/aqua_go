@@ -141,7 +141,7 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
           ),
           SizedBox(height: height * 0.03),
           // _buildBikerInfo(),
-          _buildPayTipButton(),
+          if (widget.booking.tipPaid == false) _buildPayTipButton(),
 
           if (_rating < 5) ...[
             SizedBox(height: height * 0.03),
@@ -378,6 +378,7 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
     final width = MediaQuery.sizeOf(context).width;
     return InkWell(
       onTap: () {
+        Navigator.pop(context);
         PayTipsBottomSheet.show(context, widget.booking);
       },
       child: Container(

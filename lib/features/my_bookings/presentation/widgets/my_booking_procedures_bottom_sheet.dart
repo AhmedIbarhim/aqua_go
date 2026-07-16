@@ -44,10 +44,12 @@ class MyBookingProceduresBottomSheet extends StatelessWidget {
         _buildActionItem(
           context,
           title: LocaleKeys.bookings_pay_tip_for_biker.tr(context: context),
-          onTap: () {
-            Navigator.pop(context);
-            PayTipsBottomSheet.show(context, booking);
-          },
+          onTap: booking.tipPaid == true
+              ? null
+              : () {
+                  Navigator.pop(context);
+                  PayTipsBottomSheet.show(context, booking);
+                },
         ),
         SizedBox(height: height * 0.015),
         _buildActionItem(

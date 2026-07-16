@@ -48,9 +48,7 @@ abstract class Endpoints {
   // Completed-but-unrated bookings inside the live 7-day rating window
   // (AQG-160 home rating popup). Returns a JSON array of BookingResponse.
   static const String pendingRating = 'bookings/pending-rating';
-  // Pay-before-create: re-validates the quote + soft-holds the slot, returns
-  // {amountMinor, givenId, metadata} for the on-device Moyasar SDK purchase.
-  static const String bookingsPaymentInit = 'bookings/payment-init';
+
   static String bookingDetail(String bookingId) => 'bookings/$bookingId';
   // Server-rendered receipt PDF (opened via url_launcher; no in-app render).
   static String bookingReceiptPdf(String bookingId) =>
@@ -65,6 +63,28 @@ abstract class Endpoints {
       'bookings/$bookingId/edit';
   static String tipBooking(String bookingId) => 'bookings/$bookingId/tip';
 
+  // payments Endpoints
+
+  /// Server-supplied Moyasar publishable key + Apple Pay config.
+  /// Loaded at runtime so the key is never compiled into the binary.
+  static const String paymentSdkConfig = 'payments/sdk-config';
+
+  // Pay-before-create: re-validates the quote + soft-holds the slot, returns
+  // {amountMinor, givenId, metadata} for the on-device Moyasar SDK purchase.
+  static const String bookingsPaymentInit = 'bookings/payment-init';
+  // Pay-before-confirm for subscription wash add-ons (Stage 5c2): validates
+  // the payable add-on delta and returns {amountMinor, givenId, metadata}
+  // for the on-device Moyasar SDK purchase. Idempotency-Key: wash-addon-payment-init:{washId}.
+  static String washAddonPaymentInit(String subscriptionId, String washId) =>
+      'subscriptions/$subscriptionId/washes/$washId/addons/payment-init';
+
+  // Pay-before-create for subscriptions (mirrors bookings/payment-init).
+  static const String subscriptionsPaymentInit = 'subscriptions/payment-init';
+
+  static const String tipBookingPaymentInit = 'bookings/payment-init';
+
+  static const String giftPaymentInit = 'bookings/payment-init';
+
   //  Banners Endpoints
   static const String banners = 'banners';
 
@@ -76,8 +96,7 @@ abstract class Endpoints {
   //  Packages & Subscriptions Endpoints
   static const String packages = 'subscription-packages';
   static const String subscriptions = 'subscriptions';
-  // Pay-before-create for subscriptions (mirrors bookings/payment-init).
-  static const String subscriptionsPaymentInit = 'subscriptions/payment-init';
+
   static String subscriptionDetail(String subscriptionId) =>
       'subscriptions/$subscriptionId';
   static String cancelSubscription(String subscriptionId) =>
@@ -88,11 +107,7 @@ abstract class Endpoints {
       'subscriptions/$subscriptionId/washes';
   static String subscriptionWashDetail(String subscriptionId, String washId) =>
       'subscriptions/$subscriptionId/washes/$washId';
-  // Pay-before-confirm for subscription wash add-ons (Stage 5c2): validates
-  // the payable add-on delta and returns {amountMinor, givenId, metadata}
-  // for the on-device Moyasar SDK purchase. Idempotency-Key: wash-addon-payment-init:{washId}.
-  static String washAddonPaymentInit(String subscriptionId, String washId) =>
-      'subscriptions/$subscriptionId/washes/$washId/addons/payment-init';
+
   static String previewScheduleSubscriptionWash(
     String subscriptionId,
     String washId,
@@ -143,11 +158,6 @@ abstract class Endpoints {
   static const String walletAutoTopup = 'me/wallet/auto-topup';
   static const String walletTopup = 'me/wallet/topup';
   static const String walletLedger = 'me/wallet/ledger';
-
-  // Payments Endpoints
-  /// Server-supplied Moyasar publishable key + Apple Pay config.
-  /// Loaded at runtime so the key is never compiled into the binary.
-  static const String paymentSdkConfig = 'payments/sdk-config';
 
   // Saved Cards Endpoints
   static const String savedCards = 'me/saved-cards';
