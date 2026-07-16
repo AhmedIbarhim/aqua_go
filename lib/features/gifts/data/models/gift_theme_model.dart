@@ -5,6 +5,7 @@ class GiftThemeModel extends Equatable {
   final String? nameAr;
   final String? nameEn;
   final String? imageUrl;
+  final String? color;
   final int? displayOrder;
   final bool? active;
 
@@ -13,6 +14,7 @@ class GiftThemeModel extends Equatable {
     this.nameAr,
     this.nameEn,
     this.imageUrl,
+    this.color,
     this.displayOrder,
     this.active,
   });
@@ -23,6 +25,7 @@ class GiftThemeModel extends Equatable {
       nameAr: json['nameAr'] as String?,
       nameEn: json['nameEn'] as String?,
       imageUrl: json['imageUrl'] as String?,
+      color: json['color'] as String?,
       displayOrder: json['displayOrder'] as int?,
       active: json['active'] as bool?,
     );
@@ -34,6 +37,7 @@ class GiftThemeModel extends Equatable {
       'nameAr': nameAr,
       'nameEn': nameEn,
       'imageUrl': imageUrl,
+      'color': color,
       'displayOrder': displayOrder,
       'active': active,
     };
@@ -45,6 +49,7 @@ class GiftThemeModel extends Equatable {
     nameAr,
     nameEn,
     imageUrl,
+    color,
     displayOrder,
     active,
   ];

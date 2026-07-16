@@ -13,12 +13,14 @@ class CustomNetworkImage extends StatelessWidget {
     this.fit = BoxFit.cover,
     this.height,
     this.width,
+    this.errorWidget,
   });
 
   final String image;
   final BoxFit fit;
   final double? width;
   final double? height;
+  final Widget? errorWidget;
 
   @override
   Widget build(BuildContext context) {
@@ -34,15 +36,17 @@ class CustomNetworkImage extends StatelessWidget {
           width: width,
           height: height,
           placeholder: const CustomLoadingIndicator(),
-          errorWidget: SvgPicture.asset(
-            AppAssets.emptyImage,
-            width: 18,
-            height: 18,
-            colorFilter: ColorFilter.mode(
-              context.colors.contentTertiary,
-              BlendMode.srcIn,
-            ),
-          ),
+          errorWidget:
+              errorWidget ??
+              SvgPicture.asset(
+                AppAssets.emptyImage,
+                width: 18,
+                height: 18,
+                colorFilter: ColorFilter.mode(
+                  context.colors.contentTertiary,
+                  BlendMode.srcIn,
+                ),
+              ),
         );
       },
     );

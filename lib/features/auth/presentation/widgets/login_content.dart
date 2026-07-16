@@ -82,8 +82,7 @@ class _LoginContentState extends State<LoginContent> {
                 left: 24,
                 right: 24,
                 top: height * 0.02,
-                bottom:
-                    height * 0.02 + MediaQuery.viewInsetsOf(context).bottom,
+                bottom: height * 0.02 + MediaQuery.viewInsetsOf(context).bottom,
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -91,7 +90,9 @@ class _LoginContentState extends State<LoginContent> {
                 children: [
                   Text(
                     LocaleKeys.auth_login.tr(context: context),
-                    style: AppTextStyles.semiBold24,
+                    style: AppTextStyles.semiBold24.copyWith(
+                      color: darkAppColors.textPrimary,
+                    ),
                   ),
                   SizedBox(height: height * 0.01),
                   Text(
@@ -103,7 +104,9 @@ class _LoginContentState extends State<LoginContent> {
                   SizedBox(height: height * 0.02),
                   Text(
                     LocaleKeys.auth_phone_number.tr(context: context),
-                    style: AppTextStyles.regular14,
+                    style: AppTextStyles.regular14.copyWith(
+                      color: darkAppColors.textPrimary,
+                    ),
                   ),
                   SizedBox(height: height * 0.01),
                   CustomPhoneTextField(controller: _phoneController),
@@ -113,7 +116,9 @@ class _LoginContentState extends State<LoginContent> {
                         ? () {
                             if (!ConnectivityHelper().isConnected) {
                               context.showErrorSnackBar(
-                                LocaleKeys.snackbar_no_internet.tr(context: context),
+                                LocaleKeys.snackbar_no_internet.tr(
+                                  context: context,
+                                ),
                               );
                               return;
                             }
@@ -127,7 +132,9 @@ class _LoginContentState extends State<LoginContent> {
                   ),
                   SizedBox(height: height * 0.01),
                   CustomButton(
-                    text: LocaleKeys.auth_continue_as_guest.tr(context: context),
+                    text: LocaleKeys.auth_continue_as_guest.tr(
+                      context: context,
+                    ),
                     color: darkAppColors.themeColor,
                     textColor: context.colors.primary,
                     onPressed: () {

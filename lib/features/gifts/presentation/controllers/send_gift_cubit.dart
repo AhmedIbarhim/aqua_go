@@ -23,7 +23,6 @@ class SendGiftCubit extends Cubit<SendGiftState> {
        _bookingRepository = bookingRepository,
        super(const SendGiftState());
 
-
   Future<void> fetchInitialData() async {
     emit(state.copyWith(status: SendGiftStatus.packagesLoading));
 
@@ -138,23 +137,13 @@ class SendGiftCubit extends Cubit<SendGiftState> {
   }
 
   void updatePaymentMethod(PaymentMethod method) {
-    emit(
-      state.copyWith(
-        paymentMethod: method,
-        status: SendGiftStatus.initial,
-      ),
-    );
+    emit(state.copyWith(paymentMethod: method, status: SendGiftStatus.initial));
   }
 
   void nextStep() {
     if (state.step < 3) {
       final next = state.step + 1;
-      emit(
-        state.copyWith(
-          step: next,
-          status: SendGiftStatus.initial,
-        ),
-      );
+      emit(state.copyWith(step: next, status: SendGiftStatus.initial));
       if (next == 3) {
         fetchQuote();
       }
@@ -189,12 +178,7 @@ class SendGiftCubit extends Cubit<SendGiftState> {
         );
       },
       (quote) {
-        emit(
-          state.copyWith(
-            status: SendGiftStatus.initial,
-            quote: quote,
-          ),
-        );
+        emit(state.copyWith(status: SendGiftStatus.initial, quote: quote));
       },
     );
   }
@@ -202,10 +186,7 @@ class SendGiftCubit extends Cubit<SendGiftState> {
   void previousStep() {
     if (state.step > 0) {
       emit(
-        state.copyWith(
-          step: state.step - 1,
-          status: SendGiftStatus.initial,
-        ),
+        state.copyWith(step: state.step - 1, status: SendGiftStatus.initial),
       );
     }
   }
@@ -256,15 +237,19 @@ class SendGiftCubit extends Cubit<SendGiftState> {
     final request = PurchaseGiftRequestModel(
       packageId: state.selectedService!.id!,
       themeId: state.selectedTheme!.id!,
-      recipientPhoneE164: '+966${state.recipientPhone}',
-      paymentMethod: state.paymentMethod == PaymentMethod.applePay ? 'APPLE_PAY' : 'CARD',
+      recipientPhone: '+966${state.recipientPhone}',
+      paymentMethod: state.paymentMethod == PaymentMethod.applePay
+          ? 'APPLE_PAY'
+          : 'CARD',
       savedCardTokenId: state.savedCardTokenId,
       recipientName: state.recipientName,
       messageText: state.messageText,
       scheduledDeliveryAt: scheduledDeliveryAt,
       pointsToApply: state.pointsToApply,
       moyasarPaymentId: state.moyasarPaymentId,
-      addOnIds: state.selectedAddonIds.isNotEmpty ? state.selectedAddonIds.toList() : null,
+      addOnIds: state.selectedAddonIds.isNotEmpty
+          ? state.selectedAddonIds.toList()
+          : null,
     );
 
     final result = await _giftsRepository.purchaseGift(

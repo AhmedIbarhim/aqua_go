@@ -97,11 +97,13 @@ class CustomPhoneTextField extends StatefulWidget {
     this.controller,
     this.onSaved,
     this.textColor,
+    this.fillColor,
   });
 
   final TextEditingController? controller;
   final void Function(String?)? onSaved;
   final Color? textColor;
+  final Color? fillColor;
 
   @override
   State<CustomPhoneTextField> createState() => _CustomPhoneTextFieldState();
@@ -114,7 +116,7 @@ class _CustomPhoneTextFieldState extends State<CustomPhoneTextField> {
     return Container(
       height: height * 0.055,
       decoration: BoxDecoration(
-        color: context.colors.background,
+        color: widget.fillColor ?? context.colors.background,
         border: Border.all(color: context.colors.borderSecondary),
         borderRadius: BorderRadius.circular(8),
       ),

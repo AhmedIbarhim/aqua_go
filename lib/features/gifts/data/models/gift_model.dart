@@ -70,7 +70,7 @@ class GiftModel {
   final String? giftCode;
   final GiftStatus? status;
   final int? amountMinor;
-  final String? recipientPhoneE164;
+  final String? recipientPhone;
   final String? recipientName;
   final String? themeId;
   final String? scheduledDeliveryAt;
@@ -94,7 +94,7 @@ class GiftModel {
     this.giftCode,
     this.status,
     this.amountMinor,
-    this.recipientPhoneE164,
+    this.recipientPhone,
     this.recipientName,
     this.themeId,
     this.scheduledDeliveryAt,
@@ -119,8 +119,8 @@ class GiftModel {
       status: GiftStatus.fromString(json['status'] as String?),
       amountMinor:
           json['amountMinor'] as int? ?? json['totalAmountMinor'] as int?,
-      recipientPhoneE164:
-          json['recipientPhoneE164'] as String? ??
+      recipientPhone:
+          json['recipientPhone'] as String? ??
           json['recipientPhone'] as String?,
       recipientName: json['recipientName'] as String?,
       themeId: json['themeId'] as String?,
@@ -145,7 +145,6 @@ class GiftModel {
   // --- UI Compatibility Helpers ---
   String? get id => giftId;
   String? get code => giftCode;
-  String? get recipientPhone => recipientPhoneE164;
   String? get validUntil => validityEndsAt;
   int? get totalAmountMinor => amountMinor;
 
@@ -170,10 +169,10 @@ class GiftModel {
 
   bool get isSent {
     final userPhone = currentUser.value?.phone;
-    if (userPhone == null || recipientPhoneE164 == null) return true;
+    if (userPhone == null || recipientPhone == null) return true;
 
     final digitsUser = userPhone.replaceAll(RegExp(r'\D'), '');
-    final digitsRecipient = recipientPhoneE164!.replaceAll(RegExp(r'\D'), '');
+    final digitsRecipient = recipientPhone!.replaceAll(RegExp(r'\D'), '');
 
     if (digitsUser.isEmpty || digitsRecipient.isEmpty) return true;
 

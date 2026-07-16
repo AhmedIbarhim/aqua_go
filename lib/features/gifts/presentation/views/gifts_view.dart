@@ -6,11 +6,11 @@ import '../../../../generated/locale_keys.g.dart';
 import '../../../../core/route/routes.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/components/custom_loading_indicator.dart';
+import '../../../../core/components/error_retry_widget.dart';
 import '../../../../core/components/generic_app_bar.dart';
 import '../../../../core/components/guest_placeholder_widget.dart';
 import '../../../../core/config/di/service_locator.dart';
 import '../../../../core/config/session/session_state.dart';
-import '../../data/models/gift_model.dart';
 import '../controllers/gifts_cubit.dart';
 import '../controllers/gifts_state.dart';
 import '../widgets/empty_gifts_widgets.dart';
@@ -109,19 +109,15 @@ class _GiftsViewState extends State<GiftsView> {
   }
 
   Widget _buildGiftsContent(BuildContext context, GiftsState state) {
-    if (state is GiftsLoading) {
+    if (state is GiftsLoading || state is GiftsInitial) {
       return const Center(child: CustomLoadingIndicator(size: 80));
-    }
-    //  else if (state is GiftsFailure) {
-    //   return ErrorRetryWidget(
-    //     errorMessage: state.errMessage,
-    //     onRetry: () => context.read<GiftsCubit>().fetchGifts(),
-    //   );
-    // }
-    // else if (state is GiftsSuccess)
-    {
-      // final filteredGifts = state.gifts
-      final filteredGifts = mockGifts
+    } else if (state is GiftsFailure) {
+      return ErrorRetryWidget(
+        errorMessage: state.errMessage,
+        onRetry: () => context.read<GiftsCubit>().fetchGifts(),
+      );
+    } else if (state is GiftsSuccess) {
+      final filteredGifts = state.gifts
           .where((gift) => _selectedIndex == 0 ? gift.isSent : !gift.isSent)
           .toList();
 
@@ -202,14 +198,15 @@ class _GiftsViewState extends State<GiftsView> {
         ),
       );
     }
+    return const SizedBox.shrink();
   }
 
   Widget? _buildBottomButton(BuildContext context, GiftsState state) {
     if (_selectedIndex != 0) return null;
-    // if (state is! GiftsSuccess) return null;
+    if (state is! GiftsSuccess) return null;
 
-    // final hasSentGifts = state.gifts.any((gift) => gift.isSent);
-    // if (!hasSentGifts) return null;
+    final hasSentGifts = state.gifts.any((gift) => gift.isSent);
+    if (!hasSentGifts) return null;
 
     return SafeArea(
       child: Padding(
@@ -228,53 +225,4 @@ class _GiftsViewState extends State<GiftsView> {
       ),
     );
   }
-
-  List<GiftModel> mockGifts = [
-    GiftModel(
-      giftId: '1',
-      giftCode: 'AQUA-GIFT-111',
-      status: GiftStatus.ISSUED,
-      amountMinor: 15000,
-      recipientName: 'خالد محمد',
-      recipientPhoneE164: '+966501234567',
-      senderName: 'أحمد إبراهيم',
-      senderPhone: '+966507654321',
-      message: 'كل عام وأنت بخير بمناسبة الترقية الجديدة!',
-      packageNameAr: 'الباقة الماسية',
-      packageNameEn: 'Diamond Package',
-      createdAt: '2026-07-10T12:00:00Z',
-      validityEndsAt: '2026-10-10T12:00:00Z',
-    ),
-    GiftModel(
-      giftId: '2',
-      giftCode: 'AQUA-GIFT-222',
-      status: GiftStatus.DELIVERED,
-      amountMinor: 25000,
-      recipientName: 'سارة أحمد',
-      recipientPhoneE164: '+966509876543',
-      senderName: 'نورة علي',
-      senderPhone: '+966501112223',
-      message: 'أتمنى لك يوماً سعيداً وسيارة نظيفة دائماً!',
-      packageNameAr: 'باقة التوفير الفائقة',
-      packageNameEn: 'Super Saver Package',
-      createdAt: '2026-07-09T09:00:00Z',
-      validityEndsAt: '2026-08-09T09:00:00Z',
-    ),
-    GiftModel(
-      giftId: '3',
-      giftCode: 'AQUA-GIFT-333',
-      status: GiftStatus.REDEEMED,
-      amountMinor: 10000,
-      recipientName: 'أحمد علي',
-      recipientPhoneE164: '+966502223334',
-      senderName: 'محمد خالد',
-      senderPhone: '+966503334445',
-      message: 'هدية بسيطة لغسيل سيارتك.',
-      packageNameAr: 'الباقة الفضية',
-      packageNameEn: 'Silver Package',
-      createdAt: '2026-07-01T15:30:00Z',
-      validityEndsAt: '2026-10-01T15:30:00Z',
-      redeemedAt: '2026-07-02T10:00:00Z',
-    ),
-  ];
 }

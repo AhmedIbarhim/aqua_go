@@ -9,7 +9,7 @@ import '../../../../generated/locale_keys.g.dart';
 import '../controllers/send_gift_cubit.dart';
 import '../controllers/send_gift_state.dart';
 import 'gift_delivery_card.dart';
-import 'gift_theme_card.dart';
+import 'gift_theme_cards_grid.dart';
 import 'gift_picker_button.dart';
 
 class CustomizeStep extends StatefulWidget {
@@ -249,65 +249,24 @@ class _CustomizeStepState extends State<CustomizeStep> {
                 child: const Center(child: CircularProgressIndicator()),
               )
             else
-              _buildThemesGrid(context, state),
+              GiftThemeCardsGrid(
+                themes: state.themes,
+                selectedTheme: state.selectedTheme,
+                onThemeSelected: (theme) {
+                  context.read<SendGiftCubit>().updateCustomization(
+                    message: _messageController.text,
+                    deliveryType: state.deliveryType,
+                    date: state.scheduledDate,
+                    time: state.scheduledTime,
+                    theme: theme,
+                  );
+                },
+              ),
 
             SizedBox(height: context.sh(24)),
           ],
         );
       },
     );
-  }
-
-  Widget _buildThemesGrid(BuildContext context, SendGiftState state) {
-    final List<Widget> rows = [];
-    for (int i = 0; i < state.themes.length; i += 2) {
-      final item1 = state.themes[i];
-      final item2 = (i + 1 < state.themes.length) ? state.themes[i + 1] : null;
-
-      rows.add(
-        Row(
-          children: [
-            Expanded(
-              child: GiftThemeCard(
-                theme: item1,
-                isSelected: state.selectedTheme?.id == item1.id,
-                onTap: () {
-                  context.read<SendGiftCubit>().updateCustomization(
-                    message: _messageController.text,
-                    deliveryType: state.deliveryType,
-                    date: state.scheduledDate,
-                    time: state.scheduledTime,
-                    theme: item1,
-                  );
-                },
-              ),
-            ),
-            SizedBox(width: context.sw(12)),
-            Expanded(
-              child: item2 != null
-                  ? GiftThemeCard(
-                      theme: item2,
-                      isSelected: state.selectedTheme?.id == item2.id,
-                      onTap: () {
-                        context.read<SendGiftCubit>().updateCustomization(
-                          message: _messageController.text,
-                          deliveryType: state.deliveryType,
-                          date: state.scheduledDate,
-                          time: state.scheduledTime,
-                          theme: item2,
-                        );
-                      },
-                    )
-                  : const SizedBox.shrink(),
-            ),
-          ],
-        ),
-      );
-      if (i + 2 < state.themes.length) {
-        rows.add(SizedBox(height: context.sh(12)));
-      }
-    }
-
-    return Column(children: rows);
   }
 }

@@ -1,7 +1,7 @@
 class PurchaseGiftRequestModel {
   final String packageId;
   final String themeId;
-  final String recipientPhoneE164;
+  final String recipientPhone;
   final String paymentMethod;
   final String? savedCardTokenId;
   final String recipientName;
@@ -14,7 +14,7 @@ class PurchaseGiftRequestModel {
   PurchaseGiftRequestModel({
     required this.packageId,
     required this.themeId,
-    required this.recipientPhoneE164,
+    required this.recipientPhone,
     required this.paymentMethod,
     this.savedCardTokenId,
     required this.recipientName,
@@ -29,12 +29,13 @@ class PurchaseGiftRequestModel {
     return {
       'packageId': packageId,
       'themeId': themeId,
-      'recipientPhoneE164': recipientPhoneE164,
+      'recipientPhone': recipientPhone,
       'paymentMethod': paymentMethod,
       if (savedCardTokenId != null) 'savedCardTokenId': savedCardTokenId,
       'recipientName': recipientName,
       'messageText': messageText,
-      if (scheduledDeliveryAt != null) 'scheduledDeliveryAt': scheduledDeliveryAt,
+      if (scheduledDeliveryAt != null)
+        'scheduledDeliveryAt': scheduledDeliveryAt,
       if (pointsToApply != null) 'pointsToApply': pointsToApply,
       if (moyasarPaymentId != null) 'moyasarPaymentId': moyasarPaymentId,
       if (addOnIds != null && addOnIds!.isNotEmpty) 'addOnIds': addOnIds,

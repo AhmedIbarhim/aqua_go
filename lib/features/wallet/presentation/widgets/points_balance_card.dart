@@ -55,7 +55,7 @@ class PointsBalanceCard extends StatelessWidget {
         Container(
           width: double.infinity,
           decoration: BoxDecoration(
-            color: context.colors.brandSubtle.withValues(alpha: 0.4),
+            color: context.colors.cardBackGround.withValues(alpha: 0.7),
             borderRadius: BorderRadius.circular(sw(20)),
             border: Border.all(color: context.colors.defaultSubtle, width: 1),
           ),
@@ -94,8 +94,8 @@ class PointsBalanceCard extends StatelessWidget {
                     // Points counter
                     Container(
                       decoration: BoxDecoration(
-                        color: context.colors.brandSubtle.withValues(
-                          alpha: 0.67,
+                        color: context.colors.contentDisabled.withValues(
+                          alpha: context.isDarkTheme ? 0.2 : 0.6,
                         ),
                         borderRadius: BorderRadius.circular(sw(20)),
                         border: Border.all(
