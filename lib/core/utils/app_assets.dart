@@ -120,8 +120,10 @@ abstract class AppAssets {
 
   // Booking
   static const String packageDefault = 'assets/svg/package_default.svg';
-  static const String bookingHeaderImage =
-      'assets/images/booking_header_image.png';
+  static const String bookingHeaderImageDark =
+      'assets/images/booking_header_image_dark.png';
+  static const String bookingHeaderImageLight =
+      'assets/images/booking_header_image_light.png';
   static const String addCarIcon = 'assets/svg/add_car.svg';
   static const String date = 'assets/svg/date.svg';
   static const String document = 'assets/svg/document.svg';

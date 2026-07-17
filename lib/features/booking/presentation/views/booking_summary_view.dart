@@ -92,9 +92,11 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
           backgroundColor: context.colors.background,
           appBar: GenericAppBar(
             title: LocaleKeys.bookings_booking_summary.tr(context: context),
-            titleColor: Colors.white,
+            titleColor: context.colors.textPrimary,
             hasBackground: true,
-            backgroundImage: AppAssets.bookingHeaderImage,
+            backgroundImage: context.isDarkTheme
+                ? AppAssets.bookingHeaderImageDark
+                : AppAssets.bookingHeaderImageLight,
             centerTitle: true,
           ),
           body: Column(

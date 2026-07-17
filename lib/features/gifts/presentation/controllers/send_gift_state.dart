@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import '../../../home/data/models/service_model.dart';
 import '../../data/models/gift_model.dart';
 import '../../data/models/gift_theme_model.dart';
-import '../../../booking/data/models/quote_model.dart';
+import '../../data/models/gift_quote_model.dart';
 import '../../../../core/enums/payment_method_enum.dart';
 
 enum SendGiftStatus {
@@ -41,7 +41,7 @@ class SendGiftState extends Equatable {
   final String? moyasarPaymentId;
 
   final GiftModel? purchasedGift;
-  final QuoteModel? quote;
+  final GiftQuoteModel? quote;
 
   const SendGiftState({
     this.step = 0,
@@ -86,7 +86,7 @@ class SendGiftState extends Equatable {
     int? pointsToApply,
     String? moyasarPaymentId,
     GiftModel? purchasedGift,
-    QuoteModel? quote,
+    GiftQuoteModel? quote,
     bool clearService = false,
     bool clearTheme = false,
     bool clearQuote = false,

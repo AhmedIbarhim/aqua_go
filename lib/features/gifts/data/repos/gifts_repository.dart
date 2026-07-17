@@ -6,6 +6,9 @@ import 'package:aqua_go/features/gifts/data/models/gifts_list_response_model.dar
 import 'package:aqua_go/features/gifts/data/models/gift_model.dart';
 import 'package:aqua_go/features/gifts/data/models/gift_theme_model.dart';
 import 'package:aqua_go/features/gifts/data/models/purchase_gift_request_model.dart';
+import 'package:aqua_go/features/gifts/data/models/gift_quote_request_model.dart';
+import 'package:aqua_go/features/gifts/data/models/gift_quote_model.dart';
+import 'package:aqua_go/features/booking/data/models/payment_init_model.dart';
 import 'package:dartz/dartz.dart';
 
 class GiftsRepository {
@@ -88,5 +91,52 @@ class GiftsRepository {
   Future<Either<Failure, void>> redeemGift(String code) async {
     final result = await _remoteDataSource.redeemGift(code);
     return result.fold((failure) => Left(failure), (data) => const Right(null));
+  }
+
+  Future<Either<Failure, GiftQuoteModel>> getGiftQuote({
+    required GiftQuoteRequestModel request,
+  }) async {
+    final result = await _remoteDataSource.getGiftQuote(data: request.toJson());
+    return result.fold(
+      (failure) => Left(failure),
+      (response) {
+        try {
+          return Right(
+            GiftQuoteModel.fromJson(response as Map<String, dynamic>),
+          );
+        } catch (e) {
+          return Left(ServerFailure('Parsing error: $e'));
+        }
+      },
+    );
+  }
+
+  Future<Either<Failure, PaymentInitModel>> giftPaymentInit({
+    required String packageId,
+    required List<String>? addOnIds,
+    required int? pointsToApply,
+    required String attemptNonce,
+  }) async {
+    final customerId = FetchUserData.getUserId() ?? '';
+    final idempotencyKey =
+        'gift-payment-init:$customerId:$packageId:$attemptNonce';
+
+    final result = await _remoteDataSource.giftPaymentInit(
+      packageId: packageId,
+      addOnIds: addOnIds,
+      pointsToApply: pointsToApply,
+      attemptNonce: attemptNonce,
+      idempotencyKey: idempotencyKey,
+    );
+
+    return result.fold((failure) => Left(failure), (response) {
+      try {
+        return Right(
+          PaymentInitModel.fromJson(response as Map<String, dynamic>),
+        );
+      } catch (e) {
+        return Left(ServerFailure('Parsing error: $e'));
+      }
+    });
   }
 }

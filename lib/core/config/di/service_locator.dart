@@ -239,7 +239,6 @@ Future<void> initServiceLocator(AppConfigs configs) async {
     () => SendGiftCubit(
       giftsRepository: locator(),
       servicesRepository: locator(),
-      bookingRepository: locator(),
     ),
   );
   locator.registerFactory<MyBookingDetailsCubit>(

@@ -87,9 +87,11 @@ class _BookingLocationViewState extends State<BookingLocationView> {
         backgroundColor: context.colors.screenBG,
         appBar: GenericAppBar(
           title: LocaleKeys.bookings_choose_car_location.tr(context: context),
-          titleColor: Colors.white,
+          titleColor: context.colors.textPrimary,
           hasBackground: true,
-          backgroundImage: AppAssets.bookingHeaderImage,
+          backgroundImage: context.isDarkTheme
+              ? AppAssets.bookingHeaderImageDark
+              : AppAssets.bookingHeaderImageLight,
           centerTitle: true,
         ),
         body: MultiBlocListener(

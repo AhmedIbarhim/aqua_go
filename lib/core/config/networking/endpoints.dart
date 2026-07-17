@@ -1,7 +1,8 @@
 abstract class Endpoints {
   static const String host = 'qa-api.aquago.sa';
   static const String baseUrl = 'https://$host/api/customer/';
-  static const String baseUrlDev = 'https://p2-api.aquago.sa/api/customer/';
+  static const String baseUrlDev = 'https://api.aquago.sa/api/customer/';
+  // static const String baseUrlDev = 'https://p2-api.aquago.sa/api/customer/';
   static const String baseUrlQa = 'https://qa-api.aquago.sa/api/customer/';
 
   //  Auth Endpoints
@@ -44,6 +45,7 @@ abstract class Endpoints {
 
   //  Bookings & Quotes Endpoints
   static const String quotes = 'quotes';
+  static const String giftQuote = 'gifts/quote';
   static const String bookings = 'bookings';
   // Completed-but-unrated bookings inside the live 7-day rating window
   // (AQG-160 home rating popup). Returns a JSON array of BookingResponse.
@@ -171,6 +173,7 @@ abstract class Endpoints {
   static String giftDetail(String giftId) => 'gifts/$giftId';
   static String cancelGift(String giftId) => 'gifts/$giftId/cancel';
   static const String redeemGift = 'gifts/redeem';
+  static const String giftQuotes = 'gifts/quote';
 
   // Promos Endpoints
   static const String validatePromo = 'promos/validate';

@@ -28,50 +28,31 @@ class ReviewAndPayStep extends StatelessWidget {
         }
 
         final service = state.selectedService!;
-        final lines = state.quote?.lines ?? const [];
-        final quoteBreakdown = state.quote?.breakdown;
+        final quote = state.quote;
 
-        double servicePrice = 0.0;
+        double servicePrice = service.priceDouble / 1.15;
         final List<Map<String, dynamic>> selectedAddons = [];
 
-        if (lines.isNotEmpty) {
-          final serviceLine = lines.where((l) => l.isService).firstOrNull;
-          servicePrice = serviceLine?.net ?? 0.0;
-          for (final line in lines.where((l) => l.isAddon)) {
-            final addon = service.addons
-                .where((a) => a.id == line.refId)
-                .firstOrNull;
-            final title = addon == null
-                ? ''
-                : (context.isAr
-                      ? (addon.nameAr ?? addon.nameEn ?? '')
-                      : (addon.nameEn ?? addon.nameAr ?? ''));
-            selectedAddons.add({'name': title, 'price': line.net});
-          }
-        } else {
-          // Fallback if no quote loaded yet to avoid blank screen or crash
-          servicePrice = service.priceDouble / 1.15;
-          final List<AddOnModel> selectedAddonsList = service.addons
-              .where((addon) => state.selectedAddonIds.contains(addon.id))
-              .toList();
-          for (final addon in selectedAddonsList) {
-            selectedAddons.add({
-              'name': context.isAr
-                  ? (addon.nameAr ?? '')
-                  : (addon.nameEn ?? ''),
-              'price': addon.price / 1.15,
-            });
-          }
+        final List<AddOnModel> selectedAddonsList = service.addons
+            .where((addon) => state.selectedAddonIds.contains(addon.id))
+            .toList();
+        for (final addon in selectedAddonsList) {
+          selectedAddons.add({
+            'name': context.isAr
+                ? (addon.nameAr ?? '')
+                : (addon.nameEn ?? ''),
+            'price': addon.price / 1.15,
+          });
         }
 
         final double subtotal;
         final double vat;
         final double totalAmount;
 
-        if (quoteBreakdown != null) {
-          subtotal = quoteBreakdown.net;
-          vat = quoteBreakdown.vat;
-          totalAmount = quoteBreakdown.gross;
+        if (quote != null) {
+          subtotal = quote.breakdown?.net ?? 0.0;
+          vat = quote.breakdown?.vat ?? 0.0;
+          totalAmount = quote.cardCharge;
         } else {
           // Fallback calculations
           final rawTotal =
@@ -302,6 +283,13 @@ class ReviewAndPayStep extends StatelessWidget {
                     label: LocaleKeys.gifts_vat.tr(context: context),
                     amount: vat,
                   ),
+                  if (quote != null && quote.pointsDiscountMinor > 0) ...[
+                    SizedBox(height: context.sh(12)),
+                    GiftInvoiceRow(
+                      label: context.isAr ? "خصم النقاط" : "Points Discount",
+                      amount: -quote.pointsDiscount,
+                    ),
+                  ],
                   SizedBox(height: context.sh(12)),
                   Divider(color: context.colors.textPrimary, thickness: 1),
                   SizedBox(height: context.sh(12)),

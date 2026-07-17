@@ -9,6 +9,10 @@ import '../../../../core/components/custom_button.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../controllers/send_gift_cubit.dart';
 import '../controllers/send_gift_state.dart';
+import '../../../../core/config/payment/payment_sdk_config_service.dart';
+import '../../../booking/presentation/views/moyasar_payment_view.dart';
+import '../../../../core/enums/payment_method_enum.dart';
+import '../../../booking/data/models/payment_init_model.dart';
 
 class SendGiftBottomButton extends StatelessWidget {
   final SendGiftState state;
@@ -27,8 +31,8 @@ class SendGiftBottomButton extends StatelessWidget {
 
     // Calculate total price based on service and selected addons
     double totalAmount = 0.0;
-    if (state.quote?.breakdown != null) {
-      totalAmount = state.quote!.breakdown!.gross;
+    if (state.quote != null) {
+      totalAmount = state.quote!.cardCharge;
     } else if (state.selectedService != null) {
       totalAmount += state.selectedService!.priceDouble;
       final selectedAddonsList = state.selectedService!.addons
@@ -105,11 +109,54 @@ class SendGiftBottomButton extends StatelessWidget {
             : CustomButton(
                 postWidget: state.step == 3 ? null : Icon(Icons.arrow_forward),
                 onPressed: isValid
-                    ? () {
+                    ? () async {
                         if (state.step < 3) {
                           cubit.nextStep();
                         } else {
-                          cubit.submitPurchase();
+                          final PaymentInitModel? init =
+                              await cubit.initiateGiftPayment();
+                          if (init == null || !context.mounted) return;
+
+                          await PaymentSdkConfigService.instance.ensureLoaded();
+                          if (!context.mounted) return;
+
+                          final result = await Navigator.of(context)
+                              .push<MoyasarPaymentResult>(
+                            MaterialPageRoute(
+                              builder: (_) => MoyasarPaymentView(
+                                args: MoyasarPaymentArgs(
+                                  init: init,
+                                  paymentMethod: state.paymentMethod ??
+                                      PaymentMethod.creditCard,
+                                  description: context.isAr
+                                      ? 'هدية أكوا جو'
+                                      : 'Aqua Go Gift',
+                                ),
+                              ),
+                            ),
+                          );
+
+                          if (!context.mounted) return;
+
+                          switch (result?.status) {
+                            case MoyasarPaymentStatus.paid:
+                              await cubit.submitPurchase(
+                                moyasarPaymentId: result!.paymentId!,
+                              );
+                              break;
+                            case MoyasarPaymentStatus.failed:
+                              if (context.mounted) {
+                                context.showErrorSnackBar(
+                                  context.isAr
+                                      ? 'فشلت عملية الدفع. يرجى المحاولة مرة أخرى.'
+                                      : 'Payment failed. Please try again.',
+                                );
+                              }
+                              break;
+                            case MoyasarPaymentStatus.cancelled:
+                            case null:
+                              break;
+                          }
                         }
                       }
                     : null,

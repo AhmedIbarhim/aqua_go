@@ -2,25 +2,23 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
 import '../../../home/data/repos/services_repository.dart';
 import '../../data/repos/gifts_repository.dart';
-import '../../../booking/data/repos/booking_repository.dart';
 import 'send_gift_state.dart';
 import '../../../home/data/models/service_model.dart';
 import '../../data/models/gift_theme_model.dart';
 import '../../data/models/purchase_gift_request_model.dart';
+import '../../data/models/gift_quote_request_model.dart';
+import '../../../booking/data/models/payment_init_model.dart';
 import '../../../../core/enums/payment_method_enum.dart';
 
 class SendGiftCubit extends Cubit<SendGiftState> {
   final GiftsRepository _giftsRepository;
   final ServicesRepository _servicesRepository;
-  final BookingRepository _bookingRepository;
 
   SendGiftCubit({
     required GiftsRepository giftsRepository,
     required ServicesRepository servicesRepository,
-    required BookingRepository bookingRepository,
   }) : _giftsRepository = giftsRepository,
        _servicesRepository = servicesRepository,
-       _bookingRepository = bookingRepository,
        super(const SendGiftState());
 
   Future<void> fetchInitialData() async {
@@ -155,17 +153,11 @@ class SendGiftCubit extends Cubit<SendGiftState> {
 
     emit(state.copyWith(status: SendGiftStatus.loading));
 
-    final addOnIds = state.selectedAddonIds.toList();
-    // Default Riyadh coordinates for the quote estimation
-    const double defaultLat = 24.7136;
-    const double defaultLng = 46.6753;
-
-    final result = await _bookingRepository.getQuote(
-      packageId: state.selectedService!.id!,
-      lat: defaultLat,
-      lng: defaultLng,
-      addOnIds: addOnIds,
-      carCount: 1,
+    final result = await _giftsRepository.getGiftQuote(
+      request: GiftQuoteRequestModel(
+        packageId: state.selectedService!.id!,
+        pointsToApply: state.pointsToApply,
+      ),
     );
 
     result.fold(
@@ -191,7 +183,39 @@ class SendGiftCubit extends Cubit<SendGiftState> {
     }
   }
 
-  Future<void> submitPurchase() async {
+  Future<PaymentInitModel?> initiateGiftPayment() async {
+    if (state.selectedService == null) return null;
+
+    final attemptNonce = const Uuid().v4();
+    emit(state.copyWith(status: SendGiftStatus.loading));
+
+    final result = await _giftsRepository.giftPaymentInit(
+      packageId: state.selectedService!.id!,
+      addOnIds: state.selectedAddonIds.isNotEmpty
+          ? state.selectedAddonIds.toList()
+          : null,
+      pointsToApply: state.pointsToApply,
+      attemptNonce: attemptNonce,
+    );
+
+    return result.fold(
+      (failure) {
+        emit(
+          state.copyWith(
+            status: SendGiftStatus.failure,
+            errorMessage: failure.message,
+          ),
+        );
+        return null;
+      },
+      (init) {
+        emit(state.copyWith(status: SendGiftStatus.initial));
+        return init;
+      },
+    );
+  }
+
+  Future<void> submitPurchase({String? moyasarPaymentId}) async {
     if (state.selectedService == null || state.selectedTheme == null) {
       emit(
         state.copyWith(
@@ -246,7 +270,7 @@ class SendGiftCubit extends Cubit<SendGiftState> {
       messageText: state.messageText,
       scheduledDeliveryAt: scheduledDeliveryAt,
       pointsToApply: state.pointsToApply,
-      moyasarPaymentId: state.moyasarPaymentId,
+      moyasarPaymentId: moyasarPaymentId ?? state.moyasarPaymentId,
       addOnIds: state.selectedAddonIds.isNotEmpty
           ? state.selectedAddonIds.toList()
           : null,
