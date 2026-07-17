@@ -16,7 +16,7 @@ class TipsRemoteDataSource {
     required PaymentMethod paymentMethod,
   }) {
     return _apiClient.post(
-      Endpoints.tipBookingPaymentInit,
+      Endpoints.tipBookingPaymentInit(bookingId),
       data: {'amountMinor': amountMinor, 'paymentMethod': paymentMethod.name},
     );
   }

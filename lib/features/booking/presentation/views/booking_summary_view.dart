@@ -21,6 +21,7 @@ import 'package:aqua_go/core/config/payment/payment_sdk_config_service.dart';
 import 'package:aqua_go/core/route/routes.dart';
 import 'package:aqua_go/features/my_bookings/presentation/views/my_booking_details_view.dart';
 import 'package:aqua_go/features/my_bookings/data/models/booking_summary_model.dart';
+import 'package:aqua_go/features/booking/domain/configs/booking_flow_type.dart';
 
 class BookingSummaryView extends StatefulWidget {
   const BookingSummaryView({super.key});
@@ -30,6 +31,9 @@ class BookingSummaryView extends StatefulWidget {
 }
 
 class _BookingSummaryViewState extends State<BookingSummaryView> {
+  String? _appliedPromoCode;
+  bool _isPointsToggled = false;
+
   @override
   void initState() {
     super.initState();
@@ -187,6 +191,11 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
       total = 0.0;
     }
 
+    final double pointsDiscount = _isPointsToggled
+        ? (total > 12.5 ? 12.5 : total)
+        : 0.0;
+    final double finalTotal = total - pointsDiscount;
+
     return Container(
       padding: EdgeInsets.all(width * 0.06),
       decoration: BoxDecoration(color: context.colors.themeColor),
@@ -238,6 +247,12 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
             ),
             const SizedBox(height: 24),
           ],
+          if (config.flowType == BookingFlowType.service) ...[
+            _buildPromoCodeSection(context, bookingState),
+            const SizedBox(height: 24),
+            _buildWalletPointsSection(context, bookingState, total),
+            const SizedBox(height: 24),
+          ],
           if (config.showPaymentSummary) ...[
             _buildSectionTitle(
               LocaleKeys.bookings_payment_summary.tr(context: context),
@@ -246,10 +261,17 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
             PaymentSummaryCard(
               serviceName: serviceName,
               servicePrice: servicePrice,
-              additionalItems: selectedAddons,
+              additionalItems: [
+                ...selectedAddons,
+                if (pointsDiscount > 0)
+                  {
+                    'name': context.isAr ? 'خصم النقاط' : 'Points Discount',
+                    'price': -pointsDiscount,
+                  },
+              ],
               subtotal: subtotal,
               vat: vat,
-              total: total,
+              total: finalTotal,
             ),
           ],
           const SizedBox(height: 30),
@@ -450,5 +472,334 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
         },
       ),
     );
+  }
+
+  Widget _buildPromoCodeSection(
+    BuildContext context,
+    BookingState bookingState,
+  ) {
+    final hasAppliedCode = _appliedPromoCode != null;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle(
+          LocaleKeys.bookings_promo_code_title.tr(context: context),
+        ),
+        const SizedBox(height: 16),
+        if (!hasAppliedCode)
+          GestureDetector(
+            onTap: _showPromoCodeDialog,
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+              decoration: BoxDecoration(
+                color: context.colors.themeColor,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: context.colors.warning.withValues(alpha: 0.8),
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.confirmation_number_outlined,
+                    color: context.colors.warning,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    LocaleKeys.bookings_apply_promo_code.tr(context: context),
+                    style: AppTextStyles.medium14.copyWith(
+                      color: context.colors.warning,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          )
+        else
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: context.colors.themeColor,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: context.colors.borderSecondary.withValues(alpha: 0.3),
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: context.colors.defaultSubtle,
+                    border: Border.all(
+                      color: context.colors.borderSecondary.withValues(
+                        alpha: 0.5,
+                      ),
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.check,
+                    color: context.colors.primary,
+                    size: 16,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${LocaleKeys.bookings_promo_code_title.tr(context: context)} $_appliedPromoCode',
+                      style: AppTextStyles.medium14.copyWith(
+                        color: context.colors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      LocaleKeys.bookings_promo_code_applied.tr(
+                        context: context,
+                      ),
+                      style: AppTextStyles.regular12.copyWith(
+                        color: context.colors.textTertiary,
+                      ),
+                    ),
+                  ],
+                ),
+                const Spacer(),
+
+                GestureDetector(
+                  onTap: _removePromoCode,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: context.colors.error,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.close, color: Colors.white, size: 14),
+                        const SizedBox(width: 4),
+                        Text(
+                          LocaleKeys.bookings_delete_promo_code.tr(
+                            context: context,
+                          ),
+                          style: AppTextStyles.medium12.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildWalletPointsSection(
+    BuildContext context,
+    BookingState bookingState,
+    double total,
+  ) {
+    final double pointsValue = 12.5;
+    final bool isInsufficient = _isPointsToggled && total > pointsValue;
+
+    final borderBorder = Border.all(
+      color: _isPointsToggled
+          ? (isInsufficient ? context.colors.error : context.colors.primary)
+          : context.colors.borderSecondary.withValues(alpha: 0.3),
+      width: 1.5,
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle(
+          LocaleKeys.bookings_wallet_points_title.tr(context: context),
+        ),
+        const SizedBox(height: 16),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: context.colors.themeColor,
+            borderRadius: BorderRadius.circular(12),
+            border: borderBorder,
+          ),
+          child: Row(
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    LocaleKeys.bookings_pay_using_points.tr(context: context),
+                    style: AppTextStyles.medium14.copyWith(
+                      color: context.colors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    LocaleKeys.bookings_available_points_format.tr(
+                      context: context,
+                      args: ['1,250', '12.5'],
+                    ),
+                    style: AppTextStyles.regular12.copyWith(
+                      color: context.colors.textTertiary,
+                    ),
+                  ),
+                ],
+              ),
+              const Spacer(),
+              Switch.adaptive(
+                value: _isPointsToggled,
+
+                onChanged: (val) {
+                  setState(() {
+                    _isPointsToggled = val;
+                  });
+                },
+                activeThumbColor: isInsufficient
+                    ? context.colors.errorSecondary
+                    : context.colors.primary,
+                activeTrackColor:
+                    (isInsufficient
+                            ? context.colors.errorSecondary
+                            : context.colors.primary)
+                        .withValues(alpha: 0.3),
+                inactiveThumbColor: context.colors.textTertiary,
+                inactiveTrackColor: context.colors.defaultSubtle,
+              ),
+            ],
+          ),
+        ),
+        if (isInsufficient) ...[
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              LocaleKeys.bookings_insufficient_points.tr(context: context),
+              style: AppTextStyles.regular12.copyWith(
+                color: context.colors.error,
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  void _showPromoCodeDialog() {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          backgroundColor: context.colors.cardBackGround,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Text(
+            LocaleKeys.bookings_apply_promo_code.tr(context: context),
+            style: AppTextStyles.bold16.copyWith(
+              color: context.colors.textPrimary,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: controller,
+                autofocus: true,
+                style: AppTextStyles.regular14.copyWith(
+                  color: context.colors.textPrimary,
+                ),
+                decoration: InputDecoration(
+                  hintText: LocaleKeys.bookings_apply_code_hint.tr(
+                    context: context,
+                  ),
+                  hintStyle: AppTextStyles.regular14.copyWith(
+                    color: context.colors.textTertiary,
+                  ),
+                  filled: true,
+                  fillColor: context.colors.fields,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: context.colors.borderSecondary,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: context.colors.primary),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(
+                LocaleKeys.bookings_cancel.tr(context: context),
+                style: AppTextStyles.medium14.copyWith(
+                  color: context.colors.textSecondary,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final code = controller.text.trim();
+                if (code.isNotEmpty) {
+                  Navigator.of(dialogContext).pop();
+                  _applyPromoCode(code);
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: context.colors.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                LocaleKeys.bookings_apply.tr(context: context),
+                style: AppTextStyles.medium14.copyWith(
+                  color: context.colors.textTheme,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _applyPromoCode(String code) async {
+    final quote = await context.read<BookingCubit>().fetchQuote(
+      promoCode: code,
+    );
+    if (quote != null) {
+      setState(() {
+        _appliedPromoCode = code;
+      });
+    }
+  }
+
+  void _removePromoCode() async {
+    final quote = await context.read<BookingCubit>().fetchQuote(
+      promoCode: null,
+    );
+    if (quote != null) {
+      setState(() {
+        _appliedPromoCode = null;
+      });
+    }
   }
 }

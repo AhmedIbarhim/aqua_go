@@ -33,6 +33,23 @@ class BookingsRemoteDataSource {
     );
   }
 
+  Future<Either<Failure, dynamic>> validatePromo({
+    required String code,
+    required String packageId,
+    required double lat,
+    required double lng,
+  }) {
+    return _apiClient.post(
+      Endpoints.validatePromo,
+      data: {
+        'code': code,
+        'packageId': packageId,
+        'lat': lat,
+        'lng': lng,
+      },
+    );
+  }
+
   Future<Either<Failure, dynamic>> checkZoneAvailability({
     required double lat,
     required double lng,

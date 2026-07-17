@@ -178,6 +178,17 @@ abstract class  LocaleKeys {
   static const bookings_credit_card = 'bookings.credit_card';
   static const bookings_booking_procedures = 'bookings.booking_procedures';
   static const bookings_booking_success_message = 'bookings.booking_success_message';
+  static const bookings_promo_code_title = 'bookings.promo_code_title';
+  static const bookings_apply_promo_code = 'bookings.apply_promo_code';
+  static const bookings_promo_code_applied = 'bookings.promo_code_applied';
+  static const bookings_delete_promo_code = 'bookings.delete_promo_code';
+  static const bookings_wallet_points_title = 'bookings.wallet_points_title';
+  static const bookings_pay_using_points = 'bookings.pay_using_points';
+  static const bookings_available_points_format = 'bookings.available_points_format';
+  static const bookings_insufficient_points = 'bookings.insufficient_points';
+  static const bookings_apply_code_hint = 'bookings.apply_code_hint';
+  static const bookings_apply = 'bookings.apply';
+  static const bookings_cancel = 'bookings.cancel';
   static const bookings_rate_service = 'bookings.rate_service';
   static const bookings_submit_complaint = 'bookings.submit_complaint';
   static const bookings_complaint = 'bookings.complaint';

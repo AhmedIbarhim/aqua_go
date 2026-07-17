@@ -1,8 +1,8 @@
 abstract class Endpoints {
   static const String host = 'qa-api.aquago.sa';
   static const String baseUrl = 'https://$host/api/customer/';
-  static const String baseUrlDev = 'https://api.aquago.sa/api/customer/';
-  // static const String baseUrlDev = 'https://p2-api.aquago.sa/api/customer/';
+  // static const String baseUrlDev = 'https://api.aquago.sa/api/customer/';
+  static const String baseUrlDev = 'https://p2-api.aquago.sa/api/customer/';
   static const String baseUrlQa = 'https://qa-api.aquago.sa/api/customer/';
 
   //  Auth Endpoints
@@ -83,9 +83,10 @@ abstract class Endpoints {
   // Pay-before-create for subscriptions (mirrors bookings/payment-init).
   static const String subscriptionsPaymentInit = 'subscriptions/payment-init';
 
-  static const String tipBookingPaymentInit = 'bookings/payment-init';
+  static String tipBookingPaymentInit(String bookingId) =>
+      'bookings/$bookingId/tip/payment-init';
 
-  static const String giftPaymentInit = 'bookings/payment-init';
+  static const String giftPaymentInit = 'gifts/payment-init';
 
   //  Banners Endpoints
   static const String banners = 'banners';
@@ -156,10 +157,8 @@ abstract class Endpoints {
       'complaints/$complaintId/photos/confirm';
 
   // Wallet Endpoints
-  static const String wallet = 'me/wallet';
-  static const String walletAutoTopup = 'me/wallet/auto-topup';
-  static const String walletTopup = 'me/wallet/topup';
-  static const String walletLedger = 'me/wallet/ledger';
+  static const String wallet = 'loyalty';
+  static const String walletLedger = 'loyalty/ledger';
 
   // Saved Cards Endpoints
   static const String savedCards = 'me/saved-cards';
