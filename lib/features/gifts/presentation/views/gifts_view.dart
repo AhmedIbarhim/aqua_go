@@ -117,11 +117,11 @@ class _GiftsViewState extends State<GiftsView> {
         onRetry: () => context.read<GiftsCubit>().fetchGifts(),
       );
     } else if (state is GiftsSuccess) {
-      final filteredGifts = state.gifts
-          .where((gift) => _selectedIndex == 0 ? gift.isSent : !gift.isSent)
-          .toList();
+      final isEmpty = _selectedIndex == 0
+          ? state.sentGifts.isEmpty
+          : state.receivedGifts.isEmpty;
 
-      if (filteredGifts.isEmpty) {
+      if (isEmpty) {
         return RefreshIndicator(
           color: context.colors.primary,
           onRefresh: () async {
@@ -148,6 +148,10 @@ class _GiftsViewState extends State<GiftsView> {
         );
       }
 
+      final itemCount = _selectedIndex == 0
+          ? state.sentGifts.length
+          : state.receivedGifts.length;
+
       return RefreshIndicator(
         color: context.colors.primary,
         onRefresh: () async {
@@ -157,24 +161,27 @@ class _GiftsViewState extends State<GiftsView> {
           onNotification: (ScrollNotification scrollInfo) {
             if (scrollInfo.metrics.pixels >=
                 scrollInfo.metrics.maxScrollExtent - 200) {
-              context.read<GiftsCubit>().loadMoreGifts();
+              context.read<GiftsCubit>().loadMoreGifts(
+                tabIndex: _selectedIndex,
+              );
             }
             return false;
           },
           child: ListView.builder(
-            itemCount: filteredGifts.length,
+            itemCount: itemCount,
             physics: const AlwaysScrollableScrollPhysics(),
             itemBuilder: (context, index) {
-              final gift = filteredGifts[index];
               if (_selectedIndex == 0) {
+                final gift = state.sentGifts[index];
                 return SentGiftCard(gift: gift);
               } else {
+                final gift = state.receivedGifts[index];
                 return ReceivedGiftCard(
                   gift: gift,
                   onRedeemPressed: () async {
-                    if (gift.code != null) {
+                    if (gift.giftCode.isNotEmpty) {
                       final ok = await context.read<GiftsCubit>().redeemGift(
-                        gift.code!,
+                        gift.giftCode,
                       );
                       if (context.mounted) {
                         if (ok) {
@@ -205,7 +212,7 @@ class _GiftsViewState extends State<GiftsView> {
     if (_selectedIndex != 0) return null;
     if (state is! GiftsSuccess) return null;
 
-    final hasSentGifts = state.gifts.any((gift) => gift.isSent);
+    final hasSentGifts = state.sentGifts.isNotEmpty;
     if (!hasSentGifts) return null;
 
     return SafeArea(
@@ -220,7 +227,7 @@ class _GiftsViewState extends State<GiftsView> {
             });
           },
           text: LocaleKeys.gifts_empty_send_now.tr(context: context),
-          postWidget: Icon(Icons.add),
+          postWidget: const Icon(Icons.add),
         ),
       ),
     );

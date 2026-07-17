@@ -494,18 +494,12 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
               decoration: BoxDecoration(
                 color: context.colors.themeColor,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: context.colors.warning.withValues(alpha: 0.8),
-                  width: 1,
-                ),
+                border: Border.all(color: context.colors.warning, width: 1),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.confirmation_number_outlined,
-                    color: context.colors.warning,
-                  ),
+                  Icon(Icons.discount_outlined, color: context.colors.warning),
                   const SizedBox(width: 8),
                   Text(
                     LocaleKeys.bookings_apply_promo_code.tr(context: context),

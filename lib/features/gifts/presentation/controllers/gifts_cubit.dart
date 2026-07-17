@@ -1,5 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../data/repos/gifts_repository.dart';
+import '../../data/models/gift_model.dart';
+import '../../data/models/gifts_list_response_model.dart';
+import '../../data/models/received_gifts_list_response_model.dart';
 import 'gifts_state.dart';
 
 class GiftsCubit extends Cubit<GiftsState> {
@@ -13,52 +16,110 @@ class GiftsCubit extends Cubit<GiftsState> {
       emit(GiftsLoading());
     }
 
-    final result = await _repository.getGifts(limit: 20);
+    final sentFuture = _repository.getGifts(limit: 20);
+    final receivedFuture = _repository.getReceivedGifts(limit: 20);
 
-    result.fold(
-      (failure) => emit(GiftsFailure(failure.message)),
-      (response) {
-        emit(
-          GiftsSuccess(
-            gifts: response.items,
-            nextCursor: response.nextCursor,
-            hasReachedMax: response.nextCursor == null || response.nextCursor!.isEmpty,
-          ),
-        );
-      },
-    );
-  }
+    final results = await Future.wait([sentFuture, receivedFuture]);
+    final sentResult = results[0];
+    final receivedResult = results[1];
 
-  Future<void> loadMoreGifts() async {
-    final currentState = state;
-    if (currentState is! GiftsSuccess ||
-        currentState.hasReachedMax ||
-        _isLoadingMore) {
+    if (sentResult.isLeft() && receivedResult.isLeft()) {
+      final failure = sentResult.fold((f) => f, (_) => null)!;
+      emit(GiftsFailure(failure.message));
       return;
     }
 
-    _isLoadingMore = true;
-
-    final result = await _repository.getGifts(
-      limit: 20,
-      cursor: currentState.nextCursor,
+    final sentList = sentResult.fold(
+      (failure) => <GiftModel>[],
+      (response) => (response as GiftsListResponseModel).items,
+    );
+    final nextCursorSent = sentResult.fold(
+      (failure) => null,
+      (response) => (response as GiftsListResponseModel).nextCursor,
     );
 
-    result.fold(
-      (failure) {
-        _isLoadingMore = false;
-      },
-      (response) {
-        _isLoadingMore = false;
-        emit(
-          currentState.copyWith(
-            gifts: [...currentState.gifts, ...response.items],
-            nextCursor: response.nextCursor,
-            hasReachedMax: response.nextCursor == null || response.nextCursor!.isEmpty,
-          ),
-        );
-      },
+    final receivedList = receivedResult.fold(
+      (failure) => <ReceivedGiftModel>[],
+      (response) => (response as ReceivedGiftsListResponseModel).items,
     );
+    final nextCursorReceived = receivedResult.fold(
+      (failure) => null,
+      (response) => (response as ReceivedGiftsListResponseModel).nextCursor,
+    );
+
+    emit(
+      GiftsSuccess(
+        sentGifts: sentList,
+        receivedGifts: receivedList,
+        nextCursorSent: nextCursorSent,
+        nextCursorReceived: nextCursorReceived,
+        hasReachedMaxSent: nextCursorSent == null || nextCursorSent.isEmpty,
+        hasReachedMaxReceived:
+            nextCursorReceived == null || nextCursorReceived.isEmpty,
+      ),
+    );
+  }
+
+  Future<void> loadMoreGifts({required int tabIndex}) async {
+    final currentState = state;
+    if (currentState is! GiftsSuccess || _isLoadingMore) {
+      return;
+    }
+
+    if (tabIndex == 0) {
+      if (currentState.hasReachedMaxSent) return;
+      _isLoadingMore = true;
+
+      final result = await _repository.getGifts(
+        limit: 20,
+        cursor: currentState.nextCursorSent,
+      );
+
+      result.fold(
+        (failure) {
+          _isLoadingMore = false;
+        },
+        (response) {
+          _isLoadingMore = false;
+          emit(
+            currentState.copyWith(
+              sentGifts: [...currentState.sentGifts, ...response.items],
+              nextCursorSent: response.nextCursor,
+              hasReachedMaxSent:
+                  response.nextCursor == null || response.nextCursor!.isEmpty,
+            ),
+          );
+        },
+      );
+    } else {
+      if (currentState.hasReachedMaxReceived) return;
+      _isLoadingMore = true;
+
+      final result = await _repository.getReceivedGifts(
+        limit: 20,
+        cursor: currentState.nextCursorReceived,
+      );
+
+      result.fold(
+        (failure) {
+          _isLoadingMore = false;
+        },
+        (response) {
+          _isLoadingMore = false;
+          emit(
+            currentState.copyWith(
+              receivedGifts: [
+                ...currentState.receivedGifts,
+                ...response.items
+              ],
+              nextCursorReceived: response.nextCursor,
+              hasReachedMaxReceived:
+                  response.nextCursor == null || response.nextCursor!.isEmpty,
+            ),
+          );
+        },
+      );
+    }
   }
 
   Future<bool> redeemGift(String code) async {

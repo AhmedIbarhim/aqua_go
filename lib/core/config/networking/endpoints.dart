@@ -168,7 +168,8 @@ abstract class Endpoints {
 
   // Gift Themes & Gifts Endpoints
   static const String giftThemes = 'gift-themes';
-  static const String gifts = 'gifts';
+  static const String giftsSent = 'gifts';
+  static const String giftsReceived = 'gifts/received';
   static String giftDetail(String giftId) => 'gifts/$giftId';
   static String cancelGift(String giftId) => 'gifts/$giftId/cancel';
   static const String redeemGift = 'gifts/redeem';

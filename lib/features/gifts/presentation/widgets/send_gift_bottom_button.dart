@@ -12,7 +12,6 @@ import '../controllers/send_gift_state.dart';
 import '../../../../core/config/payment/payment_sdk_config_service.dart';
 import '../../../booking/presentation/views/moyasar_payment_view.dart';
 import '../../../../core/enums/payment_method_enum.dart';
-import '../../../booking/data/models/payment_init_model.dart';
 
 class SendGiftBottomButton extends StatelessWidget {
   final SendGiftState state;
@@ -113,8 +112,7 @@ class SendGiftBottomButton extends StatelessWidget {
                         if (state.step < 3) {
                           cubit.nextStep();
                         } else {
-                          final PaymentInitModel? init =
-                              await cubit.initiateGiftPayment();
+                          final init = await cubit.initiateGiftPayment();
                           if (init == null || !context.mounted) return;
 
                           await PaymentSdkConfigService.instance.ensureLoaded();
@@ -122,19 +120,20 @@ class SendGiftBottomButton extends StatelessWidget {
 
                           final result = await Navigator.of(context)
                               .push<MoyasarPaymentResult>(
-                            MaterialPageRoute(
-                              builder: (_) => MoyasarPaymentView(
-                                args: MoyasarPaymentArgs(
-                                  init: init,
-                                  paymentMethod: state.paymentMethod ??
-                                      PaymentMethod.creditCard,
-                                  description: context.isAr
-                                      ? 'هدية أكوا جو'
-                                      : 'Aqua Go Gift',
+                                MaterialPageRoute(
+                                  builder: (_) => MoyasarPaymentView(
+                                    args: MoyasarPaymentArgs(
+                                      init: init.toPaymentInitModel(),
+                                      paymentMethod:
+                                          state.paymentMethod ??
+                                          PaymentMethod.creditCard,
+                                      description: context.isAr
+                                          ? 'هدية أكوا جو'
+                                          : 'Aqua Go Gift',
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                          );
+                              );
 
                           if (!context.mounted) return;
 

@@ -7,7 +7,8 @@ import '../../../home/data/models/service_model.dart';
 import '../../data/models/gift_theme_model.dart';
 import '../../data/models/purchase_gift_request_model.dart';
 import '../../data/models/gift_quote_request_model.dart';
-import '../../../booking/data/models/payment_init_model.dart';
+import '../../data/models/gift_payment_init_model.dart';
+import '../../data/models/gift_payment_init_request_model.dart';
 import '../../../../core/enums/payment_method_enum.dart';
 
 class SendGiftCubit extends Cubit<SendGiftState> {
@@ -183,19 +184,19 @@ class SendGiftCubit extends Cubit<SendGiftState> {
     }
   }
 
-  Future<PaymentInitModel?> initiateGiftPayment() async {
+  Future<GiftPaymentInitModel?> initiateGiftPayment() async {
     if (state.selectedService == null) return null;
 
     final attemptNonce = const Uuid().v4();
     emit(state.copyWith(status: SendGiftStatus.loading));
 
     final result = await _giftsRepository.giftPaymentInit(
-      packageId: state.selectedService!.id!,
-      addOnIds: state.selectedAddonIds.isNotEmpty
-          ? state.selectedAddonIds.toList()
-          : null,
-      pointsToApply: state.pointsToApply,
-      attemptNonce: attemptNonce,
+      request: GiftPaymentInitRequestModel(
+        packageId: state.selectedService!.id!,
+        recipientPhone: '+966${state.recipientPhone}',
+        pointsToApply: state.pointsToApply,
+        attemptNonce: attemptNonce,
+      ),
     );
 
     return result.fold(

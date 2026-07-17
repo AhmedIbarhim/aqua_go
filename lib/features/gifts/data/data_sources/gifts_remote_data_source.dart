@@ -15,7 +15,22 @@ class GiftsRemoteDataSource {
       queryParameters['cursor'] = cursor;
     }
 
-    return _apiClient.get(Endpoints.gifts, queryParameters: queryParameters);
+    return _apiClient.get(
+      Endpoints.giftsSent,
+      queryParameters: queryParameters,
+    );
+  }
+
+  Future<Either<Failure, dynamic>> getReceivedGifts({int limit = 20, String? cursor}) {
+    final Map<String, dynamic> queryParameters = {'limit': limit};
+    if (cursor != null && cursor.isNotEmpty) {
+      queryParameters['cursor'] = cursor;
+    }
+
+    return _apiClient.get(
+      Endpoints.giftsReceived,
+      queryParameters: queryParameters,
+    );
   }
 
   Future<Either<Failure, dynamic>> getGiftThemes() {
@@ -27,7 +42,7 @@ class GiftsRemoteDataSource {
     required Map<String, dynamic> data,
   }) {
     return _apiClient.post(
-      Endpoints.gifts,
+      Endpoints.giftsSent,
       data: data,
       options: Options(headers: {'Idempotency-Key': idempotencyKey}),
     );
@@ -40,37 +55,31 @@ class GiftsRemoteDataSource {
     );
   }
 
-  Future<Either<Failure, dynamic>> redeemGift(String code) {
-    return _apiClient.post(Endpoints.redeemGift, data: {'code': code});
+  Future<Either<Failure, dynamic>> redeemGift({
+    required String code,
+    required String idempotencyKey,
+  }) {
+    return _apiClient.post(
+      Endpoints.redeemGift,
+      data: {'code': code},
+      options: Options(headers: {'Idempotency-Key': idempotencyKey}),
+    );
   }
 
   Future<Either<Failure, dynamic>> getGiftQuote({
     required Map<String, dynamic> data,
   }) {
-    return _apiClient.post(
-      Endpoints.giftQuotes,
-      data: data,
-    );
+    return _apiClient.post(Endpoints.giftQuotes, data: data);
   }
 
   Future<Either<Failure, dynamic>> giftPaymentInit({
-    required String packageId,
-    required List<String>? addOnIds,
-    required int? pointsToApply,
-    required String attemptNonce,
+    required Map<String, dynamic> data,
     required String idempotencyKey,
   }) {
     return _apiClient.post(
       Endpoints.giftPaymentInit,
-      data: {
-        'packageId': packageId,
-        if (addOnIds != null && addOnIds.isNotEmpty) 'addOnIds': addOnIds,
-        if (pointsToApply != null) 'pointsToApply': pointsToApply,
-        'attemptNonce': attemptNonce,
-      },
-      options: Options(
-        headers: {'Idempotency-Key': idempotencyKey},
-      ),
+      data: data,
+      options: Options(headers: {'Idempotency-Key': idempotencyKey}),
     );
   }
 }

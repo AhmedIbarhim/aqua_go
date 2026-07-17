@@ -8,7 +8,9 @@ import 'package:aqua_go/features/gifts/data/models/gift_theme_model.dart';
 import 'package:aqua_go/features/gifts/data/models/purchase_gift_request_model.dart';
 import 'package:aqua_go/features/gifts/data/models/gift_quote_request_model.dart';
 import 'package:aqua_go/features/gifts/data/models/gift_quote_model.dart';
-import 'package:aqua_go/features/booking/data/models/payment_init_model.dart';
+import 'package:aqua_go/features/gifts/data/models/gift_payment_init_model.dart';
+import 'package:aqua_go/features/gifts/data/models/gift_payment_init_request_model.dart';
+import 'package:aqua_go/features/gifts/data/models/received_gifts_list_response_model.dart';
 import 'package:dartz/dartz.dart';
 
 class GiftsRepository {
@@ -36,6 +38,29 @@ class GiftsRepository {
         }
       }
       return const Left(ServerFailure('Failed to load gifts'));
+    });
+  }
+
+  Future<Either<Failure, ReceivedGiftsListResponseModel>> getReceivedGifts({
+    int limit = 20,
+    String? cursor,
+  }) async {
+    final result = await _remoteDataSource.getReceivedGifts(
+      limit: limit,
+      cursor: cursor,
+    );
+    return result.fold((failure) => Left(failure), (data) {
+      if (data != null) {
+        try {
+          final listResponse = ReceivedGiftsListResponseModel.fromJson(
+            data as Map<String, dynamic>,
+          );
+          return Right(listResponse);
+        } catch (e) {
+          return Left(ServerFailure('Parsing error: $e'));
+        }
+      }
+      return const Left(ServerFailure('Failed to load received gifts'));
     });
   }
 
@@ -89,7 +114,17 @@ class GiftsRepository {
   }
 
   Future<Either<Failure, void>> redeemGift(String code) async {
-    final result = await _remoteDataSource.redeemGift(code);
+    final customerId = FetchUserData.getUserId() ?? '';
+    final idempotencyKey = IdempotencyKeyHelper.generate(
+      prefix: 'gift-redeem',
+      userId: customerId,
+      requestId: code,
+    );
+
+    final result = await _remoteDataSource.redeemGift(
+      code: code,
+      idempotencyKey: idempotencyKey,
+    );
     return result.fold((failure) => Left(failure), (data) => const Right(null));
   }
 
@@ -111,32 +146,29 @@ class GiftsRepository {
     );
   }
 
-  Future<Either<Failure, PaymentInitModel>> giftPaymentInit({
-    required String packageId,
-    required List<String>? addOnIds,
-    required int? pointsToApply,
-    required String attemptNonce,
+  Future<Either<Failure, GiftPaymentInitModel>> giftPaymentInit({
+    required GiftPaymentInitRequestModel request,
   }) async {
     final customerId = FetchUserData.getUserId() ?? '';
     final idempotencyKey =
-        'gift-payment-init:$customerId:$packageId:$attemptNonce';
+        'gift-payment-init:$customerId:${request.packageId}:${request.attemptNonce}';
 
     final result = await _remoteDataSource.giftPaymentInit(
-      packageId: packageId,
-      addOnIds: addOnIds,
-      pointsToApply: pointsToApply,
-      attemptNonce: attemptNonce,
+      data: request.toJson(),
       idempotencyKey: idempotencyKey,
     );
 
-    return result.fold((failure) => Left(failure), (response) {
-      try {
-        return Right(
-          PaymentInitModel.fromJson(response as Map<String, dynamic>),
-        );
-      } catch (e) {
-        return Left(ServerFailure('Parsing error: $e'));
-      }
-    });
+    return result.fold(
+      (failure) => Left(failure),
+      (response) {
+        try {
+          return Right(
+            GiftPaymentInitModel.fromJson(response as Map<String, dynamic>),
+          );
+        } catch (e) {
+          return Left(ServerFailure('Parsing error: $e'));
+        }
+      },
+    );
   }
 }
