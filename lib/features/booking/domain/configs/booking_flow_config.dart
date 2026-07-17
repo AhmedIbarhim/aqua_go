@@ -16,7 +16,8 @@ class BookingFlowConfig {
   bool get showDetailsStep => true;
   bool get showSummaryStep =>
       flowType == BookingFlowType.service ||
-      flowType == BookingFlowType.package;
+      flowType == BookingFlowType.package ||
+      flowType == BookingFlowType.giftRedeem;
 
   // ─── Details View Sections ───
   bool get showCarSelection => true;
@@ -44,6 +45,7 @@ class BookingFlowConfig {
   bool get isReschedule => flowType == BookingFlowType.reschedule;
   bool get isNormal => flowType == BookingFlowType.service;
   bool get isPackage => flowType == BookingFlowType.package;
+  bool get isGiftRedeem => flowType == BookingFlowType.giftRedeem;
 
   @override
   bool operator ==(Object other) =>

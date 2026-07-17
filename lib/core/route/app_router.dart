@@ -180,6 +180,7 @@ abstract class AppRouter {
                   existingTime: args.existingTime,
                   subscriptionId: args.subscriptionId,
                   washId: args.washId,
+                  giftCode: args.giftCode,
                 ),
             child: const BookingLocationView(),
           ),
@@ -337,6 +338,7 @@ class BookingFlowStartArgs {
   final BookingSubmitStrategy submitStrategy;
   final String? subscriptionId;
   final String? washId;
+  final String? giftCode;
 
   BookingFlowStartArgs({
     this.service,
@@ -348,5 +350,6 @@ class BookingFlowStartArgs {
     BookingSubmitStrategy? submitStrategy,
     this.subscriptionId,
     this.washId,
+    this.giftCode,
   }) : submitStrategy = submitStrategy ?? ServiceBookingSubmit();
 }

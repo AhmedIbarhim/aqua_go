@@ -137,6 +137,7 @@ abstract class AppAssets {
   static const String adding = 'assets/svg/add.svg';
   static const String applePay = 'assets/images/apple_pay.png';
   static const String mastercardPay = 'assets/images/mastercard_pay.png';
+  static const String giftCoupon = 'assets/svg/gift_coupon.svg';
 
   static const String male = 'assets/svg/male.svg';
   static const String female = 'assets/svg/female.svg';

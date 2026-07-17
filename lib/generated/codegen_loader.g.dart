@@ -401,6 +401,8 @@ class CodegenLoader extends AssetLoader{
     "title": "قائمة الهدايا",
     "redeem_success": "تم استرداد الهدية بنجاح",
     "redeem_failed": "فشل استرداد الهدية",
+    "paid_via_gift_coupon": "تم الدفع عبر قسيمة هدية",
+    "gift_coupon": "قسيمة هدية",
     "empty": {
       "title": "لا توجد هدايا حالية",
       "sent_desc": "سيتم عرض الهدايا المرسلة في هذه الصفحة",
@@ -873,6 +875,8 @@ static const Map<String,dynamic> _en = {
     "title": "Gifts List",
     "redeem_success": "Gift redeemed successfully",
     "redeem_failed": "Failed to redeem gift",
+    "paid_via_gift_coupon": "Paid via gift coupon",
+    "gift_coupon": "Gift Coupon",
     "empty": {
       "title": "No current gifts",
       "sent_desc": "Sent gifts will be displayed on this page",

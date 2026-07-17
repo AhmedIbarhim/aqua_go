@@ -202,6 +202,37 @@ class BookingRepository {
     }
   }
 
+  Future<Either<Failure, BookingResponseModel>> redeemGiftBooking(
+    Map<String, dynamic> data,
+  ) async {
+    try {
+      final customerId = FetchUserData.getUserId() ?? '';
+      final giftCode = data['giftCode'] as String? ?? '';
+      final idempotencyKey = 'gift-redeem-booking:$customerId:$giftCode';
+
+      final response = await bookingsRemoteDataSource.redeemGiftBooking(
+        data: data,
+        idempotencyKey: idempotencyKey,
+      );
+      return response.fold((failure) => left(failure), (resData) {
+        if (resData != null) {
+          try {
+            final map = resData as Map<String, dynamic>;
+            final bookingResponse = BookingResponseModel(
+              id: map['bookingId'] as String?,
+            );
+            return right(bookingResponse);
+          } catch (e) {
+            return left(ServerFailure('Parsing error: $e'));
+          }
+        }
+        return left(ServerFailure('Failed to redeem gift booking'));
+      });
+    } catch (error) {
+      return left(ServerFailure(error.toString()));
+    }
+  }
+
   Future<Either<Failure, BookingResponseModel>> rescheduleBooking(
     ServiceRescheduleRequestModel rescheduleRequest,
   ) async {

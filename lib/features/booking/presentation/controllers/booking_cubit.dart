@@ -45,6 +45,7 @@ class BookingCubit extends Cubit<BookingState> {
     String? existingTime,
     String? subscriptionId,
     String? washId,
+    String? giftCode,
   }) {
     emit(
       BookingState(
@@ -57,6 +58,7 @@ class BookingCubit extends Cubit<BookingState> {
         flowConfig: _flowConfig,
         subscriptionId: subscriptionId,
         washId: washId,
+        giftCode: giftCode,
       ),
     );
 

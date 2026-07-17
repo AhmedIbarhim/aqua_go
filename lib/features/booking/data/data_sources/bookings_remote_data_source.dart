@@ -153,4 +153,15 @@ class BookingsRemoteDataSource {
       options: Options(headers: {'Idempotency-Key': idempotencyKey}),
     );
   }
+
+  Future<Either<Failure, dynamic>> redeemGiftBooking({
+    required Map<String, dynamic> data,
+    required String idempotencyKey,
+  }) {
+    return _apiClient.post(
+      Endpoints.redeemGift,
+      data: data,
+      options: Options(headers: {'Idempotency-Key': idempotencyKey}),
+    );
+  }
 }

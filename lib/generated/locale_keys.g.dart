@@ -365,6 +365,8 @@ abstract class  LocaleKeys {
   static const gifts_title = 'gifts.title';
   static const gifts_redeem_success = 'gifts.redeem_success';
   static const gifts_redeem_failed = 'gifts.redeem_failed';
+  static const gifts_paid_via_gift_coupon = 'gifts.paid_via_gift_coupon';
+  static const gifts_gift_coupon = 'gifts.gift_coupon';
   static const gifts_empty_title = 'gifts.empty.title';
   static const gifts_empty_sent_desc = 'gifts.empty.sent_desc';
   static const gifts_empty_received_desc = 'gifts.empty.received_desc';

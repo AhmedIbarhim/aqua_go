@@ -12,6 +12,7 @@ import '../widgets/booking_summary_card.dart';
 import '../widgets/biker_notes_selection.dart';
 import '../widgets/payment_summary_card.dart';
 import '../widgets/payment_method_selection.dart';
+import '../widgets/gift_coupon_payment_widget.dart';
 import '../controllers/booking_cubit.dart';
 import '../controllers/booking_state.dart';
 import 'moyasar_payment_view.dart';
@@ -245,6 +246,10 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
                 context.read<BookingCubit>().updatePaymentMethod(method);
               },
             ),
+            const SizedBox(height: 24),
+          ],
+          if (config.isGiftRedeem) ...[
+            const GiftCouponPaymentWidget(),
             const SizedBox(height: 24),
           ],
           if (config.flowType == BookingFlowType.service) ...[

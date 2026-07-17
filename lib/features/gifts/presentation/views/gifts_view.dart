@@ -17,6 +17,10 @@ import '../widgets/empty_gifts_widgets.dart';
 import '../widgets/gifts_tabs.dart';
 import '../widgets/sent_gift_card.dart';
 import '../widgets/received_gift_card.dart';
+import '../../../booking/domain/strategies/redeem_gift_booking_submit.dart';
+import '../../../booking/domain/configs/booking_flow_config.dart';
+import '../../../../core/route/app_router.dart';
+import '../../../home/data/models/service_model.dart';
 
 class GiftsView extends StatefulWidget {
   const GiftsView({super.key});
@@ -178,24 +182,25 @@ class _GiftsViewState extends State<GiftsView> {
                 final gift = state.receivedGifts[index];
                 return ReceivedGiftCard(
                   gift: gift,
-                  onRedeemPressed: () async {
+                  onRedeemPressed: () {
                     if (gift.giftCode.isNotEmpty) {
-                      final ok = await context.read<GiftsCubit>().redeemGift(
-                        gift.giftCode,
-                      );
-                      if (context.mounted) {
-                        if (ok) {
-                          context.showSuccessSnackBar(
-                            LocaleKeys.gifts_redeem_success.tr(
-                              context: context,
+                      Navigator.of(context).pushNamed(
+                        Routes.bookingLocation,
+                        arguments: BookingFlowStartArgs(
+                          service: ServiceModel(
+                            id: '',
+                            rawName: ServiceName(
+                              nameAr: gift.serviceName.ar,
+                              nameEn: gift.serviceName.en,
                             ),
-                          );
-                        } else {
-                          context.showErrorSnackBar(
-                            LocaleKeys.gifts_redeem_failed.tr(context: context),
-                          );
-                        }
-                      }
+                          ),
+                          giftCode: gift.giftCode,
+                          flowConfig: const BookingFlowConfig(
+                            flowType: BookingFlowType.giftRedeem,
+                          ),
+                          submitStrategy: const RedeemGiftBookingSubmit(),
+                        ),
+                      );
                     }
                   },
                 );

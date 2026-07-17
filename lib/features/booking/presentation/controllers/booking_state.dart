@@ -75,6 +75,7 @@ class BookingState extends Equatable {
   final PaymentPhase paymentPhase;
   /// The payment-init result driving the SDK purchase (null when not paying).
   final PaymentInitModel? paymentInit;
+  final String? giftCode;
 
   const BookingState({
     this.status = BookingStatus.initial,
@@ -105,6 +106,7 @@ class BookingState extends Equatable {
     this.optionalAddonIds = const {},
     this.paymentPhase = PaymentPhase.none,
     this.paymentInit,
+    this.giftCode,
   });
 
   BookingState copyWith({
@@ -134,6 +136,7 @@ class BookingState extends Equatable {
     Set<String>? optionalAddonIds,
     PaymentPhase? paymentPhase,
     PaymentInitModel? paymentInit,
+    String? giftCode,
     bool clearSelectedDate = false,
     bool clearSelectedTime = false,
     bool clearError = false,
@@ -171,6 +174,7 @@ class BookingState extends Equatable {
       optionalAddonIds: optionalAddonIds ?? this.optionalAddonIds,
       paymentPhase: paymentPhase ?? this.paymentPhase,
       paymentInit: clearPaymentInit ? null : (paymentInit ?? this.paymentInit),
+      giftCode: giftCode ?? this.giftCode,
     );
   }
 
@@ -202,5 +206,6 @@ class BookingState extends Equatable {
     optionalAddonIds,
     paymentPhase,
     paymentInit,
+    giftCode,
   ];
 }

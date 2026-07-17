@@ -385,6 +385,8 @@
         "title": "Gifts List",
         "redeem_success": "Gift redeemed successfully",
         "redeem_failed": "Failed to redeem gift",
+        "paid_via_gift_coupon": "Paid via gift coupon",
+        "gift_coupon": "Gift Coupon",
         "empty": {
             "title": "No current gifts",
             "sent_desc": "Sent gifts will be displayed on this page",
