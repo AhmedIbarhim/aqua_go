@@ -187,13 +187,15 @@ class _GiftsViewState extends State<GiftsView> {
                       Navigator.of(context).pushNamed(
                         Routes.bookingLocation,
                         arguments: BookingFlowStartArgs(
-                          service: ServiceModel(
-                            id: '',
-                            rawName: ServiceName(
-                              nameAr: gift.serviceName.ar,
-                              nameEn: gift.serviceName.en,
-                            ),
-                          ),
+                          service:
+                              gift.service ??
+                              ServiceModel(
+                                id: gift.serviceId ?? '',
+                                rawName: ServiceName(
+                                  nameAr: gift.serviceName.ar,
+                                  nameEn: gift.serviceName.en,
+                                ),
+                              ),
                           giftCode: gift.giftCode,
                           flowConfig: const BookingFlowConfig(
                             flowType: BookingFlowType.giftRedeem,
