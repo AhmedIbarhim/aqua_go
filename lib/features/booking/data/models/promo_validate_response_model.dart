@@ -13,9 +13,9 @@ class PromoValidateResponseModel {
 
   factory PromoValidateResponseModel.fromJson(Map<String, dynamic> json) =>
       PromoValidateResponseModel(
-        valid: json['valid'] as bool,
-        code: json['code'] as String,
-        discountMinor: json['discountMinor'] as int,
+        valid: json['valid'] as bool? ?? false,
+        code: json['code'] as String? ?? '',
+        discountMinor: (json['discountMinor'] as num?)?.toInt() ?? 0,
         rejectionReason: json['rejectionReason'] as String?,
       );
 

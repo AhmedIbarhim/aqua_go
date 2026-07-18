@@ -23,9 +23,12 @@ class QuoteModel {
   });
 
   factory QuoteModel.fromJson(Map<String, dynamic> json) => QuoteModel(
-    quoteId: json['quoteId'] as String,
-    currency: json['currency'] as String,
-    expiresAt: DateTime.parse(json['expiresAt'] as String),
+    quoteId: json['quoteId'] as String? ?? '',
+    currency: json['currency'] as String? ?? 'SAR',
+    expiresAt: json['expiresAt'] != null
+        ? DateTime.tryParse(json['expiresAt'] as String)?.toUtc() ??
+              DateTime.now().toUtc()
+        : DateTime.now().toUtc(),
     breakdown: json['breakdown'] != null
         ? Breakdown.fromJson(json['breakdown'] as Map<String, dynamic>)
         : null,
@@ -63,7 +66,8 @@ class QuoteModel {
   int? get currentBalancePoints => loyalty?.currentBalancePoints;
   int? get currentBalanceValueMinor => loyalty?.currentBalanceValueMinor;
   int? get pointsApplied => loyalty?.pointsApplied;
-  int? get pointsDiscountMinor => loyalty?.pointsDiscountMinor ?? breakdown?.pointsDiscountMinor;
+  int? get pointsDiscountMinor =>
+      loyalty?.pointsDiscountMinor ?? breakdown?.pointsDiscountMinor;
   int? get amountDueMinor => breakdown?.amountDueMinor;
 }
 
@@ -78,11 +82,12 @@ class QuoteSurgeModel {
     required this.demandBps,
   });
 
-  factory QuoteSurgeModel.fromJson(Map<String, dynamic> json) => QuoteSurgeModel(
-    timeBps: json['timeBps'] as int,
-    zoneBps: json['zoneBps'] as int,
-    demandBps: json['demandBps'] as int,
-  );
+  factory QuoteSurgeModel.fromJson(Map<String, dynamic> json) =>
+      QuoteSurgeModel(
+        timeBps: (json['timeBps'] as num?)?.toInt() ?? 0,
+        zoneBps: (json['zoneBps'] as num?)?.toInt() ?? 0,
+        demandBps: (json['demandBps'] as num?)?.toInt() ?? 0,
+      );
 
   Map<String, dynamic> toJson() => {
     'timeBps': timeBps,
@@ -106,13 +111,14 @@ class QuotePromoModel {
     required this.discountMinor,
   });
 
-  factory QuotePromoModel.fromJson(Map<String, dynamic> json) => QuotePromoModel(
-    code: json['code'] as String,
-    discountType: json['discountType'] as String,
-    percent: json['percent'] as int,
-    fixedAmountMinor: json['fixedAmountMinor'] as int,
-    discountMinor: json['discountMinor'] as int,
-  );
+  factory QuotePromoModel.fromJson(Map<String, dynamic> json) =>
+      QuotePromoModel(
+        code: json['code'] as String? ?? '',
+        discountType: json['discountType'] as String? ?? '',
+        percent: (json['percent'] as num?)?.toInt() ?? 0,
+        fixedAmountMinor: (json['fixedAmountMinor'] as num?)?.toInt() ?? 0,
+        discountMinor: (json['discountMinor'] as num?)?.toInt() ?? 0,
+      );
 
   Map<String, dynamic> toJson() => {
     'code': code,
@@ -140,13 +146,16 @@ class QuoteLoyaltyModel {
     required this.pointsDiscountMinor,
   });
 
-  factory QuoteLoyaltyModel.fromJson(Map<String, dynamic> json) => QuoteLoyaltyModel(
-    currentBalancePoints: json['currentBalancePoints'] as int,
-    currentBalanceValueMinor: json['currentBalanceValueMinor'] as int,
-    maxApplicablePoints: json['maxApplicablePoints'] as int,
-    discountMinorAtMax: json['discountMinorAtMax'] as int,
-    pointsApplied: json['pointsApplied'] as int,
-    pointsDiscountMinor: json['pointsDiscountMinor'] as int,
+  factory QuoteLoyaltyModel.fromJson(
+    Map<String, dynamic> json,
+  ) => QuoteLoyaltyModel(
+    currentBalancePoints: (json['currentBalancePoints'] as num?)?.toInt() ?? 0,
+    currentBalanceValueMinor:
+        (json['currentBalanceValueMinor'] as num?)?.toInt() ?? 0,
+    maxApplicablePoints: (json['maxApplicablePoints'] as num?)?.toInt() ?? 0,
+    discountMinorAtMax: (json['discountMinorAtMax'] as num?)?.toInt() ?? 0,
+    pointsApplied: (json['pointsApplied'] as num?)?.toInt() ?? 0,
+    pointsDiscountMinor: (json['pointsDiscountMinor'] as num?)?.toInt() ?? 0,
   );
 
   Map<String, dynamic> toJson() => {

@@ -33,20 +33,20 @@ class GiftQuoteModel {
 
   factory GiftQuoteModel.fromJson(Map<String, dynamic> json) {
     return GiftQuoteModel(
-      faceMinor: json['faceMinor'] as int,
+      faceMinor: (json['faceMinor'] as num?)?.toInt() ?? 0,
       breakdown: json['breakdown'] != null
           ? Breakdown.fromJson(json['breakdown'] as Map<String, dynamic>)
           : null,
       promoCode: json['promoCode'] as String?,
-      promoDiscountMinor: json['promoDiscountMinor'] as int?,
+      promoDiscountMinor: (json['promoDiscountMinor'] as num?)?.toInt(),
       promoAccepted: json['promoAccepted'] as bool?,
       promoRejectionReason: json['promoRejectionReason'] as String?,
-      maxApplicablePoints: json['maxApplicablePoints'] as int,
-      pointsApplied: json['pointsApplied'] as int,
-      pointsClamped: json['pointsClamped'] as bool,
-      pointsDiscountMinor: json['pointsDiscountMinor'] as int,
-      cardChargeMinor: json['cardChargeMinor'] as int,
-      currency: json['currency'] as String,
+      maxApplicablePoints: (json['maxApplicablePoints'] as num?)?.toInt() ?? 0,
+      pointsApplied: (json['pointsApplied'] as num?)?.toInt() ?? 0,
+      pointsClamped: json['pointsClamped'] as bool? ?? false,
+      pointsDiscountMinor: (json['pointsDiscountMinor'] as num?)?.toInt() ?? 0,
+      cardChargeMinor: (json['cardChargeMinor'] as num?)?.toInt() ?? 0,
+      currency: json['currency'] as String? ?? 'SAR',
       addOns: json['addOns'] != null
           ? (json['addOns'] as List)
                 .map((e) => GiftQuoteAddOn.fromJson(e as Map<String, dynamic>))
