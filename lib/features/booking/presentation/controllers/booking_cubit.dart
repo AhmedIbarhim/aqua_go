@@ -216,7 +216,9 @@ class BookingCubit extends Cubit<BookingState> {
   /// No longer joins against the active-only /services feed: that dropped
   /// inactive ids and forced the picker into a load-failed error state for any
   /// package whose bundled services had been deactivated.
-  Future<void> _resolvePackageServices(List<ServiceModel> bundledServices) async {
+  Future<void> _resolvePackageServices(
+    List<ServiceModel> bundledServices,
+  ) async {
     if (bundledServices.isEmpty) {
       // Genuine data error: the backend returned an empty bundledServices list.
       // Surface the inline error + retry rather than a hidden picker (which
@@ -418,7 +420,10 @@ class BookingCubit extends Cubit<BookingState> {
     );
   }
 
-  Future<QuoteModel?> fetchQuote({String? promoCode}) async {
+  Future<QuoteModel?> fetchQuote({
+    String? promoCode,
+    int? pointsToApply,
+  }) async {
     if (state.selectedService == null || state.selectedAddress == null) {
       return null;
     }
@@ -443,6 +448,7 @@ class BookingCubit extends Cubit<BookingState> {
       promoCode: promoCode,
       addOnIds: addOnIds,
       carCount: carCount,
+      pointsToApply: pointsToApply,
     );
 
     return result.fold(
@@ -494,7 +500,7 @@ class BookingCubit extends Cubit<BookingState> {
   /// from the cubit state so the backend can run the same slot/lead/car checks
   /// it runs at create time (B1 fix — PaymentInitRequest requires all three
   /// fields: quoteId, scheduledAt, vehicles).
-  Future<PaymentInitModel?> initiatePayment() async {
+  Future<PaymentInitModel?> initiatePayment({int? pointsToApply}) async {
     final quoteId = state.quote?.quoteId;
     if (quoteId == null) {
       emit(
@@ -569,6 +575,7 @@ class BookingCubit extends Cubit<BookingState> {
       scheduledAt: scheduledAt,
       vehicles: vehicles,
       attemptNonce: attemptNonce,
+      pointsToApply: pointsToApply,
     );
 
     return result.fold(
@@ -808,14 +815,24 @@ class BookingCubit extends Cubit<BookingState> {
       );
     }
 
+    final resolvedBreakdown =
+        breakdown ??
+        Breakdown(
+          grossMinor: chargeTotalMinor,
+          totalMinor: chargeTotalMinor,
+          currency: 'SAR',
+        );
+    if (resolvedBreakdown.totalMinor == null &&
+        resolvedBreakdown.grossMinor == null) {
+      resolvedBreakdown.totalMinor = chargeTotalMinor;
+      resolvedBreakdown.grossMinor = chargeTotalMinor;
+    }
+
     return QuoteModel(
       quoteId: 'wash-preview',
-      totalMinor: breakdown?.grossMinor ?? chargeTotalMinor,
-      vatMinor: breakdown?.vatMinor ?? 0,
-      currency: breakdown?.currency ?? 'SAR',
+      currency: resolvedBreakdown.currency ?? 'SAR',
       expiresAt: DateTime.now().toUtc(),
-      promoDiscountMinor: 0,
-      breakdown: breakdown,
+      breakdown: resolvedBreakdown,
       lines: lines,
     );
   }

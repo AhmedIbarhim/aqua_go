@@ -27,6 +27,7 @@ class BookingRepository {
     String? promoCode,
     List<String> addOnIds = const [],
     int? carCount,
+    int? pointsToApply,
   }) async {
     try {
       final response = await bookingsRemoteDataSource.getQuote(
@@ -37,6 +38,7 @@ class BookingRepository {
         promoCode: promoCode,
         addOnIds: addOnIds,
         carCount: carCount,
+        pointsToApply: pointsToApply,
       );
       return response.fold((failure) => left(failure), (data) {
         if (data != null) {
@@ -146,14 +148,16 @@ class BookingRepository {
     required String scheduledAt,
     required List<Map<String, dynamic>> vehicles,
     required String attemptNonce,
+    int? pointsToApply,
   }) async {
     try {
       final response = await bookingsRemoteDataSource.bookingPaymentInit(
         quoteId: quoteId,
         scheduledAt: scheduledAt,
         vehicles: vehicles,
-        idempotencyKey: 'booking-payment-init:$quoteId:$attemptNonce',
+        idempotencyKey: 'booking-payment-init:$quoteId:${pointsToApply ?? 0}:$attemptNonce',
         attemptNonce: attemptNonce,
+        pointsToApply: pointsToApply,
       );
       return response.fold((failure) => left(failure), (data) {
         if (data != null) {

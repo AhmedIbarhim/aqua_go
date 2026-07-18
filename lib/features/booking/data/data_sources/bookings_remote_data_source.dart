@@ -17,6 +17,7 @@ class BookingsRemoteDataSource {
     String? promoCode,
     List<String> addOnIds = const [],
     int? carCount,
+    int? pointsToApply,
   }) {
     return _apiClient.post(
       Endpoints.quotes,
@@ -25,10 +26,9 @@ class BookingsRemoteDataSource {
         'lat': lat,
         'lng': lng,
         if (promoCode != null && promoCode.isNotEmpty) 'promoCode': promoCode,
-        if (addOnIds.isNotEmpty) ...{
-          'addOns': addOnIds.map((id) => {'addonId': id}).toList(),
-          'carCount': carCount ?? 1,
-        },
+        'addOns': addOnIds.map((id) => {'addonId': id}).toList(),
+        'carCount': carCount ?? 1,
+        if (pointsToApply != null) 'pointsToApply': pointsToApply,
       },
     );
   }
@@ -41,12 +41,7 @@ class BookingsRemoteDataSource {
   }) {
     return _apiClient.post(
       Endpoints.validatePromo,
-      data: {
-        'code': code,
-        'packageId': packageId,
-        'lat': lat,
-        'lng': lng,
-      },
+      data: {'code': code, 'packageId': packageId, 'lat': lat, 'lng': lng},
     );
   }
 
@@ -81,6 +76,7 @@ class BookingsRemoteDataSource {
     required List<Map<String, dynamic>> vehicles,
     required String idempotencyKey,
     required String attemptNonce,
+    int? pointsToApply,
   }) {
     return _apiClient.post(
       Endpoints.bookingsPaymentInit,
@@ -89,6 +85,7 @@ class BookingsRemoteDataSource {
         'scheduledAt': scheduledAt,
         'vehicles': vehicles,
         'attemptNonce': attemptNonce,
+        if (pointsToApply != null) 'pointsToApply': pointsToApply,
       },
       options: Options(headers: {'Idempotency-Key': idempotencyKey}),
     );

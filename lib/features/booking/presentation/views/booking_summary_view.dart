@@ -8,6 +8,7 @@ import '../../../../core/components/custom_button.dart';
 import '../../../../core/components/generic_app_bar.dart';
 import '../../../../core/components/bottom_action_sheet_container.dart';
 import '../../../../generated/locale_keys.g.dart';
+import '../../data/models/quote_model.dart';
 import '../widgets/booking_summary_card.dart';
 import '../widgets/biker_notes_selection.dart';
 import '../widgets/payment_summary_card.dart';
@@ -38,25 +39,25 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
   String? _appliedPromoCode;
   bool _isPointsToggled = false;
   LoyaltyBalanceModel? _loyaltyBalance;
-  bool _isLoadingLoyalty = false;
+  bool isLoadingLoyalty = false;
 
   void _fetchLoyaltyBalance() async {
     if (!mounted) return;
     setState(() {
-      _isLoadingLoyalty = true;
+      isLoadingLoyalty = true;
     });
     final result = await locator<WalletRepository>().getWalletBalance();
     if (mounted) {
       result.fold(
         (failure) {
           setState(() {
-            _isLoadingLoyalty = false;
+            isLoadingLoyalty = false;
           });
         },
         (balance) {
           setState(() {
             _loyaltyBalance = balance;
-            _isLoadingLoyalty = false;
+            isLoadingLoyalty = false;
           });
         },
       );
@@ -201,8 +202,6 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
       servicePrice = 0.0;
     }
 
-    final quoteBreakdown = bookingState.quote?.breakdown;
-
     // PRICE LOCK: subtotal/vat/total come STRAIGHT from the backend quote
     // breakdown frozen at booking initiation — never from the live catalog.
     // When the quote is absent (still loading / fetch failed / expired) we
@@ -213,24 +212,32 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
     final double vat;
     final double total;
 
-    if (quoteBreakdown != null) {
-      subtotal = quoteBreakdown.net;
-      vat = quoteBreakdown.vat;
-      total = quoteBreakdown.gross;
+    final quote = bookingState.quote;
+    final int balanceValueMinor =
+        quote?.currentBalanceValueMinor ??
+        _loyaltyBalance?.estimatedValueMinor ??
+        0;
+    final bool isInsufficient = _isPointsToggled && (balanceValueMinor < 100);
+
+    if (quote != null) {
+      subtotal =
+          (quote.breakdown?.netMinor ?? (quote.totalMinor - quote.vatMinor)) /
+          100.0;
+      vat = (quote.breakdown?.vatMinor ?? quote.vatMinor) / 100.0;
+      total = quote.totalMinor / 100.0;
     } else {
       subtotal = 0.0;
       vat = 0.0;
       total = 0.0;
     }
 
-    final double pointsValue =
-        (_loyaltyBalance?.estimatedValueMinor ?? 0) / 100.0;
-    final int estimatedValueMinor = _loyaltyBalance?.estimatedValueMinor ?? 0;
-    final bool isInsufficient = _isPointsToggled && (estimatedValueMinor < 100);
     final double pointsDiscount = (_isPointsToggled && !isInsufficient)
-        ? (total > pointsValue ? pointsValue : total)
+        ? ((quote?.pointsDiscountMinor ?? 0) / 100.0)
         : 0.0;
-    final double finalTotal = total - pointsDiscount;
+
+    final double finalTotal = (_isPointsToggled && !isInsufficient)
+        ? ((quote?.amountDueMinor ?? quote?.totalMinor ?? 0) / 100.0)
+        : total;
 
     return Container(
       padding: EdgeInsets.all(width * 0.06),
@@ -468,10 +475,8 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
                 return;
               }
             }
-            if (!context.mounted) return;
-            // Pay-before-create (spec §4.2): booking-payment-init →
-            // Moyasar SDK → verify + create.
-            init = await cubit.initiatePayment();
+            final pts = _getPointsToApply(bookingState.quote);
+            init = await cubit.initiatePayment(pointsToApply: pts);
           }
           if (init == null || !context.mounted) return;
           await PaymentSdkConfigService.instance.ensureLoaded();
@@ -644,10 +649,16 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
     BookingState bookingState,
     double total,
   ) {
-    final double pointsValue =
-        (_loyaltyBalance?.estimatedValueMinor ?? 0) / 100.0;
-    final int estimatedValueMinor = _loyaltyBalance?.estimatedValueMinor ?? 0;
-    final bool isInsufficient = _isPointsToggled && (estimatedValueMinor < 100);
+    final quote = bookingState.quote;
+    final int balanceValueMinor =
+        quote?.currentBalanceValueMinor ??
+        _loyaltyBalance?.estimatedValueMinor ??
+        0;
+    final bool isInsufficient = _isPointsToggled && (balanceValueMinor < 100);
+
+    final int points =
+        quote?.currentBalancePoints ?? _loyaltyBalance?.points ?? 0;
+    final double pointsValue = balanceValueMinor / 100.0;
 
     final borderBorder = Border.all(
       color: _isPointsToggled
@@ -686,11 +697,7 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
                     LocaleKeys.bookings_available_points_format.tr(
                       context: context,
                       args: [
-                        _loyaltyBalance != null
-                            ? NumberFormat(
-                                '#,###',
-                              ).format(_loyaltyBalance!.points)
-                            : '0',
+                        NumberFormat('#,###').format(points),
                         pointsValue.toStringAsFixed(2),
                       ],
                     ),
@@ -703,11 +710,34 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
               const Spacer(),
               Switch.adaptive(
                 value: _isPointsToggled,
-
-                onChanged: (val) {
+                onChanged: (val) async {
                   setState(() {
                     _isPointsToggled = val;
                   });
+                  final currentQuote = context.read<BookingCubit>().state.quote;
+                  final balValMinor =
+                      currentQuote?.currentBalanceValueMinor ??
+                      _loyaltyBalance?.estimatedValueMinor ??
+                      0;
+                  if (val && balValMinor >= 100) {
+                    final maxPoints = currentQuote?.maxApplicablePoints ?? 0;
+                    final balance =
+                        currentQuote?.currentBalancePoints ??
+                        _loyaltyBalance?.points ??
+                        0;
+                    final pointsToApply = balance < maxPoints
+                        ? balance
+                        : maxPoints;
+                    await context.read<BookingCubit>().fetchQuote(
+                      promoCode: _appliedPromoCode,
+                      pointsToApply: pointsToApply,
+                    );
+                  } else if (!val) {
+                    await context.read<BookingCubit>().fetchQuote(
+                      promoCode: _appliedPromoCode,
+                      pointsToApply: 0,
+                    );
+                  }
                 },
                 activeThumbColor: isInsufficient
                     ? context.colors.errorSecondary
@@ -824,9 +854,24 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
     );
   }
 
+  int? _getPointsToApply(QuoteModel? quote) {
+    if (!_isPointsToggled) return 0;
+    final balanceValueMinor =
+        quote?.currentBalanceValueMinor ??
+        _loyaltyBalance?.estimatedValueMinor ??
+        0;
+    if (balanceValueMinor < 100) return 0;
+    final maxPoints = quote?.maxApplicablePoints ?? 0;
+    final balance = quote?.currentBalancePoints ?? _loyaltyBalance?.points ?? 0;
+    return balance < maxPoints ? balance : maxPoints;
+  }
+
   void _applyPromoCode(String code) async {
+    final currentQuote = context.read<BookingCubit>().state.quote;
+    final pts = _getPointsToApply(currentQuote);
     final quote = await context.read<BookingCubit>().fetchQuote(
       promoCode: code,
+      pointsToApply: pts,
     );
     if (quote != null) {
       setState(() {
@@ -836,8 +881,11 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
   }
 
   void _removePromoCode() async {
+    final currentQuote = context.read<BookingCubit>().state.quote;
+    final pts = _getPointsToApply(currentQuote);
     final quote = await context.read<BookingCubit>().fetchQuote(
       promoCode: null,
+      pointsToApply: pts,
     );
     if (quote != null) {
       setState(() {

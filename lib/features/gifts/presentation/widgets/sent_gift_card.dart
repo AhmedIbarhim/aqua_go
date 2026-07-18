@@ -54,11 +54,13 @@ class SentGiftCard extends StatelessWidget {
                   children: [
                     // Theme Icon Container
                     Container(
-                      padding: const EdgeInsets.all(8),
+                      width: context.sw(40),
+                      height: context.sw(40),
                       decoration: BoxDecoration(
                         color: context.colors.cardBackGround,
                         borderRadius: BorderRadius.circular(12),
                       ),
+                      clipBehavior: Clip.antiAlias,
                       child: Image.network(
                         gift.themeImageUrl ?? "",
                         fit: BoxFit.cover,
@@ -100,7 +102,6 @@ class SentGiftCard extends StatelessWidget {
                 ),
               ),
 
-              // Status Badge
               if (gift.status != null)
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -122,7 +123,6 @@ class SentGiftCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          // Sub-card details
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
