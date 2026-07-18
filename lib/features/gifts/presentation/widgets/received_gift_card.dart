@@ -7,7 +7,7 @@ import '../../../../generated/locale_keys.g.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../data/models/gift_status_enum.dart';
-import '../../data/models/received_gifts_list_response_model.dart';
+import '../../data/models/received_gift_model.dart';
 
 class ReceivedGiftCard extends StatelessWidget {
   final ReceivedGiftModel gift;
@@ -105,7 +105,7 @@ class ReceivedGiftCard extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            gift.giftCode,
+                            gift.referenceNumber,
                             style: AppTextStyles.regular12.copyWith(
                               color: context.colors.textSecondary,
                             ),

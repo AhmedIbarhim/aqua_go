@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 import '../../data/models/gift_model.dart';
-import '../../data/models/received_gifts_list_response_model.dart';
+import '../../data/models/received_gift_model.dart';
 
 abstract class GiftsState extends Equatable {
   const GiftsState();
@@ -44,19 +44,20 @@ class GiftsSuccess extends GiftsState {
       nextCursorSent: nextCursorSent ?? this.nextCursorSent,
       nextCursorReceived: nextCursorReceived ?? this.nextCursorReceived,
       hasReachedMaxSent: hasReachedMaxSent ?? this.hasReachedMaxSent,
-      hasReachedMaxReceived: hasReachedMaxReceived ?? this.hasReachedMaxReceived,
+      hasReachedMaxReceived:
+          hasReachedMaxReceived ?? this.hasReachedMaxReceived,
     );
   }
 
   @override
   List<Object?> get props => [
-        sentGifts,
-        receivedGifts,
-        nextCursorSent,
-        nextCursorReceived,
-        hasReachedMaxSent,
-        hasReachedMaxReceived,
-      ];
+    sentGifts,
+    receivedGifts,
+    nextCursorSent,
+    nextCursorReceived,
+    hasReachedMaxSent,
+    hasReachedMaxReceived,
+  ];
 }
 
 class GiftsFailure extends GiftsState {

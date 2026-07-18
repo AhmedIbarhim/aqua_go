@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../data/models/received_gift_model.dart';
 import '../../data/repos/gifts_repository.dart';
 import '../../data/models/gift_model.dart';
 import '../../data/models/gifts_list_response_model.dart';
@@ -108,10 +109,7 @@ class GiftsCubit extends Cubit<GiftsState> {
           _isLoadingMore = false;
           emit(
             currentState.copyWith(
-              receivedGifts: [
-                ...currentState.receivedGifts,
-                ...response.items
-              ],
+              receivedGifts: [...currentState.receivedGifts, ...response.items],
               nextCursorReceived: response.nextCursor,
               hasReachedMaxReceived:
                   response.nextCursor == null || response.nextCursor!.isEmpty,
@@ -124,12 +122,9 @@ class GiftsCubit extends Cubit<GiftsState> {
 
   Future<bool> redeemGift(String code) async {
     final result = await _repository.redeemGift(code);
-    return result.fold(
-      (failure) => false,
-      (success) {
-        fetchGifts(isRefresh: true);
-        return true;
-      },
-    );
+    return result.fold((failure) => false, (success) {
+      fetchGifts(isRefresh: true);
+      return true;
+    });
   }
 }

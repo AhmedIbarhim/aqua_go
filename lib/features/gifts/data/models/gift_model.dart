@@ -8,6 +8,7 @@ import 'gift_status_enum.dart';
 class GiftModel {
   final String? giftId;
   final String? giftCode;
+  final String? referenceNumber;
   final GiftStatus? status;
   final int? amountMinor;
   final Breakdown? breakdown;
@@ -38,6 +39,7 @@ class GiftModel {
   GiftModel({
     this.giftId,
     this.giftCode,
+    this.referenceNumber,
     this.status,
     this.amountMinor,
     this.breakdown,
@@ -68,6 +70,7 @@ class GiftModel {
     return GiftModel(
       giftId: json['giftId'] as String? ?? json['id'] as String?,
       giftCode: json['giftCode'] as String? ?? json['code'] as String?,
+      referenceNumber: json['referenceNumber'] as String?,
       status: GiftStatus.fromString(json['status'] as String?),
       amountMinor:
           json['amountMinor'] as int? ?? json['totalAmountMinor'] as int?,

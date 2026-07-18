@@ -85,14 +85,13 @@ class SentGiftCard extends StatelessWidget {
                             textAlign: TextAlign.end,
                             overflow: TextOverflow.ellipsis,
                           ),
-                          if (gift.code != null) ...[
+                          if (gift.referenceNumber != null) ...[
                             const SizedBox(height: 4),
                             Text(
-                              gift.code!,
+                              gift.referenceNumber!,
                               style: AppTextStyles.regular12.copyWith(
                                 color: context.colors.textSecondary,
                               ),
-                              textAlign: TextAlign.end,
                             ),
                           ],
                         ],
