@@ -36,7 +36,7 @@ class GiftThemeCard extends StatelessWidget {
     if (!isSelected) return context.colors.cardBackGround;
     final themeColor = _parseColor(theme.color);
 
-    return themeColor!.withValues(alpha: isSelected ? 0.4 : 0.3);
+    return themeColor!.withValues(alpha: isSelected ? 0.3 : 0.2);
   }
 
   @override
@@ -61,11 +61,15 @@ class GiftThemeCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CustomNetworkImage(
-              theme.imageUrl!,
-              width: context.sw(28),
-              height: context.sw(28),
-              errorWidget: Icon(Icons.card_giftcard, size: context.sw(28)),
+            Container(
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
+              clipBehavior: Clip.antiAlias,
+              child: CustomNetworkImage(
+                theme.imageUrl!,
+                width: context.sw(28),
+                height: context.sw(28),
+                errorWidget: Icon(Icons.card_giftcard, size: context.sw(28)),
+              ),
             ),
             SizedBox(height: context.sh(8)),
             Text(

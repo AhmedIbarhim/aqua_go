@@ -176,8 +176,9 @@ class ReceivedGiftCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          _buildCarfFooter(context, formattedExpiryDate),
+
           if (showRedeemButton) ...[
+            _buildCardFooter(context, formattedExpiryDate),
             const SizedBox(height: 16),
             CustomButton(
               onPressed: onRedeemPressed,
@@ -189,7 +190,7 @@ class ReceivedGiftCard extends StatelessWidget {
     );
   }
 
-  Row _buildCarfFooter(BuildContext context, String formattedExpiryDate) {
+  Row _buildCardFooter(BuildContext context, String formattedExpiryDate) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
