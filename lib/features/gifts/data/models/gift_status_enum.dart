@@ -24,11 +24,11 @@ enum GiftStatus {
   String getStatusText(BuildContext context) {
     switch (this) {
       case GiftStatus.ISSUED:
-        return context.isEn ? "Not Yet Delivered" : "لم يتم التوصيل";
+        return context.isEn ? "Not Yet Delivered" : "لم تستلم بعد";
       case GiftStatus.DELIVERED:
         return context.isEn ? "Delivered" : "مستلمة";
       case GiftStatus.DELIVERY_FAILED:
-        return context.isEn ? "Delivery Failed" : "فشل التوصيل";
+        return context.isEn ? "Delivery Failed" : "فشل الاستلام";
       case GiftStatus.REDEEMED:
         return context.isEn ? "Used" : "تم الاستخدام";
       case GiftStatus.CANCELLED:
