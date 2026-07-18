@@ -18,24 +18,30 @@ class TipsRepository {
     required PaymentMethod paymentMethod,
   }) async {
     try {
+      final idempotencyKey = IdempotencyKeyHelper.generate(
+        prefix: 'tip-payment-init',
+        userId: FetchUserData.getUserId() ?? '',
+        requestId: bookingId,
+      );
+
       final result = await _remoteDataSource.initiateTipPayment(
         bookingId: bookingId,
         amountMinor: amountMinor,
         paymentMethod: paymentMethod,
+        idempotencyKey: idempotencyKey,
       );
-      return result.fold(
-        (failure) => Left(failure),
-        (data) {
-          if (data != null) {
-            try {
-              return Right(PaymentInitModel.fromJson(data as Map<String, dynamic>));
-            } catch (e) {
-              return Left(ServerFailure('Parsing error: $e'));
-            }
+      return result.fold((failure) => Left(failure), (data) {
+        if (data != null) {
+          try {
+            return Right(
+              PaymentInitModel.fromJson(data as Map<String, dynamic>),
+            );
+          } catch (e) {
+            return Left(ServerFailure('Parsing error: $e'));
           }
-          return const Left(ServerFailure('Failed to initialize tip payment'));
-        },
-      );
+        }
+        return const Left(ServerFailure('Failed to initialize tip payment'));
+      });
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }

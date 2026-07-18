@@ -13,7 +13,9 @@ import 'package:aqua_go/core/config/di/service_locator.dart';
 import 'package:aqua_go/core/route/app_router.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:aqua_go/features/my_bookings/data/models/booking_response_model/booking_response_model.dart';
-import 'package:aqua_go/features/my_bookings/presentation/controllers/my_booking_details_cubit.dart';
+import 'package:aqua_go/features/my_bookings/presentation/views/my_booking_details_view.dart';
+import 'package:aqua_go/features/my_bookings/data/models/booking_summary_model.dart';
+import 'package:aqua_go/core/route/routes.dart';
 import 'package:aqua_go/features/booking/presentation/widgets/payment_method_selection.dart';
 import 'package:aqua_go/features/rating/presentation/widgets/tips_biker_info_section.dart';
 import 'package:aqua_go/features/rating/presentation/widgets/tip_amount_button.dart';
@@ -168,14 +170,13 @@ class _PayTipsBottomSheetState extends State<PayTipsBottomSheet> {
               args: [amountText],
             ),
           );
-          if (AppRouter.navigatorKey.currentContext != null) {
-            try {
-              AppRouter.navigatorKey.currentContext!
-                  .read<MyBookingDetailsCubit>()
-                  .fetchBookingDetails(widget.booking.id ?? '');
-            } catch (_) {}
-          }
-          Navigator.pop(context, state.booking);
+          AppRouter.navigatorKey.currentState?.pushNamedAndRemoveUntil(
+            Routes.myBookingDetails,
+            (route) => route.settings.name == Routes.layout || route.isFirst,
+            arguments: MyBookingDetailsArgs(
+              booking: BookingSummaryModel.fromDetails(widget.booking),
+            ),
+          );
         } else if (state is PayingTipsFailure) {
           context.showErrorSnackBar(state.message);
         }
@@ -189,10 +190,14 @@ class _PayTipsBottomSheetState extends State<PayTipsBottomSheet> {
           if (_isCustomAmountSelected) ...[
             SizedBox(height: height * 0.02),
             CustomTextField(
-              label: LocaleKeys.bookings_custom_amount_label.tr(context: context),
+              label: LocaleKeys.bookings_custom_amount_label.tr(
+                context: context,
+              ),
               hint: LocaleKeys.bookings_custom_amount_hint.tr(context: context),
               controller: _customAmountController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
             ),
           ],
           SizedBox(height: height * 0.03),

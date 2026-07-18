@@ -14,10 +14,12 @@ class TipsRemoteDataSource {
     required String bookingId,
     required int amountMinor,
     required PaymentMethod paymentMethod,
+    required String idempotencyKey,
   }) {
     return _apiClient.post(
       Endpoints.tipBookingPaymentInit(bookingId),
       data: {'amountMinor': amountMinor, 'paymentMethod': paymentMethod.name},
+      options: Options(headers: {'Idempotency-Key': idempotencyKey}),
     );
   }
 
