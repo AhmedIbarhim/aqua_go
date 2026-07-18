@@ -388,6 +388,8 @@ abstract class  LocaleKeys {
   static const gifts_status_waiting_use = 'gifts.status.waiting_use';
   static const gifts_status_used = 'gifts.status.used';
   static const gifts_status_expired = 'gifts.status.expired';
+  static const gifts_status_cancelled = 'gifts.status.cancelled';
+  static const gifts_status_delivery_failed = 'gifts.status.delivery_failed';
   static const gifts_status = 'gifts.status';
   static const gifts_step_choose_gift = 'gifts.step_choose_gift';
   static const gifts_step_recipient = 'gifts.step_recipient';

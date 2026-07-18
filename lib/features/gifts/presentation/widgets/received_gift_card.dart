@@ -1,10 +1,12 @@
 import 'package:aqua_go/core/components/custom_button.dart';
+import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:svg_flutter/svg.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/themes/app_text_styles.dart';
-import '../../data/models/gift_model.dart';
+import '../../data/models/gift_status_enum.dart';
 import '../../data/models/received_gifts_list_response_model.dart';
 
 class ReceivedGiftCard extends StatelessWidget {
@@ -47,52 +49,51 @@ class ReceivedGiftCard extends StatelessWidget {
 
     final cardBgColor = _parseHexColor(
       gift.themeColor,
-      context.colors.themeColor,
+      context.colors.cardBackGround,
     );
 
     return Container(
       padding: const EdgeInsets.all(16),
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: context.colors.cardBackGround,
+        color: context.colors.themeColor,
         border: Border.all(color: context.colors.borderSecondary),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header Row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Status Badge
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: giftStatus.getStatusBg(context),
-                  borderRadius: BorderRadius.circular(100),
-                ),
-                child: Text(
-                  giftStatus.getStatusText(context),
-                  style: AppTextStyles.regular12.copyWith(
-                    color: giftStatus.getStatusTextColor(context),
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              // Title, Code and Icon
               Expanded(
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
+                    Container(
+                      width: context.sw(40),
+                      height: context.sw(40),
+                      decoration: BoxDecoration(
+                        color: context.colors.cardBackGround,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      clipBehavior: Clip.antiAlias,
+                      child: Image.network(
+                        gift.themeImageUrl!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Icon(
+                              Icons.card_giftcard_outlined,
+                              color: Colors.grey,
+                            ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+
                     Expanded(
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             title,
@@ -113,36 +114,26 @@ class ReceivedGiftCard extends StatelessWidget {
                         ],
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    // Theme Image/Icon Container
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: context.colors.cardBackGround,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      clipBehavior: Clip.antiAlias,
-                      child:
-                          gift.themeImageUrl != null &&
-                              gift.themeImageUrl!.isNotEmpty &&
-                              gift.themeImageUrl != "string"
-                          ? Image.network(
-                              gift.themeImageUrl!,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  const Icon(
-                                    Icons.card_giftcard_outlined,
-                                    color: Colors.grey,
-                                  ),
-                            )
-                          : Icon(
-                              Icons.card_giftcard_outlined,
-                              color: context.colors.textPrimary,
-                              size: 24,
-                            ),
-                    ),
                   ],
+                ),
+              ),
+              const SizedBox(width: 12),
+
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: giftStatus.getStatusBg(context),
+                  borderRadius: BorderRadius.circular(100),
+                ),
+                child: Text(
+                  giftStatus.getStatusText(context),
+                  style: AppTextStyles.regular12.copyWith(
+                    color: giftStatus.getStatusTextColor(context),
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],
@@ -171,72 +162,21 @@ class ReceivedGiftCard extends StatelessWidget {
                     label: LocaleKeys.gifts_card_sent_message.tr(
                       context: context,
                     ),
-                    value: '“${gift.messageText}”',
-                    valueColor: context.colors.textPrimary,
+                  ),
+                  Text(
+                    '"${gift.messageText}"',
+                    style: AppTextStyles.regular12.copyWith(
+                      color: context.colors.textPrimary,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 3,
                   ),
                 ],
               ],
             ),
           ),
           const SizedBox(height: 16),
-          // Footer
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Validity
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    LocaleKeys.gifts_card_validity.tr(context: context),
-                    style: AppTextStyles.regular12.copyWith(
-                      color: context.colors.textSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.access_time,
-                        size: 14,
-                        color: context.colors.textSecondary,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        LocaleKeys.gifts_card_expires.tr(
-                          args: [formattedExpiryDate],
-                          context: context,
-                        ),
-                        style: AppTextStyles.regular12.copyWith(
-                          color: context.colors.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              // Total
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    LocaleKeys.gifts_card_total.tr(context: context),
-                    style: AppTextStyles.regular12.copyWith(
-                      color: context.colors.textSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${gift.amount.toStringAsFixed(2)} ﷼',
-                    style: AppTextStyles.medium16.copyWith(
-                      color: context.colors.textPrimary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+          _buildCarfFooter(context, formattedExpiryDate),
           if (showRedeemButton) ...[
             const SizedBox(height: 16),
             CustomButton(
@@ -249,11 +189,82 @@ class ReceivedGiftCard extends StatelessWidget {
     );
   }
 
+  Row _buildCarfFooter(BuildContext context, String formattedExpiryDate) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              LocaleKeys.gifts_card_total.tr(context: context),
+              style: AppTextStyles.regular12.copyWith(
+                color: context.colors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                Text(
+                  '00.00',
+                  style: AppTextStyles.medium16.copyWith(
+                    color: context.colors.textPrimary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SvgPicture.asset(
+                  AppAssets.currency,
+                  width: context.sw(20),
+                  height: context.sw(20),
+                  colorFilter: ColorFilter.mode(
+                    context.colors.textPrimary,
+                    BlendMode.srcIn,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              LocaleKeys.gifts_card_validity.tr(context: context),
+              style: AppTextStyles.regular12.copyWith(
+                color: context.colors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                Icon(
+                  Icons.access_time,
+                  size: 14,
+                  color: context.colors.textSecondary,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  LocaleKeys.gifts_card_expires.tr(
+                    args: [formattedExpiryDate],
+                    context: context,
+                  ),
+                  style: AppTextStyles.regular12.copyWith(
+                    color: context.colors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   Widget _buildInfoColumn(
     BuildContext context, {
     required String label,
-    required String value,
-    Color? valueColor,
+    String? value,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -264,9 +275,8 @@ class ReceivedGiftCard extends StatelessWidget {
             color: context.colors.textSecondary,
           ),
         ),
-        const SizedBox(height: 8),
-
-        Text(value, style: AppTextStyles.medium14, maxLines: 3),
+        const SizedBox(height: 6),
+        if (value != null) ...[Text(value, style: AppTextStyles.medium14)],
       ],
     );
   }

@@ -6,65 +6,7 @@ import '../../../../core/constants.dart';
 import '../../../../core/config/session/session_state.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../../../my_bookings/data/models/booking_response_model/breakdown.dart';
-
-enum GiftStatus {
-  ISSUED, // created, pending delivery
-  DELIVERED, // recipient notified
-  REDEEMED, // recipient has created a booking
-  CANCELLED, // sender cancelled pre-delivery
-  EXPIRED; // validity elapsed
-
-  static GiftStatus? fromString(String? val) {
-    if (val == null) return null;
-    final upperVal = val.toUpperCase().replaceAll(' ', '_');
-    return GiftStatus.values.firstWhere(
-      (e) => e.name == upperVal,
-      orElse: () => GiftStatus.ISSUED,
-    );
-  }
-
-  String toJson() => name;
-
-  String getStatusText(BuildContext context) {
-    switch (this) {
-      case GiftStatus.ISSUED:
-        return LocaleKeys.gifts_status_received.tr(context: context);
-      case GiftStatus.DELIVERED:
-        return LocaleKeys.gifts_status_waiting_use.tr(context: context);
-      case GiftStatus.REDEEMED:
-        return LocaleKeys.gifts_status_used.tr(context: context);
-      case GiftStatus.CANCELLED:
-      case GiftStatus.EXPIRED:
-        return LocaleKeys.gifts_status_expired.tr(context: context);
-    }
-  }
-
-  Color getStatusBg(BuildContext context) {
-    switch (this) {
-      case GiftStatus.ISSUED:
-        return context.colors.primary;
-      case GiftStatus.DELIVERED:
-        return context.colors.warning;
-      case GiftStatus.REDEEMED:
-        return context.colors.successSecondry;
-      case GiftStatus.CANCELLED:
-      case GiftStatus.EXPIRED:
-        return context.colors.contentDisabled;
-    }
-  }
-
-  Color getStatusTextColor(BuildContext context) {
-    switch (this) {
-      case GiftStatus.ISSUED:
-      case GiftStatus.DELIVERED:
-        return Colors.black;
-      case GiftStatus.REDEEMED:
-      case GiftStatus.CANCELLED:
-      case GiftStatus.EXPIRED:
-        return Colors.white;
-    }
-  }
-}
+import 'gift_status_enum.dart';
 
 class GiftModel {
   final String? giftId;
@@ -76,6 +18,7 @@ class GiftModel {
   final String? recipientName;
   final String? themeId;
   final String? themeColor;
+  final String? themeImageUrl;
   final GiftThemeName? themeName;
   final String? messageText;
   final String? scheduledDeliveryAt;
@@ -105,6 +48,7 @@ class GiftModel {
     this.recipientName,
     this.themeId,
     this.themeColor,
+    this.themeImageUrl,
     this.themeName,
     this.messageText,
     this.scheduledDeliveryAt,
@@ -140,6 +84,7 @@ class GiftModel {
       themeName: json['themeName'] != null
           ? GiftThemeName.fromJson(json['themeName'] as Map<String, dynamic>)
           : null,
+      themeImageUrl: json['themeImageUrl'] as String?,
       messageText: json['messageText'] as String?,
       scheduledDeliveryAt: json['scheduledDeliveryAt'] as String?,
       deliveredAt: json['deliveredAt'] as String?,
@@ -150,8 +95,8 @@ class GiftModel {
       cardBrand: json['cardBrand'] as String?,
       addOns: json['addOns'] != null
           ? (json['addOns'] as List)
-              .map((e) => GiftAddOn.fromJson(e as Map<String, dynamic>))
-              .toList()
+                .map((e) => GiftAddOn.fromJson(e as Map<String, dynamic>))
+                .toList()
           : const [],
       senderName: json['senderName'] as String?,
       senderPhone: json['senderPhone'] as String?,
@@ -186,7 +131,7 @@ class GiftModel {
     }
     final isAr =
         CacheClient.getString(kLanguage, defaultValue: kArabicLang) ==
-            kArabicLang;
+        kArabicLang;
     final amount = (amountMinor ?? 0) / 100.0;
     return isAr
         ? 'بطاقة هدية بقيمة ${amount.toStringAsFixed(0)} ر.س'
@@ -231,10 +176,7 @@ class GiftThemeName {
   final String ar;
   final String en;
 
-  GiftThemeName({
-    required this.ar,
-    required this.en,
-  });
+  GiftThemeName({required this.ar, required this.en});
 
   factory GiftThemeName.fromJson(Map<String, dynamic> json) {
     return GiftThemeName(
@@ -244,10 +186,7 @@ class GiftThemeName {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'ar': ar,
-      'en': en,
-    };
+    return {'ar': ar, 'en': en};
   }
 }
 

@@ -10,20 +10,26 @@ class SentGiftCard extends StatelessWidget {
 
   const SentGiftCard({super.key, required this.gift});
 
+  Color _parseHexColor(String? hexString, Color fallback) {
+    if (hexString == null || hexString.isEmpty || hexString == "string") {
+      return fallback;
+    }
+    try {
+      final buffer = StringBuffer();
+      if (hexString.length == 6 || hexString.length == 7) buffer.write('ff');
+      buffer.write(hexString.replaceFirst('#', ''));
+      return Color(int.parse(buffer.toString(), radix: 16));
+    } catch (_) {
+      return fallback;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    IconData getThemeIcon(String? iconName) {
-      switch (iconName?.toLowerCase()) {
-        case 'cake':
-          return Icons.cake_outlined;
-        case 'gift':
-          return Icons.card_giftcard_outlined;
-        case 'trophy':
-          return Icons.emoji_events_outlined;
-        default:
-          return Icons.card_giftcard_outlined;
-      }
-    }
+    final cardBgColor = _parseHexColor(
+      gift.themeColor,
+      context.colors.cardBackGround,
+    );
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -53,10 +59,14 @@ class SentGiftCard extends StatelessWidget {
                         color: context.colors.cardBackGround,
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Icon(
-                        getThemeIcon(gift.themeIcon),
-                        color: context.colors.textPrimary,
-                        size: 24,
+                      child: Image.network(
+                        gift.themeImageUrl ?? "",
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Icon(
+                              Icons.card_giftcard_outlined,
+                              color: Colors.grey,
+                            ),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -116,7 +126,7 @@ class SentGiftCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: context.colors.cardBackGround,
+              color: cardBgColor.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Column(

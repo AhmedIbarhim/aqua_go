@@ -411,7 +411,9 @@
             "received": "Received",
             "waiting_use": "Waiting for use",
             "used": "Used",
-            "expired": "Expired"
+            "expired": "Expired",
+            "cancelled": "Cancelled",
+            "delivery_failed": "Delivery Failed"
         },
         "step_choose_gift": "Choose Gift",
         "step_recipient": "Recipient",

@@ -411,7 +411,9 @@
             "received": "مستلمة",
             "waiting_use": "في انتظار الاستخدام",
             "used": "مستخدمة",
-            "expired": "منتهية"
+            "expired": "منتهية",
+            "cancelled": "ملغاة",
+            "delivery_failed": "فشل التسليم"
         },
         "step_choose_gift": "اختر الهدية",
         "step_recipient": "المستلم",

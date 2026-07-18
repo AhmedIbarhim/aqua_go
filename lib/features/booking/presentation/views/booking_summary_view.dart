@@ -23,6 +23,9 @@ import 'package:aqua_go/core/route/routes.dart';
 import 'package:aqua_go/features/my_bookings/presentation/views/my_booking_details_view.dart';
 import 'package:aqua_go/features/my_bookings/data/models/booking_summary_model.dart';
 import 'package:aqua_go/features/booking/domain/configs/booking_flow_type.dart';
+import 'package:aqua_go/core/config/di/service_locator.dart';
+import 'package:aqua_go/features/wallet/data/repos/wallet_repository.dart';
+import 'package:aqua_go/features/wallet/data/models/loyalty_balance_model.dart';
 
 class BookingSummaryView extends StatefulWidget {
   const BookingSummaryView({super.key});
@@ -34,12 +37,40 @@ class BookingSummaryView extends StatefulWidget {
 class _BookingSummaryViewState extends State<BookingSummaryView> {
   String? _appliedPromoCode;
   bool _isPointsToggled = false;
+  LoyaltyBalanceModel? _loyaltyBalance;
+  bool _isLoadingLoyalty = false;
+
+  void _fetchLoyaltyBalance() async {
+    if (!mounted) return;
+    setState(() {
+      _isLoadingLoyalty = true;
+    });
+    final result = await locator<WalletRepository>().getWalletBalance();
+    if (mounted) {
+      result.fold(
+        (failure) {
+          setState(() {
+            _isLoadingLoyalty = false;
+          });
+        },
+        (balance) {
+          setState(() {
+            _loyaltyBalance = balance;
+            _isLoadingLoyalty = false;
+          });
+        },
+      );
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final config = context.read<BookingCubit>().state.flowConfig;
+      if (config.flowType == BookingFlowType.service) {
+        _fetchLoyaltyBalance();
+      }
       if (config.requiresQuote) {
         context.read<BookingCubit>().fetchQuote();
       } else if (config.isPackage) {
@@ -192,8 +223,12 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
       total = 0.0;
     }
 
-    final double pointsDiscount = _isPointsToggled
-        ? (total > 12.5 ? 12.5 : total)
+    final double pointsValue =
+        (_loyaltyBalance?.estimatedValueMinor ?? 0) / 100.0;
+    final int estimatedValueMinor = _loyaltyBalance?.estimatedValueMinor ?? 0;
+    final bool isInsufficient = _isPointsToggled && (estimatedValueMinor < 100);
+    final double pointsDiscount = (_isPointsToggled && !isInsufficient)
+        ? (total > pointsValue ? pointsValue : total)
         : 0.0;
     final double finalTotal = total - pointsDiscount;
 
@@ -609,8 +644,10 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
     BookingState bookingState,
     double total,
   ) {
-    final double pointsValue = 12.5;
-    final bool isInsufficient = _isPointsToggled && total > pointsValue;
+    final double pointsValue =
+        (_loyaltyBalance?.estimatedValueMinor ?? 0) / 100.0;
+    final int estimatedValueMinor = _loyaltyBalance?.estimatedValueMinor ?? 0;
+    final bool isInsufficient = _isPointsToggled && (estimatedValueMinor < 100);
 
     final borderBorder = Border.all(
       color: _isPointsToggled
@@ -648,7 +685,14 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
                   Text(
                     LocaleKeys.bookings_available_points_format.tr(
                       context: context,
-                      args: ['1,250', '12.5'],
+                      args: [
+                        _loyaltyBalance != null
+                            ? NumberFormat(
+                                '#,###',
+                              ).format(_loyaltyBalance!.points)
+                            : '0',
+                        pointsValue.toStringAsFixed(2),
+                      ],
                     ),
                     style: AppTextStyles.regular12.copyWith(
                       color: context.colors.textTertiary,
