@@ -67,10 +67,10 @@ class PointsTransactionTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  transaction.bookingId != null
+                  transaction.refNumber != null
                       ? LocaleKeys.wallet_booking_number.tr(
                           context: context,
-                          args: [transaction.bookingId!],
+                          args: [transaction.refNumber!],
                         )
                       : '',
                   style: AppTextStyles.bold13.copyWith(

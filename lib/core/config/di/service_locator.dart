@@ -54,6 +54,9 @@ import 'package:aqua_go/features/rating/presentation/controllers/paying_tips_cub
 import 'package:aqua_go/features/support/data/data_sources/faqs_remote_data_source.dart';
 import 'package:aqua_go/features/support/data/repos/faqs_repository.dart';
 import 'package:aqua_go/features/support/presentation/controllers/faqs_cubit.dart';
+import 'package:aqua_go/features/wallet/data/data_sources/wallet_remote_data_source.dart';
+import 'package:aqua_go/features/wallet/data/repos/wallet_repository.dart';
+import 'package:aqua_go/features/wallet/presentation/controllers/wallet_cubit.dart';
 import 'package:get_it/get_it.dart';
 
 import '../../../features/address/data/services/location_service.dart';
@@ -122,6 +125,9 @@ Future<void> initServiceLocator(AppConfigs configs) async {
   locator.registerLazySingleton<FaqsRemoteDataSource>(
     () => FaqsRemoteDataSource(locator()),
   );
+  locator.registerLazySingleton<WalletRemoteDataSource>(
+    () => WalletRemoteDataSource(locator()),
+  );
 
   // Repositories
 
@@ -186,6 +192,9 @@ Future<void> initServiceLocator(AppConfigs configs) async {
   );
   locator.registerLazySingleton<FaqsRepository>(
     () => FaqsRepository(locator()),
+  );
+  locator.registerLazySingleton<WalletRepository>(
+    () => WalletRepository(locator()),
   );
 
   // Cubits
@@ -255,4 +264,5 @@ Future<void> initServiceLocator(AppConfigs configs) async {
   locator.registerFactory<PayingTipsCubit>(() => PayingTipsCubit(locator()));
   locator.registerFactory<FaqsCubit>(() => FaqsCubit(locator()));
   locator.registerFactory<SupportCubit>(() => SupportCubit(locator()));
+  locator.registerFactory<WalletCubit>(() => WalletCubit(locator()));
 }

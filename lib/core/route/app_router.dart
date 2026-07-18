@@ -55,6 +55,7 @@ import '../../features/my_bookings/presentation/controllers/my_booking_details_c
 import '../../features/subscriptions/presentation/controllers/subscriptions_controller/subscriptions_cubit.dart';
 import '../../features/profile/presentation/views/my_subscribed_packages_view.dart';
 import '../../features/wallet/presentation/views/my_wallet_view.dart';
+import '../../features/wallet/presentation/controllers/wallet_cubit.dart';
 
 import 'routes.dart';
 
@@ -310,7 +311,12 @@ abstract class AppRouter {
         );
 
       case Routes.myWallet:
-        return MaterialPageRoute(builder: (_) => const MyWalletView());
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => locator<WalletCubit>()..fetchWallet(),
+            child: const MyWalletView(),
+          ),
+        );
 
       case Routes.supportChat:
         return MaterialPageRoute(builder: (_) => const SupportChatView());
