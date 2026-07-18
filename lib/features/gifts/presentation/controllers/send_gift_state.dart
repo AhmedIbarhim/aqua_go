@@ -39,6 +39,8 @@ class SendGiftState extends Equatable {
   final String? savedCardTokenId;
   final int? pointsToApply;
   final String? moyasarPaymentId;
+  final String? promoCode;
+  final String? attemptNonce;
 
   final GiftModel? purchasedGift;
   final GiftQuoteModel? quote;
@@ -62,6 +64,8 @@ class SendGiftState extends Equatable {
     this.savedCardTokenId,
     this.pointsToApply,
     this.moyasarPaymentId,
+    this.promoCode,
+    this.attemptNonce,
     this.purchasedGift,
     this.quote,
   });
@@ -85,6 +89,8 @@ class SendGiftState extends Equatable {
     String? savedCardTokenId,
     int? pointsToApply,
     String? moyasarPaymentId,
+    String? promoCode,
+    String? attemptNonce,
     GiftModel? purchasedGift,
     GiftQuoteModel? quote,
     bool clearService = false,
@@ -112,6 +118,8 @@ class SendGiftState extends Equatable {
       savedCardTokenId: savedCardTokenId ?? this.savedCardTokenId,
       pointsToApply: pointsToApply ?? this.pointsToApply,
       moyasarPaymentId: moyasarPaymentId ?? this.moyasarPaymentId,
+      promoCode: promoCode ?? this.promoCode,
+      attemptNonce: attemptNonce ?? this.attemptNonce,
       purchasedGift: purchasedGift ?? this.purchasedGift,
       quote: clearQuote ? null : (quote ?? this.quote),
     );
@@ -137,6 +145,8 @@ class SendGiftState extends Equatable {
     savedCardTokenId,
     pointsToApply,
     moyasarPaymentId,
+    promoCode,
+    attemptNonce,
     purchasedGift,
     quote,
   ];

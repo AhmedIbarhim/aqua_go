@@ -149,6 +149,11 @@ class SendGiftCubit extends Cubit<SendGiftState> {
     }
   }
 
+  void setPromoCode(String? code) {
+    emit(state.copyWith(promoCode: code));
+    fetchQuote();
+  }
+
   Future<void> fetchQuote() async {
     if (state.selectedService == null) return;
 
@@ -158,6 +163,10 @@ class SendGiftCubit extends Cubit<SendGiftState> {
       request: GiftQuoteRequestModel(
         packageId: state.selectedService!.id!,
         pointsToApply: state.pointsToApply,
+        promoCode: state.promoCode,
+        addOnIds: state.selectedAddonIds.isNotEmpty
+            ? state.selectedAddonIds.toList()
+            : null,
       ),
     );
 
@@ -188,14 +197,21 @@ class SendGiftCubit extends Cubit<SendGiftState> {
     if (state.selectedService == null) return null;
 
     final attemptNonce = const Uuid().v4();
-    emit(state.copyWith(status: SendGiftStatus.loading));
+    emit(state.copyWith(
+      status: SendGiftStatus.loading,
+      attemptNonce: attemptNonce,
+    ));
 
     final result = await _giftsRepository.giftPaymentInit(
       request: GiftPaymentInitRequestModel(
         packageId: state.selectedService!.id!,
         recipientPhone: '+966${state.recipientPhone}',
         pointsToApply: state.pointsToApply,
+        promoCode: state.promoCode,
         attemptNonce: attemptNonce,
+        addOnIds: state.selectedAddonIds.isNotEmpty
+            ? state.selectedAddonIds.toList()
+            : null,
       ),
     );
 
@@ -263,15 +279,13 @@ class SendGiftCubit extends Cubit<SendGiftState> {
       packageId: state.selectedService!.id!,
       themeId: state.selectedTheme!.id!,
       recipientPhone: '+966${state.recipientPhone}',
-      paymentMethod: state.paymentMethod == PaymentMethod.applePay
-          ? 'APPLE_PAY'
-          : 'CARD',
-      savedCardTokenId: state.savedCardTokenId,
       recipientName: state.recipientName,
       messageText: state.messageText,
       scheduledDeliveryAt: scheduledDeliveryAt,
       pointsToApply: state.pointsToApply,
       moyasarPaymentId: moyasarPaymentId ?? state.moyasarPaymentId,
+      promoCode: state.promoCode,
+      attemptNonce: state.attemptNonce,
       addOnIds: state.selectedAddonIds.isNotEmpty
           ? state.selectedAddonIds.toList()
           : null,
