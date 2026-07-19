@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../../core/extentions/context_extentions.dart';
-import '../../../../core/themes/app_text_styles.dart';
-import '../../../home/data/models/service_model.dart';
+import '../../../../../core/extentions/context_extentions.dart';
+import '../../../../../core/themes/app_text_styles.dart';
+import '../../../../home/data/models/service_model.dart';
 
 /// Horizontal single-select list of the package's included services. Mirrors the
 /// car-selection card pattern for visual + interaction consistency. The customer

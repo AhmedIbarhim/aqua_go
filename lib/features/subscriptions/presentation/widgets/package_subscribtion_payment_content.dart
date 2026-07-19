@@ -8,7 +8,7 @@ import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../../../home/data/models/package_model.dart';
-import '../../../booking/presentation/widgets/payment_method_selection.dart';
+import '../../../booking/presentation/widgets/booking_summary_widgets/payment_method_selection.dart';
 
 class PackageSubscribtionPaymentContent extends StatefulWidget {
   final PackageModel packageModel;

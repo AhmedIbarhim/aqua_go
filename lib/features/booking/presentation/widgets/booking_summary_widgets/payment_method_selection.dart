@@ -2,12 +2,12 @@ import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import '../../../../core/extentions/context_extentions.dart';
-import '../../../../core/themes/app_text_styles.dart';
-import '../../../../core/utils/app_assets.dart';
-import '../../../../generated/locale_keys.g.dart';
-import '../../../../core/components/custom_radio_widget.dart';
-import '../../../../core/enums/payment_method_enum.dart';
+import '../../../../../core/extentions/context_extentions.dart';
+import '../../../../../core/themes/app_text_styles.dart';
+import '../../../../../core/utils/app_assets.dart';
+import '../../../../../generated/locale_keys.g.dart';
+import '../../../../../core/components/custom_radio_widget.dart';
+import '../../../../../core/enums/payment_method_enum.dart';
 
 class PaymentMethodSelection extends StatefulWidget {
   final Function(PaymentMethod) onPaymentMethodChanged;

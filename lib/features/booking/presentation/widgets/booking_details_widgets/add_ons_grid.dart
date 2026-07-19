@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
-import '../../../../core/extentions/context_extentions.dart';
-import '../../../../core/themes/app_text_styles.dart';
-import '../../../../core/utils/app_assets.dart';
-import '../../../../core/components/custom_network_image.dart';
-import '../../../home/data/models/add_on_model.dart';
+import '../../../../../core/extentions/context_extentions.dart';
+import '../../../../../core/themes/app_text_styles.dart';
+import '../../../../../core/utils/app_assets.dart';
+import '../../../../../core/components/custom_network_image.dart';
+import '../../../../home/data/models/add_on_model.dart';
 
 class AddOnsGrid extends StatelessWidget {
   final List<AddOnModel> addons;

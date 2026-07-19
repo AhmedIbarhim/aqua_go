@@ -16,7 +16,7 @@ import 'package:aqua_go/features/my_bookings/data/models/booking_response_model/
 import 'package:aqua_go/features/my_bookings/presentation/views/my_booking_details_view.dart';
 import 'package:aqua_go/features/my_bookings/data/models/booking_summary_model.dart';
 import 'package:aqua_go/core/route/routes.dart';
-import 'package:aqua_go/features/booking/presentation/widgets/payment_method_selection.dart';
+import 'package:aqua_go/features/booking/presentation/widgets/booking_summary_widgets/payment_method_selection.dart';
 import 'package:aqua_go/features/rating/presentation/widgets/tips_biker_info_section.dart';
 import 'package:aqua_go/features/rating/presentation/widgets/tip_amount_button.dart';
 import 'package:aqua_go/features/rating/presentation/controllers/paying_tips_cubit/paying_tips_cubit.dart';

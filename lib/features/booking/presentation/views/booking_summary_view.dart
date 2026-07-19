@@ -4,22 +4,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
-import '../../../../core/components/custom_button.dart';
 import '../../../../core/components/generic_app_bar.dart';
-import '../../../../core/components/bottom_action_sheet_container.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../../data/models/quote_model.dart';
-import '../widgets/booking_summary_card.dart';
-import '../widgets/biker_notes_selection.dart';
-import '../widgets/payment_summary_card.dart';
-import '../widgets/payment_method_selection.dart';
-import '../widgets/gift_coupon_payment_widget.dart';
+import '../widgets/booking_summary_widgets/booking_summary_card.dart';
+import '../widgets/booking_summary_widgets/biker_notes_selection.dart';
+import '../widgets/booking_summary_widgets/payment_summary_card.dart';
+import '../widgets/booking_summary_widgets/payment_method_selection.dart';
+import '../widgets/booking_summary_widgets/gift_coupon_payment_widget.dart';
 import '../controllers/booking_cubit.dart';
 import '../controllers/booking_state.dart';
-import 'moyasar_payment_view.dart';
-import 'package:aqua_go/core/enums/payment_method_enum.dart';
-import 'package:aqua_go/features/booking/data/models/payment_init_model.dart';
-import 'package:aqua_go/core/config/payment/payment_sdk_config_service.dart';
 import 'package:aqua_go/core/route/routes.dart';
 import 'package:aqua_go/features/my_bookings/presentation/views/my_booking_details_view.dart';
 import 'package:aqua_go/features/my_bookings/data/models/booking_summary_model.dart';
@@ -27,6 +21,9 @@ import 'package:aqua_go/features/booking/domain/configs/booking_flow_type.dart';
 import 'package:aqua_go/core/config/di/service_locator.dart';
 import 'package:aqua_go/features/wallet/data/repos/wallet_repository.dart';
 import 'package:aqua_go/features/wallet/data/models/loyalty_balance_model.dart';
+import '../widgets/booking_summary_widgets/promo_code_section.dart';
+import '../widgets/booking_summary_widgets/wallet_points_section.dart';
+import '../widgets/booking_summary_widgets/booking_summary_bottom_action_sheet.dart';
 
 class BookingSummaryView extends StatefulWidget {
   const BookingSummaryView({super.key});
@@ -143,7 +140,11 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
                   child: _buildContent(context, bookingState, width),
                 ),
               ),
-              _buildBottomActionSheet(context, bookingState),
+              BookingSummaryBottomActionSheet(
+                bookingState: bookingState,
+                appliedPromoCode: _appliedPromoCode,
+                getPointsToApply: () => _getPointsToApply(bookingState.quote),
+              ),
             ],
           ),
         );
@@ -295,9 +296,46 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
             const SizedBox(height: 24),
           ],
           if (config.flowType == BookingFlowType.service) ...[
-            _buildPromoCodeSection(context, bookingState),
+            PromoCodeSection(
+              appliedPromoCode: _appliedPromoCode,
+              onApplyPromoCode: _applyPromoCode,
+              onRemovePromoCode: _removePromoCode,
+            ),
             const SizedBox(height: 24),
-            _buildWalletPointsSection(context, bookingState, total),
+            WalletPointsSection(
+              bookingState: bookingState,
+              loyaltyBalance: _loyaltyBalance,
+              isPointsToggled: _isPointsToggled,
+              onPointsToggled: (val) async {
+                setState(() {
+                  _isPointsToggled = val;
+                });
+                final currentQuote = context.read<BookingCubit>().state.quote;
+                final balValMinor =
+                    currentQuote?.currentBalanceValueMinor ??
+                    _loyaltyBalance?.estimatedValueMinor ??
+                    0;
+                if (val && balValMinor >= 100) {
+                  final maxPoints = currentQuote?.maxApplicablePoints ?? 0;
+                  final balance =
+                      currentQuote?.currentBalancePoints ??
+                      _loyaltyBalance?.points ??
+                      0;
+                  final pointsToApply = balance < maxPoints
+                      ? balance
+                      : maxPoints;
+                  await context.read<BookingCubit>().fetchQuote(
+                    promoCode: _appliedPromoCode,
+                    pointsToApply: pointsToApply,
+                  );
+                } else if (!val) {
+                  await context.read<BookingCubit>().fetchQuote(
+                    promoCode: _appliedPromoCode,
+                    pointsToApply: 0,
+                  );
+                }
+              },
+            ),
             const SizedBox(height: 24),
           ],
           if (config.showPaymentSummary) ...[
@@ -327,11 +365,6 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
     );
   }
 
-  /// Service name shown on BOTH the Booking-Summary and Payment-Summary cards.
-  /// For a multi-service package the customer PICKED a specific service, so show
-  /// that chosen service (selectedPackageService); fall back to selectedService
-  /// (which holds the PACKAGE name) only for a single-service bundle / the
-  /// non-package service flow where selectedService is the real chosen service.
   String _resolveServiceName(BuildContext context, BookingState state) {
     final chosen = state.flowConfig.isPackage
         ? (state.selectedPackageService ??
@@ -344,513 +377,12 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
         : (chosen?.rawName?.nameEn ?? '');
   }
 
-  /// True when a multi-service package REQUIRES a service pick that hasn't been
-  /// made yet (or the picker failed to load) — Confirm is blocked in that state
-  /// so a paid wash can never silently submit serviceId=null. Mirrors the
-  /// booking_details_view `servicePicked` gate.
-  bool _servicePicked(BookingState state) {
-    final config = state.flowConfig;
-    return !config.isPackage ||
-        state.packageServices.length <= 1 ||
-        state.selectedPackageService != null;
-  }
-
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
       style: AppTextStyles.regular16.copyWith(
         color: context.colors.textPrimary,
       ),
-    );
-  }
-
-  /// Load-bearing safety net (spec Fix B): true when the package wash carries
-  /// at least one PAYABLE add-on (optional add-ons always pay; included add-ons
-  /// pay when their free allowance is exhausted) — mirrors
-  /// booking_details_view._requiresPayment. ORed into the Confirm gate so a
-  /// paid wash can NEVER bare-submit (→ backend 422), even if the charge
-  /// preview is slow or failed.
-  bool _hasPayableAddon(BookingState state) {
-    if (!state.flowConfig.isPackage) return false;
-    final addons = state.selectedService?.addons ?? [];
-    final optionalIds = state.optionalAddonIds;
-    final includedIds = state.includedAddonIds;
-    for (final idx in state.selectedServiceIndices) {
-      if (idx >= addons.length) continue;
-      final addon = addons[idx];
-      final id = addon.id ?? '';
-      if (optionalIds.contains(id)) return true;
-      if (includedIds.contains(id) && (addon.freeQty ?? 0) <= 0) return true;
-    }
-    return false;
-  }
-
-  double _calculateTotal(BookingState state) {
-    // Total used only to gate "needs payment". Backend breakdown.gross already
-    // includes every add-on — NO client-side add-on summing (that double-added
-    // the add-on amounts on top of the gross total). No client math at all.
-    // No live-catalog fallback: when the quote is absent we return 0.0 so the
-    // covered-wash zero-total path stays enabled while the service flow is held
-    // by the explicit quote-presence gate below.
-    final quoteBreakdown = state.quote?.breakdown;
-    if (quoteBreakdown != null) {
-      return quoteBreakdown.gross;
-    }
-    return 0.0;
-  }
-
-  Widget _buildBottomActionSheet(
-    BuildContext context,
-    BookingState bookingState,
-  ) {
-    final config = bookingState.flowConfig;
-    final total = _calculateTotal(bookingState);
-    // hasPayableAddon is the safety net: a paid package wash needs payment even
-    // before/without the charge preview (total may still be 0 if it failed).
-    final hasPayableAddon = _hasPayableAddon(bookingState);
-    final needsPayment =
-        config.requiresPaymentMethod || total > 0 || hasPayableAddon;
-    // PRICE LOCK gate: the service flow must have a locked quote before Confirm
-    // so a failed/expired quote fetch can never charge a live (unlocked) amount.
-    // The package flow does not require the service quote (it uses the wash
-    // charge-preview + hasPayableAddon safety net), so it is not blocked here —
-    // preserving the covered-wash zero-total path.
-    final priceLocked = !config.requiresQuote || bookingState.quote != null;
-    // Multi-service package gate: a required service pick must be made before
-    // Confirm — never silently submit serviceId=null when the picker failed to
-    // load or no service is selected.
-    final servicePicked = _servicePicked(bookingState);
-    final isEnabled =
-        priceLocked &&
-        servicePicked &&
-        (needsPayment ? bookingState.paymentMethod != null : true);
-
-    return BottomActionSheetContainer(
-      child: CustomButton(
-        text: LocaleKeys.bookings_confirm_booking.tr(context: context),
-        enabled: isEnabled,
-        onPressed: () async {
-          final cubit = context.read<BookingCubit>();
-          // Hard block: a required package service must be chosen before any
-          // submit/charge — never bare-submit serviceId=null.
-          if (!_servicePicked(bookingState)) {
-            context.showErrorSnackBar(
-              LocaleKeys.bookings_service_selection_required.tr(
-                context: context,
-              ),
-            );
-            return;
-          }
-          // Covered / zero-total (NOT_REQUIRED): no on-device payment — the
-          // backend creates the booking directly.
-          if (!needsPayment) {
-            cubit.submitBooking();
-            return;
-          }
-
-          // Branch: package flow (subscription wash with payable add-ons) uses
-          // wash-addon-payment-init; service flow uses booking-payment-init.
-          final PaymentInitModel? init;
-          if (config.isPackage) {
-            // Pay-before-confirm (spec §4.4 / A2): addon-payment-init →
-            // Moyasar SDK → schedule with moyasarPaymentId.
-            init = await cubit.initiateWashAddonPayment();
-          } else {
-            // PRICE LOCK / 15-min TTL: if the locked quote has expired, re-quote
-            // before charging. If the refreshed total differs, surface the
-            // "prices refreshed" notice and abort so the customer reviews the
-            // new amount rather than being silently charged a changed total.
-            final existing = cubit.state.quote;
-            if (existing != null &&
-                DateTime.now().isAfter(existing.expiresAt)) {
-              final previousGross = existing.breakdown?.gross;
-              final refreshed = await cubit.fetchQuote();
-              if (!context.mounted) return;
-              if (refreshed == null) return; // fetch failed → cubit set error
-              final newGross = refreshed.breakdown?.gross;
-              if (previousGross != newGross) {
-                context.showErrorSnackBar(
-                  LocaleKeys.bookings_price_updated.tr(context: context),
-                );
-                return;
-              }
-            }
-            final pts = _getPointsToApply(bookingState.quote);
-            init = await cubit.initiatePayment(pointsToApply: pts);
-          }
-          if (init == null || !context.mounted) return;
-          await PaymentSdkConfigService.instance.ensureLoaded();
-          if (!context.mounted) return;
-          final PaymentInitModel resolvedInit = init;
-          final result = await Navigator.of(context).push<MoyasarPaymentResult>(
-            MaterialPageRoute(
-              builder: (_) => MoyasarPaymentView(
-                args: MoyasarPaymentArgs(
-                  init: resolvedInit,
-                  paymentMethod:
-                      bookingState.paymentMethod ?? PaymentMethod.creditCard,
-                  description: context.isAr ? 'أكوا جو' : 'Aqua Go',
-                ),
-              ),
-            ),
-          );
-          if (!context.mounted) return;
-          switch (result?.status) {
-            case MoyasarPaymentStatus.paid:
-              await cubit.completeBookingAfterPayment(result!.paymentId!);
-              break;
-            case MoyasarPaymentStatus.failed:
-              cubit.onPaymentCancelled();
-              if (context.mounted) {
-                context.showErrorSnackBar(
-                  context.isAr
-                      ? 'فشلت عملية الدفع. يرجى المحاولة مرة أخرى.'
-                      : 'Payment failed. Please try again.',
-                );
-              }
-              break;
-            case MoyasarPaymentStatus.cancelled:
-            case null:
-              cubit.onPaymentCancelled();
-              break;
-          }
-        },
-      ),
-    );
-  }
-
-  Widget _buildPromoCodeSection(
-    BuildContext context,
-    BookingState bookingState,
-  ) {
-    final hasAppliedCode = _appliedPromoCode != null;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionTitle(
-          LocaleKeys.bookings_promo_code_title.tr(context: context),
-        ),
-        const SizedBox(height: 16),
-        if (!hasAppliedCode)
-          GestureDetector(
-            onTap: _showPromoCodeDialog,
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-              decoration: BoxDecoration(
-                color: context.colors.themeColor,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: context.colors.warning, width: 1),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.discount_outlined, color: context.colors.warning),
-                  const SizedBox(width: 8),
-                  Text(
-                    LocaleKeys.bookings_apply_promo_code.tr(context: context),
-                    style: AppTextStyles.medium14.copyWith(
-                      color: context.colors.warning,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          )
-        else
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: context.colors.themeColor,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: context.colors.borderSecondary.withValues(alpha: 0.3),
-              ),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: context.colors.defaultSubtle,
-                    border: Border.all(
-                      color: context.colors.borderSecondary.withValues(
-                        alpha: 0.5,
-                      ),
-                    ),
-                  ),
-                  child: Icon(
-                    Icons.check,
-                    color: context.colors.primary,
-                    size: 16,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '${LocaleKeys.bookings_promo_code_title.tr(context: context)} $_appliedPromoCode',
-                      style: AppTextStyles.medium14.copyWith(
-                        color: context.colors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      LocaleKeys.bookings_promo_code_applied.tr(
-                        context: context,
-                      ),
-                      style: AppTextStyles.regular12.copyWith(
-                        color: context.colors.textTertiary,
-                      ),
-                    ),
-                  ],
-                ),
-                const Spacer(),
-
-                GestureDetector(
-                  onTap: _removePromoCode,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: context.colors.error,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.close, color: Colors.white, size: 14),
-                        const SizedBox(width: 4),
-                        Text(
-                          LocaleKeys.bookings_delete_promo_code.tr(
-                            context: context,
-                          ),
-                          style: AppTextStyles.medium12.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildWalletPointsSection(
-    BuildContext context,
-    BookingState bookingState,
-    double total,
-  ) {
-    final quote = bookingState.quote;
-    final int balanceValueMinor =
-        quote?.currentBalanceValueMinor ??
-        _loyaltyBalance?.estimatedValueMinor ??
-        0;
-    final bool isInsufficient = _isPointsToggled && (balanceValueMinor < 100);
-
-    final int points =
-        quote?.currentBalancePoints ?? _loyaltyBalance?.points ?? 0;
-    final double pointsValue = balanceValueMinor / 100.0;
-
-    final borderBorder = Border.all(
-      color: _isPointsToggled
-          ? (isInsufficient ? context.colors.error : context.colors.primary)
-          : context.colors.borderSecondary.withValues(alpha: 0.3),
-      width: 1.5,
-    );
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionTitle(
-          LocaleKeys.bookings_wallet_points_title.tr(context: context),
-        ),
-        const SizedBox(height: 16),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            color: context.colors.themeColor,
-            borderRadius: BorderRadius.circular(12),
-            border: borderBorder,
-          ),
-          child: Row(
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    LocaleKeys.bookings_pay_using_points.tr(context: context),
-                    style: AppTextStyles.medium14.copyWith(
-                      color: context.colors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    LocaleKeys.bookings_available_points_format.tr(
-                      context: context,
-                      args: [
-                        NumberFormat('#,###').format(points),
-                        pointsValue.toStringAsFixed(2),
-                      ],
-                    ),
-                    style: AppTextStyles.regular12.copyWith(
-                      color: context.colors.textTertiary,
-                    ),
-                  ),
-                ],
-              ),
-              const Spacer(),
-              Switch.adaptive(
-                value: _isPointsToggled,
-                onChanged: (val) async {
-                  setState(() {
-                    _isPointsToggled = val;
-                  });
-                  final currentQuote = context.read<BookingCubit>().state.quote;
-                  final balValMinor =
-                      currentQuote?.currentBalanceValueMinor ??
-                      _loyaltyBalance?.estimatedValueMinor ??
-                      0;
-                  if (val && balValMinor >= 100) {
-                    final maxPoints = currentQuote?.maxApplicablePoints ?? 0;
-                    final balance =
-                        currentQuote?.currentBalancePoints ??
-                        _loyaltyBalance?.points ??
-                        0;
-                    final pointsToApply = balance < maxPoints
-                        ? balance
-                        : maxPoints;
-                    await context.read<BookingCubit>().fetchQuote(
-                      promoCode: _appliedPromoCode,
-                      pointsToApply: pointsToApply,
-                    );
-                  } else if (!val) {
-                    await context.read<BookingCubit>().fetchQuote(
-                      promoCode: _appliedPromoCode,
-                      pointsToApply: 0,
-                    );
-                  }
-                },
-                activeThumbColor: isInsufficient
-                    ? context.colors.errorSecondary
-                    : context.colors.primary,
-                activeTrackColor:
-                    (isInsufficient
-                            ? context.colors.errorSecondary
-                            : context.colors.primary)
-                        .withValues(alpha: 0.3),
-                inactiveThumbColor: context.colors.textTertiary,
-                inactiveTrackColor: context.colors.defaultSubtle,
-              ),
-            ],
-          ),
-        ),
-        if (isInsufficient) ...[
-          const SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Text(
-              LocaleKeys.bookings_insufficient_points.tr(context: context),
-              style: AppTextStyles.regular12.copyWith(
-                color: context.colors.error,
-              ),
-            ),
-          ),
-        ],
-      ],
-    );
-  }
-
-  void _showPromoCodeDialog() {
-    final controller = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          backgroundColor: context.colors.cardBackGround,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: Text(
-            LocaleKeys.bookings_apply_promo_code.tr(context: context),
-            style: AppTextStyles.bold16.copyWith(
-              color: context.colors.textPrimary,
-            ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: controller,
-                autofocus: true,
-                style: AppTextStyles.regular14.copyWith(
-                  color: context.colors.textPrimary,
-                ),
-                decoration: InputDecoration(
-                  hintText: LocaleKeys.bookings_apply_code_hint.tr(
-                    context: context,
-                  ),
-                  hintStyle: AppTextStyles.regular14.copyWith(
-                    color: context.colors.textTertiary,
-                  ),
-                  filled: true,
-                  fillColor: context.colors.fields,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(
-                      color: context.colors.borderSecondary,
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: context.colors.primary),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(
-                LocaleKeys.bookings_cancel.tr(context: context),
-                style: AppTextStyles.medium14.copyWith(
-                  color: context.colors.textSecondary,
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                final code = controller.text.trim();
-                if (code.isNotEmpty) {
-                  Navigator.of(dialogContext).pop();
-                  _applyPromoCode(code);
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: context.colors.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: Text(
-                LocaleKeys.bookings_apply.tr(context: context),
-                style: AppTextStyles.medium14.copyWith(
-                  color: context.colors.textTheme,
-                ),
-              ),
-            ),
-          ],
-        );
-      },
     );
   }
 

@@ -6,7 +6,7 @@ import '../../../../core/themes/app_text_styles.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../controllers/send_gift_cubit.dart';
 import '../controllers/send_gift_state.dart';
-import '../../../booking/presentation/widgets/add_ons_grid.dart';
+import '../../../booking/presentation/widgets/booking_details_widgets/add_ons_grid.dart';
 import 'gift_service_card.dart';
 
 class ChooseGiftStep extends StatelessWidget {
