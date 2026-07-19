@@ -17,36 +17,45 @@ class ReceiptPaymentMethodCard extends StatelessWidget {
     double sw(double width) => context.sw(width);
     double sh(double height) => context.sh(height);
 
+    final bool isGift = booking.isFromGift == true;
     final bool isSub = booking.isCoveredBySubscription;
     final bool isApplePay =
-        !isSub && booking.paymentMethod == PaymentMethod.applePay;
+        !isSub && !isGift && booking.paymentMethod == PaymentMethod.applePay;
 
-    final paymentMethodText = isSub
-        ? LocaleKeys.receipt_subscription_package.tr(context: context)
-        : (isApplePay
-              ? LocaleKeys.bookings_apple_pay.tr(context: context)
-              : LocaleKeys.receipt_credit_card.tr(context: context));
+    final paymentMethodText = isGift
+        ? LocaleKeys.gifts_gift_coupon.tr(context: context)
+        : (isSub
+              ? LocaleKeys.receipt_subscription_package.tr(context: context)
+              : (isApplePay
+                    ? LocaleKeys.bookings_apple_pay.tr(context: context)
+                    : LocaleKeys.receipt_credit_card.tr(context: context)));
 
-    final paymentMethodIconWidget = isSub
+    final paymentMethodIconWidget = isGift
         ? Icon(
-            Icons.card_membership_outlined,
+            Icons.card_giftcard,
             color: context.colors.primary,
             size: sw(20),
           )
-        : Container(
-            padding: EdgeInsets.symmetric(horizontal: sw(6), vertical: sh(4)),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(sw(4)),
-              border: Border.all(color: context.colors.borderSecondary),
-            ),
-            child: Image.asset(
-              isApplePay ? AppAssets.applePay : AppAssets.visaPay,
-              width: sw(32),
-              height: sh(18),
-              fit: BoxFit.contain,
-            ),
-          );
+        : (isSub
+              ? Icon(
+                  Icons.card_membership_outlined,
+                  color: context.colors.primary,
+                  size: sw(20),
+                )
+              : Container(
+                  padding: EdgeInsets.symmetric(horizontal: sw(6), vertical: sh(4)),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(sw(4)),
+                    border: Border.all(color: context.colors.borderSecondary),
+                  ),
+                  child: Image.asset(
+                    isApplePay ? AppAssets.applePay : AppAssets.visaPay,
+                    width: sw(32),
+                    height: sh(18),
+                    fit: BoxFit.contain,
+                  ),
+                ));
 
     return Container(
       padding: EdgeInsets.all(sw(16)),

@@ -23,7 +23,9 @@ class BookingDetailsSummaryCard extends StatelessWidget {
     final bool showNetVatSummary =
         hasAddons &&
         breakdown != null &&
-        (!booking.isCoveredBySubscription || (breakdown.grossMinor ?? 0) != 0);
+        (!booking.isCoveredBySubscription ||
+            (breakdown.grossMinor ?? 0) != 0) &&
+        booking.isFromGift != true;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -56,16 +58,21 @@ class BookingDetailsSummaryCard extends StatelessWidget {
                 value: booking.formattedDateTime,
                 icon: AppAssets.date,
               ),
+
               // Service's OWN price line (NET) — sourced from the SERVICE line's
               // netMinor, the same source the add-on rows use. Shown only for a
               // real money breakdown (not covered subscription washes), so the
               // service appears with a price like the add-ons. No client math;
               // it does NOT change the backend-sourced subtotal/total below.
-              if (showNetVatSummary)
+              if (showNetVatSummary || booking.isFromGift == true)
                 _buildSummaryRow(
                   context,
                   title: LocaleKeys.bookings_service_price.tr(context: context),
-                  value: _serviceNet() == 0.0
+                  value: booking.isFromGift == true
+                      ? LocaleKeys.gifts_paid_via_gift_coupon.tr(
+                          context: context,
+                        )
+                      : _serviceNet() == 0.0
                       ? LocaleKeys.bookings_covered_by_subscription.tr(
                           context: context,
                         )
@@ -81,7 +88,11 @@ class BookingDetailsSummaryCard extends StatelessWidget {
                   return _buildSummaryRow(
                     context,
                     title: addon.name,
-                    value: addonPrice == 0.0
+                    value: booking.isFromGift == true
+                        ? LocaleKeys.gifts_paid_via_gift_coupon.tr(
+                            context: context,
+                          )
+                        : addonPrice == 0.0
                         ? LocaleKeys.bookings_covered_by_subscription.tr(
                             context: context,
                           )
@@ -110,12 +121,15 @@ class BookingDetailsSummaryCard extends StatelessWidget {
                 ),
                 _buildTotalDivider(context),
               ],
+              if (booking.isFromGift == true) _buildTotalDivider(context),
               // Exactly ONE grand total, last, VAT-inclusive (gross).
               _buildSummaryRow(
                 context,
                 title: LocaleKeys.bookings_total_amount.tr(context: context),
-                value:
-                    booking.isCoveredBySubscription && booking.totalAmount == 0
+                value: booking.isFromGift == true
+                    ? LocaleKeys.gifts_paid_via_gift_coupon.tr(context: context)
+                    : booking.isCoveredBySubscription &&
+                          booking.totalAmount == 0
                     ? LocaleKeys.bookings_covered_by_subscription.tr(
                         context: context,
                       )

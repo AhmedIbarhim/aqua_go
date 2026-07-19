@@ -22,7 +22,8 @@ class ReceiptPaymentSummaryCard extends StatelessWidget {
     final bool showNetVatSummary =
         hasAddons &&
         breakdown != null &&
-        (!booking.isCoveredBySubscription || (breakdown.grossMinor ?? 0) != 0);
+        (!booking.isCoveredBySubscription || (breakdown.grossMinor ?? 0) != 0) &&
+        booking.isFromGift != true;
 
     return Container(
       padding: EdgeInsets.all(sw(16)),
@@ -158,6 +159,12 @@ class ReceiptPaymentSummaryCard extends StatelessWidget {
     required TextStyle style,
     required bool isCovered,
   }) {
+    if (booking.isFromGift == true) {
+      return Text(
+        LocaleKeys.gifts_paid_via_gift_coupon.tr(context: context),
+        style: style,
+      );
+    }
     if (isCovered || price == 0.0) {
       return Text(
         LocaleKeys.receipt_subscription_package.tr(context: context),
