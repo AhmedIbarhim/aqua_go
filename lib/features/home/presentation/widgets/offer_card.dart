@@ -16,7 +16,7 @@ class OfferCard extends StatelessWidget {
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
-        child: Image.asset(offerModel.image, fit: BoxFit.fill),
+        child: Image.asset(offerModel.imageUrl, fit: BoxFit.fill),
       ),
     );
   }

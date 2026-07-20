@@ -21,6 +21,7 @@ import 'package:aqua_go/core/route/app_router.dart';
 import 'package:aqua_go/features/booking/domain/configs/booking_flow_config.dart';
 import 'package:aqua_go/features/booking/domain/strategies/package_booking_submit.dart';
 import '../widgets/home_banners_carosal.dart';
+import '../widgets/offers_list_view.dart';
 import '../widgets/packages_list_view.dart';
 import '../widgets/services_page_view.dart';
 import '../widgets/current_package_section.dart';
@@ -270,9 +271,9 @@ class _HomeViewState extends State<HomeView> {
                                   ),
                                   SizedBox(height: context.screenHeight * 0.02),
                                   const ServicesPageView(),
-                                  SizedBox(height: context.screenHeight * 0.3),
-                                  // const OffersListView(),
-                                  // SizedBox(height: context.screenHeight * 0.15),
+                                  SizedBox(height: context.screenHeight * 0.03),
+                                  const OffersListView(),
+                                  SizedBox(height: context.screenHeight * 0.15),
                                 ],
                               ),
                             ),
