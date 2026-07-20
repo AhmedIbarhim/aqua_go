@@ -9,7 +9,13 @@ import '../../features/gifts/presentation/views/gifts_view.dart';
 import '../../features/gifts/presentation/views/send_gift_view.dart';
 import '../../features/gifts/presentation/controllers/send_gift_cubit.dart';
 import '../../features/my_bookings/data/models/booking_response_model/booking_response_model.dart';
-import '../../features/profile/presentation/views/support_chat_view.dart';
+import '../../features/chat/data/models/thread_model.dart';
+import '../../features/chat/data/repos/chat_repository.dart';
+import '../../features/chat/presentation/controllers/chat_thread_cubit/chat_thread_cubit.dart';
+import '../../features/chat/presentation/controllers/chat_threads_cubit/chat_threads_cubit.dart';
+import '../../features/chat/presentation/views/chat_inbox_view.dart';
+import '../../features/chat/presentation/views/chat_thread_view.dart';
+import '../helpers/fetch_user_data_helper.dart';
 import '../../features/subscriptions/data/repos/subscriptions_repository.dart';
 import '../../features/address/presentation/views/my_addresses_view.dart';
 import '../../features/address/presentation/views/new_address_map_view.dart';
@@ -318,13 +324,51 @@ abstract class AppRouter {
           ),
         );
 
-      case Routes.supportChat:
-        return MaterialPageRoute(builder: (_) => const SupportChatView());
+      case Routes.chatInbox:
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => locator<ChatThreadsCubit>()..loadThreads(),
+            child: const ChatInboxView(),
+          ),
+        );
+
+      case Routes.chatThread:
+        // Accepts a full ChatThreadArgs (from the inbox) or a bare threadId
+        // String (from an FCM deep-link) when only the id is known.
+        final args = settings.arguments;
+        final String threadId = args is ChatThreadArgs
+            ? args.threadId
+            : (args is String ? args : '');
+        final ThreadModel? initialThread = args is ChatThreadArgs
+            ? args.initialThread
+            : null;
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) =>
+                ChatThreadCubit(
+                  repository: locator<ChatRepository>(),
+                  threadId: threadId,
+                  currentUserId: FetchUserData.getUserId() ?? '',
+                  initialThread: initialThread,
+                )..open(),
+            child: const ChatThreadView(),
+          ),
+        );
 
       default:
         return MaterialPageRoute(builder: (_) => const Placeholder());
     }
   }
+}
+
+/// Args for opening a single chat thread. [initialThread] pre-populates the
+/// header + status when navigating from the inbox; an FCM deep-link may pass
+/// only a threadId (as a bare String or via this class with initialThread null).
+class ChatThreadArgs {
+  final String threadId;
+  final ThreadModel? initialThread;
+
+  const ChatThreadArgs({required this.threadId, this.initialThread});
 }
 
 /// Args for passing an already-created BookingCubit between views in the flow.

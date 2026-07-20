@@ -9,7 +9,9 @@ import 'package:aqua_go/core/helpers/connectivity_helper.dart';
 import 'package:aqua_go/features/auth/data/services/device_token_sync.dart';
 import 'package:aqua_go/init_notifications.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
@@ -34,6 +36,19 @@ void launchApp(AppEnvironment environment) async {
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
+    );
+    // App Check attestation: activate right after Firebase init on the default
+    // app. Debug builds use the debug providers (their debug token is registered
+    // in the Firebase console for CI/dev devices); release builds attest with
+    // Play Integrity (Android) + App Attest (iOS). Enforcement is server-side
+    // (default off) — a failure here must still boot the app.
+    await FirebaseAppCheck.instance.activate(
+      providerAndroid: kDebugMode
+          ? const AndroidDebugProvider()
+          : const AndroidPlayIntegrityProvider(),
+      providerApple: kDebugMode
+          ? const AppleDebugProvider()
+          : const AppleAppAttestProvider(),
     );
   } catch (e) {
     /* proceed without firebase */

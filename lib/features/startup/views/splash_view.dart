@@ -101,6 +101,12 @@ class _SplashViewState extends State<SplashView>
       return;
     }
 
+    // PH1-008/024: rehydrate the in-memory user cache from secure storage once
+    // at cold start (getUser() no longer reads disk). Token-gated inside
+    // restoreCachedUser, so a stale blob is never resurrected without a token.
+    await locator<AuthRepository>().restoreCachedUser();
+    if (!mounted) return;
+
     final result = await locator<AuthRepository>().refreshProfile();
     if (!mounted) return;
 

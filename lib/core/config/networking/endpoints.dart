@@ -1,8 +1,7 @@
 abstract class Endpoints {
   static const String host = 'qa-api.aquago.sa';
   static const String baseUrl = 'https://$host/api/customer/';
-  // static const String baseUrlDev = 'https://api.aquago.sa/api/customer/';
-  static const String baseUrlDev = 'https://p2-api.aquago.sa/api/customer/';
+  static const String baseUrlDev = 'https://api.aquago.sa/api/customer/';
   static const String baseUrlQa = 'https://qa-api.aquago.sa/api/customer/';
 
   //  Auth Endpoints
@@ -45,12 +44,13 @@ abstract class Endpoints {
 
   //  Bookings & Quotes Endpoints
   static const String quotes = 'quotes';
-  static const String giftQuote = 'gifts/quote';
   static const String bookings = 'bookings';
   // Completed-but-unrated bookings inside the live 7-day rating window
   // (AQG-160 home rating popup). Returns a JSON array of BookingResponse.
   static const String pendingRating = 'bookings/pending-rating';
-
+  // Pay-before-create: re-validates the quote + soft-holds the slot, returns
+  // {amountMinor, givenId, metadata} for the on-device Moyasar SDK purchase.
+  static const String bookingsPaymentInit = 'bookings/payment-init';
   static String bookingDetail(String bookingId) => 'bookings/$bookingId';
   // Server-rendered receipt PDF (opened via url_launcher; no in-app render).
   static String bookingReceiptPdf(String bookingId) =>
@@ -65,29 +65,6 @@ abstract class Endpoints {
       'bookings/$bookingId/edit';
   static String tipBooking(String bookingId) => 'bookings/$bookingId/tip';
 
-  // payments Endpoints
-
-  /// Server-supplied Moyasar publishable key + Apple Pay config.
-  /// Loaded at runtime so the key is never compiled into the binary.
-  static const String paymentSdkConfig = 'payments/sdk-config';
-
-  // Pay-before-create: re-validates the quote + soft-holds the slot, returns
-  // {amountMinor, givenId, metadata} for the on-device Moyasar SDK purchase.
-  static const String bookingsPaymentInit = 'bookings/payment-init';
-  // Pay-before-confirm for subscription wash add-ons (Stage 5c2): validates
-  // the payable add-on delta and returns {amountMinor, givenId, metadata}
-  // for the on-device Moyasar SDK purchase. Idempotency-Key: wash-addon-payment-init:{washId}.
-  static String washAddonPaymentInit(String subscriptionId, String washId) =>
-      'subscriptions/$subscriptionId/washes/$washId/addons/payment-init';
-
-  // Pay-before-create for subscriptions (mirrors bookings/payment-init).
-  static const String subscriptionsPaymentInit = 'subscriptions/payment-init';
-
-  static String tipBookingPaymentInit(String bookingId) =>
-      'bookings/$bookingId/tip/payment-init';
-
-  static const String giftPaymentInit = 'gifts/payment-init';
-
   //  Banners Endpoints
   static const String banners = 'banners';
 
@@ -95,11 +72,13 @@ abstract class Endpoints {
   static const String zoneCheck = 'geo/zone-check';
   static const String geoPlacesAutocomplete = 'geo/places/autocomplete';
   static String geoPlaceDetail(String placeId) => 'geo/places/$placeId';
+  static const String geoPlacesReverseGeocode = 'geo/places/reverse-geocode';
 
   //  Packages & Subscriptions Endpoints
   static const String packages = 'subscription-packages';
   static const String subscriptions = 'subscriptions';
-
+  // Pay-before-create for subscriptions (mirrors bookings/payment-init).
+  static const String subscriptionsPaymentInit = 'subscriptions/payment-init';
   static String subscriptionDetail(String subscriptionId) =>
       'subscriptions/$subscriptionId';
   static String cancelSubscription(String subscriptionId) =>
@@ -110,7 +89,11 @@ abstract class Endpoints {
       'subscriptions/$subscriptionId/washes';
   static String subscriptionWashDetail(String subscriptionId, String washId) =>
       'subscriptions/$subscriptionId/washes/$washId';
-
+  // Pay-before-confirm for subscription wash add-ons (Stage 5c2): validates
+  // the payable add-on delta and returns {amountMinor, givenId, metadata}
+  // for the on-device Moyasar SDK purchase. Idempotency-Key: wash-addon-payment-init:{washId}.
+  static String washAddonPaymentInit(String subscriptionId, String washId) =>
+      'subscriptions/$subscriptionId/washes/$washId/addons/payment-init';
   static String previewScheduleSubscriptionWash(
     String subscriptionId,
     String washId,
@@ -157,8 +140,15 @@ abstract class Endpoints {
       'complaints/$complaintId/photos/confirm';
 
   // Wallet Endpoints
-  static const String wallet = 'loyalty';
-  static const String walletLedger = 'loyalty/ledger';
+  static const String wallet = 'me/wallet';
+  static const String walletAutoTopup = 'me/wallet/auto-topup';
+  static const String walletTopup = 'me/wallet/topup';
+  static const String walletLedger = 'me/wallet/ledger';
+
+  // Payments Endpoints
+  /// Server-supplied Moyasar publishable key + Apple Pay config.
+  /// Loaded at runtime so the key is never compiled into the binary.
+  static const String paymentSdkConfig = 'payments/sdk-config';
 
   // Saved Cards Endpoints
   static const String savedCards = 'me/saved-cards';
@@ -168,12 +158,10 @@ abstract class Endpoints {
 
   // Gift Themes & Gifts Endpoints
   static const String giftThemes = 'gift-themes';
-  static const String giftsSent = 'gifts';
-  static const String giftsReceived = 'gifts/received';
+  static const String gifts = 'gifts';
   static String giftDetail(String giftId) => 'gifts/$giftId';
   static String cancelGift(String giftId) => 'gifts/$giftId/cancel';
   static const String redeemGift = 'gifts/redeem';
-  static const String giftQuotes = 'gifts/quote';
 
   // Promos Endpoints
   static const String validatePromo = 'promos/validate';
@@ -195,13 +183,8 @@ abstract class Endpoints {
   static String reportChatMessage(String messageId) =>
       'chat/messages/$messageId/report';
 
-  // External Google Maps Endpoints (Legacy Direct Calls)
-  static const String googleMapsAutocompleteUrl =
-      'https://maps.googleapis.com/maps/api/place/autocomplete/json';
-  static const String googleMapsPlaceDetailsUrl =
-      'https://maps.googleapis.com/maps/api/place/details/json';
-  static const String googleMapsGeocodeUrl =
-      'https://maps.googleapis.com/maps/api/geocode/json';
+  // PH1-005: legacy direct Google Maps endpoints removed — all place lookups now
+  // route through the backend geo/places proxy (server holds the Google key).
 
   static String nameAvatar(String? userName) =>
       'https://ui-avatars.com/api/?name=$userName&background=00D5DD&color=fff';

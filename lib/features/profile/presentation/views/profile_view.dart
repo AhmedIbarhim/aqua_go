@@ -4,6 +4,7 @@ import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:aqua_go/core/security/screen_protection.dart';
 import 'package:aqua_go/core/config/di/service_locator.dart';
 import 'package:aqua_go/features/auth/presentation/controllers/auth_cubit/auth_cubit.dart';
 import 'package:svg_flutter/svg_flutter.dart';
@@ -30,6 +31,11 @@ class ProfileView extends StatefulWidget {
 class _ProfileViewState extends State<ProfileView> {
   @override
   Widget build(BuildContext context) {
+    // PH1-022: profile screen shows PII — block screenshots/snapshots.
+    return ScreenProtectionScope(child: _buildProtected(context));
+  }
+
+  Widget _buildProtected(BuildContext context) {
     double sw(double width) => context.sw(width);
     double sh(double height) => context.sh(height);
 
@@ -90,10 +96,6 @@ class _ProfileViewState extends State<ProfileView> {
                               AppAssets.verified,
                               width: sw(18),
                               height: sh(18),
-                              colorFilter: ColorFilter.mode(
-                                context.colors.info,
-                                BlendMode.srcIn,
-                              ),
                             ),
                           ],
                         ],
@@ -204,20 +206,16 @@ class _ProfileViewState extends State<ProfileView> {
                               },
                             ),
 
-                            SizedBox(height: sh(8)),
-                            ProfileTile(
-                              title: LocaleKeys.profile_my_wallet.tr(
-                                context: context,
-                              ),
-                              icon: AppAssets.wallet,
-                              onTap: () {
-                                if (isGuest) {
-                                  _promptGuestToLogin(context);
-                                } else {
-                                  context.pushNamed(Routes.myWallet);
-                                }
-                              },
-                            ),
+                            // SizedBox(height: sh(8)),
+                            // ProfileTile(
+                            //   title: LocaleKeys.profile_my_wallet.tr(context: context),
+                            //   icon: AppAssets.wallet,
+                            //   onTap: () {
+                            //     if (isGuest) {
+                            //       _promptGuestToLogin(context);
+                            //     }
+                            //   },
+                            // ),
                             SizedBox(height: sh(8)),
 
                             ProfileTile(
