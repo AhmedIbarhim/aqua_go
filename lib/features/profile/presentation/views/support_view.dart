@@ -92,7 +92,7 @@ class SupportView extends StatelessWidget {
                       title: LocaleKeys.support_contact_us.tr(context: context),
                       icon: AppAssets.messages,
                       onTap: () {
-                        context.pushNamed(Routes.supportChat);
+                        context.pushNamed(Routes.chatInbox);
                       },
                     ),
                     SizedBox(height: sh(12)),

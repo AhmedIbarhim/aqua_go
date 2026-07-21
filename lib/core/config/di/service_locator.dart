@@ -57,6 +57,9 @@ import 'package:aqua_go/features/support/presentation/controllers/faqs_cubit.dar
 import 'package:aqua_go/features/wallet/data/data_sources/wallet_remote_data_source.dart';
 import 'package:aqua_go/features/wallet/data/repos/wallet_repository.dart';
 import 'package:aqua_go/features/wallet/presentation/controllers/wallet_cubit.dart';
+import 'package:aqua_go/features/chat/data/data_sources/chat_remote_data_source.dart';
+import 'package:aqua_go/features/chat/data/repos/chat_repository.dart';
+import 'package:aqua_go/features/chat/presentation/controllers/chat_threads_cubit/chat_threads_cubit.dart';
 import 'package:get_it/get_it.dart';
 
 import '../../../features/address/data/services/location_service.dart';
@@ -128,6 +131,9 @@ Future<void> initServiceLocator(AppConfigs configs) async {
   locator.registerLazySingleton<WalletRemoteDataSource>(
     () => WalletRemoteDataSource(locator()),
   );
+  locator.registerLazySingleton<ChatRemoteDataSource>(
+    () => ChatRemoteDataSource(locator()),
+  );
 
   // Repositories
 
@@ -195,6 +201,9 @@ Future<void> initServiceLocator(AppConfigs configs) async {
   );
   locator.registerLazySingleton<WalletRepository>(
     () => WalletRepository(locator()),
+  );
+  locator.registerLazySingleton<ChatRepository>(
+    () => ChatRepository(locator()),
   );
 
   // Cubits
@@ -265,4 +274,10 @@ Future<void> initServiceLocator(AppConfigs configs) async {
   locator.registerFactory<FaqsCubit>(() => FaqsCubit(locator()));
   locator.registerFactory<SupportCubit>(() => SupportCubit(locator()));
   locator.registerFactory<WalletCubit>(() => WalletCubit(locator()));
+  // ChatThreadsCubit drives the support inbox. ChatThreadCubit (a single open
+  // thread) is NOT registered here — it needs threadId + currentUserId +
+  // initialThread ctor args, so the router constructs it with locator<ChatRepository>().
+  locator.registerFactory<ChatThreadsCubit>(
+    () => ChatThreadsCubit(locator()),
+  );
 }

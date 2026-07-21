@@ -24,7 +24,7 @@ import '../my_bookings/presentation/views/my_booking_details_view.dart';
 
 /// A deep-link target parsed from either an inbox record or an FCM data block.
 class NotificationTarget {
-  final String targetType; // BOOKING | COMPLAINT | SUBSCRIPTION
+  final String targetType; // BOOKING | COMPLAINT | SUBSCRIPTION | CHAT
   final String targetId;
 
   const NotificationTarget({required this.targetType, required this.targetId});
@@ -33,16 +33,26 @@ class NotificationTarget {
 
   /// Builds a target from an FCM data payload (a `Map<String, dynamic>` whose
   /// values are Strings). Returns null when the routing pair is absent.
+  ///
+  /// Chat replies deep-link into a thread. The canonical shape is
+  /// `(targetType=CHAT, targetId=<threadId>)`; as a best-effort fallback a bare
+  /// `threadId` data field is also accepted (the exact backend chat-push shape
+  /// is not yet pinned — see task note).
   static NotificationTarget? fromData(Map<String, dynamic> data) {
     final targetType = data['targetType']?.toString();
     final targetId = data['targetId']?.toString();
-    if (targetType == null ||
-        targetType.isEmpty ||
-        targetId == null ||
-        targetId.isEmpty) {
-      return null;
+    if (targetType != null &&
+        targetType.isNotEmpty &&
+        targetId != null &&
+        targetId.isNotEmpty) {
+      return NotificationTarget(targetType: targetType, targetId: targetId);
     }
-    return NotificationTarget(targetType: targetType, targetId: targetId);
+    // Best-effort: a chat push that only carries a threadId.
+    final threadId = data['threadId']?.toString();
+    if (threadId != null && threadId.isNotEmpty) {
+      return NotificationTarget(targetType: 'CHAT', targetId: threadId);
+    }
+    return null;
   }
 }
 
@@ -86,6 +96,14 @@ bool routeForNotification(NotificationTarget target, {bool dedupe = true}) {
     case 'SUBSCRIPTION':
       // No per-subscription detail route exists today; land on the list view.
       navigator.pushNamed(Routes.mySubscribedPackages);
+      _lastRoutedKey = target.key;
+      return true;
+    case 'CHAT':
+      // A chat reply — open the thread directly by id.
+      navigator.pushNamed(
+        Routes.chatThread,
+        arguments: ChatThreadArgs(threadId: target.targetId),
+      );
       _lastRoutedKey = target.key;
       return true;
     default:

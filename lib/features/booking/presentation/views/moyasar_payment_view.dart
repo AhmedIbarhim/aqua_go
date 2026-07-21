@@ -8,6 +8,7 @@ import 'package:moyasar/moyasar.dart' as moyasar;
 import 'package:aqua_go/core/config/payment/moyasar_config.dart';
 import 'package:aqua_go/core/enums/payment_method_enum.dart';
 import 'package:aqua_go/core/extentions/context_extentions.dart';
+import 'package:aqua_go/core/security/screen_protection.dart';
 import 'package:aqua_go/features/booking/data/models/payment_init_model.dart';
 
 enum MoyasarPaymentStatus { paid, failed, cancelled }
@@ -200,6 +201,13 @@ class _MoyasarPaymentViewState extends State<MoyasarPaymentView>
 
   @override
   Widget build(BuildContext context) {
+    // PH1-022: payment screen — block screenshots/snapshots. The wrapper only
+    // toggles platform protection; it does NOT alter the deliberate light-island
+    // Moyasar theme below.
+    return ScreenProtectionScope(child: _buildProtected(context));
+  }
+
+  Widget _buildProtected(BuildContext context) {
     final isAr = context.isAr;
     final topInset = MediaQuery.of(context).padding.top;
 

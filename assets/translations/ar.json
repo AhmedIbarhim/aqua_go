@@ -191,6 +191,7 @@
         "pay_using_points": "ادفع باستخدام النقاط",
         "available_points_format": "المتاح: {} نقطة ≈ {} ريال",
         "insufficient_points": "رصيد الحالي لا يكفي",
+        "card_charged": "المبلغ المدفوع بالبطاقة",
         "apply_code_hint": "أدخل كود الخصم",
         "apply": "تطبيق",
         "cancel": "إلغاء",
@@ -472,5 +473,50 @@
         "booking_number": "رقم الحجز {}",
         "today": "اليوم",
         "yesterday": "امس"
+    },
+    "chat": {
+        "inbox_title": "الدعم",
+        "thread_title": "الدعم",
+        "new_ticket": "محادثة جديدة",
+        "inbox_empty_title": "لا توجد محادثات بعد",
+        "inbox_empty_subtitle": "ابدأ محادثة مع فريق الدعم وسنعود إليك في أقرب وقت.",
+        "new_ticket_title": "تذكرة دعم جديدة",
+        "new_ticket_category": "التصنيف",
+        "new_ticket_category_hint": "اختر التصنيف",
+        "new_ticket_category_required": "الرجاء اختيار التصنيف",
+        "new_ticket_subject": "الموضوع",
+        "new_ticket_subject_hint": "صف مشكلتك باختصار",
+        "new_ticket_subject_required": "الرجاء إدخال الموضوع",
+        "new_ticket_subject_too_long": "يجب ألا يزيد الموضوع عن 200 حرف",
+        "new_ticket_start": "بدء المحادثة",
+        "resolved_banner": "تم حل هذه المحادثة. أرسل رسالة لإعادة فتحها.",
+        "uploading_attachment": "جاري رفع المرفق...",
+        "send_failed": "فشل إرسال الرسالة. حاول مرة أخرى.",
+        "resend": "اضغط لإعادة الإرسال",
+        "attachment_failed": "تعذر إرسال المرفق. حاول مرة أخرى.",
+        "report_title": "الإبلاغ عن الرسالة",
+        "report_confirm": "هل تريد الإبلاغ عن هذه الرسالة لمراجعتها من قبل فريقنا؟",
+        "report_action": "إبلاغ",
+        "report_success": "تم الإبلاغ عن الرسالة للمراجعة",
+        "report_failed": "تعذر الإبلاغ عن الرسالة. حاول مرة أخرى.",
+        "status": {
+            "open": "مفتوحة",
+            "assigned": "قيد المعالجة",
+            "resolved": "تم الحل",
+            "closed": "مغلقة"
+        },
+        "category": {
+            "booking_issue": "مشكلة في الحجز",
+            "payment": "الدفع",
+            "account": "الحساب",
+            "worker": "العامل",
+            "general": "عام"
+        },
+        "role": {
+            "you": "أنت",
+            "support_agent": "الدعم",
+            "worker": "العامل",
+            "system": "النظام"
+        }
     }
 }

@@ -191,6 +191,7 @@
         "pay_using_points": "Pay using points",
         "available_points_format": "Available: {} points ≈ {} SAR",
         "insufficient_points": "Current balance is not enough",
+        "card_charged": "Card Charged",
         "apply_code_hint": "Enter promo code",
         "apply": "Apply",
         "cancel": "Cancel",
@@ -472,5 +473,50 @@
         "booking_number": "Booking No. {}",
         "today": "Today",
         "yesterday": "Yesterday"
+    },
+    "chat": {
+        "inbox_title": "Support",
+        "thread_title": "Support",
+        "new_ticket": "New ticket",
+        "inbox_empty_title": "No conversations yet",
+        "inbox_empty_subtitle": "Start a conversation with our support team and we'll get back to you.",
+        "new_ticket_title": "New support ticket",
+        "new_ticket_category": "Category",
+        "new_ticket_category_hint": "Select a category",
+        "new_ticket_category_required": "Please select a category",
+        "new_ticket_subject": "Subject",
+        "new_ticket_subject_hint": "Briefly describe your issue",
+        "new_ticket_subject_required": "Please enter a subject",
+        "new_ticket_subject_too_long": "Subject must be 200 characters or fewer",
+        "new_ticket_start": "Start conversation",
+        "resolved_banner": "This conversation is resolved. Send a message to reopen it.",
+        "uploading_attachment": "Uploading attachment...",
+        "send_failed": "Message failed to send. Please try again.",
+        "resend": "Tap to resend",
+        "attachment_failed": "Couldn't send attachment. Please try again.",
+        "report_title": "Report message",
+        "report_confirm": "Report this message to our team for review?",
+        "report_action": "Report",
+        "report_success": "Message reported for review",
+        "report_failed": "Couldn't report the message. Please try again.",
+        "status": {
+            "open": "Open",
+            "assigned": "Assigned",
+            "resolved": "Resolved",
+            "closed": "Closed"
+        },
+        "category": {
+            "booking_issue": "Booking issue",
+            "payment": "Payment",
+            "account": "Account",
+            "worker": "Worker",
+            "general": "General"
+        },
+        "role": {
+            "you": "You",
+            "support_agent": "Support",
+            "worker": "Worker",
+            "system": "System"
+        }
     }
 }

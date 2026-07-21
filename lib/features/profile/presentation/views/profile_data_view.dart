@@ -2,6 +2,7 @@ import 'package:aqua_go/core/components/custom_button.dart';
 import 'package:aqua_go/core/components/custom_text_field.dart';
 import 'package:aqua_go/core/components/generic_app_bar.dart';
 import 'package:aqua_go/core/extentions/context_extentions.dart';
+import 'package:aqua_go/core/security/screen_protection.dart';
 import 'package:aqua_go/core/themes/app_colors.dart';
 import 'package:aqua_go/core/themes/app_text_styles.dart';
 import 'package:aqua_go/core/utils/app_assets.dart';
@@ -70,6 +71,11 @@ class _ProfileDataViewState extends State<ProfileDataView> {
 
   @override
   Widget build(BuildContext context) {
+    // PH1-022: profile-data screen collects/shows PII — block screenshots.
+    return ScreenProtectionScope(child: _buildProtected(context));
+  }
+
+  Widget _buildProtected(BuildContext context) {
     return BlocProvider(
       create: (context) => locator<AuthCubit>(),
       child: BlocListener<AuthCubit, AuthState>(

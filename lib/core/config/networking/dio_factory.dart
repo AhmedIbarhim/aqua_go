@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:talker_dio_logger/talker_dio_logger.dart';
 
+import 'app_check_interceptor.dart';
 import 'auth_interceptor.dart';
 import 'refresh_token_interceptor.dart';
 
@@ -20,6 +21,7 @@ class DioFactory {
     );
 
     dio.interceptors.addAll([
+      AppCheckInterceptor(),
       AuthInterceptor(),
       RefreshTokenInterceptor(dio),
     ]);

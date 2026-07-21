@@ -1,3 +1,5 @@
+/// PH1-005: mirrors the backend flat geo DTOs (`PlaceDetailsResponse` /
+/// `ReverseGeocodeResponse`): {placeId, formattedAddress, latitude, longitude}.
 class LocationModel {
   final String formattedAddress;
   final double lat;
@@ -9,22 +11,12 @@ class LocationModel {
     required this.lng,
   });
 
-  factory LocationModel.fromGeocodeJson(Map<String, dynamic> json) {
-    final location = json['geometry']['location'];
+  /// Parses the flat proxy DTO shared by place-details and reverse-geocode.
+  factory LocationModel.fromJson(Map<String, dynamic> json) {
     return LocationModel(
-      formattedAddress: json['formatted_address'] ?? '',
-      lat: (location['lat'] as num).toDouble(),
-      lng: (location['lng'] as num).toDouble(),
-    );
-  }
-
-  factory LocationModel.fromPlaceDetailsJson(Map<String, dynamic> json) {
-    final location = json['result']['geometry']['location'];
-    return LocationModel(
-      formattedAddress:
-          json['result']['formatted_address'] ?? json['result']['name'] ?? '',
-      lat: (location['lat'] as num).toDouble(),
-      lng: (location['lng'] as num).toDouble(),
+      formattedAddress: json['formattedAddress'] ?? '',
+      lat: (json['latitude'] as num).toDouble(),
+      lng: (json['longitude'] as num).toDouble(),
     );
   }
 }

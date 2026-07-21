@@ -4,6 +4,7 @@ import 'package:equatable/equatable.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/foundation.dart';
+import 'package:uuid/uuid.dart';
 import '../../../data/repos/maps_repository.dart';
 import '../../../data/models/place_prediction_model.dart';
 
@@ -18,6 +19,14 @@ class MapsCubit extends Cubit<MapsState> {
 
   Timer? _debounce;
   StreamSubscription<ServiceStatus>? _serviceStatusSubscription;
+
+  // PH1-005: one Google billing session groups the autocomplete calls of a
+  // single search until the user picks a result (or clears). Minted lazily on
+  // the first keystroke; reset once a place is selected or the search clears.
+  static const _uuid = Uuid();
+  String? _sessionToken;
+
+  String _currentSessionToken() => _sessionToken ??= _uuid.v4();
 
   void _monitorLocationService() {
     _serviceStatusSubscription = Geolocator.getServiceStatusStream().listen((
@@ -108,13 +117,17 @@ class MapsCubit extends Cubit<MapsState> {
       if (query.isNotEmpty) {
         _getAutocomplete(query);
       } else {
+        _sessionToken = null;
         emit(state.copyWith(placePredictions: [], showSearchResults: false));
       }
     });
   }
 
   Future<void> _getAutocomplete(String query) async {
-    final result = await mapsRepository.getAutocomplete(query);
+    final result = await mapsRepository.getAutocomplete(
+      query,
+      _currentSessionToken(),
+    );
 
     result.fold(
       (failure) => debugPrint(failure.message),
@@ -129,6 +142,9 @@ class MapsCubit extends Cubit<MapsState> {
 
   Future<void> getPlaceDetails(String placeId) async {
     final result = await mapsRepository.getPlaceDetails(placeId);
+
+    // The billing session ends once a suggestion is resolved to a place.
+    _sessionToken = null;
 
     result.fold((failure) => debugPrint(failure.message), (address) {
       final latLng = LatLng(address.lat, address.lng);
@@ -172,6 +188,7 @@ class MapsCubit extends Cubit<MapsState> {
   }
 
   void clearSearch() {
+    _sessionToken = null;
     emit(state.copyWith(placePredictions: [], showSearchResults: false));
   }
 
