@@ -64,6 +64,9 @@ abstract class Endpoints {
   static String editBookingLogistics(String bookingId) =>
       'bookings/$bookingId/edit';
   static String tipBooking(String bookingId) => 'bookings/$bookingId/tip';
+  static String tipBookingPaymentInit(String bookingId) =>
+      'bookings/$bookingId/tip/payment-init';
+
 
   //  Banners Endpoints
   static const String banners = 'banners';
@@ -158,10 +161,13 @@ abstract class Endpoints {
 
   // Gift Themes & Gifts Endpoints
   static const String giftThemes = 'gift-themes';
-  static const String gifts = 'gifts';
+  static const String giftsSent = 'gifts';
+  static const String giftsReceived = 'gifts/received';
   static String giftDetail(String giftId) => 'gifts/$giftId';
   static String cancelGift(String giftId) => 'gifts/$giftId/cancel';
   static const String redeemGift = 'gifts/redeem';
+  static const String giftQuotes = 'gifts/quote';
+  static const String giftPaymentInit = 'gifts/payment-init';
 
   // Promos Endpoints
   static const String validatePromo = 'promos/validate';
