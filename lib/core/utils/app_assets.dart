@@ -196,6 +196,9 @@ abstract class AppAssets {
       'assets/svg/account_blocked_light.svg';
   static const String noAddresses = 'assets/svg/no_addresses.svg';
 
+  // defaults
+  static const String defatltPackageIcon = 'assets/images/gift_demo.png';
+
   //Demos
   static const String demoBanner = 'assets/demos/banner_demo.webp';
 
