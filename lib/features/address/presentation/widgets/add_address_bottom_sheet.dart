@@ -214,6 +214,7 @@ class _AddAddressBottomSheetState extends State<AddAddressBottomSheet> {
               SizedBox(height: height * 0.01),
               CustomTextFormField(
                 controller: _addressNameController,
+                maxLength: 20,
                 label: LocaleKeys.address_address_name_label.tr(
                   context: context,
                 ),

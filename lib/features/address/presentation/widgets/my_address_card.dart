@@ -35,10 +35,14 @@ class MyAddressCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                address.label,
-                style: AppTextStyles.regular16.copyWith(
-                  color: context.colors.contentSecondaryLight,
+              Expanded(
+                child: Text(
+                  address.label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyles.regular16.copyWith(
+                    color: context.colors.contentSecondaryLight,
+                  ),
                 ),
               ),
               Row(
