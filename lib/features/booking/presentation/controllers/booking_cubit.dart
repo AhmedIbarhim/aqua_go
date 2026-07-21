@@ -16,23 +16,46 @@ import '../../domain/strategies/booking_submit_strategy.dart';
 import 'booking_state.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:aqua_go/features/home/data/models/add_on_model.dart';
+import 'package:aqua_go/features/home/data/repos/services_repository.dart';
 import 'package:aqua_go/features/subscriptions/data/repos/subscriptions_repository.dart';
 import 'package:aqua_go/features/subscriptions/data/models/subscription_response_model/subscription_wash.dart';
 import 'package:aqua_go/features/subscriptions/data/models/subscription_response_model/subscription_included_allowance.dart';
 
+/// Remaps index-based add-on selections ([BookingState.selectedServiceIndices])
+/// onto [freshAddons] by add-on ID. Selections whose add-on no longer exists
+/// are dropped. Top-level + pure for unit-testing.
+Set<int> remapAddonSelections(
+  List<AddOnModel> oldAddons,
+  Set<int> selectedIndices,
+  List<AddOnModel> freshAddons,
+) {
+  final remapped = <int>{};
+  for (final idx in selectedIndices) {
+    if (idx < 0 || idx >= oldAddons.length) continue;
+    final id = oldAddons[idx].id;
+    if (id == null) continue;
+    final newIdx = freshAddons.indexWhere((a) => a.id == id);
+    if (newIdx != -1) remapped.add(newIdx);
+  }
+  return remapped;
+}
+
 class BookingCubit extends Cubit<BookingState> {
   final BookingRepository _bookingRepo;
   final SubscriptionsRepository _subscriptionsRepo;
+  final ServicesRepository _servicesRepo;
   final BookingFlowConfig _flowConfig;
   final BookingSubmitStrategy _submitStrategy;
 
   BookingCubit({
     required BookingRepository bookingRepo,
     required SubscriptionsRepository subscriptionsRepo,
+    required ServicesRepository servicesRepo,
     BookingFlowConfig flowConfig = BookingFlowConfig.normal,
     required BookingSubmitStrategy submitStrategy,
   }) : _bookingRepo = bookingRepo,
        _subscriptionsRepo = subscriptionsRepo,
+       _servicesRepo = servicesRepo,
        _flowConfig = flowConfig,
        _submitStrategy = submitStrategy,
        super(BookingState(flowConfig: flowConfig));
@@ -242,6 +265,50 @@ class BookingCubit extends Cubit<BookingState> {
             ? bundledServices.first
             : null,
       ),
+    );
+  }
+
+  /// Refetches the current catalogue so displayed add-on prices are fresh.
+  /// Service flow: rebinds [BookingState.selectedService] and remaps the
+  /// index-based selections by add-on ID ([remapAddonSelections]). Package
+  /// flow: re-runs [fetchSubscriptionDetails]. Reschedule: no-op (booking
+  /// content is frozen at creation). Failures keep the existing snapshot —
+  /// the server quote stays authoritative for money.
+  Future<void> refreshCatalog() async {
+    if (state.flowConfig.isPackage) {
+      final subscriptionId = state.subscriptionId;
+      if (subscriptionId != null) {
+        await fetchSubscriptionDetails(subscriptionId);
+      }
+      return;
+    }
+    if (!state.flowConfig.isNormal) return;
+    final current = state.selectedService;
+    if (current == null || current.id == null) return;
+
+    final result = await _servicesRepo.fetchServices();
+    result.fold(
+      (_) {},
+      (services) {
+        ServiceModel? fresh;
+        for (final s in services) {
+          if (s.id == current.id) {
+            fresh = s;
+            break;
+          }
+        }
+        if (fresh == null) return;
+        emit(
+          state.copyWith(
+            selectedService: fresh,
+            selectedServiceIndices: remapAddonSelections(
+              current.addons,
+              state.selectedServiceIndices,
+              fresh.addons,
+            ),
+          ),
+        );
+      },
     );
   }
 

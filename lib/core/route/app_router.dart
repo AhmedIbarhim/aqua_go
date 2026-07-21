@@ -34,6 +34,7 @@ import '../../features/my_bookings/presentation/views/my_booking_details_view.da
 import '../../features/my_bookings/presentation/views/receipt_summary_view.dart';
 import '../../features/my_cars/data/models/my_car_model.dart';
 import '../../features/home/data/models/service_model.dart';
+import '../../features/home/data/repos/services_repository.dart';
 import '../../features/address/data/models/address_model.dart';
 import '../../features/booking/data/repos/booking_repository.dart';
 import '../../features/profile/presentation/views/language_select_view.dart';
@@ -171,6 +172,7 @@ abstract class AppRouter {
                 BookingCubit(
                   bookingRepo: locator<BookingRepository>(),
                   subscriptionsRepo: locator<SubscriptionsRepository>(),
+                  servicesRepo: locator<ServicesRepository>(),
                   flowConfig: args.flowConfig,
                   submitStrategy: args.submitStrategy,
                 )..initBooking(

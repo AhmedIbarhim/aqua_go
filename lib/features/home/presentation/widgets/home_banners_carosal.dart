@@ -30,10 +30,10 @@ class _HomeBannersCarosalState extends State<HomeBannersCarosal> {
       children: [
         CarouselSlider.builder(
           carouselController: widget.carouselController,
-          itemCount: widget.banners.length,
+          itemCount: getDemoBanners().length,
           itemBuilder: (context, index, realIndex) {
-            final banner = widget.banners[index];
-            final bannerImage = banner.image;
+            final banner = getDemoBanners()[index];
+            final bannerImage = banner.imageUrl;
             final isNetworkImage =
                 bannerImage.startsWith('http') ||
                 bannerImage.startsWith('https');
@@ -146,5 +146,50 @@ class _HomeBannersCarosalState extends State<HomeBannersCarosal> {
         // 'NONE' / null / unknown — no-op.
         break;
     }
+  }
+
+  List<String> demoBanners() {
+    if (context.isAr) {
+      return [
+        AppAssets.bannersOneAr,
+        AppAssets.bannersTwoAr,
+        AppAssets.bannersThreeAr,
+      ];
+    } else {
+      return [
+        AppAssets.bannersOneEn,
+        AppAssets.bannersTwoEn,
+        AppAssets.bannersThreeEn,
+      ];
+    }
+  }
+
+  List<BannerModel> getDemoBanners() {
+    return [
+      BannerModel(
+        id: '0',
+        imageUrl: demoBanners().first,
+        ctaType: 'URL',
+        ctaTarget: 'https://aquago.sa/',
+        locale: context.isAr ? 'ar' : 'en',
+        sortOrder: 0,
+      ),
+      BannerModel(
+        id: '1',
+        imageUrl: demoBanners()[1],
+        ctaType: 'URL',
+        ctaTarget: 'https://aquago.sa/',
+        locale: context.isAr ? 'ar' : 'en',
+        sortOrder: 1,
+      ),
+      BannerModel(
+        id: '2',
+        imageUrl: demoBanners()[2],
+        ctaType: 'URL',
+        ctaTarget: "https://aquago.sa/",
+        locale: context.isAr ? 'ar' : 'en',
+        sortOrder: 2,
+      ),
+    ];
   }
 }

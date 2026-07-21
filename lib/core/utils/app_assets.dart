@@ -26,7 +26,6 @@ abstract class AppAssets {
       'assets/images/base_service_dark_en.png';
   static const String baseServiceLightEnverted =
       'assets/images/base_service_light_en.png';
-  static const String demoBanner = 'assets/images/banner_demo.webp';
 
   // Empty Screens
   static const String emptyCarsDark = 'assets/svg/empty_cars_dark.svg';
@@ -195,4 +194,22 @@ abstract class AppAssets {
       'assets/svg/account_blocked_dark.svg';
   static const String accountBlockedLight =
       'assets/svg/account_blocked_light.svg';
+  static const String noAddresses = 'assets/svg/no_addresses.svg';
+
+  //Demos
+  static const String demoBanner = 'assets/demos/banner_demo.webp';
+
+  static const String bannersOneAr = 'assets/demos/banners_1_ar.png';
+  static const String bannersTwoAr = 'assets/demos/banners_2_ar.png';
+  static const String bannersThreeAr = 'assets/demos/banners_3_ar.png';
+  static const String bannersOneEn = 'assets/demos/banners_1_ar.png';
+  static const String bannersTwoEn = 'assets/demos/banners_2_ar.png';
+  static const String bannersThreeEn = 'assets/demos/banners_3_ar.png';
+
+  static const String offersOneAr = 'assets/demos/offers_1_ar.png';
+  static const String offersTwoAr = 'assets/demos/offers_2_ar.png';
+  static const String offersThreeAr = 'assets/demos/offers_3_ar.png';
+  static const String offersOneEn = 'assets/demos/offers_1_ar.png';
+  static const String offersTwoEn = 'assets/demos/offers_2_ar.png';
+  static const String offersThreeEn = 'assets/demos/offers_3_ar.png';
 }

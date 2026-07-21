@@ -44,11 +44,13 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
     // total and every selected add-on. The displayed total reads from this
     // quote only — never from the (potentially stale) live catalog snapshot —
     // so later admin price edits affect only NEW bookings.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
       final cubit = context.read<BookingCubit>();
-      final state = cubit.state;
-      if (state.flowConfig.requiresQuote && !_initialQuoteRequested) {
+      final flowConfig = cubit.state.flowConfig;
+      await cubit.refreshCatalog();
+      if (!mounted) return;
+      if (flowConfig.requiresQuote && !_initialQuoteRequested) {
         _initialQuoteRequested = true;
         cubit.fetchQuote();
       }

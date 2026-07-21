@@ -1,8 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_text_styles.dart';
+import '../../../../core/utils/app_assets.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../../data/models/offer_model.dart';
 import 'offer_card.dart';
@@ -18,12 +20,6 @@ class OffersListView extends StatefulWidget {
 }
 
 class _OffersListViewState extends State<OffersListView> {
-  final List<OfferModel> offers = [
-    OfferModel(image: "assets/images/offer_demo.png"),
-    OfferModel(image: "assets/images/offer_demo.png"),
-    OfferModel(image: "assets/images/offer_demo.png"),
-  ];
-
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.sizeOf(context).height;
@@ -66,7 +62,7 @@ class _OffersListViewState extends State<OffersListView> {
                 onTap: () {
                   context.pushNamed(
                     Routes.offers,
-                    arguments: OffersArgs(offers: offers),
+                    arguments: OffersArgs(offers: getDemoOffers(context)),
                   );
                 },
                 child: Row(
@@ -110,13 +106,101 @@ class _OffersListViewState extends State<OffersListView> {
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 24),
-            itemCount: offers.length,
+            itemCount: getDemoOffers(context).length,
             separatorBuilder: (context, index) => const SizedBox(width: 16),
-            itemBuilder: (context, index) =>
-                OfferCard(offerModel: offers[index]),
+            itemBuilder: (context, index) => GestureDetector(
+              onTap: () =>
+                  _handleOfferTap(context, getDemoOffers(context)[index]),
+              child: OfferCard(offerModel: getDemoOffers(context)[index]),
+            ),
           ),
         ),
       ],
     );
+  }
+
+  List<String> demoOffers() {
+    if (context.isAr) {
+      return [
+        AppAssets.offersOneAr,
+        AppAssets.offersTwoAr,
+        AppAssets.offersThreeAr,
+      ];
+    } else {
+      return [
+        AppAssets.offersOneEn,
+        AppAssets.offersTwoEn,
+        AppAssets.offersThreeEn,
+      ];
+    }
+  }
+
+  List<OfferModel> getDemoOffers(BuildContext context) {
+    final List<OfferModel> offers = [
+      OfferModel(
+        id: '1',
+        locale: context.isAr ? 'ar' : 'en',
+        imageUrl: demoOffers()[0],
+        ctaType: 'URL',
+        ctaTarget: 'https://aquago.sa/',
+        sortOrder: 1,
+      ),
+      OfferModel(
+        id: '2',
+        locale: context.isAr ? 'ar' : 'en',
+        imageUrl: demoOffers()[1],
+        ctaType: 'DEEPLINK',
+        ctaTarget: 'packages',
+        sortOrder: 2,
+      ),
+      OfferModel(
+        id: '3',
+        locale: context.isAr ? 'ar' : 'en',
+        imageUrl: demoOffers()[2],
+        ctaType: 'DEEPLINK',
+        ctaTarget: 'packages',
+        sortOrder: 3,
+      ),
+    ];
+    return offers;
+  }
+
+  Future<void> _handleOfferTap(BuildContext context, OfferModel banner) async {
+    switch (banner.ctaType) {
+      case 'URL':
+        final target = banner.ctaTarget;
+        if (target == null || target.isEmpty) return;
+        try {
+          final ok = await launchUrl(
+            Uri.parse(target),
+            mode: LaunchMode.externalApplication,
+          );
+          if (!ok && context.mounted) {
+            context.showWarningSnackBar(
+              context.isAr ? 'تعذّر فتح الرابط.' : 'Could not open the link.',
+            );
+          }
+        } catch (_) {
+          if (context.mounted) {
+            context.showWarningSnackBar(
+              context.isAr ? 'تعذّر فتح الرابط.' : 'Could not open the link.',
+            );
+          }
+        }
+        break;
+      case 'DEEPLINK':
+        switch (banner.ctaTarget) {
+          case 'packages':
+            Navigator.pushNamed(context, Routes.packages);
+            break;
+          default:
+            // Unknown deeplink target — safe no-op.
+            break;
+        }
+        break;
+      default:
+        // 'NONE' / null / unknown — no-op.
+        break;
+    }
   }
 }
