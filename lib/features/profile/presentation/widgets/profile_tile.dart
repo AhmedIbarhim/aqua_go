@@ -72,11 +72,21 @@ class ProfileTile extends StatelessWidget {
                           ),
                   ),
                   SizedBox(width: sw(8)),
-                  Text(
-                    title,
-                    textDirection: isPhoneNumber ? ui.TextDirection.ltr : null,
-                    style: AppTextStyles.regular14.copyWith(
-                      color: textColor ?? context.colors.textPrimary,
+                  Expanded(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: AlignmentDirectional.centerStart,
+                      child: Text(
+                        title,
+                        maxLines: 1,
+                        softWrap: false,
+                        textDirection: isPhoneNumber
+                            ? ui.TextDirection.ltr
+                            : null,
+                        style: AppTextStyles.regular14.copyWith(
+                          color: textColor ?? context.colors.textPrimary,
+                        ),
+                      ),
                     ),
                   ),
                 ],
