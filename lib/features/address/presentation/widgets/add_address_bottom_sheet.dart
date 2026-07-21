@@ -137,16 +137,8 @@ class _AddAddressBottomSheetState extends State<AddAddressBottomSheet> {
             dismissDuration: const Duration(seconds: 2),
           );
         }
-
-        if (state is AddressesActionError) {
-          if (state.message == 'address-outside-service-area') {
-            context.showErrorSnackBar(
-              LocaleKeys.address_zone_not_available.tr(context: context),
-            );
-          } else {
-            context.showErrorSnackBar(state.message);
-          }
-        }
+        // AQG-267: AddressesActionError is handled by the parent MyAddressesView
+        // listener (single toast, no duplicate dialog).
       },
       builder: (context, state) {
         return SingleChildScrollView(
