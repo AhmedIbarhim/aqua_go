@@ -167,34 +167,58 @@ class _HomeViewState extends State<HomeView> {
                             _subscriptionsCubit.getActiveSubscriptions(),
                         ]);
                       },
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            BlocBuilder<BannersCubit, BannersState>(
-                              builder: (context, state) {
-                                final isLoading =
-                                    state is BannersLoading ||
-                                    state is BannersInitial;
-                                if (isLoading) {
-                                  return ShimmerHelper.banners(
+                      child: CustomScrollView(
+                        slivers: [
+                          BlocBuilder<BannersCubit, BannersState>(
+                            builder: (context, state) {
+                              final isLoading =
+                                  state is BannersLoading ||
+                                  state is BannersInitial;
+                              if (isLoading) {
+                                return SliverToBoxAdapter(
+                                  child: ShimmerHelper.banners(
                                     controller: _carouselController,
-                                  );
-                                }
-                                List<BannerModel> activeBanners = [];
-                                if (state is BannersLoaded) {
-                                  activeBanners = state.banners;
-                                }
-                                if (activeBanners.isEmpty) {
-                                  return const SizedBox.shrink();
-                                }
-                                return HomeBannersCarosal(
-                                  carouselController: _carouselController,
-                                  banners: activeBanners,
+                                  ),
                                 );
-                              },
+                              }
+                              List<BannerModel> activeBanners = [];
+                              if (state is BannersLoaded) {
+                                activeBanners = state.banners;
+                              }
+                              if (activeBanners.isEmpty) {
+                                return const SliverToBoxAdapter(
+                                  child: SizedBox.shrink(),
+                                );
+                              }
+                              final double carouselHeight = context.isTablet
+                                  ? context.screenHeight * 0.22
+                                  : context.screenHeight * 0.18;
+                              final double dotsHeight = activeBanners.isNotEmpty
+                                  ? context.screenHeight * 0.012 + 16
+                                  : 0;
+
+                              return SliverAppBar(
+                                automaticallyImplyLeading: false,
+                                backgroundColor: Colors.transparent,
+                                elevation: 0,
+                                toolbarHeight: 0,
+                                expandedHeight: carouselHeight + dotsHeight,
+                                flexibleSpace: FlexibleSpaceBar(
+                                  background: HomeBannersCarosal(
+                                    carouselController: _carouselController,
+                                    banners: activeBanners,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                          SliverToBoxAdapter(
+                            child: SizedBox(
+                              height: context.screenHeight * 0.01,
                             ),
-                            SizedBox(height: context.screenHeight * 0.01),
-                            Container(
+                          ),
+                          SliverToBoxAdapter(
+                            child: Container(
                               decoration: BoxDecoration(
                                 color: context.colors.background,
                                 borderRadius: const BorderRadius.only(
@@ -277,8 +301,8 @@ class _HomeViewState extends State<HomeView> {
                                 ],
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     );
                   },
