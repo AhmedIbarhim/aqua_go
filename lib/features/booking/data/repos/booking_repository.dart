@@ -8,6 +8,7 @@ import '../models/service_booking_request_model.dart';
 import '../models/service_reschedule_request_model.dart';
 import '../models/package_booking_request_model.dart';
 import '../models/package_reschedule_request_model.dart';
+import '../models/redeem_gift_booking_request_model.dart';
 import '../models/quote_model.dart';
 import '../models/payment_init_model.dart';
 import '../models/availability_response_model.dart';
@@ -207,15 +208,15 @@ class BookingRepository {
   }
 
   Future<Either<Failure, BookingResponseModel>> redeemGiftBooking(
-    Map<String, dynamic> data,
+    RedeemGiftBookingRequestModel request,
   ) async {
     try {
       final customerId = FetchUserData.getUserId() ?? '';
-      final giftCode = data['giftCode'] as String? ?? '';
+      final giftCode = request.giftCode;
       final idempotencyKey = 'gift-redeem-booking:$customerId:$giftCode';
 
       final response = await bookingsRemoteDataSource.redeemGiftBooking(
-        data: data,
+        data: request.toJson(),
         idempotencyKey: idempotencyKey,
       );
       return response.fold((failure) => left(failure), (resData) {
