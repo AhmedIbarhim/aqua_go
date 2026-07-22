@@ -23,7 +23,7 @@ ChatTheme buildChatTheme(BuildContext context) {
       onSurface: colors.textPrimary,
       // Received-message bubbles.
       surfaceContainer: colors.chatSecondary,
-      surfaceContainerLow: colors.chatPrimary,
+      surfaceContainerLow: colors.screenBG,
       surfaceContainerHigh: colors.cardBackGround,
     ),
     typography: ChatTypography.standard(fontFamily: fontFamily),

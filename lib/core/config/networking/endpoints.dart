@@ -45,14 +45,8 @@ abstract class Endpoints {
   //  Bookings & Quotes Endpoints
   static const String quotes = 'quotes';
   static const String bookings = 'bookings';
-  // Completed-but-unrated bookings inside the live 7-day rating window
-  // (AQG-160 home rating popup). Returns a JSON array of BookingResponse.
   static const String pendingRating = 'bookings/pending-rating';
-  // Pay-before-create: re-validates the quote + soft-holds the slot, returns
-  // {amountMinor, givenId, metadata} for the on-device Moyasar SDK purchase.
-  static const String bookingsPaymentInit = 'bookings/payment-init';
   static String bookingDetail(String bookingId) => 'bookings/$bookingId';
-  // Server-rendered receipt PDF (opened via url_launcher; no in-app render).
   static String bookingReceiptPdf(String bookingId) =>
       'bookings/$bookingId/receipt.pdf';
   static String cancelBooking(String bookingId) => 'bookings/$bookingId/cancel';
@@ -64,8 +58,6 @@ abstract class Endpoints {
   static String editBookingLogistics(String bookingId) =>
       'bookings/$bookingId/edit';
   static String tipBooking(String bookingId) => 'bookings/$bookingId/tip';
-  static String tipBookingPaymentInit(String bookingId) =>
-      'bookings/$bookingId/tip/payment-init';
 
   //  Banners Endpoints
   static const String banners = 'banners';
@@ -79,7 +71,6 @@ abstract class Endpoints {
   //  Packages & Subscriptions Endpoints
   static const String packages = 'subscription-packages';
   static const String subscriptions = 'subscriptions';
-  // Pay-before-create for subscriptions (mirrors bookings/payment-init).
   static const String subscriptionsPaymentInit = 'subscriptions/payment-init';
   static String subscriptionDetail(String subscriptionId) =>
       'subscriptions/$subscriptionId';
@@ -91,9 +82,7 @@ abstract class Endpoints {
       'subscriptions/$subscriptionId/washes';
   static String subscriptionWashDetail(String subscriptionId, String washId) =>
       'subscriptions/$subscriptionId/washes/$washId';
-  // Pay-before-confirm for subscription wash add-ons (Stage 5c2): validates
-  // the payable add-on delta and returns {amountMinor, givenId, metadata}
-  // for the on-device Moyasar SDK purchase. Idempotency-Key: wash-addon-payment-init:{washId}.
+
   static String washAddonPaymentInit(String subscriptionId, String washId) =>
       'subscriptions/$subscriptionId/washes/$washId/addons/payment-init';
   static String previewScheduleSubscriptionWash(
@@ -143,14 +132,14 @@ abstract class Endpoints {
 
   // Wallet Endpoints
   static const String wallet = 'loyalty';
-  static const String walletAutoTopup = 'me/wallet/auto-topup';
-  static const String walletTopup = 'me/wallet/topup';
   static const String walletLedger = 'loyalty/ledger';
 
   // Payments Endpoints
-  /// Server-supplied Moyasar publishable key + Apple Pay config.
-  /// Loaded at runtime so the key is never compiled into the binary.
   static const String paymentSdkConfig = 'payments/sdk-config';
+  static const String bookingsPaymentInit = 'bookings/payment-init';
+  static String tipBookingPaymentInit(String bookingId) =>
+      'bookings/$bookingId/tip/payment-init';
+  static const String giftPaymentInit = 'gifts/payment-init';
 
   // Saved Cards Endpoints
   static const String savedCards = 'me/saved-cards';
@@ -166,7 +155,6 @@ abstract class Endpoints {
   static String cancelGift(String giftId) => 'gifts/$giftId/cancel';
   static const String redeemGift = 'gifts/redeem';
   static const String giftQuotes = 'gifts/quote';
-  static const String giftPaymentInit = 'gifts/payment-init';
 
   // Promos Endpoints
   static const String validatePromo = 'promos/validate';
@@ -187,9 +175,6 @@ abstract class Endpoints {
       'chat/threads/$threadId/messages/attachment/presign';
   static String reportChatMessage(String messageId) =>
       'chat/messages/$messageId/report';
-
-  // PH1-005: legacy direct Google Maps endpoints removed — all place lookups now
-  // route through the backend geo/places proxy (server holds the Google key).
 
   static String nameAvatar(String? userName) =>
       'https://ui-avatars.com/api/?name=$userName&background=00D5DD&color=fff';
