@@ -58,6 +58,7 @@ class ServiceBookingSubmit implements BookingSubmitStrategy {
       paymentMethod: state.paymentMethod,
       quote: state.quote,
       moyasarPaymentId: moyasarPaymentId,
+      holdToken: state.paymentInit?.holdToken,
     );
 
     return repo.createBooking(booking);

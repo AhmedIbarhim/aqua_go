@@ -22,6 +22,9 @@ class ServiceBookingRequestModel {
   /// (pay-before-create). Required on the create call.
   final String? moyasarPaymentId;
 
+  /// Soft slot-hold token returned by POST /api/customer/bookings/payment-init.
+  final String? holdToken;
+
   ServiceBookingRequestModel({
     this.service,
     this.car,
@@ -33,9 +36,13 @@ class ServiceBookingRequestModel {
     this.paymentMethod,
     this.quote,
     this.moyasarPaymentId,
+    this.holdToken,
   });
 
-  ServiceBookingRequestModel copyWith({String? moyasarPaymentId}) {
+  ServiceBookingRequestModel copyWith({
+    String? moyasarPaymentId,
+    String? holdToken,
+  }) {
     return ServiceBookingRequestModel(
       service: service,
       car: car,
@@ -47,6 +54,7 @@ class ServiceBookingRequestModel {
       paymentMethod: paymentMethod,
       quote: quote,
       moyasarPaymentId: moyasarPaymentId ?? this.moyasarPaymentId,
+      holdToken: holdToken ?? this.holdToken,
     );
   }
 
@@ -104,7 +112,8 @@ class ServiceBookingRequestModel {
       if (serviceAddOns.isNotEmpty)
         'addOns': serviceAddOns.map((e) => {'addonId': e.id}).toList(),
       if (paymentMethod != null) 'paymentMethod': paymentMethod!.name,
-      if (moyasarPaymentId != null) 'moyasarPaymentId': moyasarPaymentId,
+      'moyasarPaymentId': ?moyasarPaymentId,
+      'holdToken': ?holdToken,
     };
   }
 }
