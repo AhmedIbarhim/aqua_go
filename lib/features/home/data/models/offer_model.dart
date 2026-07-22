@@ -8,6 +8,8 @@ class OfferModel {
   final String? validTo;
   final int sortOrder;
   final String? currentPolicyVersion;
+  final String? serviceId;
+  final String? packageId;
 
   OfferModel({
     required this.id,
@@ -19,6 +21,8 @@ class OfferModel {
     this.validTo,
     required this.sortOrder,
     this.currentPolicyVersion,
+    this.serviceId,
+    this.packageId,
   });
 
   factory OfferModel.fromJson(Map<String, dynamic> json) {
@@ -32,6 +36,8 @@ class OfferModel {
       validTo: json['validTo'] as String?,
       sortOrder: json['sortOrder'] as int,
       currentPolicyVersion: json['currentPolicyVersion'] as String?,
+      serviceId: json['serviceId'] as String?,
+      packageId: json['packageId'] as String?,
     );
   }
 
@@ -46,6 +52,8 @@ class OfferModel {
       'validTo': validTo,
       'sortOrder': sortOrder,
       'currentPolicyVersion': currentPolicyVersion,
+      'serviceId': serviceId,
+      'packageId': packageId,
     };
   }
 }

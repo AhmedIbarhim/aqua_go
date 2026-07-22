@@ -3,19 +3,29 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../../core/config/session/session_state.dart';
+import '../../../../core/helpers/fetch_user_data_helper.dart';
+import '../../../../core/route/app_router.dart';
 import '../../../../core/route/routes.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/utils/app_assets.dart';
+import '../../../subscriptions/presentation/widgets/package_subscribtion_bottom_sheet.dart';
 import '../../data/models/banner_model.dart';
+import '../../data/models/package_model.dart';
+import '../../data/models/service_model.dart';
 
 class HomeBannersCarosal extends StatefulWidget {
   const HomeBannersCarosal({
     super.key,
     required this.banners,
     required this.carouselController,
+    this.packages = const [],
+    this.services = const [],
   });
   final List<BannerModel> banners;
   final CarouselSliderController carouselController;
+  final List<PackageModel> packages;
+  final List<ServiceModel> services;
 
   @override
   State<HomeBannersCarosal> createState() => _HomeBannersCarosalState();
@@ -158,7 +168,38 @@ class _HomeBannersCarosalState extends State<HomeBannersCarosal> {
       case 'DEEPLINK':
         switch (banner.ctaTarget) {
           case 'packages':
-            Navigator.pushNamed(context, Routes.packages);
+            if (banner.packageId != null && widget.packages.isNotEmpty) {
+              final package = widget.packages.firstWhere(
+                (p) => p.id == banner.packageId,
+                orElse: () => widget.packages.first,
+              );
+              if (currentUser.value == null) {
+                FetchUserData.promptGuestToLogin(context);
+              } else {
+                PackageSubscribtionBottomSheet.show(
+                  context,
+                  packageModel: package,
+                );
+              }
+            } else {
+              context.pushNamed(Routes.packages);
+            }
+            break;
+          case 'services':
+            if (banner.serviceId != null && widget.services.isNotEmpty) {
+              final service = widget.services.firstWhere(
+                (s) => s.id == banner.serviceId,
+                orElse: () => widget.services.first,
+              );
+              if (currentUser.value == null) {
+                FetchUserData.promptGuestToLogin(context);
+              } else {
+                context.pushNamed(
+                  Routes.bookingLocation,
+                  arguments: BookingFlowStartArgs(service: service),
+                );
+              }
+            } else {}
             break;
           default:
             // Unknown deeplink target — safe no-op.
@@ -192,16 +233,18 @@ class _HomeBannersCarosalState extends State<HomeBannersCarosal> {
       BannerModel(
         id: '0',
         imageUrl: demoBanners().first,
-        ctaType: 'URL',
-        ctaTarget: 'https://aquago.sa/',
+        ctaType: 'DEEPLINK',
+        ctaTarget: 'services',
+        serviceId: "00000000-0000-0000-0000-000000000d12",
         locale: context.isAr ? 'ar' : 'en',
         sortOrder: 0,
       ),
       BannerModel(
         id: '1',
         imageUrl: demoBanners()[1],
-        ctaType: 'URL',
-        ctaTarget: 'https://aquago.sa/',
+        ctaType: 'DEEPLINK',
+        ctaTarget: 'services',
+        serviceId: "00000000-0000-0000-0000-000000000d18",
         locale: context.isAr ? 'ar' : 'en',
         sortOrder: 1,
       ),

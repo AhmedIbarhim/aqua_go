@@ -5,6 +5,8 @@ import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/config/di/service_locator.dart';
 import '../../../../core/config/session/session_state.dart';
 import '../../data/models/banner_model.dart';
+import '../../data/models/package_model.dart';
+import '../../data/models/service_model.dart';
 import 'package:aqua_go/features/auth/data/models/user_model.dart';
 import 'package:aqua_go/features/subscriptions/data/models/subscription_response_model/subscription_response_model.dart';
 import '../controllers/services_controller/services_cubit.dart';
@@ -187,9 +189,17 @@ class _HomeViewState extends State<HomeView> {
                                 if (activeBanners.isEmpty) {
                                   return const SizedBox.shrink();
                                 }
+                                final services = servicesState is ServicesLoaded
+                                    ? servicesState.services
+                                    : const <ServiceModel>[];
+                                final packages = packagesState is PackagesLoaded
+                                    ? packagesState.packages
+                                    : const <PackageModel>[];
                                 return HomeBannersCarosal(
                                   carouselController: _carouselController,
                                   banners: activeBanners,
+                                  packages: packages,
+                                  services: services,
                                 );
                               },
                             ),
@@ -272,7 +282,22 @@ class _HomeViewState extends State<HomeView> {
                                   SizedBox(height: context.screenHeight * 0.02),
                                   const ServicesPageView(),
                                   SizedBox(height: context.screenHeight * 0.03),
-                                  const OffersListView(),
+                                  Builder(
+                                    builder: (context) {
+                                      final services =
+                                          servicesState is ServicesLoaded
+                                          ? servicesState.services
+                                          : const <ServiceModel>[];
+                                      final packages =
+                                          packagesState is PackagesLoaded
+                                          ? packagesState.packages
+                                          : const <PackageModel>[];
+                                      return OffersListView(
+                                        packages: packages,
+                                        services: services,
+                                      );
+                                    },
+                                  ),
                                   SizedBox(height: context.screenHeight * 0.15),
                                 ],
                               ),
