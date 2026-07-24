@@ -26,6 +26,10 @@ class PackageCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
     final height = MediaQuery.sizeOf(context).height;
+    // Icon scales with screen width, but the card is height-constrained inside a
+    // fixed-height horizontal list. On wide screens (iPad) width*0.1 grows large
+    // enough to overflow the card, so cap it so the content always fits.
+    final iconBox = (width * 0.1).clamp(0.0, 60.0).toDouble();
     return ValueListenableBuilder(
       valueListenable: currentUser,
       builder: (context, user, _) => GestureDetector(
@@ -91,8 +95,8 @@ class PackageCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Container(
-                          width: width * 0.1,
-                          height: width * 0.1,
+                          width: iconBox,
+                          height: iconBox,
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             color: context.colors.primary,
