@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     // START: FlutterFire Configuration
@@ -8,10 +11,15 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+val keystoreProperties = Properties()
+val keystorePropertiesFile = rootProject.file("key.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+}
+
 android {
     namespace = "com.example.aqua_go"
-    compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    compileSdk = 36
 
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
@@ -26,8 +34,8 @@ android {
         applicationId = "sa.aquago.customerapp"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        minSdk = 24
+        targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
         multiDexEnabled = true
@@ -39,13 +47,13 @@ android {
         create("dev") {
             dimension = "environment"
             // applicationIdSuffix = ".dev"
-            resValue("string", "app_name", "Aqua Go (Dev)")
+            resValue("string", "app_name", "Aqua Go")
             buildConfigField("String", "FLAVOR", "\"dev\"")
         }
         create("qa") {
             dimension = "environment"
             // applicationIdSuffix = ".qa"
-            resValue("string", "app_name", "Aqua Go (QA)")
+            resValue("string", "app_name", "Aqua Go")
             buildConfigField("String", "FLAVOR", "\"qa\"")
         }
         create("prod") {
@@ -59,11 +67,21 @@ android {
         buildConfig = true
     }
 
+    signingConfigs {
+        create("release") {
+            keyAlias = keystoreProperties["keyAlias"] as String
+            keyPassword = keystoreProperties["keyPassword"] as String
+            storeFile = keystoreProperties["storeFile"]?.let { file(it) }
+            storePassword = keystoreProperties["storePassword"] as String
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
+        }
+        debug {
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 }
