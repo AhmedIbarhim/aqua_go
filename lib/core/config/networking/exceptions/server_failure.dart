@@ -30,6 +30,16 @@ class ServerFailure extends Failure {
           type: FailureType.timeout,
         );
 
+      // dio 5.10 added transformTimeout. This switch is deliberately
+      // exhaustive (no `default:`) so a new dio enum member surfaces as a
+      // compile error rather than a silent fallthrough — treat it exactly like
+      // the other three timeout kinds.
+      case DioExceptionType.transformTimeout:
+        return ServerFailure(
+          LocaleKeys.snackbar_connection_timeout.tr(),
+          type: FailureType.timeout,
+        );
+
       case DioExceptionType.badCertificate:
         return const ServerFailure(
           'Bad certificate from server',
