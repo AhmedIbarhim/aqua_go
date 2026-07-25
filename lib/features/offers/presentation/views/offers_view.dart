@@ -10,6 +10,7 @@ import '../../../../generated/locale_keys.g.dart';
 import '../../data/models/customer_offer_model.dart';
 import '../controllers/offers_controller/offers_cubit.dart';
 import '../widgets/offer_card.dart';
+import '../widgets/offer_motion.dart';
 import 'offer_detail_view.dart';
 
 /// Optional route arguments for [Routes.offers]. A caller that ALREADY holds
@@ -28,6 +29,10 @@ class OffersView extends StatelessWidget {
   /// `getOffers()` in that case).
   final List<CustomerOfferModel>? offers;
 
+  /// Card height the skeleton stands in for, as a fraction of the screen. Kept
+  /// close to the real card so the handoff doesn't shift the page.
+  static const double _cardHeightFactor = 0.3;
+
   @override
   Widget build(BuildContext context) {
     final seeded = offers;
@@ -39,38 +44,51 @@ class OffersView extends StatelessWidget {
   }
 
   Widget _fromCubit(BuildContext context) {
-    final height = MediaQuery.sizeOf(context).height;
     return BlocBuilder<OffersCubit, OffersState>(
       builder: (context, state) {
-        switch (state) {
-          case OffersLoaded(offers: final loaded):
-            return RefreshIndicator(
-              onRefresh: () => context.read<OffersCubit>().getOffers(),
-              child: _list(context, loaded),
-            );
-          case OffersError():
-            return _Message(text: LocaleKeys.offers_error.tr(context: context));
-          case OffersInitial():
-          case OffersLoading():
-            return Padding(
-              padding: const EdgeInsets.all(16),
-              child: ShimmerHelper.offers(height: height * 0.3),
-            );
-        }
+        // Crossfades the skeleton straight into the resolved screen instead of
+        // swapping it out on a single frame.
+        return AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          switchInCurve: Curves.easeOut,
+          switchOutCurve: Curves.easeIn,
+          child: switch (state) {
+            OffersLoaded(offers: final loaded) => _Refreshable(
+                key: const ValueKey('offers-loaded'),
+                child: _list(context, loaded),
+              ),
+            OffersError() => _Refreshable(
+                key: const ValueKey('offers-error'),
+                // Pull-to-retry is the only recovery path this screen offers,
+                // so the error state has to stay scrollable.
+                child: _fill(LocaleKeys.offers_error.tr(context: context)),
+              ),
+            OffersInitial() || OffersLoading() => _skeleton(context),
+          },
+        );
       },
+    );
+  }
+
+  Widget _skeleton(BuildContext context) {
+    final cardHeight = MediaQuery.sizeOf(context).height * _cardHeightFactor;
+    return ListView.separated(
+      key: const ValueKey('offers-loading'),
+      padding: const EdgeInsets.all(16),
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: 3,
+      separatorBuilder: (context, index) => const SizedBox(height: 16),
+      itemBuilder: (context, index) => ShimmerHelper.homeItemCard(
+        context,
+        width: double.infinity,
+        height: cardHeight,
+      ),
     );
   }
 
   Widget _list(BuildContext context, List<CustomerOfferModel> offers) {
     if (offers.isEmpty) {
-      // Kept scrollable so the RefreshIndicator above still works when empty.
-      return ListView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        children: [
-          SizedBox(height: MediaQuery.sizeOf(context).height * 0.25),
-          _Message(text: LocaleKeys.offers_empty.tr(context: context)),
-        ],
-      );
+      return _fill(LocaleKeys.offers_empty.tr(context: context));
     }
     // Defensive: the API already returns endsAt ASC, but this screen owns the
     // ordering the design pins, so it re-sorts locally.
@@ -80,9 +98,32 @@ class OffersView extends StatelessWidget {
       physics: const AlwaysScrollableScrollPhysics(),
       itemCount: sorted.length,
       separatorBuilder: (context, index) => const SizedBox(height: 16),
-      itemBuilder: (context, index) => GestureDetector(
-        onTap: () => _openDetail(context, sorted[index]),
-        child: OfferCard(offer: sorted[index], atHome: false),
+      itemBuilder: (context, index) {
+        final card = GestureDetector(
+          onTap: () => _openDetail(context, sorted[index]),
+          child: OfferCard(offer: sorted[index], atHome: false),
+        );
+        // Only the opening screenful is staggered; items further down are built
+        // lazily on scroll, where a delay would read as a dropped card.
+        if (index >= OfferEntrance.maxStaggerSteps) return card;
+        return OfferEntrance(index: index, child: card);
+      },
+    );
+  }
+
+  /// A single centred message that still fills — and scrolls — the whole body,
+  /// so it sits at the optical centre on every screen size and pull-to-refresh
+  /// keeps working.
+  Widget _fill(String text) {
+    return LayoutBuilder(
+      builder: (context, constraints) => ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: _Message(text: text),
+          ),
+        ],
       ),
     );
   }
@@ -90,6 +131,20 @@ class OffersView extends StatelessWidget {
   void _openDetail(BuildContext context, CustomerOfferModel offer) {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (_) => OfferDetailView(offer: offer)),
+    );
+  }
+}
+
+class _Refreshable extends StatelessWidget {
+  const _Refreshable({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return RefreshIndicator(
+      onRefresh: () => context.read<OffersCubit>().getOffers(),
+      child: child,
     );
   }
 }

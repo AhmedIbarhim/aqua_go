@@ -6,6 +6,11 @@ import '../../../../core/themes/app_text_styles.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../../data/models/customer_offer_model.dart';
 import '../../domain/offer_countdown.dart';
+import 'offer_motion.dart';
+
+/// Hero tag shared by the offers-list card banner and the offer detail banner,
+/// so tapping a card flies its banner into the detail screen.
+String offerBannerHeroTag(String offerId) => 'offer-banner-$offerId';
 
 class OfferCard extends StatelessWidget {
   const OfferCard({super.key, required this.offer, this.atHome = true});
@@ -39,6 +44,9 @@ class OfferCard extends StatelessWidget {
           _Banner(
             url: banner,
             height: atHome ? size.height * 0.10 : size.height * 0.18,
+            // Only the offers-list card opens the detail screen, so only it
+            // owns the flight; the home rail routes elsewhere and stays put.
+            heroTag: atHome ? null : offerBannerHeroTag(offer.id),
           ),
           Padding(
             padding: EdgeInsets.all(atHome ? 12 : 16),
@@ -96,24 +104,51 @@ class OfferCard extends StatelessWidget {
 }
 
 class _Banner extends StatelessWidget {
-  const _Banner({required this.url, required this.height});
+  const _Banner({required this.url, required this.height, this.heroTag});
 
   final String? url;
   final double height;
 
+  /// Non-null -> this banner is the source of a flight into the detail screen.
+  final Object? heroTag;
+
   @override
   Widget build(BuildContext context) {
-    final placeholder = Container(height: height, color: context.colors.fields);
     final source = url;
-    if (source == null || source.isEmpty) return placeholder;
-    return Image.network(
-      source,
+    // The tinted plate sits under the image for the whole life of the card, so
+    // a slow, failed or absent banner leaves a finished-looking block rather
+    // than a hole, and the image has something to fade onto.
+    final plate = ColoredBox(color: context.colors.fields);
+    if (source == null || source.isEmpty) {
+      return SizedBox(height: height, width: double.infinity, child: plate);
+    }
+
+    final tag = heroTag;
+    // Matches the corners the card's own clip already produces; carrying it on
+    // the hero child keeps the return flight rounded too.
+    Widget image = ClipRRect(
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      child: Image.network(
+        source,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+        frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+          if (wasSynchronouslyLoaded) return child;
+          return AnimatedOpacity(
+            opacity: frame == null ? 0 : 1,
+            duration: const Duration(milliseconds: 260),
+            curve: Curves.easeOut,
+            child: child,
+          );
+        },
+      ),
+    );
+    if (tag != null) image = Hero(tag: tag, child: image);
+
+    return SizedBox(
       height: height,
       width: double.infinity,
-      fit: BoxFit.cover,
-      errorBuilder: (context, error, stackTrace) => placeholder,
-      loadingBuilder: (context, child, progress) =>
-          progress == null ? child : placeholder,
+      child: Stack(fit: StackFit.expand, children: [plate, image]),
     );
   }
 }
@@ -128,15 +163,17 @@ class _EndsInChip extends StatelessWidget {
     final label = days == 1
         ? LocaleKeys.offers_ends_in_one_day.tr(context: context)
         : LocaleKeys.offers_ends_in_days.tr(context: context, args: ['$days']);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: context.colors.errorLight,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text(
-        label,
-        style: AppTextStyles.medium11.copyWith(color: context.colors.error),
+    return OfferPopIn(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: BoxDecoration(
+          color: context.colors.errorLight,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(
+          label,
+          style: AppTextStyles.medium11.copyWith(color: context.colors.error),
+        ),
       ),
     );
   }
