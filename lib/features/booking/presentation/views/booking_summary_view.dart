@@ -12,6 +12,7 @@ import '../widgets/booking_summary_card.dart';
 import '../widgets/biker_notes_selection.dart';
 import '../widgets/payment_summary_card.dart';
 import '../widgets/payment_method_selection.dart';
+import '../widgets/promo_code_section.dart';
 import '../controllers/booking_cubit.dart';
 import '../controllers/booking_state.dart';
 import 'moyasar_payment_view.dart';
@@ -21,6 +22,7 @@ import 'package:aqua_go/core/config/payment/payment_sdk_config_service.dart';
 import 'package:aqua_go/core/route/routes.dart';
 import 'package:aqua_go/features/my_bookings/presentation/views/my_booking_details_view.dart';
 import 'package:aqua_go/features/my_bookings/data/models/booking_summary_model.dart';
+import 'package:aqua_go/features/booking/domain/configs/booking_flow_type.dart';
 
 class BookingSummaryView extends StatefulWidget {
   const BookingSummaryView({super.key});
@@ -30,6 +32,11 @@ class BookingSummaryView extends StatefulWidget {
 }
 
 class _BookingSummaryViewState extends State<BookingSummaryView> {
+  /// Promo code the customer applied on THIS screen. Held in view state (not
+  /// the cubit) because it is a UI affordance — the authoritative promo lives
+  /// in the locked backend quote, which every submit path already carries.
+  String? _appliedPromoCode;
+
   @override
   void initState() {
     super.initState();
@@ -233,6 +240,14 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
               onPaymentMethodChanged: (method) {
                 context.read<BookingCubit>().updatePaymentMethod(method);
               },
+            ),
+            const SizedBox(height: 24),
+          ],
+          if (config.flowType == BookingFlowType.service) ...[
+            PromoCodeSection(
+              appliedPromoCode: _appliedPromoCode,
+              onApplyPromoCode: _applyPromoCode,
+              onRemovePromoCode: _removePromoCode,
             ),
             const SizedBox(height: 24),
           ],
@@ -448,5 +463,36 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
         },
       ),
     );
+  }
+
+  /// Re-quote WITH the code. The locked quote is the source of truth for every
+  /// displayed amount, so we only mark the code as applied once the backend
+  /// returned a fresh quote — a rejected code leaves the chip un-applied and
+  /// the cubit's failure state raises the error snackbar via BlocConsumer.
+  /// The fresh quote's subtotal/vat/total are ALREADY net of the promo, so no
+  /// further client-side arithmetic is done anywhere on this screen.
+  void _applyPromoCode(String code) async {
+    final quote = await context.read<BookingCubit>().fetchQuote(
+      promoCode: code,
+    );
+    if (!mounted) return;
+    if (quote != null) {
+      setState(() {
+        _appliedPromoCode = code;
+      });
+    }
+  }
+
+  /// Re-quote WITHOUT the code, then clear the chip.
+  void _removePromoCode() async {
+    final quote = await context.read<BookingCubit>().fetchQuote(
+      promoCode: null,
+    );
+    if (!mounted) return;
+    if (quote != null) {
+      setState(() {
+        _appliedPromoCode = null;
+      });
+    }
   }
 }
