@@ -163,6 +163,13 @@ abstract class  LocaleKeys {
   static const bookings_payment_summary = 'bookings.payment_summary';
   static const bookings_subtotal = 'bookings.subtotal';
   static const bookings_vat = 'bookings.vat';
+  static const bookings_promo_code_title = 'bookings.promo_code_title';
+  static const bookings_apply_promo_code = 'bookings.apply_promo_code';
+  static const bookings_promo_code_applied = 'bookings.promo_code_applied';
+  static const bookings_delete_promo_code = 'bookings.delete_promo_code';
+  static const bookings_apply_code_hint = 'bookings.apply_code_hint';
+  static const bookings_cancel = 'bookings.cancel';
+  static const bookings_apply = 'bookings.apply';
   static const bookings_vat_included = 'bookings.vat_included';
   static const bookings_covered_by_subscription = 'bookings.covered_by_subscription';
   static const bookings_covered_by_package = 'bookings.covered_by_package';
