@@ -104,6 +104,24 @@ class CodegenLoader extends AssetLoader{
     "read_less": "Read less",
     "notifications": "Notifications"
   },
+  "offers": {
+    "title": "Offers",
+    "empty": "There are no offers available right now",
+    "error": "Could not load offers",
+    "valid_until": "Valid until {}",
+    "ends_in_days": "Ends in {} days",
+    "ends_in_one_day": "Ends in 1 day",
+    "terms_title": "Offer details",
+    "use_code": "Use this code",
+    "view_package": "View package",
+    "code_saved": "{} will be applied to your next booking",
+    "min_order": "Minimum order {} SAR",
+    "discount_percent": "{}% off",
+    "discount_amount": "{} SAR off",
+    "package_washes": "{} washes",
+    "package_validity": "Valid for {} days",
+    "package_price": "{} SAR"
+  },
   "my_cars": {
     "empty_state": "No cars added yet",
     "empty_desc": "Your vehicles will appear here once you add them",
@@ -473,6 +491,24 @@ static const Map<String,dynamic> _ar = {
     "read_more": "اقرأ المزيد",
     "read_less": "عرض أقل",
     "notifications": "الإشعارات"
+  },
+  "offers": {
+    "title": "العروض",
+    "empty": "لا توجد عروض متاحة حاليا",
+    "error": "تعذر تحميل العروض",
+    "valid_until": "ساري حتى {}",
+    "ends_in_days": "ينتهي خلال {} أيام",
+    "ends_in_one_day": "ينتهي خلال يوم واحد",
+    "terms_title": "تفاصيل العرض",
+    "use_code": "استخدم هذا الكود",
+    "view_package": "عرض الباقة",
+    "code_saved": "سيتم تطبيق {} على حجزك القادم",
+    "min_order": "الحد الأدنى للطلب {} ريال",
+    "discount_percent": "خصم {}%",
+    "discount_amount": "خصم {} ريال",
+    "package_washes": "{} غسلات",
+    "package_validity": "صالحة لمدة {} يوم",
+    "package_price": "{} ريال"
   },
   "my_cars": {
     "empty_state": "لا توجد سيارات مسجلة",

@@ -23,6 +23,10 @@ import 'package:aqua_go/features/home/data/repos/packages_repository.dart';
 import 'package:aqua_go/features/subscriptions/data/repos/subscriptions_repository.dart';
 import 'package:aqua_go/features/home/presentation/controllers/services_controller/services_cubit.dart';
 import 'package:aqua_go/features/home/presentation/controllers/banners_controller/banners_cubit.dart';
+import 'package:aqua_go/features/offers/data/data_source/offers_remote_data_source.dart';
+import 'package:aqua_go/features/offers/data/repos/offers_repository.dart';
+import 'package:aqua_go/features/offers/presentation/controllers/offers_controller/offers_cubit.dart';
+import 'package:aqua_go/features/home/presentation/controllers/package_detail_controller/package_detail_cubit.dart';
 import 'package:aqua_go/features/home/presentation/controllers/packages_controller/packages_cubit.dart';
 import 'package:aqua_go/features/subscriptions/presentation/controllers/subscriptions_controller/subscriptions_cubit.dart';
 import 'package:aqua_go/features/profile/data/data_sources/profile_remote_data_source.dart';
@@ -81,6 +85,9 @@ Future<void> initServiceLocator(AppConfigs configs) async {
   locator.registerLazySingleton<BannersRemoteDataSource>(
     () => BannersRemoteDataSource(locator()),
   );
+  locator.registerLazySingleton<OffersRemoteDataSource>(
+    () => OffersRemoteDataSource(locator()),
+  );
   locator.registerLazySingleton<PackagesRemoteDataSource>(
     () => PackagesRemoteDataSource(locator()),
   );
@@ -129,6 +136,10 @@ Future<void> initServiceLocator(AppConfigs configs) async {
 
   locator.registerLazySingleton<BannersRepository>(
     () => BannersRepository(locator()),
+  );
+
+  locator.registerLazySingleton<OffersRepository>(
+    () => OffersRepository(locator()),
   );
 
   locator.registerLazySingleton<PackagesRepository>(
@@ -190,8 +201,16 @@ Future<void> initServiceLocator(AppConfigs configs) async {
     () => BannersCubit(bannersRepository: locator()),
   );
 
+  locator.registerFactory<OffersCubit>(
+    () => OffersCubit(offersRepository: locator()),
+  );
+
   locator.registerFactory<PackagesCubit>(
     () => PackagesCubit(packagesRepository: locator()),
+  );
+
+  locator.registerFactory<PackageDetailCubit>(
+    () => PackageDetailCubit(packagesRepository: locator()),
   );
 
   // Lazy singleton so every surface that displays the user's subscriptions

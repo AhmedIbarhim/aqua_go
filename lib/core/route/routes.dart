@@ -8,6 +8,7 @@ abstract class Routes {
   static const String layout = '/layout_view';
   static const String offers = '/offers_view';
   static const String packages = '/packages_view';
+  static const String packageDetail = '/package_detail_view';
   static const String mySubscribedPackages = '/my_subscribed_packages_view';
   static const String settings = '/settings_view';
   static const String languageSelect = '/language_select_view';

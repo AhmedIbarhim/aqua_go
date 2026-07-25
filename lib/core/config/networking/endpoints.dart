@@ -68,6 +68,20 @@ abstract class Endpoints {
   //  Banners Endpoints
   static const String banners = 'banners';
 
+  //  Public (unauthenticated) Endpoints — served under /api/public/**, NOT
+  //  under the /api/customer/ base the Dio client is configured with. Dio
+  //  concatenates baseUrl + path unless the path starts with http, so callers
+  //  must wrap these with publicUrl(dio.options.baseUrl, …) to get an absolute
+  //  URL that stays correct across the dev / qa / prod flavours.
+  static const String publicOffers = 'offers';
+  static String publicOffer(String offerId) => 'offers/$offerId';
+
+  /// Maps a customer-scoped base URL to its public sibling and appends [suffix].
+  /// 'https://qa-api.aquago.sa/api/customer/' + 'offers'
+  ///   -> 'https://qa-api.aquago.sa/api/public/offers'
+  static String publicUrl(String customerBaseUrl, String suffix) =>
+      '${customerBaseUrl.replaceFirst('/api/customer/', '/api/public/')}$suffix';
+
   //  Geo & Zone Coverage Endpoints
   static const String zoneCheck = 'geo/zone-check';
   static const String geoPlacesAutocomplete = 'geo/places/autocomplete';

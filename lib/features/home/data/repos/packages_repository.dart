@@ -27,4 +27,18 @@ class PackagesRepository {
       return const Left(ServerFailure('Failed to load packages'));
     });
   }
+
+  /// Single-package read for the package-detail screen. The customer surface
+  /// exposes only the public list endpoint (`GET /api/customer/subscription-packages`),
+  /// so the id is resolved against that list; an id that is absent means the
+  /// package was deactivated or archived since the offer was rendered.
+  Future<Either<Failure, PackageModel>> fetchPackageById(String packageId) async {
+    final result = await fetchPackages();
+    return result.fold((failure) => Left(failure), (packages) {
+      for (final package in packages) {
+        if (package.id == packageId) return Right(package);
+      }
+      return const Left(ServerFailure('PACKAGE_NOT_FOUND'));
+    });
+  }
 }

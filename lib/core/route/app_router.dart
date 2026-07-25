@@ -16,7 +16,10 @@ import '../../features/booking/presentation/views/booking_details_view.dart';
 import '../../features/booking/presentation/views/booking_location_view.dart';
 import '../../features/booking/presentation/views/booking_summary_view.dart';
 import '../../features/home/presentation/controllers/packages_controller/packages_cubit.dart';
-import '../../features/home/presentation/views/offers_view.dart';
+import '../../features/home/presentation/controllers/package_detail_controller/package_detail_cubit.dart';
+import '../../features/home/presentation/views/package_detail_view.dart';
+import '../../features/offers/presentation/controllers/offers_controller/offers_cubit.dart';
+import '../../features/offers/presentation/views/offers_view.dart';
 import '../../features/home/presentation/views/packages_view.dart';
 import '../../features/layout/presentation/views/main_layout.dart';
 import '../../features/complaints/presentation/views/complaint_view.dart';
@@ -91,9 +94,28 @@ abstract class AppRouter {
         return MaterialPageRoute(builder: (_) => MainLayout(args: args));
 
       case Routes.offers:
-        final args = settings.arguments as OffersArgs;
+        // Arguments are OPTIONAL and may be null: the home rail's "View more"
+        // pushes bare and the screen loads its own UCC23 feed.
+        final args = settings.arguments as OffersArgs?;
         return MaterialPageRoute(
-          builder: (_) => OffersView(offers: args.offers),
+          builder: (_) => BlocProvider(
+            create: (_) {
+              final cubit = locator<OffersCubit>();
+              if (args == null) cubit.getOffers();
+              return cubit;
+            },
+            child: OffersView(offers: args?.offers),
+          ),
+        );
+
+      case Routes.packageDetail:
+        final args = settings.arguments as PackageDetailArgs;
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) =>
+                locator<PackageDetailCubit>()..getPackage(args.packageId),
+            child: PackageDetailView(packageId: args.packageId),
+          ),
         );
 
       case Routes.packages:
@@ -321,4 +343,12 @@ class BookingFlowStartArgs {
     this.subscriptionId,
     this.washId,
   }) : submitStrategy = submitStrategy ?? ServiceBookingSubmit();
+}
+
+/// Args for [Routes.packageDetail]. Pushed by the home "Best Offers" rail and by
+/// the offer detail screen's "View package" action.
+class PackageDetailArgs {
+  final String packageId;
+
+  PackageDetailArgs({required this.packageId});
 }

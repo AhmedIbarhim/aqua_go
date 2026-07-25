@@ -23,6 +23,7 @@ import 'package:aqua_go/core/route/routes.dart';
 import 'package:aqua_go/features/my_bookings/presentation/views/my_booking_details_view.dart';
 import 'package:aqua_go/features/my_bookings/data/models/booking_summary_model.dart';
 import 'package:aqua_go/features/booking/domain/configs/booking_flow_type.dart';
+import 'package:aqua_go/features/offers/domain/pending_promo_code.dart';
 
 class BookingSummaryView extends StatefulWidget {
   const BookingSummaryView({super.key});
@@ -43,7 +44,15 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final config = context.read<BookingCubit>().state.flowConfig;
       if (config.requiresQuote) {
-        context.read<BookingCubit>().fetchQuote();
+        // A code picked from an offer ("Use this code") is applied to the very
+        // first quote of this flow, then dropped so it cannot leak into a later
+        // booking. take() is single-shot by design. Only quote-bearing flows
+        // reach this branch, so no flow-type guard is needed.
+        final stashed = PendingPromoCode.instance.take();
+        if (stashed != null) {
+          _appliedPromoCode = stashed;
+        }
+        context.read<BookingCubit>().fetchQuote(promoCode: stashed);
       } else if (config.isPackage) {
         // Subscription wash: fetch the read-only charge preview so the summary
         // shows the real payable total (e.g. 8 SAR add-on) instead of 0.00 and
