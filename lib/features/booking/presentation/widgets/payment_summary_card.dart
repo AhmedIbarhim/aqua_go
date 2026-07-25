@@ -57,6 +57,19 @@ class PaymentSummaryCard extends StatelessWidget {
           color: context.colors.borderSecondary.withValues(alpha: 0.6),
         ),
         const SizedBox(height: 12),
+        // PROMO IS ALREADY NETTED OUT — DO NOT ADD A DISCOUNT ROW HERE.
+        // `subtotal`, `vat` and `total` come straight from the backend quote
+        // breakdown, and PriceQuoteServiceImpl subtracts the promo from the
+        // surged gross BEFORE splitting VAT:
+        //   discountedGross = surgedGross - appliedDiscount
+        //   serviceNetMinor = discountedGross - serviceVatMinor
+        // Even `servicePrice` above is the post-discount SERVICE line net.
+        // Inserting an arithmetic `-promoDiscount` row between Subtotal and VAT
+        // double-subtracts and the column stops adding up: base gross 11500 with
+        // a 2000 promo would render 82.61 / -20.00 / 12.39 / 95.00, and
+        // 82.61 - 20.00 + 12.39 = 75.00, not 95.00. The applied code is surfaced
+        // by PromoCodeSection's chip instead.
+        // Locked by test/features/booking/payment_summary_reconciliation_test.dart.
         _buildPaymentRow(
           context,
           label: LocaleKeys.bookings_subtotal.tr(context: context),
