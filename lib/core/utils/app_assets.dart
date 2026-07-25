@@ -163,18 +163,4 @@ abstract class AppAssets {
 
   //Demos
   static const String demoBanner = 'assets/demos/banner_demo.webp';
-
-  static const String bannersOneAr = 'assets/demos/banners_1_ar.png';
-  static const String bannersTwoAr = 'assets/demos/banners_2_ar.png';
-  static const String bannersThreeAr = 'assets/demos/banners_3_ar.png';
-  static const String bannersOneEn = 'assets/demos/banners_1_ar.png';
-  static const String bannersTwoEn = 'assets/demos/banners_2_ar.png';
-  static const String bannersThreeEn = 'assets/demos/banners_3_ar.png';
-
-  static const String offersOneAr = 'assets/demos/offers_1_ar.png';
-  static const String offersTwoAr = 'assets/demos/offers_2_ar.png';
-  static const String offersThreeAr = 'assets/demos/offers_3_ar.png';
-  static const String offersOneEn = 'assets/demos/offers_1_ar.png';
-  static const String offersTwoEn = 'assets/demos/offers_2_ar.png';
-  static const String offersThreeEn = 'assets/demos/offers_3_ar.png';
 }

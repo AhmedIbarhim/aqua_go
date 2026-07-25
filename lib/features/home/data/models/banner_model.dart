@@ -8,8 +8,6 @@ class BannerModel {
   final String? validTo;
   final int sortOrder;
   final String? currentPolicyVersion;
-  final String? packageId;
-  final String? serviceId;
 
   BannerModel({
     required this.id,
@@ -21,8 +19,6 @@ class BannerModel {
     this.validTo,
     required this.sortOrder,
     this.currentPolicyVersion,
-    this.packageId,
-    this.serviceId,
   });
 
   /// Helper getter for backward compatibility with existing widgets using `.image`
@@ -39,8 +35,6 @@ class BannerModel {
       validTo: json['validTo'] as String?,
       sortOrder: json['sortOrder'] as int? ?? 0,
       currentPolicyVersion: json['currentPolicyVersion'] as String?,
-      packageId: json['packageId'] as String?,
-      serviceId: json['serviceId'] as String?,
     );
   }
 
@@ -56,8 +50,6 @@ class BannerModel {
       'sortOrder': sortOrder,
       if (currentPolicyVersion != null)
         'currentPolicyVersion': currentPolicyVersion,
-      if (packageId != null) 'packageId': packageId,
-      if (serviceId != null) 'serviceId': serviceId,
     };
   }
 }
