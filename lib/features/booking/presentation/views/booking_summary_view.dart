@@ -404,11 +404,17 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
             // before charging. If the refreshed total differs, surface the
             // "prices refreshed" notice and abort so the customer reviews the
             // new amount rather than being silently charged a changed total.
+            // The re-quote MUST carry the applied promo code — fetchQuote is
+            // stateless w.r.t. the promo, so omitting it re-quotes at the
+            // undiscounted price, which both drops the discount and trips the
+            // gross comparison below, making the booking uncompletable.
             final existing = cubit.state.quote;
             if (existing != null &&
                 DateTime.now().isAfter(existing.expiresAt)) {
               final previousGross = existing.breakdown?.gross;
-              final refreshed = await cubit.fetchQuote();
+              final refreshed = await cubit.fetchQuote(
+                promoCode: _appliedPromoCode,
+              );
               if (!context.mounted) return;
               if (refreshed == null) return; // fetch failed → cubit set error
               final newGross = refreshed.breakdown?.gross;
