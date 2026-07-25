@@ -17,10 +17,12 @@ class AppColors extends ThemeExtension<AppColors> {
   final Color defaultSubtle;
   final Color borderSecondary;
   final Color cardBackGround;
+  final Color fields;
 
   // Text Colors
   final Color textPrimary;
   final Color textSecondary;
+  final Color textTertiary;
   final Color textTheme;
 
   // Content Colors
@@ -50,8 +52,10 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.defaultSubtle,
     required this.borderSecondary,
     required this.cardBackGround,
+    required this.fields,
     required this.textPrimary,
     required this.textSecondary,
+    required this.textTertiary,
     required this.textTheme,
     required this.contentBlack,
     required this.contentPrimary,
@@ -78,8 +82,10 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? defaultSubtle,
     Color? borderSecondary,
     Color? cardBackGround,
+    Color? fields,
     Color? textPrimary,
     Color? textSecondary,
+    Color? textTertiary,
     Color? textDark,
     Color? contentBlack,
     Color? contentPrimary,
@@ -105,8 +111,10 @@ class AppColors extends ThemeExtension<AppColors> {
       defaultSubtle: defaultSubtle ?? this.defaultSubtle,
       borderSecondary: borderSecondary ?? this.borderSecondary,
       cardBackGround: cardBackGround ?? this.cardBackGround,
+      fields: fields ?? this.fields,
       textPrimary: textPrimary ?? this.textPrimary,
       textSecondary: textSecondary ?? this.textSecondary,
+      textTertiary: textTertiary ?? this.textTertiary,
       textTheme: textDark ?? textTheme,
       contentBlack: contentBlack ?? this.contentBlack,
       contentPrimary: contentPrimary ?? this.contentPrimary,
@@ -145,8 +153,10 @@ class AppColors extends ThemeExtension<AppColors> {
       defaultSubtle: Color.lerp(defaultSubtle, other.defaultSubtle, t)!,
       borderSecondary: Color.lerp(borderSecondary, other.borderSecondary, t)!,
       cardBackGround: Color.lerp(cardBackGround, other.cardBackGround, t)!,
+      fields: Color.lerp(fields, other.fields, t)!,
       textPrimary: Color.lerp(textPrimary, other.textPrimary, t)!,
       textSecondary: Color.lerp(textSecondary, other.textSecondary, t)!,
+      textTertiary: Color.lerp(textTertiary, other.textTertiary, t)!,
       textTheme: Color.lerp(textTheme, other.textTheme, t)!,
       contentBlack: Color.lerp(contentBlack, other.contentBlack, t)!,
       contentPrimary: Color.lerp(contentPrimary, other.contentPrimary, t)!,
@@ -186,8 +196,10 @@ const darkAppColors = AppColors(
   defaultSubtle: Color(0xFF262626),
   borderSecondary: Color(0xFF525252),
   cardBackGround: Color(0xFF1C1C1C),
+  fields: Color(0xFF151515),
   textPrimary: Color(0xFFFFFFFF),
   textSecondary: Color(0xFFA3A3A3),
+  textTertiary: Color(0xFFA3A3A3),
   textTheme: Colors.black,
   contentBlack: Color(0xFF171717),
   contentPrimary: Color(0xFF262C35),
@@ -218,8 +230,10 @@ const lightAppColors = AppColors(
   defaultSubtle: Color(0xFFE2E8F0),
   borderSecondary: Color(0xFFCBD5E1),
   cardBackGround: Color(0xFFE1E2E3),
+  fields: Color(0xFFEFF0F2),
   textPrimary: Color(0xFF0F172A),
   textSecondary: Color(0xFF64748B),
+  textTertiary: Color(0xFF5A687D),
   textTheme: Colors.white,
   contentBlack: Color(0xFF171717),
   contentPrimary: Color(0xFFF1F5F9),
