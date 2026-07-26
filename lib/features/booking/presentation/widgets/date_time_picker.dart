@@ -114,9 +114,7 @@ class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
           children: [
             Text(
               selectedDate != null
-                  ? (context.isAr
-                        ? DateFormat('MMMM, yyyy', 'ar').format(selectedDate!)
-                        : DateFormat('MMMM, yyyy').format(selectedDate!))
+                  ? formatMonthYear(selectedDate!)
                   : LocaleKeys.bookings_choose_day.tr(context: context),
               style: AppTextStyles.medium14.copyWith(
                 color: context.colors.textSecondary,
@@ -151,10 +149,8 @@ class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
           final date = dates[index];
           final isSelected =
               selectedDate != null && DateUtils.isSameDay(date, selectedDate!);
-          final dayName = context.isAr
-              ? DateFormat('EEEE', 'ar').format(date)
-              : DateFormat('EEEE').format(date);
-          final dayNumber = DateFormat('d').format(date);
+          final dayName = formatWeekday(date);
+          final dayNumber = formatDayOfMonth(date);
 
           return GestureDetector(
             onTap: () {
@@ -255,7 +251,7 @@ class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
             spacing: width * 0.02,
             runSpacing: width * 0.02,
             children: widget.availabilitySlots.map((slot) {
-              final timeStr = formatSlotTime(slot.start, isArabic: context.isAr);
+              final timeStr = formatClockTime(slot.start);
               // Matched on the slot's instant, not on its label: the label is
               // display-only and is not stable across locales.
               final isSelected =

@@ -1,6 +1,6 @@
-import 'package:easy_localization/easy_localization.dart';
 import '../../../../core/config/local_storage/shared_prefs.dart';
 import '../../../../core/constants.dart';
+import '../../../../core/utils/date_time_formatter.dart';
 import '../enums/booking_status_enum.dart';
 import '../enums/booking_type_enum.dart';
 import 'booking_response_model/booking_response_model.dart';
@@ -199,9 +199,7 @@ class BookingSummaryModel {
     if (scheduledAt == null) return '';
     try {
       final dateTime = DateTime.parse(scheduledAt!).toLocal();
-      final timeStr = DateFormat.jm().format(dateTime);
-      final dateStr = DateFormat.yMd().format(dateTime);
-      return '$dateStr - $timeStr';
+      return formatDateAndTime(dateTime);
     } catch (_) {
       return scheduledAt!;
     }

@@ -222,10 +222,7 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
                   bookingState.selectedAddress?.details ??
                   '',
               dateTime: bookingState.selectedSlotStart != null
-                  ? formatSlotDateTime(
-                      bookingState.selectedSlotStart!,
-                      isArabic: context.isAr,
-                    )
+                  ? formatDateAndTime(bookingState.selectedSlotStart!)
                   : '',
             ),
             const SizedBox(height: 24),
