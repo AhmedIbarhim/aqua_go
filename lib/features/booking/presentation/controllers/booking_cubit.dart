@@ -9,8 +9,8 @@ import '../../data/models/quote_model.dart';
 import '../../../my_bookings/data/models/booking_response_model/breakdown.dart';
 import '../../../my_bookings/data/models/booking_response_model/quote_line.dart';
 import '../../data/models/payment_init_model.dart';
-import '../../data/models/day_time_model.dart';
 import '../../data/repos/booking_repository.dart';
+import '../../../../core/utils/saudi_wire_format.dart';
 import '../../../../core/enums/payment_method_enum.dart';
 import '../../domain/strategies/booking_submit_strategy.dart';
 import 'booking_state.dart';
@@ -65,7 +65,7 @@ class BookingCubit extends Cubit<BookingState> {
     MyCarModel? existingCar,
     AddressModel? existingAddress,
     DateTime? existingDate,
-    String? existingTime,
+    DateTime? existingSlotStart,
     String? subscriptionId,
     String? washId,
   }) {
@@ -76,7 +76,7 @@ class BookingCubit extends Cubit<BookingState> {
         selectedCar: existingCar,
         selectedAddress: existingAddress,
         selectedDate: existingDate,
-        selectedTime: existingTime,
+        selectedSlotStart: existingSlotStart,
         flowConfig: _flowConfig,
         subscriptionId: subscriptionId,
         washId: washId,
@@ -353,14 +353,16 @@ class BookingCubit extends Cubit<BookingState> {
     );
   }
 
-  void updateDateTime(DateTime? date, String? time) {
+  /// [slotStart] is the availability slot's own `start` instant — never a
+  /// display label.
+  void updateDateTime(DateTime? date, DateTime? slotStart) {
     final dateChanged = date != state.selectedDate;
     emit(
       state.copyWith(
         selectedDate: date,
-        selectedTime: dateChanged ? null : time,
+        selectedSlotStart: dateChanged ? null : slotStart,
         clearSelectedDate: date == null,
-        clearSelectedTime: dateChanged || time == null,
+        clearSelectedSlotStart: dateChanged || slotStart == null,
         clearError: true,
       ),
     );
@@ -421,8 +423,9 @@ class BookingCubit extends Cubit<BookingState> {
       return;
     }
 
-    // Format date as YYYY-MM-DD
-    final dateStr = DateFormat('yyyy-MM-dd').format(date);
+    // Wire value — built locale-independently so a ZERODIGIT device locale
+    // can never send Arabic-Indic digits as the `date` query parameter.
+    final dateStr = toWireDate(date);
 
     // Get zoneId
     String? zoneId = address.zoneId;
@@ -555,10 +558,11 @@ class BookingCubit extends Cubit<BookingState> {
   /// quote + soft-hold the slot, then expose the {amount, givenId, metadata}
   /// the Moyasar SDK needs.
   ///
-  /// Builds `scheduledAt` (bare ISO-8601 Saudi time) and the `vehicles` list
-  /// from the cubit state so the backend can run the same slot/lead/car checks
-  /// it runs at create time (B1 fix — PaymentInitRequest requires all three
-  /// fields: quoteId, scheduledAt, vehicles).
+  /// Builds `scheduledAt` (bare ISO-8601 Saudi time) from the selected slot's
+  /// own instant and the `vehicles` list from the cubit state, so the backend
+  /// can run the same slot/lead/car checks it runs at create time (B1 fix —
+  /// PaymentInitRequest requires all three fields: quoteId, scheduledAt,
+  /// vehicles).
   Future<PaymentInitModel?> initiatePayment() async {
     final quoteId = state.quote?.quoteId;
     if (quoteId == null) {
@@ -572,15 +576,10 @@ class BookingCubit extends Cubit<BookingState> {
       return null;
     }
 
-    // Build scheduledAt in the exact format DayTimeModel produces (matches
-    // ServiceBookingRequestModel.toJson and the backend bare-ISO-8601 contract).
-    final scheduledAt =
-        (state.selectedDate != null && state.selectedTime != null)
-        ? DayTimeModel(
-            date: state.selectedDate!,
-            rawTime: state.selectedTime!,
-          ).toScheduledAtString()
-        : null;
+    // Same wire builder ServiceBookingRequestModel.toJson uses, so payment-init
+    // and create can never disagree about the slot.
+    final slotStart = state.selectedSlotStart;
+    final scheduledAt = slotStart != null ? toWireDateTime(slotStart) : null;
 
     if (scheduledAt == null) {
       emit(
@@ -692,8 +691,10 @@ class BookingCubit extends Cubit<BookingState> {
     final vehicleId = state.selectedCar?.id;
     final body = <String, dynamic>{
       // scheduledAt is required by the backend record but not used for
-      // payment-init; send a sentinel to pass @NotNull validation.
-      'scheduledAt': DateTime.now().toUtc().toIso8601String(),
+      // payment-init; send a sentinel to pass @NotNull validation. Bare
+      // Asia/Riyadh local, never a `Z`-suffixed instant — the sentinel has to
+      // satisfy the same wire contract as a real value.
+      'scheduledAt': toWireDateTime(saudiNow()),
       if (vehicleId != null) 'vehicleIds': [vehicleId],
       if (addOns.isNotEmpty) 'addOns': addOns,
     };
@@ -768,7 +769,7 @@ class BookingCubit extends Cubit<BookingState> {
     }
     final vehicleId = state.selectedCar?.id;
     final body = <String, dynamic>{
-      'scheduledAt': DateTime.now().toUtc().toIso8601String(),
+      'scheduledAt': toWireDateTime(saudiNow()),
       if (vehicleId != null) 'vehicleIds': [vehicleId],
       if (addOns.isNotEmpty) 'addOns': addOns,
     };

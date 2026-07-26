@@ -2,16 +2,17 @@ import '../../../address/data/models/address_model.dart';
 import '../../../my_cars/data/models/my_car_model.dart';
 import '../../../home/data/models/service_model.dart';
 import '../../../home/data/models/add_on_model.dart';
-import 'day_time_model.dart';
 import '../../../../core/enums/payment_method_enum.dart';
+import '../../../../core/utils/saudi_wire_format.dart';
 import 'quote_model.dart';
 
 class ServiceBookingRequestModel {
   final ServiceModel? service;
   final MyCarModel? car;
   final AddressModel? address;
-  final DateTime? date;
-  final String? time;
+  /// The picked availability slot's own `start` instant. Serialised verbatim
+  /// as the bare Asia/Riyadh `scheduledAt` — no display string in between.
+  final DateTime? slotStart;
   final List<AddOnModel> serviceAddOns;
   final List<String> workerNotes;
   final PaymentMethod? paymentMethod;
@@ -26,8 +27,7 @@ class ServiceBookingRequestModel {
     this.service,
     this.car,
     this.address,
-    this.date,
-    this.time,
+    this.slotStart,
     this.serviceAddOns = const [],
     this.workerNotes = const [],
     this.paymentMethod,
@@ -40,8 +40,7 @@ class ServiceBookingRequestModel {
       service: service,
       car: car,
       address: address,
-      date: date,
-      time: time,
+      slotStart: slotStart,
       serviceAddOns: serviceAddOns,
       workerNotes: workerNotes,
       paymentMethod: paymentMethod,
@@ -50,22 +49,10 @@ class ServiceBookingRequestModel {
     );
   }
 
-  bool get isComplete =>
-      service != null &&
-      car != null &&
-      address != null &&
-      date != null &&
-      time != null;
-
   Map<String, dynamic> toJson() {
     final addr = address;
-    String? scheduledAt;
-    if (date != null && time != null) {
-      scheduledAt = DayTimeModel(
-        date: date!,
-        rawTime: time!,
-      ).toScheduledAtString();
-    }
+    final start = slotStart;
+    final String? scheduledAt = start != null ? toWireDateTime(start) : null;
 
     final isSavedAddress =
         addr?.id != null &&

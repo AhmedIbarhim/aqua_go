@@ -55,8 +55,7 @@ class PackageBookingSubmit implements BookingSubmitStrategy {
 
     final packageBooking = PackageBookingRequestModel(
       address: state.selectedAddress,
-      date: state.selectedDate,
-      time: state.selectedTime,
+      slotStart: state.selectedSlotStart,
       vehicleIds: vehicleIds,
       serviceAddOns: addonsList,
       workerNotes: notesList,

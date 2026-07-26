@@ -55,7 +55,8 @@ class BookingsRemoteDataSource {
   /// and returns {amountMinor, givenId, metadata} for the Moyasar SDK.
   ///
   /// `scheduledAt` is the bare ISO-8601 Saudi time string (no offset) matching
-  /// the format produced by [DayTimeModel.toScheduledAtString].
+  /// the format produced by `toWireDateTime`
+  /// (`core/utils/saudi_wire_format.dart`).
   /// `vehicles` is the 1-element list matching the shape in
   /// [ServiceBookingRequestModel.toJson] (savedVehicleId XOR denormalised fields).
   Future<Either<Failure, dynamic>> bookingPaymentInit({

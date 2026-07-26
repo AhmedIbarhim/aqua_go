@@ -25,8 +25,7 @@ class ServiceRescheduleBookingSubmit implements BookingSubmitStrategy {
 
     final rescheduleRequest = ServiceRescheduleRequestModel(
       bookingId: existingBookingId,
-      date: state.selectedDate!,
-      time: state.selectedTime!,
+      slotStart: state.selectedSlotStart!,
       address: state.selectedAddress,
       vehicleIds: vehicleIds,
     );

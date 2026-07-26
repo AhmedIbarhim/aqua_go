@@ -194,7 +194,7 @@ abstract class AppRouter {
                   existingCar: args.existingCar,
                   existingAddress: args.existingAddress,
                   existingDate: args.existingDate,
-                  existingTime: args.existingTime,
+                  existingSlotStart: args.existingSlotStart,
                   subscriptionId: args.subscriptionId,
                   washId: args.washId,
                 ),
@@ -326,7 +326,10 @@ class BookingFlowStartArgs {
   final MyCarModel? existingCar;
   final AddressModel? existingAddress;
   final DateTime? existingDate;
-  final String? existingTime;
+
+  /// The booking's current slot, carried as a [DateTime] so the reschedule
+  /// prefill never round-trips through a localised display label.
+  final DateTime? existingSlotStart;
   final BookingFlowConfig flowConfig;
   final BookingSubmitStrategy submitStrategy;
   final String? subscriptionId;
@@ -337,7 +340,7 @@ class BookingFlowStartArgs {
     this.existingCar,
     this.existingAddress,
     this.existingDate,
-    this.existingTime,
+    this.existingSlotStart,
     this.flowConfig = BookingFlowConfig.normal,
     BookingSubmitStrategy? submitStrategy,
     this.subscriptionId,

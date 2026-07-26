@@ -43,7 +43,10 @@ class BookingState extends Equatable {
   final MyCarModel? selectedCar;
   final Set<int> selectedServiceIndices;
   final DateTime? selectedDate;
-  final String? selectedTime;
+  /// The availability slot the customer picked, carried as the slot's own
+  /// `start` [DateTime]. Never a display string: the wire `scheduledAt` is
+  /// built from this value, so no localised label is ever re-parsed.
+  final DateTime? selectedSlotStart;
   final Set<String> bikerNotes;
   final String specialNoteText;
   final PaymentMethod? paymentMethod;
@@ -86,7 +89,7 @@ class BookingState extends Equatable {
     this.selectedCar,
     this.selectedServiceIndices = const {},
     this.selectedDate,
-    this.selectedTime,
+    this.selectedSlotStart,
     this.bikerNotes = const {},
     this.specialNoteText = '',
     this.paymentMethod,
@@ -115,7 +118,7 @@ class BookingState extends Equatable {
     MyCarModel? selectedCar,
     Set<int>? selectedServiceIndices,
     DateTime? selectedDate,
-    String? selectedTime,
+    DateTime? selectedSlotStart,
     Set<String>? bikerNotes,
     String? specialNoteText,
     PaymentMethod? paymentMethod,
@@ -135,7 +138,7 @@ class BookingState extends Equatable {
     PaymentPhase? paymentPhase,
     PaymentInitModel? paymentInit,
     bool clearSelectedDate = false,
-    bool clearSelectedTime = false,
+    bool clearSelectedSlotStart = false,
     bool clearError = false,
     bool clearPaymentInit = false,
   }) {
@@ -148,7 +151,9 @@ class BookingState extends Equatable {
       selectedServiceIndices:
           selectedServiceIndices ?? this.selectedServiceIndices,
       selectedDate: clearSelectedDate ? null : (selectedDate ?? this.selectedDate),
-      selectedTime: clearSelectedTime ? null : (selectedTime ?? this.selectedTime),
+      selectedSlotStart: clearSelectedSlotStart
+          ? null
+          : (selectedSlotStart ?? this.selectedSlotStart),
       bikerNotes: bikerNotes ?? this.bikerNotes,
       specialNoteText: specialNoteText ?? this.specialNoteText,
       paymentMethod: paymentMethod ?? this.paymentMethod,
@@ -183,7 +188,7 @@ class BookingState extends Equatable {
     selectedCar,
     selectedServiceIndices,
     selectedDate,
-    selectedTime,
+    selectedSlotStart,
     bikerNotes,
     specialNoteText,
     paymentMethod,

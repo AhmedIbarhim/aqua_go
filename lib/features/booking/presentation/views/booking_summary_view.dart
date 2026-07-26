@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
+import '../../../../core/utils/date_time_formatter.dart';
 import '../../../../core/components/custom_button.dart';
 import '../../../../core/components/generic_app_bar.dart';
 import '../../../../core/components/bottom_action_sheet_container.dart';
@@ -220,8 +221,11 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
                   bookingState.selectedAddress?.label ??
                   bookingState.selectedAddress?.details ??
                   '',
-              dateTime: bookingState.selectedDate != null
-                  ? '${bookingState.selectedDate!.month}/${bookingState.selectedDate!.day}/${bookingState.selectedDate!.year} - ${bookingState.selectedTime ?? ""}'
+              dateTime: bookingState.selectedSlotStart != null
+                  ? formatSlotDateTime(
+                      bookingState.selectedSlotStart!,
+                      isArabic: context.isAr,
+                    )
                   : '',
             ),
             const SizedBox(height: 24),

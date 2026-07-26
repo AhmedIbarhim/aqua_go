@@ -219,8 +219,9 @@ BookingCubit _buildCubit(_RecordingBookingRepo repo) {
     existingAddress: _address,
   );
   final date = DateTime.now().add(const Duration(days: 2));
+  final slotStart = DateTime(date.year, date.month, date.day, 10, 0);
   cubit.updateDateTime(date, null);
-  cubit.updateDateTime(date, '10:00 AM');
+  cubit.updateDateTime(date, slotStart);
   cubit.updatePaymentMethod(PaymentMethod.creditCard);
   return cubit;
 }

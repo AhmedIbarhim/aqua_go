@@ -325,19 +325,19 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
           SizedBox(height: height * 0.02),
           BookingDateTimePicker(
             initialDate: bookingState.selectedDate,
-            initialTime: bookingState.selectedTime,
+            initialSlotStart: bookingState.selectedSlotStart,
             availabilitySlots: bookingState.availabilitySlots,
             isLoading: bookingState.isAvailabilityLoading,
             onDateChanged: (date) {
               context.read<BookingCubit>().updateDateTime(
                 date,
-                bookingState.selectedTime,
+                bookingState.selectedSlotStart,
               );
             },
-            onTimeChanged: (time) {
+            onSlotSelected: (slotStart) {
               context.read<BookingCubit>().updateDateTime(
                 bookingState.selectedDate,
-                time,
+                slotStart,
               );
             },
           ),
@@ -414,7 +414,7 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
     final isComplete =
         bookingState.selectedCar != null &&
         bookingState.selectedDate != null &&
-        bookingState.selectedTime != null &&
+        bookingState.selectedSlotStart != null &&
         servicePicked;
 
     // For reschedule flow: submit directly from details view

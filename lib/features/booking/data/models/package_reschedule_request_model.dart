@@ -1,25 +1,20 @@
 import '../../../address/data/models/address_model.dart';
-import 'day_time_model.dart';
+import '../../../../core/utils/saudi_wire_format.dart';
 
 class PackageRescheduleRequestModel {
-  final DateTime date;
-  final String time;
+  /// The picked availability slot's own `start` instant.
+  final DateTime slotStart;
   final AddressModel? address;
   final List<String> vehicleIds;
 
   PackageRescheduleRequestModel({
-    required this.date,
-    required this.time,
+    required this.slotStart,
     this.address,
     this.vehicleIds = const [],
   });
 
   Map<String, dynamic> toJson() {
-    String scheduledAt = '';
-    scheduledAt = DayTimeModel(
-      date: date,
-      rawTime: time,
-    ).toScheduledAtString();
+    final scheduledAt = toWireDateTime(slotStart);
 
     final addr = address;
     final isSavedAddress =

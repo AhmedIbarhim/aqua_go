@@ -327,28 +327,6 @@ class MyBookingDetailsView extends StatelessWidget {
   //   );
   // }
 
-  String _formatTimeSlot(DateTime time, BuildContext context) {
-    if (context.isAr) {
-      final hour = time.hour;
-      final minute = time.minute;
-      final minStr = minute.toString().padLeft(2, '0');
-
-      String period;
-      int displayHour = hour;
-      if (hour >= 12) {
-        period = hour == 12 ? 'ظهراً' : 'مساءً';
-        if (hour > 12) displayHour = hour - 12;
-      } else {
-        period = 'صباحاً';
-        if (hour == 0) displayHour = 12;
-      }
-
-      return '$displayHour:$minStr $period';
-    } else {
-      return DateFormat('h:mm a').format(time);
-    }
-  }
-
   /// Mirrors the backend reschedule policy (AQG-119:
   /// reschedulePolicy.minHoursBeforeStart = 12h). Editing launches the
   /// reschedule flow, which the server rejects (RescheduleTooLateException)
@@ -415,15 +393,12 @@ class MyBookingDetailsView extends StatelessWidget {
             ),
           );
 
-          DateTime? existingDate;
-          String? existingTime;
-          if (booking.scheduledAt != null) {
-            final parsedDate = DateTime.tryParse(booking.scheduledAt!);
-            if (parsedDate != null) {
-              existingDate = parsedDate;
-              existingTime = _formatTimeSlot(parsedDate, context);
-            }
-          }
+          // Carry the booking's slot as a structured DateTime. This entry
+          // point bypasses the picker entirely, so a display label here would
+          // ride straight to the wire if the customer never re-taps a slot.
+          final existingSlotStart = booking.scheduledAt != null
+              ? DateTime.tryParse(booking.scheduledAt!)
+              : null;
 
           context.pushNamed(
             Routes.bookingLocation,
@@ -431,8 +406,8 @@ class MyBookingDetailsView extends StatelessWidget {
               service: service,
               existingCar: existingCar,
               existingAddress: existingAddress,
-              existingDate: existingDate,
-              existingTime: existingTime,
+              existingDate: existingSlotStart,
+              existingSlotStart: existingSlotStart,
               flowConfig: const BookingFlowConfig(
                 flowType: BookingFlowType.reschedule,
               ),
