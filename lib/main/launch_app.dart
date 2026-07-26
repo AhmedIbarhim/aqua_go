@@ -4,7 +4,6 @@ import 'package:aqua_go/core/config/controllers/language_controller/language_cub
 import 'package:aqua_go/core/config/controllers/theme_controller/theme_cubit.dart';
 import 'package:aqua_go/core/config/di/service_locator.dart';
 import 'package:aqua_go/core/config/local_storage/shared_prefs.dart';
-import 'package:aqua_go/core/constants.dart';
 import 'package:aqua_go/core/helpers/connectivity_helper.dart';
 import 'package:aqua_go/features/auth/data/services/device_token_sync.dart';
 import 'package:aqua_go/init_notifications.dart';
@@ -46,10 +45,17 @@ void launchApp(AppEnvironment environment) async {
   // Fire-and-forget: sync FCM token if user is already logged in from a
   // previous session. No await — must not block app startup.
   syncDeviceToken();
-  final isArabic =
-      CacheClient.getString(kLanguage, defaultValue: kArabicLang) ==
-      kArabicLang;
-  final Locale startLocale = isArabic ? const Locale('ar') : const Locale('en');
+  // ONE locale computation, shared by easy_localization's startLocale and the
+  // Intl pin below, so the two can never desync.
+  final Locale startLocale = LanguageCubit.initialLocale;
+
+  // Pin intl to the app's language. Without this, `EasyLocalization
+  // .ensureInitialized()` leaves `Intl.systemLocale` holding the DEVICE OS
+  // locale and `Intl.defaultLocale` null, so every `DateFormat` built without
+  // an explicit locale formats against the phone rather than the language the
+  // customer picked in-app. Re-pinned on every language change in
+  // `LanguageCubit._applyLocale`.
+  Intl.defaultLocale = startLocale.languageCode;
 
   Bloc.observer = AppBlocObserver();
 
