@@ -105,21 +105,21 @@ class _CustomAlertBoxState extends State<CustomAlertBox> {
             bottom: MediaQuery.viewInsetsOf(context).bottom,
           ),
           child: Center(
-          child: GestureDetector(
-            onTap: () {}, // Prevent tap from bubbling up to background
-            child: Container(
-              width: double.infinity,
-              margin:
-                  widget.margin ??
-                  EdgeInsets.symmetric(horizontal: width * 0.06),
-              padding: widget.padding ?? EdgeInsets.all(width * 0.04),
-              decoration: BoxDecoration(
-                color: context.colors.cardBackGround,
-                borderRadius: BorderRadius.circular(24),
+            child: GestureDetector(
+              onTap: () {}, // Prevent tap from bubbling up to background
+              child: Container(
+                width: double.infinity,
+                margin:
+                    widget.margin ??
+                    EdgeInsets.symmetric(horizontal: width * 0.06),
+                padding: widget.padding ?? EdgeInsets.all(width * 0.04),
+                decoration: BoxDecoration(
+                  color: context.colors.cardBackGround,
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: widget.child,
               ),
-              child: widget.child,
             ),
-          ),
           ),
         ),
       ),
