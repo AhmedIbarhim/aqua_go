@@ -95,6 +95,25 @@ class BookingDetailsSummaryCard extends StatelessWidget {
                     icon: AppAssets.terms,
                   );
                 }),
+              // The negative DISCOUNT row, sourced from the backend's own line.
+              //
+              // The SERVICE row above states the wash's PRE-discount price (the
+              // backend rebuilds the breakdown that way so the true price of
+              // what was bought is visible), which means the item rows no longer
+              // add up to the Subtotal beneath them unless the saving is stated
+              // as its own row. It is a NET figure, like every row in this
+              // column — which is why it is labelled "before VAT" and differs
+              // from the VAT-inclusive discount in the promo block further down.
+              if (showNetVatSummary && _discountNet() != null)
+                _buildSummaryRow(
+                  context,
+                  title: LocaleKeys.bookings_promo_discount_before_vat.tr(
+                    context: context,
+                  ),
+                  value:
+                      '${_discountNet()!.toStringAsFixed(2)} $currency',
+                  icon: AppAssets.money,
+                ),
               if (showNetVatSummary) ...[
                 // Totals block, bottom-up: subtotal (net) → VAT → grand total.
                 // Subtle hairline between the line items above and the net row,
@@ -191,6 +210,19 @@ class BookingDetailsSummaryCard extends StatelessWidget {
     final lines = booking.lines ?? const <QuoteLine>[];
     final matches = lines.where((l) => l.isAddon && l.refId == addon.addonId);
     return matches.isEmpty ? addon.charged : matches.first.net;
+  }
+
+  /// The DISCOUNT line's NET amount (already negative), or null when this
+  /// booking carried no code.
+  ///
+  /// Read from the line, never computed: the backend splits VAT off the
+  /// discount at the canonical rate and lands the rounding residue on the
+  /// SERVICE row, so recomputing it here would disagree with the Subtotal by a
+  /// halala on some baskets.
+  double? _discountNet() {
+    final lines = booking.lines ?? const <QuoteLine>[];
+    final line = lines.where((l) => l.isDiscount).firstOrNull;
+    return line?.net;
   }
 
   /// NET amount for the SERVICE's own line, sourced from the backend SERVICE

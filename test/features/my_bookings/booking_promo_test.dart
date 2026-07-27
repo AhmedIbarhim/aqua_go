@@ -28,6 +28,36 @@ Map<String, dynamic> _bookingJson({
   'promo': ?promo,
 };
 
+/// The per-line breakdown of a discounted booking, exactly as the server now
+/// rebuilds it: the SERVICE row states the PRE-discount wash price and a
+/// negative DISCOUNT row carries the saving, so the rows still sum to the
+/// charged total (9200 + 2300 − 2000 == 9500) and to the net subtotal
+/// (8000 + 2000 − 1739 == 8261). The fixture used to encode the pre-fix shape,
+/// which is why no test saw the card stop reconciling.
+const List<Map<String, dynamic>> _discountedLines = [
+  {
+    'kind': 'SERVICE',
+    'refId': 'pkg-1',
+    'grossMinor': 9200,
+    'netMinor': 8000,
+    'vatMinor': 1200,
+  },
+  {
+    'kind': 'ADDON',
+    'refId': 'addon-1',
+    'grossMinor': 2300,
+    'netMinor': 2000,
+    'vatMinor': 300,
+  },
+  {
+    'kind': 'DISCOUNT',
+    'refId': null,
+    'grossMinor': -2000,
+    'netMinor': -1739,
+    'vatMinor': -261,
+  },
+];
+
 Future<void> _pumpCard(
   WidgetTester tester,
   BookingResponseModel booking, {
@@ -234,16 +264,7 @@ void main() {
             'charged': 2300,
           },
         ]
-        ..['lines'] = [
-          {'kind': 'SERVICE', 'grossMinor': 7200, 'netMinor': 6261, 'vatMinor': 939},
-          {
-            'kind': 'ADDON',
-            'refId': 'addon-1',
-            'grossMinor': 2300,
-            'netMinor': 2000,
-            'vatMinor': 300,
-          },
-        ]
+        ..['lines'] = _discountedLines
         ..['breakdown'] = {
           'grossMinor': 9500,
           'netMinor': 8261,
@@ -258,6 +279,87 @@ void main() {
       expect(find.text('WELCOME20'), findsOneWidget);
       expect(find.text('الإجمالي قبل الخصم'), findsOneWidget);
       expect(tester.takeException(), isNull);
+    });
+
+    /// The defect this closes: the backend states the wash's PRE-discount price
+    /// on the SERVICE row and carries the saving as its own negative row, so a
+    /// card that renders the item rows and drops the discount shows a column
+    /// adding up to more than the Subtotal printed directly beneath it.
+    ///
+    /// 80.00 service + 20.00 add-on − 17.39 discount == 82.61 subtotal. Every
+    /// figure is the backend's own `netMinor`; nothing here is recomputed.
+    testWidgets('the item rows still reconcile with the Subtotal beneath them', (
+      tester,
+    ) async {
+      final json = _bookingJson(
+        promo: {'code': 'WELCOME20', 'discountMinor': 2000},
+      )
+        ..['addOns'] = [
+          {
+            'addonId': 'addon-1',
+            'nameAr': 'تلميع الإطارات',
+            'nameEn': 'Tyre polish',
+            'charged': 2300,
+          },
+        ]
+        ..['lines'] = _discountedLines
+        ..['breakdown'] = {
+          'grossMinor': 9500,
+          'netMinor': 8261,
+          'vatMinor': 1239,
+          'currency': 'SAR',
+        };
+      await _pumpCard(tester, BookingResponseModel.fromJson(json));
+
+      expect(find.text('80.00 SAR'), findsOneWidget, reason: 'the wash, before the code');
+      expect(find.text('20.00 SAR'), findsOneWidget, reason: 'the add-on');
+      expect(
+        find.text('-17.39 SAR'),
+        findsOneWidget,
+        reason: 'the saving, stated NET like every other row in this column',
+      );
+      expect(find.text('82.61 SAR'), findsOneWidget, reason: 'the subtotal they sum to');
+      // The VAT-inclusive promo statement below is unchanged and separate.
+      expect(find.text('-20.00 SAR'), findsOneWidget);
+      expect(find.text('115.00 SAR'), findsOneWidget);
+      expect(find.text('95.00 SAR'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('a booking with no code shows no discount row', (tester) async {
+      final json = _bookingJson()
+        ..['addOns'] = [
+          {
+            'addonId': 'addon-1',
+            'nameAr': 'تلميع الإطارات',
+            'nameEn': 'Tyre polish',
+            'charged': 2300,
+          },
+        ]
+        ..['lines'] = [
+          {
+            'kind': 'SERVICE',
+            'refId': 'pkg-1',
+            'grossMinor': 7200,
+            'netMinor': 6261,
+            'vatMinor': 939,
+          },
+          {
+            'kind': 'ADDON',
+            'refId': 'addon-1',
+            'grossMinor': 2300,
+            'netMinor': 2000,
+            'vatMinor': 300,
+          },
+        ]
+        ..['breakdown'] = {
+          'grossMinor': 9500,
+          'netMinor': 8261,
+          'vatMinor': 1239,
+          'currency': 'SAR',
+        };
+      await _pumpCard(tester, BookingResponseModel.fromJson(json));
+      expect(find.text('Promo discount (before VAT)'), findsNothing);
     });
 
     testWidgets('a booking with no promo renders no promo rows', (
