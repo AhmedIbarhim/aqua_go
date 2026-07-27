@@ -1,0 +1,194 @@
+import 'package:aqua_go/core/config/controllers/language_controller/language_cubit.dart';
+import 'package:aqua_go/core/config/local_storage/shared_prefs.dart';
+import 'package:aqua_go/core/constants.dart';
+import 'package:aqua_go/core/themes/app_colors.dart';
+import 'package:aqua_go/features/my_bookings/data/models/booking_response_model/booking_response_model.dart';
+import 'package:aqua_go/features/my_bookings/presentation/widgets/booking_details_summary_card.dart';
+import 'package:aqua_go/generated/codegen_loader.g.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+/// The wire shape of a discounted booking. `discountMinor` is ALREADY netted off
+/// `totalAmountMinor`, so 9500 charged + 2000 saved describes an 11500 original.
+Map<String, dynamic> _bookingJson({
+  Map<String, dynamic>? promo,
+  int totalAmountMinor = 9500,
+}) => {
+  'id': 'booking-1',
+  'referenceNumber': 'BK-000123',
+  'type': 'SCHEDULED',
+  'status': 'PENDING',
+  'scheduledAt': '2026-08-02T10:00:00',
+  'totalAmountMinor': totalAmountMinor,
+  'currency': 'SAR',
+  'isSubscription': false,
+  'promo': ?promo,
+};
+
+Future<void> _pumpCard(WidgetTester tester, BookingResponseModel booking) async {
+  await CacheClient.setString(kLanguage, 'en');
+  await tester.pumpWidget(
+    EasyLocalization(
+      supportedLocales: const [Locale('ar'), Locale('en')],
+      path: 'assets/translations',
+      fallbackLocale: const Locale('ar'),
+      startLocale: const Locale('en'),
+      assetLoader: const CodegenLoader(),
+      child: BlocProvider(
+        create: (_) => LanguageCubit(),
+        child: Builder(
+          builder: (context) => MaterialApp(
+            locale: context.locale,
+            supportedLocales: context.supportedLocales,
+            localizationsDelegates: context.localizationDelegates,
+            theme: ThemeData(
+              extensions: <ThemeExtension<dynamic>>[darkAppColors],
+            ),
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: BookingDetailsSummaryCard(booking: booking),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+  await tester.pump();
+  await tester.pump();
+}
+
+void main() {
+  group('BookingPromo.fromJson', () {
+    test('parses the full record', () {
+      final booking = BookingResponseModel.fromJson(
+        _bookingJson(
+          promo: {
+            'code': 'WELCOME20',
+            'discountMinor': 2000,
+            'offerId': '018f-offer',
+            'redeemedAt': '2026-07-26T14:30:00',
+          },
+        ),
+      );
+      final promo = booking.promo!;
+      expect(promo.code, 'WELCOME20');
+      expect(promo.discountMinor, 2000);
+      expect(promo.discount, 20.0);
+      expect(promo.offerId, '018f-offer');
+      // Bare Riyadh wall clock -> the Riyadh frame, on any device.
+      expect(promo.redeemedAt, DateTime.utc(2026, 7, 26, 14, 30));
+      expect(promo.releasedAt, isNull);
+      expect(promo.isReleased, isFalse);
+      expect(promo.isEmpty, isFalse);
+    });
+
+    test('a released redemption carries its release instant', () {
+      final booking = BookingResponseModel.fromJson(
+        _bookingJson(
+          promo: {
+            'code': 'WELCOME20',
+            'discountMinor': 2000,
+            'redeemedAt': '2026-07-26T14:30:00',
+            'releasedAt': '2026-07-27T09:00:00',
+          },
+        ),
+      );
+      expect(booking.promo!.isReleased, isTrue);
+      expect(booking.promo!.releasedAt, DateTime.utc(2026, 7, 27, 9));
+    });
+
+    test('a booking with no promo parses to null, not to an empty promo', () {
+      expect(BookingResponseModel.fromJson(_bookingJson()).promo, isNull);
+    });
+
+    test('a malformed promo payload degrades to null instead of throwing', () {
+      // Read-reconstruction path: stored data must keep reading.
+      final json = _bookingJson()..['promo'] = 'WELCOME20';
+      expect(BookingResponseModel.fromJson(json).promo, isNull);
+    });
+
+    test('a code that saved nothing reads as empty', () {
+      // Naming a saving of 0.00 would read as a bug rather than as a fact.
+      final booking = BookingResponseModel.fromJson(
+        _bookingJson(promo: {'code': 'WELCOME20', 'discountMinor': 0}),
+      );
+      expect(booking.promo!.isEmpty, isTrue);
+    });
+
+    test('the two other stale BookingResponse fields parse', () {
+      final json = _bookingJson()
+        ..['cantFindClientNotes'] = 'No answer at the gate'
+        ..['addonPaymentIntentId'] = 'pi-addon-1';
+      final booking = BookingResponseModel.fromJson(json);
+      expect(booking.cantFindClientNotes, 'No answer at the gate');
+      expect(booking.addonPaymentIntentId, 'pi-addon-1');
+    });
+  });
+
+  group('BookingDetailsSummaryCard — UCC16 discount on the booking detail', () {
+    setUp(() async {
+      TestWidgetsFlutterBinding.ensureInitialized();
+      SharedPreferences.setMockInitialValues({});
+      await CacheClient.init();
+      await EasyLocalization.ensureInitialized();
+    });
+
+    testWidgets('states the code, the original total and what it saved', (
+      tester,
+    ) async {
+      await _pumpCard(
+        tester,
+        BookingResponseModel.fromJson(
+          _bookingJson(
+            promo: {
+              'code': 'WELCOME20',
+              'discountMinor': 2000,
+              'redeemedAt': '2026-07-26T14:30:00',
+            },
+          ),
+        ),
+      );
+      expect(find.text('WELCOME20'), findsOneWidget);
+      // original == total + discount, exactly: the backend subtracts the
+      // discount from the VAT-inclusive gross to reach the charged total.
+      expect(find.text('115.00 SAR'), findsOneWidget);
+      expect(find.text('-20.00 SAR'), findsOneWidget);
+      expect(find.text('95.00 SAR'), findsOneWidget);
+      expect(find.text('Code returned after cancellation'), findsNothing);
+    });
+
+    testWidgets('a released redemption keeps the rows and says so', (
+      tester,
+    ) async {
+      await _pumpCard(
+        tester,
+        BookingResponseModel.fromJson(
+          _bookingJson(
+            promo: {
+              'code': 'WELCOME20',
+              'discountMinor': 2000,
+              'redeemedAt': '2026-07-26T14:30:00',
+              'releasedAt': '2026-07-27T09:00:00',
+            },
+          ),
+        ),
+      );
+      expect(find.text('WELCOME20'), findsOneWidget);
+      expect(find.text('-20.00 SAR'), findsOneWidget);
+      expect(find.text('Code returned after cancellation'), findsOneWidget);
+    });
+
+    testWidgets('a booking with no promo renders no promo rows', (
+      tester,
+    ) async {
+      await _pumpCard(tester, BookingResponseModel.fromJson(_bookingJson()));
+      expect(find.text('Promo Code'), findsNothing);
+      expect(find.text('Original Total'), findsNothing);
+      expect(find.text('95.00 SAR'), findsOneWidget);
+    });
+  });
+}

@@ -200,6 +200,7 @@
     "promo_code_removed": "تمت إزالة كود الخصم. يرجى مراجعة الإجمالي المحدث.",
     "original_total": "الإجمالي قبل الخصم",
     "promo_discount": "خصم الكود",
+    "promo_released": "تمت إعادة الكود بعد الإلغاء",
     "payment_refunded_title": "لم يكتمل الحجز",
     "payment_refunded_notice": "تم خصم المبلغ من بطاقتك وتمت إعادته بالكامل. قد يستغرق ظهوره في كشف حسابك حتى 7 أيام حسب البنك.",
     "delete_promo_code": "حذف الكود",

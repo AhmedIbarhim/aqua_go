@@ -200,6 +200,7 @@
     "promo_code_removed": "The promo code was removed. Please review the updated total.",
     "original_total": "Original Total",
     "promo_discount": "Promo Discount",
+    "promo_released": "Code returned after cancellation",
     "payment_refunded_title": "Booking not completed",
     "payment_refunded_notice": "Your card was charged and the full amount has been refunded. It can take up to 7 days to appear on your statement, depending on your bank.",
     "delete_promo_code": "Delete Code",

@@ -8,6 +8,7 @@ import '../../enums/booking_type_enum.dart';
 import 'assigned_worker.dart';
 import 'booking_addon.dart';
 import 'booking_address.dart';
+import 'booking_promo.dart';
 import 'booking_rating.dart';
 import 'booking_vehicle.dart';
 import 'breakdown.dart';
@@ -20,6 +21,7 @@ import 'service_name.dart';
 export 'assigned_worker.dart';
 export 'booking_addon.dart';
 export 'booking_address.dart';
+export 'booking_promo.dart';
 export 'booking_rating.dart';
 export 'booking_vehicle.dart';
 export 'bookings_list_response_model.dart';
@@ -85,6 +87,12 @@ class BookingResponseModel {
   String? cancelledAt;
   String? completionNotes;
   String? cantFindClientReportedAt;
+  String? cantFindClientNotes;
+  String? addonPaymentIntentId;
+
+  /// The promo code applied to this booking, or null when none was. Its
+  /// `discountMinor` is ALREADY netted off [totalAmountMinor].
+  BookingPromo? promo;
 
   BookingResponseModel({
     this.id,
@@ -139,6 +147,9 @@ class BookingResponseModel {
     this.cancelledAt,
     this.completionNotes,
     this.cantFindClientReportedAt,
+    this.cantFindClientNotes,
+    this.addonPaymentIntentId,
+    this.promo,
   });
 
   BookingResponseModel.fromJson(Map<String, dynamic> json) {
@@ -233,6 +244,11 @@ class BookingResponseModel {
     cancelledAt = json['cancelledAt'];
     completionNotes = json['completionNotes'];
     cantFindClientReportedAt = json['cantFindClientReportedAt'];
+    cantFindClientNotes = json['cantFindClientNotes'];
+    addonPaymentIntentId = json['addonPaymentIntentId'];
+    promo = json['promo'] is Map<String, dynamic>
+        ? BookingPromo.fromJson(json['promo'] as Map<String, dynamic>)
+        : null;
   }
 
   // --- UI Compatibility Helpers ---

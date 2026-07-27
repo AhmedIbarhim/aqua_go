@@ -24,6 +24,12 @@ class BookingDetailsSummaryCard extends StatelessWidget {
         hasAddons &&
         breakdown != null &&
         (!booking.isCoveredBySubscription || (breakdown.grossMinor ?? 0) != 0);
+    // UCC16 — the customer can see the discount that applied to THEIR booking,
+    // on the booking itself and not only on the review screen they passed
+    // through once. A code that priced to nothing on this basket states no
+    // saving rather than a "0.00 off" line that reads as a bug.
+    final promo = booking.promo;
+    final bool showPromo = promo != null && !promo.isEmpty;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -108,6 +114,55 @@ class BookingDetailsSummaryCard extends StatelessWidget {
                   value: '${breakdown.vat.toStringAsFixed(2)} $currency',
                   icon: AppAssets.document,
                 ),
+                _buildTotalDivider(context),
+              ],
+              // The promo statement, mirroring the review screen's
+              // original − discount == total. It is a SEPARATE statement from
+              // the Subtotal/VAT column above, which reads subtotal + VAT ==
+              // total; nothing above is recomputed, so the two do not disturb
+              // each other. `discountMinor` is already netted off
+              // `totalAmountMinor`, so the original is reconstructed as
+              // total + discount — exact, because the backend subtracts the
+              // discount from the VAT-inclusive surged gross to reach this very
+              // total.
+              if (showPromo) ...[
+                if (!showNetVatSummary) _buildTotalDivider(context),
+                _buildSummaryRow(
+                  context,
+                  title: LocaleKeys.bookings_promo_code_title.tr(
+                    context: context,
+                  ),
+                  value: promo.code!,
+                  icon: AppAssets.gift,
+                ),
+                _buildSummaryRow(
+                  context,
+                  title: LocaleKeys.bookings_original_total.tr(
+                    context: context,
+                  ),
+                  value:
+                      '${(booking.totalAmount + promo.discount).toStringAsFixed(2)} $currency',
+                  icon: AppAssets.document,
+                ),
+                _buildSummaryRow(
+                  context,
+                  title: LocaleKeys.bookings_promo_discount.tr(
+                    context: context,
+                  ),
+                  value: '-${promo.discount.toStringAsFixed(2)} $currency',
+                  icon: AppAssets.money,
+                ),
+                // A released redemption no longer counts against the campaign,
+                // but the discount it granted still shaped what this booking was
+                // charged — so the rows stay and the state is stated, rather
+                // than the whole block silently disappearing on cancellation.
+                if (promo.isReleased)
+                  Text(
+                    LocaleKeys.bookings_promo_released.tr(context: context),
+                    style: AppTextStyles.regular12.copyWith(
+                      color: context.colors.contentDisabled,
+                    ),
+                  ),
                 _buildTotalDivider(context),
               ],
               // Exactly ONE grand total, last, VAT-inclusive (gross).
