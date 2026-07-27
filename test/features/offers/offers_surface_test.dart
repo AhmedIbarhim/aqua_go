@@ -252,7 +252,10 @@ void main() {
         cubit: cubitFor(repo),
       );
 
-      final en = DateFormat.yMMMd('en').format(offer.endsAt.toLocal());
+      // No `.toLocal()`: `endsAt` is in the Riyadh frame, so its fields already
+      // ARE the date to print. Converting here would expect a different day
+      // from the one the screen renders on any device off UTC+3.
+      final en = DateFormat.yMMMd('en').format(offer.endsAt);
       expect(
         find.text(LocaleKeys.offers_expires_on.tr(args: [en])),
         findsOneWidget,
@@ -270,7 +273,7 @@ void main() {
         locale: const Locale('ar'),
       );
 
-      final ar = DateFormat.yMMMd('ar').format(offer.endsAt.toLocal());
+      final ar = DateFormat.yMMMd('ar').format(offer.endsAt);
       expect(
         find.text(LocaleKeys.offers_expires_on.tr(args: [ar])),
         findsOneWidget,

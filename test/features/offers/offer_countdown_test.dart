@@ -1,3 +1,4 @@
+import 'package:aqua_go/features/offers/data/models/customer_offer_model.dart';
 import 'package:aqua_go/features/offers/domain/offer_countdown.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -29,9 +30,23 @@ void main() {
       expect(offerEndsInDays(now.subtract(const Duration(hours: 1)), now), isNull);
     });
 
-    test('local-time endsAt is compared in UTC', () {
-      final local = now.add(const Duration(days: 2)).toLocal();
-      expect(offerEndsInDays(local, now), 2);
+    test('the chip does not move with the device timezone', () {
+      // Both arguments live in the Riyadh frame — UTC-flagged, carrying Riyadh
+      // wall-clock fields — so the boundary falls at the same wall clock on
+      // every device. Built from the WIRE STRING, so the parse is under test
+      // too: a device-local parse shifts this over the 7-day cutoff.
+      final offer = CustomerOfferModel.fromJson({
+        'id': 'x',
+        'offerType': 'PROMO_CODE',
+        'titleAr': 'ع',
+        'titleEn': 'T',
+        'descriptionAr': 'و',
+        'descriptionEn': 'D',
+        'endsAt': '2026-08-03T00:00:00',
+        'terms': {'promoCode': 'X'},
+      });
+      expect(offerEndsInDays(offer.endsAt, DateTime.utc(2026, 8, 1)), 2);
+      expect(offerEndsInDays(offer.endsAt, DateTime.utc(2026, 7, 27)), isNull);
     });
 
     test('the CustomerOfferModel far-future fallback renders no chip', () {
