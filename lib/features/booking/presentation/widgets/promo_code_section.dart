@@ -18,9 +18,18 @@ import '../../domain/promo_code_rules.dart';
 /// quote response carries `promoCode` + `promoDiscountMinor`, and the offer
 /// feed's terms carry neither. `remainingUses` exists only on the ADMIN
 /// projection, withheld from every customer surface on purpose — remaining
-/// campaign inventory on an anonymous endpoint is a "which campaigns are nearly
-/// exhausted" scraper. Do not add a field to the customer contract to satisfy
-/// this note; it is an owner decision, not an oversight.
+/// campaign inventory on a CUSTOMER endpoint is a "which campaigns are nearly
+/// exhausted" scraper, and an account costs one 4-digit SMS OTP, so requiring a
+/// sign-in raises the price of scraping without closing it. (The lookup IS
+/// authenticated; an earlier version of this note called it anonymous, which
+/// is false and is the kind of wrong reason that invites the change it exists
+/// to prevent — the field has been added back to the customer projection twice
+/// by authors who checked the stated justification and found it did not hold.)
+///
+/// The clause was put to the owner with that trade-off named and **WITHDRAWN,
+/// ratified 2026-07-27**. Do not add a field to the customer contract to
+/// satisfy this note; re-opening it is an owner decision, not an oversight to
+/// close.
 class PromoCodeSection extends StatelessWidget {
   final String? appliedPromoCode;
 
