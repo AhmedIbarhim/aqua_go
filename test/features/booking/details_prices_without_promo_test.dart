@@ -36,10 +36,10 @@ void main() {
 
   /// Arms the flow where the owner's report starts: the customer tapped "Use
   /// this code" on an offer, so the next summary mount consumes the handoff.
-  /// The held code is display-only — the server resolves the offer's own code
-  /// and echoes [offerResolvedPromoCode], which is what lands on the state.
+  /// Only the offer id travels — the server resolves the offer's own code and
+  /// echoes [offerResolvedPromoCode], which is what lands on the state.
   void takeOffer() {
-    PendingPromoCode.instance.hold(offerId: offerId, promoCode: 'HELD');
+    PendingPromoCode.instance.hold(offerId: offerId);
     // Drain the single-shot slot so a failed test cannot leak a handoff into
     // the next one.
     addTearDown(PendingPromoCode.instance.takeHandoff);

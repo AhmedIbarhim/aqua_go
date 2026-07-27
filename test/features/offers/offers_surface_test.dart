@@ -12,6 +12,7 @@ import 'package:aqua_go/features/offers/presentation/views/offer_detail_view.dar
 import 'package:aqua_go/features/offers/presentation/views/offers_view.dart';
 import 'package:aqua_go/features/offers/presentation/widgets/offer_card.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dartz/dartz.dart';
 // `intl` (re-exported by easy_localization) ships its own TextDirection, which
 // would shadow the dart:ui one the Directionality assertions need.
@@ -34,6 +35,21 @@ void main() {
 
   OffersCubit cubitFor(ScriptedOffersRepository r) =>
       OffersCubit(offersRepository: r);
+
+  /// The A6 retry affordance is the house `ErrorRetryWidget`; its action is the
+  /// ElevatedButton inside it, which is what a tap has to land on.
+  final retryButton = find.descendant(
+    of: find.byKey(const ValueKey('offers-retry')),
+    matching: find.byType(ElevatedButton),
+  );
+
+  /// Every remote image on these surfaces goes through the house
+  /// `CustomNetworkImage`, i.e. `cached_network_image` — UCC23's "banner images
+  /// are cached".
+  List<String> bannerUrls(WidgetTester tester) => tester
+      .widgetList<CachedNetworkImage>(find.byType(CachedNetworkImage))
+      .map((i) => i.imageUrl)
+      .toList();
 
   group('UCC23 A6 — the offers screen distinguishes empty, error and loading', () {
     testWidgets('an outage offers a RETRY, not an empty list', (tester) async {
@@ -63,7 +79,7 @@ void main() {
       expect(repo.listCalls, 1);
 
       repo.answerListWith(Right([promoOffer()]));
-      await tester.tap(find.byKey(const ValueKey('offers-retry')));
+      await tester.tap(retryButton);
       await tester.pump();
       await tester.pump();
 
@@ -191,7 +207,7 @@ void main() {
       await tester.pump();
 
       await tester.tap(find.text('Welcome offer').first);
-      await tester.pumpAndSettle();
+      await settleOffers(tester);
 
       final detail = tester.widget<OfferDetailView>(find.byType(OfferDetailView));
       expect(detail.offer.id, 'wanted');
@@ -213,7 +229,7 @@ void main() {
       await tester.pump();
 
       await tester.tap(find.text('Gold package').first);
-      await tester.pumpAndSettle();
+      await settleOffers(tester);
 
       expect(find.byType(OfferDetailView), findsOneWidget);
     });
@@ -261,11 +277,11 @@ void main() {
       await cubit.getOffers();
       await tester.pump();
       await tester.tap(find.text(offer.title(isAr: false)));
-      await tester.pumpAndSettle();
+      await settleOffers(tester);
       expect(find.byType(OfferDetailView), findsOneWidget);
 
       await tester.tap(find.byKey(const ValueKey('offer-primary-action')));
-      await tester.pumpAndSettle();
+      await settleOffers(tester);
 
       expect(find.text(LocaleKeys.offers_expired.tr()), findsOneWidget);
       expect(find.byType(OfferDetailView), findsNothing);
@@ -352,12 +368,12 @@ void main() {
       await cubit.getOffers();
       await tester.pump();
       await tester.tap(find.text('Welcome offer'));
-      await tester.pumpAndSettle();
+      await settleOffers(tester);
       expect(find.byType(OfferDetailView), findsOneWidget);
 
       repo.answerListWith(const Right(<CustomerOfferModel>[]));
       await tester.tap(find.byKey(const ValueKey('offer-primary-action')));
-      await tester.pumpAndSettle();
+      await settleOffers(tester);
 
       // "the system re-validates, blocks the action and returns the customer to
       // a refreshed list with a brief toast."
@@ -387,18 +403,22 @@ void main() {
       );
 
       await tester.tap(find.byKey(const ValueKey('offer-primary-action')));
-      await tester.pumpAndSettle();
+      await settleOffers(tester);
 
+      // The OFFER id is the only thing that travels: the server resolves the
+      // offer's own code and refuses a request carrying both.
       final held = PendingPromoCode.instance.takeHandoff();
       expect(held?.offerId, 'offer-live');
-      expect(held?.promoCode, 'WELCOME20');
       expect(pushed.single.name, Routes.layout);
     });
 
     testWidgets('the re-validated copy supersedes the one the list drew', (tester) async {
-      // The list handed over a stale copy; the server's answer is authoritative.
+      // The list handed over a copy that still carried a code; the server's
+      // answer — the same offer, its link now gone — is authoritative, so the
+      // action must take the A2 blocked outcome rather than act on the stale
+      // copy it was handed.
       final stale = promoOffer(id: 'offer-live', code: 'OLDCODE');
-      final fresh = promoOffer(id: 'offer-live', code: 'NEWCODE');
+      final fresh = offerWithoutItsLink(id: 'offer-live', offerType: 'PROMO_CODE');
       repo = ScriptedOffersRepository(
         listResult: Right([stale]),
         detailResult: Right(fresh),
@@ -411,9 +431,11 @@ void main() {
       );
 
       await tester.tap(find.byKey(const ValueKey('offer-primary-action')));
-      await tester.pumpAndSettle();
+      await settleOffers(tester);
 
-      expect(PendingPromoCode.instance.takeHandoff()?.promoCode, 'NEWCODE');
+      expect(repo.detailCalls, ['offer-live']);
+      expect(PendingPromoCode.instance.takeHandoff(), isNull);
+      expect(pushed.where((r) => r.name != null), isEmpty);
     });
 
     testWidgets('an unreachable server is not treated as an expiry', (tester) async {
@@ -432,10 +454,10 @@ void main() {
       );
 
       await tester.tap(find.byKey(const ValueKey('offer-primary-action')));
-      await tester.pumpAndSettle();
+      await settleOffers(tester);
 
       expect(repo.listCalls, 0, reason: 'nothing died, so nothing to refresh');
-      expect(PendingPromoCode.instance.takeHandoff()?.promoCode, 'WELCOME20');
+      expect(PendingPromoCode.instance.takeHandoff()?.offerId, 'offer-live');
       expect(pushed.single.name, Routes.layout);
     });
 
@@ -455,7 +477,7 @@ void main() {
       );
 
       await tester.tap(find.byKey(const ValueKey('offer-primary-action')));
-      await tester.pumpAndSettle();
+      await settleOffers(tester);
 
       expect(pushed.single.name, Routes.packageDetail);
       expect((pushed.single.arguments as PackageDetailArgs).packageId, 'pkg-77');
@@ -544,9 +566,8 @@ void main() {
         Directionality.of(tester.element(find.byType(OfferCard))),
         TextDirection.rtl,
       );
-      final images = tester.widgetList<Image>(find.byType(Image)).toList();
       expect(
-        images.map((i) => (i.image as NetworkImage).url),
+        bannerUrls(tester),
         contains('https://cdn.example/offer-1-ar.png'),
       );
     });
@@ -569,9 +590,8 @@ void main() {
         Directionality.of(tester.element(find.byType(OfferCard))),
         TextDirection.ltr,
       );
-      final images = tester.widgetList<Image>(find.byType(Image)).toList();
       expect(
-        images.map((i) => (i.image as NetworkImage).url),
+        bannerUrls(tester),
         contains('https://cdn.example/offer-1-en.png'),
       );
     });

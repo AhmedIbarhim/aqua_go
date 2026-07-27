@@ -96,7 +96,15 @@ class _CustomAlertBoxState extends State<CustomAlertBox> {
       onTap: () => Navigator.pop(context),
       child: Material(
         color: Colors.transparent,
-        child: Center(
+        // Centre in the space the keyboard leaves, not in the whole screen —
+        // otherwise a box holding a text field sits half under the keyboard the
+        // field itself raised. Zero on every dialog that has no field, so the
+        // existing ones are unchanged.
+        child: Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.viewInsetsOf(context).bottom,
+          ),
+          child: Center(
           child: GestureDetector(
             onTap: () {}, // Prevent tap from bubbling up to background
             child: Container(
@@ -111,6 +119,7 @@ class _CustomAlertBoxState extends State<CustomAlertBox> {
               ),
               child: widget.child,
             ),
+          ),
           ),
         ),
       ),

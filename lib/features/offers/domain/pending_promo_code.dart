@@ -1,20 +1,17 @@
 /// What the customer picked when they tapped "Use this code" on an offer.
 ///
-/// Carries the OFFER id as well as the code because the two are not
-/// interchangeable at the money boundary. The server binds a quote to an
-/// `offerId` and writes it onto the redemption row, which is the only way a
-/// sale can be attributed back to the offer that produced it — UCA22 A6 lets
-/// two live offers point at the same promo code, so the code alone cannot say
-/// which one the customer came through.
+/// Carries the OFFER id and NOTHING else. The offer id is the only value that
+/// travels: the server resolves the offer's own code, refuses a request that
+/// carries both, and stamps the redemption with the offer that drove the sale —
+/// UCA22 A6 lets two live offers point at the same promo code, so the code
+/// alone cannot say which one the customer came through. Carrying the code
+/// alongside would be a second, unusable copy of a value the wire never accepts.
 class PendingOfferHandoff {
-  const PendingOfferHandoff({required this.offerId, required this.promoCode});
+  const PendingOfferHandoff({required this.offerId});
 
   /// The offer the customer opened. Sent to the quote so the server can bind
   /// the redemption to it.
   final String offerId;
-
-  /// The code that offer carries, for display while the quote is in flight.
-  final String promoCode;
 }
 
 /// Single-shot, in-memory handoff from the offers surface into the booking
@@ -32,15 +29,13 @@ class PendingPromoCode {
 
   PendingOfferHandoff? _pending;
 
-  /// Holds [offerId] and its [promoCode] for the next quote, replacing anything
-  /// previously held. A blank code is treated as nothing held — an offer with
-  /// no code behind it cannot be applied.
-  void hold({required String offerId, required String promoCode}) {
-    final trimmedCode = promoCode.trim();
+  /// Holds [offerId] for the next quote, replacing anything previously held. A
+  /// blank id is treated as nothing held — there is nothing for the server to
+  /// resolve.
+  void hold({required String offerId}) {
     final trimmedId = offerId.trim();
-    _pending = (trimmedCode.isEmpty || trimmedId.isEmpty)
-        ? null
-        : PendingOfferHandoff(offerId: trimmedId, promoCode: trimmedCode);
+    _pending =
+        trimmedId.isEmpty ? null : PendingOfferHandoff(offerId: trimmedId);
   }
 
   /// Returns what is held and clears it. Null when nothing is held.

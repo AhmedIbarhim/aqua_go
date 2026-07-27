@@ -172,7 +172,7 @@ void main() {
             ? null
             : const ServerFailure(rejection, type: FailureType.validation),
       );
-      PendingPromoCode.instance.hold(offerId: 'offer-1', promoCode: promoCode);
+      PendingPromoCode.instance.hold(offerId: 'offer-1');
       // Drain the single-shot slot so a failed test cannot leak a handoff into
       // the next one.
       addTearDown(PendingPromoCode.instance.takeHandoff);

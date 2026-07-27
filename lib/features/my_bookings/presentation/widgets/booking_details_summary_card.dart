@@ -26,8 +26,10 @@ class BookingDetailsSummaryCard extends StatelessWidget {
         (!booking.isCoveredBySubscription || (breakdown.grossMinor ?? 0) != 0);
     // UCC16 — the customer can see the discount that applied to THEIR booking,
     // on the booking itself and not only on the review screen they passed
-    // through once. A code that priced to nothing on this basket states no
-    // saving rather than a "0.00 off" line that reads as a bug.
+    // through once. A code that priced to nothing on this basket is still NAMED
+    // — it was redeemed against this booking, and the review screen says so too
+    // — but it states no saving, rather than a "0.00 off" pair that reads as a
+    // bug.
     final promo = booking.promo;
     final bool showPromo = promo != null && !promo.isEmpty;
     return Column(
@@ -154,23 +156,25 @@ class BookingDetailsSummaryCard extends StatelessWidget {
                   value: promo.code!,
                   icon: AppAssets.gift,
                 ),
-                _buildSummaryRow(
-                  context,
-                  title: LocaleKeys.bookings_original_total.tr(
-                    context: context,
+                if (promo.hasDiscount) ...[
+                  _buildSummaryRow(
+                    context,
+                    title: LocaleKeys.bookings_original_total.tr(
+                      context: context,
+                    ),
+                    value:
+                        '${(booking.totalAmount + promo.discount).toStringAsFixed(2)} $currency',
+                    icon: AppAssets.document,
                   ),
-                  value:
-                      '${(booking.totalAmount + promo.discount).toStringAsFixed(2)} $currency',
-                  icon: AppAssets.document,
-                ),
-                _buildSummaryRow(
-                  context,
-                  title: LocaleKeys.bookings_promo_discount.tr(
-                    context: context,
+                  _buildSummaryRow(
+                    context,
+                    title: LocaleKeys.bookings_promo_discount.tr(
+                      context: context,
+                    ),
+                    value: '-${promo.discount.toStringAsFixed(2)} $currency',
+                    icon: AppAssets.money,
                   ),
-                  value: '-${promo.discount.toStringAsFixed(2)} $currency',
-                  icon: AppAssets.money,
-                ),
+                ],
                 // A released redemption no longer counts against the campaign,
                 // but the discount it granted still shaped what this booking was
                 // charged — so the rows stay and the state is stated, rather

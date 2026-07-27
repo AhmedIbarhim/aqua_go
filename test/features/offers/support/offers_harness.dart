@@ -178,6 +178,21 @@ Future<void> bootOffersTestEnvironment() async {
 
 void signIn() => currentUser.value = const UserModel(id: 'customer-1');
 
+/// Advances past a route transition and any in-flight frames WITHOUT waiting
+/// for the tree to go quiet.
+///
+/// `pumpAndSettle` cannot be used on these surfaces: the offer banner is the
+/// house [CustomNetworkImage] — `cached_network_image` underneath, which is what
+/// UCC23's "banner images are cached" requires — and under a test binding no
+/// remote image ever resolves, so its placeholder spinner runs forever and the
+/// tree never goes quiet. A fixed, generous slice of time is all these tests
+/// need: every route transition in them is 300ms.
+Future<void> settleOffers(WidgetTester tester) async {
+  for (var i = 0; i < 6; i++) {
+    await tester.pump(const Duration(milliseconds: 150));
+  }
+}
+
 /// Pumps [child] inside the same locale, theme and cubit scaffolding the real
 /// app builds, at [locale], with [cubit] provided above it.
 ///

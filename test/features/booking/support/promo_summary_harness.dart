@@ -201,17 +201,26 @@ Future<void> openPromoDialog(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
+/// The dialog's Apply action — the house `CustomButton`, which is a
+/// `MaterialButton` underneath.
+final Finder promoApplyButton = find.descendant(
+  of: find.byKey(const ValueKey('promo-apply')),
+  matching: find.byType(MaterialButton),
+);
+
 /// Whether the dialog's Apply action is currently tappable. It is disabled
-/// until the typed code has the shape the server accepts.
+/// until the typed code has the shape the server accepts. Asserted on the
+/// button's OWN `enabled`, i.e. whether `onPressed` survived — not on the flag
+/// the caller passed in.
 bool applyButtonEnabled(WidgetTester tester) =>
-    tester.widget<ElevatedButton>(find.byType(ElevatedButton)).enabled;
+    tester.widget<MaterialButton>(promoApplyButton).enabled;
 
 /// Drives the real promo UI: opens the dialog, types the code, applies it.
 Future<void> applyPromo(WidgetTester tester, String code) async {
   await openPromoDialog(tester);
   await tester.enterText(find.byType(TextField), code);
   await tester.pumpAndSettle();
-  await tester.tap(find.byType(ElevatedButton));
+  await tester.tap(promoApplyButton);
   await settle(tester);
 }
 

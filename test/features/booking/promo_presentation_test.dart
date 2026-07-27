@@ -7,6 +7,7 @@ import 'package:aqua_go/features/booking/domain/promo_code_history.dart';
 import 'package:aqua_go/features/booking/domain/strategies/booking_submit_strategy.dart';
 import 'package:aqua_go/features/booking/presentation/controllers/booking_state.dart';
 import 'package:aqua_go/features/my_bookings/data/models/booking_response_model/booking_response_model.dart';
+import 'package:aqua_go/features/offers/domain/pending_promo_code.dart';
 import 'package:dartz/dartz.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -178,6 +179,51 @@ void main() {
       expect(find.byType(TextField), findsOneWidget);
       expect(tester.widget<TextField>(find.byType(TextField)).controller!.text,
           'OLDCODE1');
+    });
+
+    testWidgets('a code redeemed through an OFFER joins the same history', (
+      tester,
+    ) async {
+      // UCC16 UI/UX — "autocomplete of previously used codes". A code the
+      // customer redeemed by tapping "Use this code" on an offer IS a
+      // previously used code; the offer path was the one route into a
+      // redemption that never fed the suggestions.
+      PendingPromoCode.instance.hold(offerId: 'offer-1');
+      addTearDown(PendingPromoCode.instance.takeHandoff);
+
+      final cubit = buildCubit(RecordingBookingRepo());
+      addTearDown(cubit.close);
+
+      await pumpSummary(tester, cubit);
+
+      // The code is the one the SERVER resolved the offer to and echoed back —
+      // an offer-driven quote never carries a code on the request.
+      expect(cubit.state.appliedPromoCode, offerResolvedPromoCode);
+      expect(PromoCodeHistory.recent(), [offerResolvedPromoCode]);
+    });
+
+    testWidgets('an offer the backend refused leaves the history empty', (
+      tester,
+    ) async {
+      PendingPromoCode.instance.hold(offerId: 'offer-1');
+      addTearDown(PendingPromoCode.instance.takeHandoff);
+
+      final cubit = buildCubit(
+        RecordingBookingRepo(
+          quoteFailure: (_, offerId) => offerId == null
+              ? null
+              : const ServerFailure(
+                  'Code not recognised or expired',
+                  type: FailureType.validation,
+                ),
+        ),
+      );
+      addTearDown(cubit.close);
+
+      await pumpSummary(tester, cubit);
+
+      expect(cubit.state.appliedPromoCode, isNull);
+      expect(PromoCodeHistory.recent(), isEmpty);
     });
 
     testWidgets('remembers only codes the backend accepted', (tester) async {

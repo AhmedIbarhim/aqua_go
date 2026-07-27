@@ -124,6 +124,7 @@ void main() {
       expect(promo.releasedAt, isNull);
       expect(promo.isReleased, isFalse);
       expect(promo.isEmpty, isFalse);
+      expect(promo.hasDiscount, isTrue);
     });
 
     test('a released redemption carries its release instant', () {
@@ -151,10 +152,20 @@ void main() {
       expect(BookingResponseModel.fromJson(json).promo, isNull);
     });
 
-    test('a code that saved nothing reads as empty', () {
-      // Naming a saving of 0.00 would read as a bug rather than as a fact.
+    test('a code that saved nothing is still a redemption, not an absence', () {
+      // It was redeemed against this booking, so it is NOT empty — only the
+      // saving is missing. Naming a saving of 0.00 would read as a bug; erasing
+      // the code entirely erases a fact the review screen states.
       final booking = BookingResponseModel.fromJson(
         _bookingJson(promo: {'code': 'WELCOME20', 'discountMinor': 0}),
+      );
+      expect(booking.promo!.isEmpty, isFalse);
+      expect(booking.promo!.hasDiscount, isFalse);
+    });
+
+    test('a promo payload with no code at all reads as empty', () {
+      final booking = BookingResponseModel.fromJson(
+        _bookingJson(promo: {'discountMinor': 0}),
       );
       expect(booking.promo!.isEmpty, isTrue);
     });
@@ -360,6 +371,23 @@ void main() {
         };
       await _pumpCard(tester, BookingResponseModel.fromJson(json));
       expect(find.text('Promo discount (before VAT)'), findsNothing);
+    });
+
+    testWidgets('a zero-discount code is NAMED, with no original/discount pair', (
+      tester,
+    ) async {
+      // Both surfaces answer the same state the same way: the review screen
+      // falls back to "promo code applied", and the booking detail keeps the
+      // code row. What is suppressed is only the saving.
+      await _pumpCard(
+        tester,
+        BookingResponseModel.fromJson(
+          _bookingJson(promo: {'code': 'WELCOME20', 'discountMinor': 0}),
+        ),
+      );
+      expect(find.text('WELCOME20'), findsOneWidget);
+      expect(find.text('Original Total'), findsNothing);
+      expect(find.text('-0.00 SAR'), findsNothing);
     });
 
     testWidgets('a booking with no promo renders no promo rows', (

@@ -65,6 +65,17 @@ class BookingPromo {
   /// SAR saved on this booking, from the halala amount.
   double get discount => discountMinor / 100.0;
 
-  /// Nothing to render: no code came back, or it granted nothing.
-  bool get isEmpty => (code == null || code!.isEmpty) || discountMinor <= 0;
+  /// Nothing to render: no code came back at all.
+  ///
+  /// A code that priced to nothing on this basket is NOT empty — it was still
+  /// redeemed against this booking, and the review screen names it for exactly
+  /// that reason. Folding the zero-discount case in here made the same state
+  /// visible on one surface and invisible on the other, which is the one the
+  /// customer comes back to. Whether there is a saving to STATE is [hasDiscount].
+  bool get isEmpty => code == null || code!.isEmpty;
+
+  /// The redemption took money off this booking, so an original/discount pair
+  /// can be stated. False for a code that priced to nothing, where naming a
+  /// saving of 0.00 would read as a bug.
+  bool get hasDiscount => discountMinor > 0;
 }

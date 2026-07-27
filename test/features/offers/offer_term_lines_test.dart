@@ -14,6 +14,19 @@ CustomerOfferModel _offer(String type, OfferTermsModel terms) => CustomerOfferMo
       terms: terms,
     );
 
+/// The locale key a row renders from, or null when the row is a literal. The
+/// hierarchy is sealed, so this is a total function rather than a nullable-field
+/// read — and a test that asks a literal for its key gets null, not a crash.
+String? _key(OfferTermLine line) => line is OfferTermKey ? line.key : null;
+
+/// The positional args a row renders with; empty for a literal row.
+List<String> _args(OfferTermLine line) =>
+    line is OfferTermKey ? line.args : const <String>[];
+
+/// The already-localised text of a literal row, or null for a keyed one.
+String? _text(OfferTermLine line) =>
+    line is OfferTermLiteral ? line.text : null;
+
 // `offerExpiryLine` formats a date per locale, which needs the `intl` symbol
 // data that GlobalMaterialLocalizations loads for the app — unavailable to a
 // bare unit test. It is covered in offers_surface_test.dart instead, where the
@@ -39,10 +52,10 @@ void main() {
       isAr: false,
     );
     expect(lines, hasLength(2));
-    expect(lines[0].localeKey, LocaleKeys.offers_discount_percent);
-    expect(lines[0].args, ['15']);
-    expect(lines[1].localeKey, LocaleKeys.offers_min_order);
-    expect(lines[1].args, ['50.00']);
+    expect(_key(lines[0]), LocaleKeys.offers_discount_percent);
+    expect(_args(lines[0]), ['15']);
+    expect(_key(lines[1]), LocaleKeys.offers_min_order);
+    expect(_args(lines[1]), ['50.00']);
   });
 
   test('a FIXED_AMOUNT promo renders the amount in SAR, not minor units', () {
@@ -58,8 +71,8 @@ void main() {
       isAr: false,
     );
     expect(lines, hasLength(1));
-    expect(lines[0].localeKey, LocaleKeys.offers_discount_amount);
-    expect(lines[0].args, ['20.00']);
+    expect(_key(lines[0]), LocaleKeys.offers_discount_amount);
+    expect(_args(lines[0]), ['20.00']);
   });
 
   test('an unknown discount type yields no discount line (drift detector)', () {
@@ -87,14 +100,14 @@ void main() {
     );
     final en = offerTermLines(_offer('PACKAGE', terms), isAr: false);
     expect(en, hasLength(4));
-    expect(en[0].literal, 'Gold package');
-    expect(en[1].localeKey, LocaleKeys.offers_package_washes);
-    expect(en[2].localeKey, LocaleKeys.offers_package_validity);
-    expect(en[3].localeKey, LocaleKeys.offers_package_price);
-    expect(en[3].args, ['249.00']);
+    expect(_text(en[0]), 'Gold package');
+    expect(_key(en[1]), LocaleKeys.offers_package_washes);
+    expect(_key(en[2]), LocaleKeys.offers_package_validity);
+    expect(_key(en[3]), LocaleKeys.offers_package_price);
+    expect(_args(en[3]), ['249.00']);
 
     final ar = offerTermLines(_offer('PACKAGE', terms), isAr: true);
-    expect(ar[0].literal, 'الباقة الذهبية');
+    expect(_text(ar[0]), 'الباقة الذهبية');
   });
 
   group('offerMinOrderLine — BR-OFR-10 / AC-EXT-06 on the CARD', () {
@@ -106,7 +119,7 @@ void main() {
         const OfferTermsModel(promoCode: 'SAVE', discountType: 'PERCENTAGE', configuredValue: 20, minOrderMinor: 10000),
       ));
       expect(line, isNotNull);
-      expect(line!.localeKey, LocaleKeys.offers_min_order);
+      expect(line!.key, LocaleKeys.offers_min_order);
       expect(line.args, ['100.00']);
     });
 
@@ -139,7 +152,8 @@ void main() {
       );
       final card = offerMinOrderLine(offer)!;
       final detail = offerTermLines(offer, isAr: false)
-          .firstWhere((l) => l.localeKey == LocaleKeys.offers_min_order);
+          .whereType<OfferTermKey>()
+          .firstWhere((l) => l.key == LocaleKeys.offers_min_order);
       expect(card.args, detail.args);
       expect(card.args, ['75.50']);
     });
@@ -159,18 +173,18 @@ void main() {
     test('a restricted code states both, after the discount and threshold', () {
       final lines = offerTermLines(_offer('PROMO_CODE', restricted), isAr: false);
       expect(lines, hasLength(3));
-      expect(lines[0].localeKey, LocaleKeys.offers_discount_percent);
-      expect(lines[1].localeKey, LocaleKeys.offers_applicable_services);
-      expect(lines[1].args, ['Premium Wash, Interior Wash']);
-      expect(lines[2].localeKey, LocaleKeys.offers_applicable_zones);
-      expect(lines[2].args, ['Central Jeddah']);
+      expect(_key(lines[0]), LocaleKeys.offers_discount_percent);
+      expect(_key(lines[1]), LocaleKeys.offers_applicable_services);
+      expect(_args(lines[1]), ['Premium Wash, Interior Wash']);
+      expect(_key(lines[2]), LocaleKeys.offers_applicable_zones);
+      expect(_args(lines[2]), ['Central Jeddah']);
     });
 
     test('Arabic reads the Arabic names', () {
       final lines = offerTermLines(_offer('PROMO_CODE', restricted), isAr: true);
-      expect(lines[1].args, ['غسيل ممتاز، غسيل داخلي'],
+      expect(_args(lines[1]), ['غسيل ممتاز، غسيل داخلي'],
           reason: 'the list separator is the Arabic comma, not the Latin one');
-      expect(lines[2].args, ['وسط جدة']);
+      expect(_args(lines[2]), ['وسط جدة']);
     });
 
     test('an EMPTY list is UNRESTRICTED — no line at all, not an empty one', () {
@@ -185,9 +199,9 @@ void main() {
         ),
         isAr: false,
       );
-      expect(lines.map((l) => l.localeKey),
+      expect(lines.map(_key),
           isNot(contains(LocaleKeys.offers_applicable_services)));
-      expect(lines.map((l) => l.localeKey),
+      expect(lines.map(_key),
           isNot(contains(LocaleKeys.offers_applicable_zones)));
     });
 
@@ -196,7 +210,7 @@ void main() {
       // shown with its zone terms stated". These lines are pure display data
       // computed from the offer alone, so no address state can suppress them.
       final lines = offerTermLines(_offer('PROMO_CODE', restricted), isAr: false);
-      expect(lines.map((l) => l.localeKey),
+      expect(lines.map(_key),
           contains(LocaleKeys.offers_applicable_zones));
     });
 
@@ -213,9 +227,9 @@ void main() {
         ),
         isAr: false,
       );
-      expect(lines.map((l) => l.localeKey),
+      expect(lines.map(_key),
           isNot(contains(LocaleKeys.offers_applicable_services)));
-      expect(lines.map((l) => l.localeKey),
+      expect(lines.map(_key),
           isNot(contains(LocaleKeys.offers_applicable_zones)));
     });
   });

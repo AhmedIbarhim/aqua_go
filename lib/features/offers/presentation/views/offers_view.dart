@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:svg_flutter/svg.dart';
 
+import '../../../../core/components/error_retry_widget.dart';
 import '../../../../core/components/generic_app_bar.dart';
 import '../../../../core/config/session/session_state.dart';
 import '../../../../core/extentions/context_extentions.dart';
@@ -18,7 +19,6 @@ import '../../data/models/customer_offer_model.dart';
 import '../../domain/offer_visibility.dart';
 import '../controllers/offers_controller/offers_cubit.dart';
 import '../widgets/offer_card.dart';
-import '../widgets/offer_motion.dart';
 import 'offer_detail_view.dart';
 
 /// The UCC23 offers screen. It ALWAYS renders from the [OffersCubit] above it.
@@ -72,8 +72,15 @@ class OffersView extends StatelessWidget {
             OffersError() => _Refreshable(
                 key: const ValueKey('offers-error'),
                 child: _fill(
-                  LocaleKeys.offers_error.tr(context: context),
-                  onRetry: () => context.read<OffersCubit>().getOffers(),
+                  // The house error+retry component — the same one 11 other
+                  // screens use. Pull-to-refresh stays as the second affordance,
+                  // but it is not discoverable on its own, so the button is the
+                  // primary one.
+                  ErrorRetryWidget(
+                    key: const ValueKey('offers-retry'),
+                    errorMessage: LocaleKeys.offers_error.tr(context: context),
+                    onRetry: () => context.read<OffersCubit>().getOffers(),
+                  ),
                 ),
               ),
             OffersInitial() || OffersLoading() => _skeleton(context),
@@ -108,45 +115,35 @@ class OffersView extends StatelessWidget {
       // UCC23 A1 — "an illustration and the line". The illustration is what
       // makes an empty list read as a finished state rather than as a screen
       // that failed to draw; A6 is the separate state for an actual outage.
-      return _fill(
-        LocaleKeys.offers_empty.tr(context: context),
-        illustration: AppAssets.emptyOffers,
-      );
+      return _fill(const _EmptyState());
     }
     return ListView.separated(
       padding: const EdgeInsets.all(16),
       physics: const AlwaysScrollableScrollPhysics(),
       itemCount: sorted.length,
       separatorBuilder: (context, index) => const SizedBox(height: 16),
-      itemBuilder: (context, index) {
-        final card = GestureDetector(
-          onTap: () => openOfferDetail(context, sorted[index]),
-          child: OfferCard(offer: sorted[index], atHome: false),
-        );
-        // Only the opening screenful is staggered; items further down are built
-        // lazily on scroll, where a delay would read as a dropped card.
-        if (index >= OfferEntrance.maxStaggerSteps) return card;
-        return OfferEntrance(index: index, child: card);
-      },
+      // Flat, like every other list in the product (`my_bookings_view`,
+      // `my_cars_view`, `packages_list_view`, `notification_view`). No list here
+      // staggers its items, and this one is not the place to invent a second
+      // motion language.
+      itemBuilder: (context, index) => GestureDetector(
+        onTap: () => openOfferDetail(context, sorted[index]),
+        child: OfferCard(offer: sorted[index], atHome: false),
+      ),
     );
   }
 
-  /// A single centred message that still fills — and scrolls — the whole body,
-  /// so it sits at the optical centre on every screen size and pull-to-refresh
-  /// keeps working. [onRetry] non-null adds the A6 retry button beneath it;
-  /// [illustration] non-null adds the A1 artwork above it.
-  Widget _fill(String text, {VoidCallback? onRetry, String? illustration}) {
+  /// A single centred body that still fills — and scrolls — the whole screen,
+  /// so it sits at the optical centre on every size and pull-to-refresh keeps
+  /// working.
+  Widget _fill(Widget child) {
     return LayoutBuilder(
       builder: (context, constraints) => ListView(
         physics: const AlwaysScrollableScrollPhysics(),
         children: [
           ConstrainedBox(
             constraints: BoxConstraints(minHeight: constraints.maxHeight),
-            child: _Message(
-              text: text,
-              onRetry: onRetry,
-              illustration: illustration,
-            ),
+            child: child,
           ),
         ],
       ),
@@ -252,59 +249,35 @@ class _SignInPrompt extends StatelessWidget {
   }
 }
 
-class _Message extends StatelessWidget {
-  const _Message({required this.text, this.onRetry, this.illustration});
-
-  final String text;
-
-  /// Non-null renders the UCC23 A6 retry affordance under the message.
-  final VoidCallback? onRetry;
-
-  /// Non-null renders the UCC23 A1 illustration above the message. Same shape
-  /// as every other empty state in the app — a bare `SvgPicture.asset` at its
-  /// natural size, 40pt of air, then the line (`EmptyCarsWidget`,
-  /// `EmptyBookingsWidget`).
-  final String? illustration;
+/// UCC23 A1 — "an illustration and the line", and deliberately NO action: an
+/// empty feed is a finished state, not something the customer can fix.
+///
+/// Same shape as every other empty state in the app — a bare
+/// `SvgPicture.asset` at its natural size, 40pt of air, then the line
+/// (`EmptyCarsWidget`, `EmptyBookingsWidget`).
+class _EmptyState extends StatelessWidget {
+  const _EmptyState();
 
   @override
   Widget build(BuildContext context) {
-    final retry = onRetry;
-    final art = illustration;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (art != null) ...[
-              SvgPicture.asset(art, key: const ValueKey('offers-empty-art')),
-              const SizedBox(height: 40),
-            ],
+            SvgPicture.asset(
+              AppAssets.emptyOffers,
+              key: const ValueKey('offers-empty-art'),
+            ),
+            const SizedBox(height: 40),
             Text(
-              text,
+              LocaleKeys.offers_empty.tr(context: context),
               textAlign: TextAlign.center,
               style: AppTextStyles.regular14.copyWith(
                 color: context.colors.textSecondary,
               ),
             ),
-            if (retry != null) ...[
-              const SizedBox(height: 16),
-              OutlinedButton(
-                key: const ValueKey('offers-retry'),
-                onPressed: retry,
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: context.colors.primary,
-                  side: BorderSide(color: context.colors.primary),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                child: Text(
-                  LocaleKeys.retry.tr(context: context),
-                  style: AppTextStyles.semiBold16,
-                ),
-              ),
-            ],
           ],
         ),
       ),

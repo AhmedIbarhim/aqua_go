@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../core/components/custom_network_image.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/themes/app_colors.dart';
 import '../../../../core/themes/app_text_styles.dart';
@@ -9,11 +10,6 @@ import '../../../../generated/locale_keys.g.dart';
 import '../../data/models/customer_offer_model.dart';
 import '../../domain/offer_countdown.dart';
 import '../../domain/offer_term_lines.dart';
-import 'offer_motion.dart';
-
-/// Hero tag shared by the offers-list card banner and the offer detail banner,
-/// so tapping a card flies its banner into the detail screen.
-String offerBannerHeroTag(String offerId) => 'offer-banner-$offerId';
 
 class OfferCard extends StatelessWidget {
   const OfferCard({super.key, required this.offer, this.atHome = true});
@@ -50,9 +46,6 @@ class OfferCard extends StatelessWidget {
           _Banner(
             url: banner,
             height: atHome ? size.height * 0.10 : size.height * 0.18,
-            // Only the offers-list card opens the detail screen, so only it
-            // owns the flight; the home rail routes elsewhere and stays put.
-            heroTag: atHome ? null : offerBannerHeroTag(offer.id),
           ),
           Padding(
             padding: EdgeInsets.all(atHome ? 12 : 16),
@@ -87,7 +80,7 @@ class OfferCard extends StatelessWidget {
                 if (minOrder != null) ...[
                   SizedBox(height: atHome ? 6 : 10),
                   Text(
-                    minOrder.localeKey!.tr(context: context, args: minOrder.args),
+                    minOrder.key.tr(context: context, args: minOrder.args),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: AppTextStyles.medium12.copyWith(
@@ -125,52 +118,44 @@ class OfferCard extends StatelessWidget {
   }
 }
 
+/// The offer banner, on the house remote-image control.
+///
+/// [CustomNetworkImage] is what every other card in the product uses for a
+/// remote catalogue image (`service_card`, `package_card`), and it is
+/// `cached_network_image` underneath — which is what satisfies UCC23's "banner
+/// images are cached". A raw `Image.network` only ever sat in Flutter's
+/// in-memory `ImageCache`, so nothing survived a restart or memory pressure.
 class _Banner extends StatelessWidget {
-  const _Banner({required this.url, required this.height, this.heroTag});
+  const _Banner({required this.url, required this.height});
 
   final String? url;
   final double height;
-
-  /// Non-null -> this banner is the source of a flight into the detail screen.
-  final Object? heroTag;
 
   @override
   Widget build(BuildContext context) {
     final source = url;
     // The tinted plate sits under the image for the whole life of the card, so
     // a slow, failed or absent banner leaves a finished-looking block rather
-    // than a hole, and the image has something to fade onto.
+    // than a hole, and the image has something to resolve onto.
     final plate = ColoredBox(color: context.colors.fields);
     if (source == null || source.isEmpty) {
       return SizedBox(height: height, width: double.infinity, child: plate);
     }
 
-    final tag = heroTag;
-    // Matches the corners the card's own clip already produces; carrying it on
-    // the hero child keeps the return flight rounded too.
-    Widget image = ClipRRect(
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-      child: Image.network(
-        source,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
-        frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-          if (wasSynchronouslyLoaded) return child;
-          return AnimatedOpacity(
-            opacity: frame == null ? 0 : 1,
-            duration: const Duration(milliseconds: 260),
-            curve: Curves.easeOut,
-            child: child,
-          );
-        },
-      ),
-    );
-    if (tag != null) image = Hero(tag: tag, child: image);
-
     return SizedBox(
       height: height,
       width: double.infinity,
-      child: Stack(fit: StackFit.expand, children: [plate, image]),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          plate,
+          // Matches the corners the card's own clip already produces.
+          ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            child: CustomNetworkImage(source),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -185,24 +170,24 @@ class _EndsInChip extends StatelessWidget {
     final label = days == 1
         ? LocaleKeys.offers_ends_in_one_day.tr(context: context)
         : LocaleKeys.offers_ends_in_days.tr(context: context, args: ['$days']);
-    return OfferPopIn(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-        decoration: BoxDecoration(
-          color: context.colors.errorLight,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        // The app's `errorLight` plate is always paired with
-        // `darkAppColors.themeOpositeColor` — see
-        // `ComplaintStatus.getBgColor`/`getTextColor`, the established chip
-        // pattern. `context.colors.error` on it is dark red on bright red, at
-        // 11pt, which is not readable and is not a pairing this product uses
-        // anywhere else.
-        child: Text(
-          label,
-          style: AppTextStyles.medium11.copyWith(
-            color: darkAppColors.themeOpositeColor,
-          ),
+    // Static, like every other chip in the product (`ComplaintStatus`, the
+    // booking-status chips). Nothing else here animates on entry.
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: context.colors.errorLight,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      // The app's `errorLight` plate is always paired with
+      // `darkAppColors.themeOpositeColor` — see
+      // `ComplaintStatus.getBgColor`/`getTextColor`, the established chip
+      // pattern. `context.colors.error` on it is dark red on bright red, at
+      // 11pt, which is not readable and is not a pairing this product uses
+      // anywhere else.
+      child: Text(
+        label,
+        style: AppTextStyles.medium11.copyWith(
+          color: darkAppColors.themeOpositeColor,
         ),
       ),
     );

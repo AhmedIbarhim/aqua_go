@@ -1,5 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import '../../../../core/components/custom_button.dart';
+import '../../../../core/components/custom_text_field.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../generated/locale_keys.g.dart';
@@ -81,10 +83,13 @@ class PromoCodeSection extends StatelessWidget {
     );
   }
 
+  /// Hosted in the app's own alert box — blurred backdrop, 24pt radius,
+  /// `CustomButton` actions — which is what every other dialog in the product
+  /// uses (`booking_location_view`, the delete confirmations, the success
+  /// boxes). A Material `AlertDialog` here was the only one in the app.
   void _showPromoCodeDialog(BuildContext context) {
-    showDialog<void>(
-      context: context,
-      builder: (_) => _PromoCodeDialog(onApply: onApplyPromoCode),
+    context.showCustomAlert<void>(
+      child: _PromoCodeDialog(onApply: onApplyPromoCode),
     );
   }
 }
@@ -159,8 +164,6 @@ class _AppliedCode extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Lands a beat after the card itself, so the tick reads as the
-          // confirmation rather than more of the same fade.
           const _CheckMark(),
           const SizedBox(width: 8),
           Expanded(
@@ -222,32 +225,24 @@ class _AppliedCode extends StatelessWidget {
   }
 }
 
+/// The applied-code tick. Static, like every other status glyph in the product
+/// — the surrounding `AnimatedSwitcher`/`AnimatedSize` already carries the swap
+/// from the empty prompt to this card.
 class _CheckMark extends StatelessWidget {
   const _CheckMark();
 
   @override
   Widget build(BuildContext context) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween<double>(begin: 0, end: 1),
-      duration: MediaQuery.disableAnimationsOf(context)
-          ? Duration.zero
-          : const Duration(milliseconds: 520),
-      curve: const Interval(0.45, 1, curve: Curves.easeOutCubic),
-      builder: (context, t, child) => Opacity(
-        opacity: t,
-        child: Transform.scale(scale: 0.8 + 0.2 * t, child: child),
-      ),
-      child: Container(
-        padding: const EdgeInsets.all(4),
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: context.colors.defaultSubtle,
-          border: Border.all(
-            color: context.colors.borderSecondary.withValues(alpha: 0.5),
-          ),
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: context.colors.defaultSubtle,
+        border: Border.all(
+          color: context.colors.borderSecondary.withValues(alpha: 0.5),
         ),
-        child: Icon(Icons.check, color: context.colors.primary, size: 16),
       ),
+      child: Icon(Icons.check, color: context.colors.primary, size: 16),
     );
   }
 }
@@ -307,53 +302,48 @@ class _PromoCodeDialogState extends State<_PromoCodeDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final width = context.screenWidth;
     final showsError = !_isEmpty && !_isWellFormed;
     final suggestions = _suggestions;
-    return AlertDialog(
-      backgroundColor: context.colors.cardBackGround,
-      // The content grew a malformed-code line and up to five suggestion chips
-      // on top of the field. On a short screen with the keyboard up that is
-      // more than the dialog's default non-scrolling body can hold, and an
-      // AlertDialog whose column overflows clips its actions — the customer
-      // would lose the Apply button. Scrolling costs nothing when it fits.
-      scrollable: true,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      title: Text(
-        LocaleKeys.bookings_apply_promo_code.tr(context: context),
-        style: AppTextStyles.bold16.copyWith(color: context.colors.textPrimary),
-      ),
-      content: Column(
+    // The content grew a malformed-code line and up to five suggestion chips on
+    // top of the field. On a short screen with the keyboard up that is more than
+    // the box can hold, and the customer would lose the Apply button off the
+    // bottom. Scrolling costs nothing when it fits.
+    return SingleChildScrollView(
+      child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          TextField(
+          // Centred `medium16`, the same heading treatment `WarningBox` and
+          // `SuccessAlertBox` give theirs — the form below it stays left-aligned
+          // like every other form in the app.
+          SizedBox(
+            width: double.infinity,
+            child: Text(
+              LocaleKeys.bookings_apply_promo_code.tr(context: context),
+              textAlign: TextAlign.center,
+              style: AppTextStyles.medium16.copyWith(
+                color: context.colors.textPrimary,
+              ),
+            ),
+          ),
+          SizedBox(height: width * 0.04),
+          // The house field. `mustCapitalize` is exactly UCC16's input rule —
+          // alphanumeric only, upper case — so a stray character or a pasted URL
+          // never reaches the shape check at all.
+          CustomTextField(
+            label: LocaleKeys.bookings_promo_code_title.tr(context: context),
+            hint: LocaleKeys.bookings_apply_code_hint.tr(context: context),
             controller: _controller,
+            mustCapitalize: true,
             autofocus: true,
             textInputAction: TextInputAction.done,
+            fillColor: context.colors.fields,
             // Re-renders the Apply button's enabled state, the malformed-code
             // line and the filtered suggestions. It never submits on its own —
             // applying stays an explicit action.
             onChanged: (_) => setState(() {}),
             onSubmitted: (_) => _submit(),
-            style: AppTextStyles.regular14.copyWith(
-              color: context.colors.textPrimary,
-            ),
-            decoration: InputDecoration(
-              hintText: LocaleKeys.bookings_apply_code_hint.tr(context: context),
-              hintStyle: AppTextStyles.regular14.copyWith(
-                color: context.colors.textTertiary,
-              ),
-              filled: true,
-              fillColor: context.colors.fields,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: context.colors.borderSecondary),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: context.colors.primary),
-              ),
-            ),
           ),
           if (showsError) ...[
             const SizedBox(height: 8),
@@ -391,34 +381,32 @@ class _PromoCodeDialogState extends State<_PromoCodeDialog> {
               ],
             ),
           ],
+          SizedBox(height: width * 0.06),
+          Row(
+            children: [
+              Expanded(
+                child: CustomButton(
+                  key: const ValueKey('promo-apply'),
+                  enabled: _isWellFormed,
+                  onPressed: _submit,
+                  text: LocaleKeys.bookings_apply.tr(context: context),
+                ),
+              ),
+              SizedBox(width: width * 0.02),
+              Expanded(
+                child: CustomButton(
+                  key: const ValueKey('promo-cancel'),
+                  text: LocaleKeys.bookings_cancel.tr(context: context),
+                  color: context.colors.cardBackGround,
+                  borderColor: context.colors.borderSecondary,
+                  textColor: context.colors.textPrimary,
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(
-            LocaleKeys.bookings_cancel.tr(context: context),
-            style: AppTextStyles.medium14.copyWith(
-              color: context.colors.textSecondary,
-            ),
-          ),
-        ),
-        ElevatedButton(
-          onPressed: _isWellFormed ? _submit : null,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: context.colors.primary,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-          child: Text(
-            LocaleKeys.bookings_apply.tr(context: context),
-            style: AppTextStyles.medium14.copyWith(
-              color: context.colors.textTheme,
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

@@ -583,9 +583,18 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
   /// and deliberately so — an unknown, deactivated or out-of-window offer all
   /// return the same `promo-not-recognised` a mistyped code returns, and any
   /// message this screen invented would be claiming to know which.
+  ///
+  /// A code redeemed THROUGH an offer is a previously used code like any other,
+  /// so it feeds the same UCC16 autocomplete the typed path feeds. It is taken
+  /// from the code the SERVER echoed on the accepted quote — never from the
+  /// offer copy the list drew — so, exactly as on the typed path, only a code
+  /// the backend actually accepted is ever suggested again.
   void _applyOfferFromHandoff(String offerId) async {
     final cubit = context.read<BookingCubit>();
     final quote = await cubit.applyOffer(offerId);
+    if (quote?.promoCode != null) {
+      await PromoCodeHistory.remember(quote!.promoCode!);
+    }
     if (!mounted || quote != null) return;
     await cubit.reprice();
   }

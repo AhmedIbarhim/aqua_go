@@ -29,8 +29,11 @@ Map<String, dynamic> _packageJson(String id, String nameEn) => {
       'allowScheduleLater': true,
       'active': true,
       'bundledServiceIds': <String>[],
-      'createdAt': '2026-07-01T00:00:00Z',
-      'updatedAt': '2026-07-01T00:00:00Z',
+      // Bare Asia/Riyadh local ISO-8601 — the only wire shape the backend
+      // emits. A `Z` here would teach the next reader a contract that does not
+      // exist and hide a device-local parse if these ever become DateTimes.
+      'createdAt': '2026-07-01T00:00:00',
+      'updatedAt': '2026-07-01T00:00:00',
       'version': 0,
     };
 

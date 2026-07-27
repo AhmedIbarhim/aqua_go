@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/components/custom_button.dart';
+import '../../../../core/components/custom_network_image.dart';
 import '../../../../core/components/generic_app_bar.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/route/app_router.dart';
@@ -17,8 +18,6 @@ import '../../domain/offer_revalidation.dart';
 import '../../domain/offer_term_lines.dart';
 import '../../domain/pending_promo_code.dart';
 import '../controllers/offers_controller/offers_cubit.dart';
-import '../widgets/offer_card.dart';
-import '../widgets/offer_motion.dart';
 
 class OfferDetailView extends StatelessWidget {
   const OfferDetailView({super.key, required this.offer});
@@ -43,45 +42,46 @@ class OfferDetailView extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
         children: [
-          // The banner arrives on the hero flight from the offers list, so it
-          // is deliberately left out of the staggered entrance below.
-          if (banner != null && banner.isNotEmpty) _Banner(offer: offer, url: banner),
-          OfferEntrance(index: 0, child: _Summary(offer: offer)),
-          OfferEntrance(index: 1, child: _Terms(lines: lines)),
-          OfferEntrance(index: 2, child: _PrimaryAction(offer: offer)),
+          if (banner != null && banner.isNotEmpty) _Banner(url: banner),
+          _Summary(offer: offer),
+          _Terms(lines: lines),
+          _PrimaryAction(offer: offer),
         ],
       ),
     );
   }
 }
 
+/// The offer banner, on the same house control and the same tinted plate as the
+/// list card — `CustomNetworkImage` (cached_network_image), which is what UCC23
+/// means by "banner images are cached".
+///
+/// Height-bounded rather than left to the image's own aspect ratio, so a slow,
+/// failed or absent banner leaves a finished-looking block instead of collapsing
+/// the top of the screen to nothing. Slightly taller than the list card's
+/// banner, because here it is the screen's lead image rather than a row in a
+/// list.
 class _Banner extends StatelessWidget {
-  const _Banner({required this.offer, required this.url});
+  const _Banner({required this.url});
 
-  final CustomerOfferModel offer;
+  static const double _heightFactor = 0.22;
+
   final String url;
 
   @override
   Widget build(BuildContext context) {
-    return Hero(
-      tag: offerBannerHeroTag(offer.id),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: Image.network(
-          url,
-          width: double.infinity,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
-          frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-            if (wasSynchronouslyLoaded) return child;
-            return AnimatedOpacity(
-              opacity: frame == null ? 0 : 1,
-              duration: const Duration(milliseconds: 260),
-              curve: Curves.easeOut,
-              child: child,
-            );
-          },
-        ),
+    return SizedBox(
+      height: MediaQuery.sizeOf(context).height * _heightFactor,
+      width: double.infinity,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          ColoredBox(color: context.colors.fields),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: CustomNetworkImage(url),
+          ),
+        ],
       ),
     );
   }
@@ -118,16 +118,14 @@ class _Summary extends StatelessWidget {
         // stated once, in the place the requirement puts it.
         if (endsIn != null) ...[
           const SizedBox(height: 12),
-          OfferPopIn(
-            child: Text(
-              endsIn == 1
-                  ? LocaleKeys.offers_ends_in_one_day.tr(context: context)
-                  : LocaleKeys.offers_ends_in_days.tr(
-                      context: context,
-                      args: ['$endsIn'],
-                    ),
-              style: AppTextStyles.medium12.copyWith(color: context.colors.error),
-            ),
+          Text(
+            endsIn == 1
+                ? LocaleKeys.offers_ends_in_one_day.tr(context: context)
+                : LocaleKeys.offers_ends_in_days.tr(
+                    context: context,
+                    args: ['$endsIn'],
+                  ),
+            style: AppTextStyles.medium12.copyWith(color: context.colors.error),
           ),
         ],
       ],
@@ -157,7 +155,11 @@ class _Terms extends StatelessWidget {
           (line) => Padding(
             padding: const EdgeInsets.only(bottom: 6),
             child: Text(
-              line.literal ?? line.localeKey!.tr(context: context, args: line.args),
+              switch (line) {
+                OfferTermLiteral(text: final text) => text,
+                OfferTermKey(key: final key, args: final args) =>
+                  key.tr(context: context, args: args),
+              },
               style: AppTextStyles.regular14.copyWith(
                 color: context.colors.textSecondary,
               ),
@@ -260,7 +262,7 @@ class _PrimaryActionState extends State<_PrimaryAction> {
       // onto the redemption row, which is the only way a sale can be attributed
       // back to the offer that produced it, since two live offers may carry the
       // same code (UCA22 A6).
-      PendingPromoCode.instance.hold(offerId: offer.id, promoCode: code);
+      PendingPromoCode.instance.hold(offerId: offer.id);
       context.showSuccessSnackBar(
         LocaleKeys.offers_code_saved.tr(context: context, args: [code]),
       );
