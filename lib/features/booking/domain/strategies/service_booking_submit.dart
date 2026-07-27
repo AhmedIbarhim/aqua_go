@@ -57,6 +57,9 @@ class ServiceBookingSubmit implements BookingSubmitStrategy {
       paymentMethod: state.paymentMethod,
       quote: state.quote,
       moyasarPaymentId: moyasarPaymentId,
+      // Redemption attribution (UCA22 A6): the offer the applied code came
+      // through, so the sale is credited to the offer that drove it.
+      offerId: state.appliedOfferId,
     );
 
     return repo.createBooking(booking);

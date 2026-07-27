@@ -78,6 +78,17 @@ class BookingState extends Equatable {
   final PaymentPhase paymentPhase;
   /// The payment-init result driving the SDK purchase (null when not paying).
   final PaymentInitModel? paymentInit;
+  /// The promo code the CURRENT [quote] was priced with, as the server
+  /// normalised it (always upper case), or null when none applies. Lives here
+  /// rather than in the summary route's `State` so it survives a pop back to
+  /// the details screen and forward again — the quote it belongs to survives,
+  /// so the chip that announces it must too.
+  final String? appliedPromoCode;
+  /// The merchandising offer the applied code came from, or null when the
+  /// customer typed the code in. Sent to booking-create for redemption
+  /// attribution; two live offers may link one code, so the code alone cannot
+  /// say which offer drove the sale.
+  final String? appliedOfferId;
 
   const BookingState({
     this.status = BookingStatus.initial,
@@ -108,6 +119,8 @@ class BookingState extends Equatable {
     this.optionalAddonIds = const {},
     this.paymentPhase = PaymentPhase.none,
     this.paymentInit,
+    this.appliedPromoCode,
+    this.appliedOfferId,
   });
 
   BookingState copyWith({
@@ -137,10 +150,13 @@ class BookingState extends Equatable {
     Set<String>? optionalAddonIds,
     PaymentPhase? paymentPhase,
     PaymentInitModel? paymentInit,
+    String? appliedPromoCode,
+    String? appliedOfferId,
     bool clearSelectedDate = false,
     bool clearSelectedSlotStart = false,
     bool clearError = false,
     bool clearPaymentInit = false,
+    bool clearPromo = false,
   }) {
     return BookingState(
       status: status ?? (clearError ? BookingStatus.initial : this.status),
@@ -176,6 +192,15 @@ class BookingState extends Equatable {
       optionalAddonIds: optionalAddonIds ?? this.optionalAddonIds,
       paymentPhase: paymentPhase ?? this.paymentPhase,
       paymentInit: clearPaymentInit ? null : (paymentInit ?? this.paymentInit),
+      // The code and the offer it came from are one fact — a quote priced
+      // without a promo clears both, so a dropped code can never leave the
+      // offer id behind to be stamped on a booking it did not drive.
+      appliedPromoCode: clearPromo
+          ? null
+          : (appliedPromoCode ?? this.appliedPromoCode),
+      appliedOfferId: clearPromo
+          ? null
+          : (appliedOfferId ?? this.appliedOfferId),
     );
   }
 
@@ -207,5 +232,7 @@ class BookingState extends Equatable {
     optionalAddonIds,
     paymentPhase,
     paymentInit,
+    appliedPromoCode,
+    appliedOfferId,
   ];
 }

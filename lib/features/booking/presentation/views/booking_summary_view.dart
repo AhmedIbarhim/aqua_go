@@ -24,6 +24,7 @@ import 'package:aqua_go/core/route/routes.dart';
 import 'package:aqua_go/features/my_bookings/presentation/views/my_booking_details_view.dart';
 import 'package:aqua_go/features/my_bookings/data/models/booking_summary_model.dart';
 import 'package:aqua_go/features/booking/domain/configs/booking_flow_type.dart';
+import 'package:aqua_go/features/booking/domain/promo_code_history.dart';
 import 'package:aqua_go/features/offers/domain/pending_promo_code.dart';
 
 class BookingSummaryView extends StatefulWidget {
@@ -34,26 +35,30 @@ class BookingSummaryView extends StatefulWidget {
 }
 
 class _BookingSummaryViewState extends State<BookingSummaryView> {
-  /// Promo code the customer applied on THIS screen. Held in view state (not
-  /// the cubit) because it is a UI affordance — the authoritative promo lives
-  /// in the locked backend quote, which every submit path already carries.
-  String? _appliedPromoCode;
-
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final config = context.read<BookingCubit>().state.flowConfig;
       if (config.requiresQuote) {
-        // A code picked from an offer ("Use this code") is applied to the very
-        // first quote of this flow, then dropped so it cannot leak into a later
-        // booking. take() is single-shot by design. Only quote-bearing flows
-        // reach this branch, so no flow-type guard is needed.
-        final stashed = PendingPromoCode.instance.take();
-        if (stashed != null) {
-          _appliedPromoCode = stashed;
+        // An offer picked on the offers surface ("Use this code") is applied to
+        // the very first quote of this flow, then dropped so it cannot leak
+        // into a later booking — takeHandoff is single-shot by design. The
+        // OFFER id is what goes on the wire, never the code alongside it:
+        // the server resolves the offer's own code, refuses a request carrying
+        // both, and stamps the redemption with the offer that drove the sale.
+        // Only quote-bearing flows reach this branch, so no flow-type guard is
+        // needed.
+        final handoff = PendingPromoCode.instance.takeHandoff();
+        if (handoff != null) {
+          context.read<BookingCubit>().applyOffer(handoff.offerId);
+        } else {
+          // Coming BACK to this screen (pop → forward) must re-price with the
+          // code that is already applied. Quoting bare here would drop the
+          // customer's discount without a word, and the applied chip would
+          // then be describing a quote that no longer carries it.
+          _reprice();
         }
-        context.read<BookingCubit>().fetchQuote(promoCode: stashed);
       } else if (config.isPackage) {
         // Subscription wash: fetch the read-only charge preview so the summary
         // shows the real payable total (e.g. 8 SAR add-on) instead of 0.00 and
@@ -101,7 +106,25 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
                 }
               });
         } else if (state.status == BookingStatus.failure) {
-          context.showErrorSnackBar(state.errorMessage ?? '');
+          if (state.paymentPhase == PaymentPhase.refundPending) {
+            // The card was ALREADY charged (pay-before-create) and the server
+            // refunded it before answering — a promo cap consumed between the
+            // quote and the charge, a lost slot, a mismatched amount. The
+            // server's reason says none of that, and a customer who has just
+            // seen money leave their account has to be told it is coming back,
+            // and when. Root CLAUDE.md §10: up to 7 days on a card refund.
+            context.showWarningAlert(
+              title: LocaleKeys.bookings_payment_refunded_title.tr(
+                context: context,
+              ),
+              message:
+                  '${state.errorMessage ?? ''}\n\n'
+                  '${LocaleKeys.bookings_payment_refunded_notice.tr(context: context)}',
+              primaryButtonText: LocaleKeys.ok.tr(context: context),
+            );
+          } else {
+            context.showErrorSnackBar(state.errorMessage ?? '');
+          }
         }
       },
       builder: (context, bookingState) {
@@ -202,6 +225,13 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
       total = 0.0;
     }
 
+    // What the applied code took off THIS order, straight from the locked
+    // quote — the same figure the server subtracted before splitting VAT. It
+    // drives both the amount saved on the promo chip and the original/discount
+    // pair in the payment summary; 0 when no code is applied, which is what
+    // suppresses them.
+    final int promoDiscountMinor = bookingState.quote?.promoDiscountMinor ?? 0;
+
     return Container(
       padding: EdgeInsets.all(width * 0.06),
       decoration: BoxDecoration(color: context.colors.themeColor),
@@ -255,7 +285,8 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
           ],
           if (config.flowType == BookingFlowType.service) ...[
             PromoCodeSection(
-              appliedPromoCode: _appliedPromoCode,
+              appliedPromoCode: bookingState.appliedPromoCode,
+              promoDiscountMinor: promoDiscountMinor,
               onApplyPromoCode: _applyPromoCode,
               onRemovePromoCode: _removePromoCode,
             ),
@@ -273,6 +304,7 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
               subtotal: subtotal,
               vat: vat,
               total: total,
+              promoDiscount: promoDiscountMinor / 100,
             ),
           ],
           const SizedBox(height: 30),
@@ -414,19 +446,27 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
             // before charging. If the refreshed total differs, surface the
             // "prices refreshed" notice and abort so the customer reviews the
             // new amount rather than being silently charged a changed total.
-            // The re-quote MUST carry the applied promo code — fetchQuote is
-            // stateless w.r.t. the promo, so omitting it re-quotes at the
-            // undiscounted price, which both drops the discount and trips the
+            // The re-quote MUST carry the applied promo — reprice() re-sends it
+            // from the state, because quoting bare here would re-price at the
+            // undiscounted total, which both drops the discount and trips the
             // gross comparison below, making the booking uncompletable.
             final existing = cubit.state.quote;
             if (existing != null &&
                 DateTime.now().isAfter(existing.expiresAt)) {
               final previousGross = existing.breakdown?.gross;
-              final refreshed = await cubit.fetchQuote(
-                promoCode: _appliedPromoCode,
-              );
+              final refresh = await cubit.reprice();
               if (!context.mounted) return;
-              if (refreshed == null) return; // fetch failed → cubit set error
+              final refreshed = refresh.quote;
+              if (refreshed == null) return; // failed → cubit set the error
+              if (refresh.droppedPromoReason != null) {
+                // The code stopped being applicable between the quote and the
+                // charge. It is gone and the total has moved, so the customer
+                // reviews the new figure rather than tapping into the same
+                // rejection again — which is what the old bare return left them
+                // doing, forever, with no way of telling why.
+                _sayPromoWasDropped(refresh.droppedPromoReason!);
+                return;
+              }
               final newGross = refreshed.breakdown?.gross;
               if (previousGross != newGross) {
                 context.showErrorSnackBar(
@@ -482,33 +522,46 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
   }
 
   /// Re-quote WITH the code. The locked quote is the source of truth for every
-  /// displayed amount, so we only mark the code as applied once the backend
-  /// returned a fresh quote — a rejected code leaves the chip un-applied and
-  /// the cubit's failure state raises the error snackbar via BlocConsumer.
-  /// The fresh quote's subtotal/vat/total are ALREADY net of the promo, so no
-  /// further client-side arithmetic is done anywhere on this screen.
+  /// displayed amount and for whether the code counts as applied — the cubit
+  /// takes that from the code the server echoes back, so a rejected code leaves
+  /// the chip un-applied and the cubit's failure state raises the error
+  /// snackbar via BlocConsumer. The fresh quote's subtotal/vat/total are
+  /// ALREADY net of the promo, so no further client-side arithmetic is done
+  /// anywhere on this screen.
+  ///
+  /// A code the backend accepted is remembered on this device so the customer
+  /// can pick it again next time (UCC16 UI/UX) — only accepted ones, so the
+  /// suggestions never offer a code that has never worked.
   void _applyPromoCode(String code) async {
-    final quote = await context.read<BookingCubit>().fetchQuote(
-      promoCode: code,
-    );
-    if (!mounted) return;
-    if (quote != null) {
-      setState(() {
-        _appliedPromoCode = code;
-      });
+    final quote = await context.read<BookingCubit>().applyPromoCode(code);
+    if (quote?.promoCode != null) {
+      await PromoCodeHistory.remember(quote!.promoCode!);
     }
   }
 
-  /// Re-quote WITHOUT the code, then clear the chip.
-  void _removePromoCode() async {
-    final quote = await context.read<BookingCubit>().fetchQuote(
-      promoCode: null,
-    );
+  /// Re-quote WITHOUT the code; the quote that comes back carries no code, so
+  /// the chip clears itself.
+  void _removePromoCode() {
+    context.read<BookingCubit>().removePromoCode();
+  }
+
+  /// Re-prices the current selection, keeping whatever promo is applied, and
+  /// says so when the code had to be dropped to get a usable quote.
+  void _reprice() async {
+    final refresh = await context.read<BookingCubit>().reprice();
     if (!mounted) return;
-    if (quote != null) {
-      setState(() {
-        _appliedPromoCode = null;
-      });
-    }
+    final reason = refresh.droppedPromoReason;
+    if (reason != null) _sayPromoWasDropped(reason);
+  }
+
+  /// One message carrying both halves: the server's own reason (which states
+  /// the customer's actual situation for an eligibility failure, and stays
+  /// deliberately generic for one that would otherwise say whether a code
+  /// exists), and the consequence — the code is off the order and the total
+  /// has changed.
+  void _sayPromoWasDropped(String reason) {
+    context.showErrorSnackBar(
+      '$reason\n${LocaleKeys.bookings_promo_code_removed.tr(context: context)}',
+    );
   }
 }

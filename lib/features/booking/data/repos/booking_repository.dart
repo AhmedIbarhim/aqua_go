@@ -18,12 +18,15 @@ class BookingRepository {
 
   BookingRepository({required this.bookingsRemoteDataSource});
 
+  /// [offerId] and [promoCode] are alternatives — see
+  /// [BookingsRemoteDataSource.getQuote].
   Future<Either<Failure, QuoteModel>> getQuote({
     required String packageId,
     required double lat,
     required double lng,
     List<Map<String, dynamic>>? addOns,
     String? promoCode,
+    String? offerId,
     List<String> addOnIds = const [],
     int? carCount,
   }) async {
@@ -34,6 +37,7 @@ class BookingRepository {
         lng: lng,
         addOns: addOns,
         promoCode: promoCode,
+        offerId: offerId,
         addOnIds: addOnIds,
         carCount: carCount,
       );

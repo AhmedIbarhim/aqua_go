@@ -14,6 +14,10 @@ class PaymentSummaryCard extends StatelessWidget {
   final double vat;
   final double total;
 
+  /// What the applied promo code took off this order, in SAR. 0 when no code
+  /// is applied — the discount group is then not rendered at all.
+  final double promoDiscount;
+
   const PaymentSummaryCard({
     super.key,
     required this.serviceName,
@@ -22,6 +26,7 @@ class PaymentSummaryCard extends StatelessWidget {
     required this.subtotal,
     required this.vat,
     required this.total,
+    this.promoDiscount = 0,
   });
 
   @override
@@ -86,6 +91,31 @@ class PaymentSummaryCard extends StatelessWidget {
         const SizedBox(height: 12),
         const Divider(height: 1, thickness: 1, color: Colors.white),
         const SizedBox(height: 12),
+        // UCC16 step 4 — "breakdown shown (original, discount, new total)".
+        // These two rows plus the Total row below ARE those three values, and
+        // they are a SEPARATE statement from the Subtotal/VAT column above:
+        // original − discount == total, while subtotal + VAT == total. Nothing
+        // above is recomputed, so neither statement disturbs the other. The
+        // original is reconstructed as total + discount, which is exact —
+        // PriceQuoteServiceImpl subtracts the discount from the VAT-inclusive
+        // surged gross to get this very total (discountedGross = surgedGross −
+        // appliedDiscount), so adding it back is the same figure, not an
+        // estimate.
+        if (promoDiscount > 0) ...[
+          _buildPaymentRow(
+            context,
+            label: LocaleKeys.bookings_original_total.tr(context: context),
+            value: total + promoDiscount,
+          ),
+          const SizedBox(height: 12),
+          _buildPaymentRow(
+            context,
+            label: LocaleKeys.bookings_promo_discount.tr(context: context),
+            value: promoDiscount,
+            negative: true,
+          ),
+          const SizedBox(height: 12),
+        ],
         _buildPaymentRow(
           context,
           label: LocaleKeys.bookings_total_amount.tr(context: context),
@@ -101,6 +131,7 @@ class PaymentSummaryCard extends StatelessWidget {
     required String label,
     required double value,
     bool isTotal = false,
+    bool negative = false,
   }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -117,7 +148,7 @@ class PaymentSummaryCard extends StatelessWidget {
         Row(
           children: [
             Text(
-              value.toStringAsFixed(2),
+              '${negative ? '-' : ''}${value.toStringAsFixed(2)}',
               style:
                   (isTotal ? AppTextStyles.medium16 : AppTextStyles.regular16)
                       .copyWith(

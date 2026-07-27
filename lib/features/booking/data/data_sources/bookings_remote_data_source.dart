@@ -9,22 +9,31 @@ class BookingsRemoteDataSource {
 
   BookingsRemoteDataSource(this._apiClient);
 
+  /// [offerId] and [promoCode] are ALTERNATIVES, never companions: the server
+  /// resolves an offer's linked promo code itself, and a body carrying both is
+  /// a 400 (`promo-and-offer-mutually-exclusive`). The offer wins when both are
+  /// somehow supplied — it is the richer binding, carrying the attribution the
+  /// bare code cannot.
   Future<Either<Failure, dynamic>> getQuote({
     required String packageId,
     required double lat,
     required double lng,
     List<Map<String, dynamic>>? addOns,
     String? promoCode,
+    String? offerId,
     List<String> addOnIds = const [],
     int? carCount,
   }) {
+    final hasOffer = offerId != null && offerId.isNotEmpty;
     return _apiClient.post(
       Endpoints.quotes,
       data: {
         'packageId': packageId,
         'lat': lat,
         'lng': lng,
-        if (promoCode != null && promoCode.isNotEmpty) 'promoCode': promoCode,
+        if (hasOffer) 'offerId': offerId,
+        if (!hasOffer && promoCode != null && promoCode.isNotEmpty)
+          'promoCode': promoCode,
         if (addOnIds.isNotEmpty) ...{
           'addOns': addOnIds.map((id) => {'addonId': id}).toList(),
           'carCount': carCount ?? 1,

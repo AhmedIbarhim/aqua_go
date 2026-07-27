@@ -23,6 +23,13 @@ class ServiceBookingRequestModel {
   /// (pay-before-create). Required on the create call.
   final String? moyasarPaymentId;
 
+  /// The merchandising offer this booking came through — the SAME offerId the
+  /// quote was priced with. Null for a manually typed code. Carried purely for
+  /// redemption attribution (`promo.promo_redemptions.offer_id`): the discount
+  /// itself is already frozen in the quote, and the server rejects a create
+  /// whose offer resolves to a different code than the quote was priced with.
+  final String? offerId;
+
   ServiceBookingRequestModel({
     this.service,
     this.car,
@@ -33,6 +40,7 @@ class ServiceBookingRequestModel {
     this.paymentMethod,
     this.quote,
     this.moyasarPaymentId,
+    this.offerId,
   });
 
   ServiceBookingRequestModel copyWith({String? moyasarPaymentId}) {
@@ -46,6 +54,7 @@ class ServiceBookingRequestModel {
       paymentMethod: paymentMethod,
       quote: quote,
       moyasarPaymentId: moyasarPaymentId ?? this.moyasarPaymentId,
+      offerId: offerId,
     );
   }
 
@@ -92,6 +101,7 @@ class ServiceBookingRequestModel {
         'addOns': serviceAddOns.map((e) => {'addonId': e.id}).toList(),
       if (paymentMethod != null) 'paymentMethod': paymentMethod!.name,
       if (moyasarPaymentId != null) 'moyasarPaymentId': moyasarPaymentId,
+      if (offerId != null) 'offerId': offerId,
     };
   }
 }

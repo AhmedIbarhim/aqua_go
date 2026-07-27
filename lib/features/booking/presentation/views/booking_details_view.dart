@@ -60,7 +60,7 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
       if (!mounted) return;
       if (flowConfig.requiresQuote && !_initialQuoteRequested) {
         _initialQuoteRequested = true;
-        cubit.fetchQuote();
+        _reprice();
       }
     });
   }
@@ -77,10 +77,30 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
   void _scheduleQuoteRefresh(BookingState state) {
     if (!state.flowConfig.requiresQuote) return;
     _quoteDebounce?.cancel();
-    _quoteDebounce = Timer(const Duration(milliseconds: 350), () {
-      if (!mounted) return;
-      context.read<BookingCubit>().fetchQuote();
-    });
+    _quoteDebounce = Timer(const Duration(milliseconds: 350), _reprice);
+  }
+
+  /// Re-prices the current selection KEEPING whatever promo code is applied.
+  ///
+  /// The customer can reach this screen with a code already applied — they
+  /// applied it on the summary, then came back to change an add-on. Quoting
+  /// bare here would drop their discount without a word, and the applied chip
+  /// waiting for them on the summary would then be describing a quote that no
+  /// longer carries the code.
+  ///
+  /// Changing the basket can also legitimately invalidate the code — removing
+  /// an add-on can drop the order under the code's minimum. The cubit then
+  /// re-prices without it and hands back the server's reason, which is what the
+  /// customer is owed rather than a total that silently went up.
+  void _reprice() async {
+    if (!mounted) return;
+    final refresh = await context.read<BookingCubit>().reprice();
+    if (!mounted) return;
+    final reason = refresh.droppedPromoReason;
+    if (reason == null) return;
+    context.showErrorSnackBar(
+      '$reason\n${LocaleKeys.bookings_promo_code_removed.tr(context: context)}',
+    );
   }
 
   /// Returns true if any currently-selected addon in a package flow requires

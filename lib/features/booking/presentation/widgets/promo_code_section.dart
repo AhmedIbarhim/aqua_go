@@ -3,9 +3,30 @@ import 'package:flutter/material.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../generated/locale_keys.g.dart';
+import '../../domain/promo_code_history.dart';
+import '../../domain/promo_code_rules.dart';
 
+/// UCC16's promo affordance: apply a code, see what it saved, take it off
+/// again.
+///
+/// **There is deliberately no "N uses remaining" line**, though UCC16's UI/UX
+/// notes ask for one. No customer-facing endpoint carries that number:
+/// `GET /api/customer/promos/{code}` returns `PromoTerms`
+/// (code / discountType / value / minOrderMinor / validFrom / validTo), the
+/// quote response carries `promoCode` + `promoDiscountMinor`, and the offer
+/// feed's terms carry neither. `remainingUses` exists only on the ADMIN
+/// projection, withheld from every customer surface on purpose — remaining
+/// campaign inventory on an anonymous endpoint is a "which campaigns are nearly
+/// exhausted" scraper. Do not add a field to the customer contract to satisfy
+/// this note; it is an owner decision, not an oversight.
 class PromoCodeSection extends StatelessWidget {
   final String? appliedPromoCode;
+
+  /// What the applied code took off this order, in halala. Rendered as the
+  /// amount saved: a customer who is only told "code applied" cannot tell
+  /// whether it was worth 5 SAR or 50.
+  final int promoDiscountMinor;
+
   final Function(String) onApplyPromoCode;
   final VoidCallback onRemovePromoCode;
 
@@ -14,6 +35,7 @@ class PromoCodeSection extends StatelessWidget {
     required this.appliedPromoCode,
     required this.onApplyPromoCode,
     required this.onRemovePromoCode,
+    this.promoDiscountMinor = 0,
   });
 
   static const Duration _swap = Duration(milliseconds: 300);
@@ -50,6 +72,7 @@ class PromoCodeSection extends StatelessWidget {
                 : _AppliedCode(
                     key: const ValueKey('promo-applied'),
                     code: code,
+                    discountMinor: promoDiscountMinor,
                     onRemove: onRemovePromoCode,
                   ),
           ),
@@ -106,14 +129,25 @@ class _AppliedCode extends StatelessWidget {
   const _AppliedCode({
     super.key,
     required this.code,
+    required this.discountMinor,
     required this.onRemove,
   });
 
   final String code;
+  final int discountMinor;
   final VoidCallback onRemove;
 
   @override
   Widget build(BuildContext context) {
+    // What the code was worth on THIS order, taken from the locked quote. Falls
+    // back to the plain "applied" line for the zero-discount case (a code that
+    // priced to nothing on this basket), where naming a saving would be a lie.
+    final saved = discountMinor > 0
+        ? LocaleKeys.bookings_promo_saved.tr(
+            context: context,
+            args: [(discountMinor / 100).toStringAsFixed(2)],
+          )
+        : LocaleKeys.bookings_promo_code_applied.tr(context: context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -144,7 +178,7 @@ class _AppliedCode extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  LocaleKeys.bookings_promo_code_applied.tr(context: context),
+                  saved,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: AppTextStyles.regular12.copyWith(
@@ -219,8 +253,8 @@ class _CheckMark extends StatelessWidget {
 }
 
 /// Owns the field controller for the life of the dialog so it is disposed with
-/// the route, and keeps the Apply action disabled until there is something to
-/// apply.
+/// the route, keeps the Apply action disabled until the code has the shape the
+/// server accepts, and offers the codes this device has used before.
 class _PromoCodeDialog extends StatefulWidget {
   const _PromoCodeDialog({required this.onApply});
 
@@ -233,6 +267,24 @@ class _PromoCodeDialog extends StatefulWidget {
 class _PromoCodeDialogState extends State<_PromoCodeDialog> {
   final TextEditingController _controller = TextEditingController();
 
+  /// Codes applied before on this device, most recent first (UCC16 UI/UX).
+  late final List<String> _history = PromoCodeHistory.recent();
+
+  /// Only judge the input once the customer has typed something: an empty field
+  /// they have not filled in yet is not an error, it is the starting state.
+  bool get _isEmpty => _controller.text.trim().isEmpty;
+  bool get _isWellFormed => isWellFormedPromoCode(_controller.text);
+
+  /// The history entries that still match what has been typed. Filtering by
+  /// prefix is what makes this autocomplete rather than a static list.
+  List<String> get _suggestions {
+    final typed = _controller.text.trim().toUpperCase();
+    if (typed.isEmpty) return _history;
+    return _history
+        .where((code) => code.startsWith(typed) && code != typed)
+        .toList(growable: false);
+  }
+
   @override
   void dispose() {
     _controller.dispose();
@@ -241,15 +293,28 @@ class _PromoCodeDialogState extends State<_PromoCodeDialog> {
 
   void _submit() {
     final code = _controller.text.trim();
-    if (code.isEmpty) return;
+    if (!isWellFormedPromoCode(code)) {
+      // Re-render so the malformed-code line is on screen; the customer may
+      // have hit the keyboard's done action rather than the disabled button.
+      setState(() {});
+      return;
+    }
     Navigator.of(context).pop();
     widget.onApply(code);
   }
 
   @override
   Widget build(BuildContext context) {
+    final showsError = !_isEmpty && !_isWellFormed;
+    final suggestions = _suggestions;
     return AlertDialog(
       backgroundColor: context.colors.cardBackGround,
+      // The content grew a malformed-code line and up to five suggestion chips
+      // on top of the field. On a short screen with the keyboard up that is
+      // more than the dialog's default non-scrolling body can hold, and an
+      // AlertDialog whose column overflows clips its actions — the customer
+      // would lose the Apply button. Scrolling costs nothing when it fits.
+      scrollable: true,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: Text(
         LocaleKeys.bookings_apply_promo_code.tr(context: context),
@@ -257,11 +322,16 @@ class _PromoCodeDialogState extends State<_PromoCodeDialog> {
       ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           TextField(
             controller: _controller,
             autofocus: true,
             textInputAction: TextInputAction.done,
+            // Re-renders the Apply button's enabled state, the malformed-code
+            // line and the filtered suggestions. It never submits on its own —
+            // applying stays an explicit action.
+            onChanged: (_) => setState(() {}),
             onSubmitted: (_) => _submit(),
             style: AppTextStyles.regular14.copyWith(
               color: context.colors.textPrimary,
@@ -283,6 +353,42 @@ class _PromoCodeDialogState extends State<_PromoCodeDialog> {
               ),
             ),
           ),
+          if (showsError) ...[
+            const SizedBox(height: 8),
+            Text(
+              LocaleKeys.bookings_promo_code_malformed.tr(context: context),
+              style: AppTextStyles.regular12.copyWith(
+                color: context.colors.error,
+              ),
+            ),
+          ],
+          if (suggestions.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Text(
+              LocaleKeys.bookings_promo_recent_codes.tr(context: context),
+              style: AppTextStyles.regular12.copyWith(
+                color: context.colors.textTertiary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (final code in suggestions)
+                  _SuggestionChip(
+                    code: code,
+                    onTap: () {
+                      _controller.text = code;
+                      _controller.selection = TextSelection.collapsed(
+                        offset: code.length,
+                      );
+                      setState(() {});
+                    },
+                  ),
+              ],
+            ),
+          ],
         ],
       ),
       actions: [
@@ -296,7 +402,7 @@ class _PromoCodeDialogState extends State<_PromoCodeDialog> {
           ),
         ),
         ElevatedButton(
-          onPressed: _submit,
+          onPressed: _isWellFormed ? _submit : null,
           style: ElevatedButton.styleFrom(
             backgroundColor: context.colors.primary,
             shape: RoundedRectangleBorder(
@@ -311,6 +417,39 @@ class _PromoCodeDialogState extends State<_PromoCodeDialog> {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// One previously used code, tapped to fill the field. It fills rather than
+/// applies: the customer stays in control of when the code is sent, and can
+/// still edit it.
+class _SuggestionChip extends StatelessWidget {
+  const _SuggestionChip({required this.code, required this.onTap});
+
+  final String code;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: context.colors.fields,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: context.colors.borderSecondary.withValues(alpha: 0.5),
+          ),
+        ),
+        child: Text(
+          code,
+          style: AppTextStyles.medium12.copyWith(
+            color: context.colors.textSecondary,
+          ),
+        ),
+      ),
     );
   }
 }

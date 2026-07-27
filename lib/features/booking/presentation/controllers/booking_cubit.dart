@@ -1,6 +1,8 @@
+import 'package:dartz/dartz.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
+import '../../../../core/config/networking/exceptions/failure.dart';
 import '../../../address/data/models/address_model.dart';
 import '../../../my_cars/data/models/my_car_model.dart';
 import '../../../home/data/models/service_model.dart';
@@ -38,6 +40,22 @@ Set<int> remapAddonSelections(
     if (newIdx != -1) remapped.add(newIdx);
   }
   return remapped;
+}
+
+/// Outcome of [BookingCubit.reprice]: the fresh quote, plus the rejection the
+/// server gave for the promo it had to drop to get one.
+class QuoteRefresh {
+  const QuoteRefresh({this.quote, this.droppedPromoReason});
+
+  /// The re-priced quote, or null when pricing failed outright.
+  final QuoteModel? quote;
+
+  /// Non-null when the applied promo no longer validated and was removed to
+  /// obtain [quote] — the server's own reason, which is what the customer is
+  /// owed as an explanation.
+  final String? droppedPromoReason;
+
+  bool get promoDropped => droppedPromoReason != null;
 }
 
 class BookingCubit extends Cubit<BookingState> {
@@ -486,32 +504,22 @@ class BookingCubit extends Cubit<BookingState> {
     );
   }
 
-  Future<QuoteModel?> fetchQuote({String? promoCode}) async {
+  /// Prices the current selection, optionally with a promo.
+  ///
+  /// [promoCode] and [offerId] are ALTERNATIVES — the server resolves an
+  /// offer's own code and rejects a body carrying both. On success the promo
+  /// the server actually applied is recorded on the state ([applyPromoCode],
+  /// [applyOffer], [removePromoCode] are the callers that express intent), so
+  /// the applied-code chip and the create call read one authoritative value
+  /// instead of a screen-local mirror that dies with the route.
+  Future<QuoteModel?> fetchQuote({String? promoCode, String? offerId}) async {
     if (state.selectedService == null || state.selectedAddress == null) {
       return null;
     }
 
     emit(state.copyWith(status: BookingStatus.loading));
 
-    final availableAddons = state.selectedService?.addons ?? [];
-    final List<String> addOnIds = [];
-    for (final idx in state.selectedServiceIndices) {
-      if (idx < availableAddons.length) {
-        final id = availableAddons[idx].id;
-        if (id != null) addOnIds.add(id);
-      }
-    }
-    // A service booking carries a single vehicle, so car count is 1.
-    const int carCount = 1;
-
-    final result = await _bookingRepo.getQuote(
-      packageId: state.selectedService!.id!,
-      lat: state.selectedAddress!.lat,
-      lng: state.selectedAddress!.lng,
-      promoCode: promoCode,
-      addOnIds: addOnIds,
-      carCount: carCount,
-    );
+    final result = await _requestQuote(promoCode: promoCode, offerId: offerId);
 
     return result.fold(
       (failure) {
@@ -524,13 +532,132 @@ class BookingCubit extends Cubit<BookingState> {
         return null;
       },
       (quote) {
-        emit(state.copyWith(status: BookingStatus.initial, quote: quote));
+        _emitQuote(quote, offerId);
         return quote;
       },
     );
   }
 
-  Future<void> submitBooking({String? promoCode}) async {
+  /// Prices the current selection without touching the emitted state, so a
+  /// caller that has to try twice (see [reprice]) does not flash a rejection
+  /// the customer is about to be given a resolution for.
+  Future<Either<Failure, QuoteModel>> _requestQuote({
+    String? promoCode,
+    String? offerId,
+  }) {
+    final availableAddons = state.selectedService?.addons ?? [];
+    final List<String> addOnIds = [];
+    for (final idx in state.selectedServiceIndices) {
+      if (idx < availableAddons.length) {
+        final id = availableAddons[idx].id;
+        if (id != null) addOnIds.add(id);
+      }
+    }
+    // A service booking carries a single vehicle, so car count is 1.
+    const int carCount = 1;
+
+    return _bookingRepo.getQuote(
+      packageId: state.selectedService!.id!,
+      lat: state.selectedAddress!.lat,
+      lng: state.selectedAddress!.lng,
+      promoCode: promoCode,
+      offerId: offerId,
+      addOnIds: addOnIds,
+      carCount: carCount,
+    );
+  }
+
+  /// Publishes a freshly priced quote and the promo it was priced with.
+  ///
+  /// The quote echoes the code the server actually applied — normalised to
+  /// upper case, and resolved from the offer when an offerId was sent — so it,
+  /// not the request, is what the applied state is taken from. A quote that
+  /// came back without a code clears both halves of the promo.
+  void _emitQuote(QuoteModel quote, String? offerId) {
+    final applied = quote.promoCode;
+    emit(
+      state.copyWith(
+        status: BookingStatus.initial,
+        quote: quote,
+        appliedPromoCode: applied,
+        appliedOfferId: applied == null ? null : offerId,
+        clearPromo: applied == null,
+      ),
+    );
+  }
+
+  /// Applies a manually typed code to the current selection. The chip only
+  /// lights up once the backend has returned a quote priced with it.
+  Future<QuoteModel?> applyPromoCode(String code) =>
+      fetchQuote(promoCode: code);
+
+  /// Applies a merchandising offer. Only the offer id goes on the wire — the
+  /// server resolves its linked code, and sending both is a 400.
+  Future<QuoteModel?> applyOffer(String offerId) => fetchQuote(offerId: offerId);
+
+  /// Re-prices without any promo and clears the applied code.
+  Future<QuoteModel?> removePromoCode() => fetchQuote();
+
+  /// Re-prices the current selection PRESERVING whatever promo is applied —
+  /// used by every re-quote the customer did not explicitly ask for (the
+  /// details screen's add-on toggles, the summary's price-lock refresh once
+  /// the quote's TTL lapses). Re-quoting bare would silently throw the
+  /// customer's discount away.
+  ///
+  /// When the applied code no longer validates — its cap was consumed, the
+  /// campaign ended, or the order no longer clears its minimum — retrying with
+  /// the same dead code repeats the same rejection forever, and the customer
+  /// has no way out but to guess. So the code is dropped, the selection is
+  /// re-priced WITHOUT it, and the reason the server gave comes back on
+  /// [QuoteRefresh.droppedPromoReason] for the caller to state.
+  Future<QuoteRefresh> reprice() async {
+    if (state.selectedService == null || state.selectedAddress == null) {
+      return const QuoteRefresh();
+    }
+    final promoCode = state.appliedPromoCode;
+    final offerId = state.appliedOfferId;
+
+    emit(state.copyWith(status: BookingStatus.loading));
+    final result = await _requestQuote(promoCode: promoCode, offerId: offerId);
+
+    final QuoteModel? quote = result.fold((_) => null, (q) => q);
+    if (quote != null) {
+      _emitQuote(quote, offerId);
+      return QuoteRefresh(quote: quote);
+    }
+
+    final String rejection = result.fold((f) => f.message, (_) => '');
+    if (promoCode == null) {
+      emit(
+        state.copyWith(
+          status: BookingStatus.failure,
+          errorMessage: rejection,
+        ),
+      );
+      return const QuoteRefresh();
+    }
+
+    // Second attempt WITHOUT the code. Its own failure is the one worth
+    // surfacing — at that point nothing about the promo is left to explain.
+    final clean = await _requestQuote();
+    return clean.fold(
+      (failure) {
+        emit(
+          state.copyWith(
+            status: BookingStatus.failure,
+            errorMessage: failure.message,
+          ),
+        );
+        return const QuoteRefresh();
+      },
+      (quote) {
+        _emitQuote(quote, null);
+        return QuoteRefresh(quote: quote, droppedPromoReason: rejection);
+      },
+    );
+  }
+
+  Future<void> submitBooking() async {
     emit(state.copyWith(status: BookingStatus.loading));
     // Delegate to the strategy
     final result = await _submitStrategy.submit(
