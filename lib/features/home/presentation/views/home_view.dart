@@ -280,7 +280,7 @@ class _HomeViewState extends State<HomeView> {
                                   const ServicesPageView(),
                                   SizedBox(height: context.screenHeight * 0.03),
                                   const OffersListView(),
-                                  SizedBox(height: context.screenHeight * 0.15),
+                                  SizedBox(height: context.screenHeight * 0.25),
                                 ],
                               ),
                             ),
