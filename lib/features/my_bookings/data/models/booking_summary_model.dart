@@ -7,6 +7,10 @@ import 'booking_response_model/booking_response_model.dart';
 
 class BookingSummaryModel {
   final String? id;
+
+  /// Human-friendly reference (BK-NNNNNN), DB-generated and stable. REQUIRED
+  /// on the wire: the list can show a reference without a detail fetch.
+  final String? referenceNumber;
   final String? customerId;
   final String? workerId;
   final String? addressLabel;
@@ -33,8 +37,24 @@ class BookingSummaryModel {
   final String? plate;
   final String? vehicleMakeLogoUrl;
 
+  /// Customer-authored job notes the worker sees, frozen at booking creation.
+  /// Mirrors `BookingResponse.workerNotes`, exposed on the list endpoints so
+  /// upcoming bookings render without a per-row detail fetch.
+  final List<String>? workerNotes;
+
+  /// Customer arrival notes for the worker (parking, gate code), frozen at
+  /// booking creation.
+  final String? addressArrivalNotes;
+
+  /// 1-based wash index within its subscription; null for a normal booking.
+  final int? subscriptionSequence;
+
+  /// Canonical gross / net / VAT breakdown for this booking.
+  final Breakdown? breakdown;
+
   BookingSummaryModel({
     this.id,
+    this.referenceNumber,
     this.customerId,
     this.workerId,
     this.addressLabel,
@@ -60,11 +80,16 @@ class BookingSummaryModel {
     this.vehicleColor,
     this.plate,
     this.vehicleMakeLogoUrl,
+    this.workerNotes,
+    this.addressArrivalNotes,
+    this.subscriptionSequence,
+    this.breakdown,
   });
 
   factory BookingSummaryModel.fromJson(Map<String, dynamic> json) {
     return BookingSummaryModel(
       id: json['id'] as String?,
+      referenceNumber: json['referenceNumber'] as String?,
       customerId: json['customerId'] as String?,
       workerId: json['workerId'] as String?,
       addressLabel: json['addressLabel'] as String?,
@@ -101,6 +126,18 @@ class BookingSummaryModel {
           json['plate_masked'] ??
           json['plate_text'],
       vehicleMakeLogoUrl: json['vehicleMakeLogoUrl'] as String?,
+      // Read-reconstruction path: a non-list payload degrades to null rather
+      // than throwing and killing the bookings list.
+      workerNotes: json['workerNotes'] is List
+          ? (json['workerNotes'] as List).whereType<String>().toList()
+          : null,
+      addressArrivalNotes: json['addressArrivalNotes'] as String?,
+      subscriptionSequence: json['subscriptionSequence'] != null
+          ? int.tryParse(json['subscriptionSequence'].toString())
+          : null,
+      breakdown: json['breakdown'] is Map<String, dynamic>
+          ? Breakdown.fromJson(json['breakdown'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -110,6 +147,7 @@ class BookingSummaryModel {
         : null;
     return BookingSummaryModel(
       id: details.id,
+      referenceNumber: details.referenceNumber,
       customerId: details.customerId,
       workerId: details.workerId,
       addressLabel: details.addressLabel,
@@ -135,6 +173,9 @@ class BookingSummaryModel {
       serviceNameAr: details.serviceName?.ar,
       packageNameAr: details.packageName?.ar,
       packageNameEn: details.packageName?.en,
+      workerNotes: details.workerNotes,
+      addressArrivalNotes: details.addressArrivalNotes,
+      breakdown: details.breakdown,
     );
   }
 
@@ -142,6 +183,7 @@ class BookingSummaryModel {
   BookingResponseModel toDetailsPlaceholder() {
     return BookingResponseModel(
       id: id,
+      referenceNumber: referenceNumber,
       customerId: customerId,
       workerId: workerId,
       addressLabel: addressLabel,
@@ -158,6 +200,9 @@ class BookingSummaryModel {
       currency: currency,
       isSubscription: isSubscription,
       plate: plate,
+      workerNotes: workerNotes,
+      addressArrivalNotes: addressArrivalNotes,
+      breakdown: breakdown,
       vehicles: [
         BookingVehicle(
           vehicleYear: vehicleYear,
