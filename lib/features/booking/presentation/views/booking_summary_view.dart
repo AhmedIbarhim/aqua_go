@@ -107,24 +107,41 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
                 }
               });
         } else if (state.status == BookingStatus.failure) {
-          if (state.paymentPhase == PaymentPhase.refundPending) {
+          switch (state.paymentPhase) {
             // The card was ALREADY charged (pay-before-create) and the server
             // refunded it before answering — a promo cap consumed between the
             // quote and the charge, a lost slot, a mismatched amount. The
             // server's reason says none of that, and a customer who has just
             // seen money leave their account has to be told it is coming back,
             // and when. Root CLAUDE.md §10: up to 7 days on a card refund.
-            context.showWarningAlert(
-              title: LocaleKeys.bookings_payment_refunded_title.tr(
-                context: context,
-              ),
-              message:
-                  '${state.errorMessage ?? ''}\n\n'
-                  '${LocaleKeys.bookings_payment_refunded_notice.tr(context: context)}',
-              primaryButtonText: LocaleKeys.ok.tr(context: context),
-            );
-          } else {
-            context.showErrorSnackBar(state.errorMessage ?? '');
+            case PaymentPhase.refundPending:
+              context.showWarningAlert(
+                title: LocaleKeys.bookings_payment_refunded_title.tr(
+                  context: context,
+                ),
+                message:
+                    '${state.errorMessage ?? ''}\n\n'
+                    '${LocaleKeys.bookings_payment_refunded_notice.tr(context: context)}',
+                primaryButtonText: LocaleKeys.ok.tr(context: context),
+              );
+            // The card was charged and the create did NOT come back with an
+            // answer this client can read as a refund — a dropped connection, a
+            // timeout, a 5xx. The booking may exist; the charge may still be
+            // sitting there awaiting the reconciliation sweeper. So nothing is
+            // asserted about either: the customer is told not to pay again and
+            // to check My Bookings, which is the one action that resolves it.
+            case PaymentPhase.createUnconfirmed:
+              context.showWarningAlert(
+                title: LocaleKeys.bookings_payment_unconfirmed_title.tr(
+                  context: context,
+                ),
+                message:
+                    '${state.errorMessage ?? ''}\n\n'
+                    '${LocaleKeys.bookings_payment_unconfirmed_notice.tr(context: context)}',
+                primaryButtonText: LocaleKeys.ok.tr(context: context),
+              );
+            default:
+              context.showErrorSnackBar(state.errorMessage ?? '');
           }
         }
       },

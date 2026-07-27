@@ -197,6 +197,8 @@ abstract class  LocaleKeys {
   static const bookings_promo_released = 'bookings.promo_released';
   static const bookings_payment_refunded_title = 'bookings.payment_refunded_title';
   static const bookings_payment_refunded_notice = 'bookings.payment_refunded_notice';
+  static const bookings_payment_unconfirmed_title = 'bookings.payment_unconfirmed_title';
+  static const bookings_payment_unconfirmed_notice = 'bookings.payment_unconfirmed_notice';
   static const bookings_delete_promo_code = 'bookings.delete_promo_code';
   static const bookings_apply_code_hint = 'bookings.apply_code_hint';
   static const bookings_cancel = 'bookings.cancel';

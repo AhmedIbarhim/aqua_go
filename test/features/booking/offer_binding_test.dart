@@ -18,6 +18,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'support/promo_summary_harness.dart';
+
 /// An offer-driven booking must reach the server as an `offerId`, NOT as the
 /// bare code the offer happens to carry. The server resolves the offer's linked
 /// promo code itself and stamps `promo_redemptions.offer_id`, which is the only
@@ -142,6 +144,46 @@ void main() {
       );
 
       expect(repo.captured!.toJson()['offerId'], 'offer-1');
+    });
+  });
+
+  group('offer attribution on the cubit', () {
+    setUp(() async {
+      TestWidgetsFlutterBinding.ensureInitialized();
+      SharedPreferences.setMockInitialValues({});
+      await CacheClient.init();
+    });
+
+    test('a typed code applied over a live offer drops the attribution', () async {
+      final cubit = buildCubit(RecordingBookingRepo());
+      addTearDown(cubit.close);
+
+      await cubit.applyOffer('offer-1');
+      expect(cubit.state.appliedOfferId, 'offer-1');
+
+      // The customer types a different code over the offer. The quote that
+      // comes back was priced with NO offer, so the booking must not be
+      // stamped with one — `promo_redemptions.offer_id` is the whole of the
+      // sale attribution, and this sale did not come through that offer.
+      await cubit.applyPromoCode('OTHERCODE');
+
+      expect(cubit.state.appliedPromoCode, 'OTHERCODE');
+      expect(
+        cubit.state.appliedOfferId,
+        isNull,
+        reason: 'the offer the customer did not come through must not be '
+            'credited with the sale',
+      );
+    });
+
+    test('an offer-driven reprice keeps the attribution', () async {
+      final cubit = buildCubit(RecordingBookingRepo());
+      addTearDown(cubit.close);
+
+      await cubit.applyOffer('offer-1');
+      await cubit.reprice();
+
+      expect(cubit.state.appliedOfferId, 'offer-1');
     });
   });
 }

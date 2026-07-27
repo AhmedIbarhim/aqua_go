@@ -7,6 +7,7 @@ import '../../../address/data/models/address_model.dart';
 import '../../../my_cars/data/models/my_car_model.dart';
 import '../../../home/data/models/service_model.dart';
 import '../../domain/configs/booking_flow_config.dart';
+import '../../domain/refund_evidence.dart';
 import '../../data/models/quote_model.dart';
 import '../../../my_bookings/data/models/booking_response_model/breakdown.dart';
 import '../../../my_bookings/data/models/booking_response_model/quote_line.dart';
@@ -573,6 +574,12 @@ class BookingCubit extends Cubit<BookingState> {
   /// upper case, and resolved from the offer when an offerId was sent — so it,
   /// not the request, is what the applied state is taken from. A quote that
   /// came back without a code clears both halves of the promo.
+  ///
+  /// [offerId] is the offer this quote was priced FOR, and it is authoritative
+  /// in both directions: null means the order carries no offer attribution, so
+  /// any id held from an earlier quote is dropped rather than retained. A typed
+  /// code applied over a live offer must not inherit that offer — the
+  /// redemption's `offer_id` is the only record of which offer drove the sale.
   void _emitQuote(QuoteModel quote, String? offerId) {
     final applied = quote.promoCode;
     emit(
@@ -582,6 +589,7 @@ class BookingCubit extends Cubit<BookingState> {
         appliedPromoCode: applied,
         appliedOfferId: applied == null ? null : offerId,
         clearPromo: applied == null,
+        clearOfferId: offerId == null,
       ),
     );
   }
@@ -1021,8 +1029,18 @@ class BookingCubit extends Cubit<BookingState> {
   }
 
   /// Pay-before-create step 4 (spec §4.2): the SDK returned a verified `paid`
-  /// payment; create the booking with idempotency `booking-create:{id}`. On a
-  /// 409 slot-race the server auto-refunds and the UI reflects [refundPending].
+  /// payment; create the booking with idempotency `booking-create:{id}`.
+  ///
+  /// The card is ALREADY charged when this runs, so what the customer is told
+  /// about their money turns on whether the failure is evidence that it came
+  /// back. Only the rejections in `refund_evidence.dart` are — each one runs
+  /// the server's compensating refund before throwing, so [refundPending] is a
+  /// statement of fact. Everything else is [PaymentPhase.createUnconfirmed]:
+  /// a dropped connection or a timeout never reached an answer at all and the
+  /// booking may well have been created, and a 5xx rolled the transaction back
+  /// without refunding anything. Promising a refund there would be inventing
+  /// one, and telling a customer their charge is reversed when it is not is
+  /// worse than telling them we do not yet know.
   Future<void> completeBookingAfterPayment(String moyasarPaymentId) async {
     emit(
       state.copyWith(
@@ -1041,7 +1059,9 @@ class BookingCubit extends Cubit<BookingState> {
       (failure) => emit(
         state.copyWith(
           status: BookingStatus.failure,
-          paymentPhase: PaymentPhase.refundPending,
+          paymentPhase: carriesRefundEvidence(failure)
+              ? PaymentPhase.refundPending
+              : PaymentPhase.createUnconfirmed,
           errorMessage: failure.message,
         ),
       ),

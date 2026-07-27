@@ -202,11 +202,16 @@ void main() {
       (tester) async {
         // The 422 the server raises when a promo cap was consumed between the
         // quote and the charge. The card WAS charged and HAS been refunded —
-        // the server detail says nothing about either.
+        // the server detail says nothing about either, but the SLUG does: the
+        // backend runs its compensating refund on this rejection before it
+        // throws, so the claim rests on the contract rather than a guess.
         const serverDetail = 'This promo code is no longer valid.';
         final cubit = buildCubit(
           RecordingBookingRepo(),
-          submitStrategy: const _FailingSubmit(serverDetail),
+          submitStrategy: const _FailingSubmit(
+            serverDetail,
+            slug: 'promo-code-no-longer-valid',
+          ),
         );
         addTearDown(cubit.close);
 
@@ -229,6 +234,77 @@ void main() {
           findsOneWidget,
           reason: 'money left the account — the customer must be told it is '
               'coming back, and that a card refund can take up to 7 days',
+        );
+      },
+    );
+
+    testWidgets(
+      'never promises a refund when the create never got an answer',
+      (tester) async {
+        // The connection dropped after the card was charged. The server may
+        // have created the booking and may never have refunded anything — the
+        // client knows neither.
+        final cubit = buildCubit(
+          RecordingBookingRepo(),
+          submitStrategy: const _FailingSubmit(
+            'No internet connection',
+            type: FailureType.network,
+          ),
+        );
+        addTearDown(cubit.close);
+
+        await pumpSummary(tester, cubit);
+        await cubit.completeBookingAfterPayment('pay_1');
+        await settle(tester);
+
+        expect(cubit.state.paymentPhase, PaymentPhase.createUnconfirmed);
+        expect(
+          find.textContaining('bookings.payment_refunded_notice'),
+          findsNothing,
+          reason: 'the booking may in fact exist and no refund may have run — '
+              'asserting one would be inventing it',
+        );
+        expect(
+          find.textContaining('bookings.payment_unconfirmed_title'),
+          findsOneWidget,
+        );
+        expect(
+          find.textContaining('bookings.payment_unconfirmed_notice'),
+          findsOneWidget,
+          reason: 'the customer must be told not to pay again and where to '
+              'check whether the booking went through',
+        );
+      },
+    );
+
+    testWidgets(
+      'a 4xx that runs no compensation is unconfirmed, not refunded',
+      (tester) async {
+        // A rejection thrown AFTER verify but on a path with no compensating
+        // refund (zone mismatch, saved address gone, schedule window). Same
+        // 422/409 shape as the refunding ones, so the status code cannot tell
+        // them apart — only the slug can, and this one is not in the set.
+        final cubit = buildCubit(
+          RecordingBookingRepo(),
+          submitStrategy: const _FailingSubmit(
+            'The address is no longer in this zone.',
+            slug: 'zone-mismatch',
+          ),
+        );
+        addTearDown(cubit.close);
+
+        await pumpSummary(tester, cubit);
+        await cubit.completeBookingAfterPayment('pay_1');
+        await settle(tester);
+
+        expect(cubit.state.paymentPhase, PaymentPhase.createUnconfirmed);
+        expect(
+          find.textContaining('bookings.payment_refunded_notice'),
+          findsNothing,
+        );
+        expect(
+          find.textContaining('bookings.payment_unconfirmed_notice'),
+          findsOneWidget,
         );
       },
     );
@@ -262,16 +338,23 @@ void main() {
 }
 
 /// Fails booking-create the way the server does after the card is charged.
+/// [slug] is the RFC 9457 error slug the rejection carried — the only thing
+/// that says whether the compensating refund ran.
 class _FailingSubmit implements BookingSubmitStrategy {
-  const _FailingSubmit(this.detail);
+  const _FailingSubmit(
+    this.detail, {
+    this.type = FailureType.validation,
+    this.slug,
+  });
 
   final String detail;
+  final FailureType type;
+  final String? slug;
 
   @override
   Future<Either<Failure, BookingResponseModel>> submit({
     required BookingRepository repo,
     required BookingState state,
     String? moyasarPaymentId,
-  }) async =>
-      left(ServerFailure(detail, type: FailureType.validation));
+  }) async => left(ServerFailure(detail, type: type, slug: slug));
 }

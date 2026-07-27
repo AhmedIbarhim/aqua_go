@@ -31,8 +31,17 @@ enum PaymentPhase {
   /// user dismissed the SDK sheet.
   cancelled,
 
-  /// paid but create failed → server auto-refund in progress.
+  /// paid, and the server ANSWERED with one of the rejections that refunds the
+  /// charge as part of its contract (see `refund_evidence.dart`). The money is
+  /// known to be coming back and the customer is told so.
   refundPending,
+
+  /// paid, and the create did not come back with an answer this client can read
+  /// as a refund — a dropped connection, a timeout, a 5xx, or a rejection that
+  /// runs no compensation. The booking may or may not exist and the charge may
+  /// or may not have been returned yet, so nothing is asserted about either:
+  /// the customer is told not to pay again and to check My Bookings.
+  createUnconfirmed,
 }
 
 class BookingState extends Equatable {
@@ -157,6 +166,7 @@ class BookingState extends Equatable {
     bool clearError = false,
     bool clearPaymentInit = false,
     bool clearPromo = false,
+    bool clearOfferId = false,
   }) {
     return BookingState(
       status: status ?? (clearError ? BookingStatus.initial : this.status),
@@ -195,10 +205,16 @@ class BookingState extends Equatable {
       // The code and the offer it came from are one fact — a quote priced
       // without a promo clears both, so a dropped code can never leave the
       // offer id behind to be stamped on a booking it did not drive.
+      //
+      // [clearOfferId] covers the other half: a quote priced WITH a code but
+      // with no offer behind it (the customer typed a code over a live offer).
+      // Without an explicit flag the `??` below would keep the previous offer
+      // id and attribute the sale to an offer the customer never came through —
+      // `offer_id` on the redemption row is the only attribution there is.
       appliedPromoCode: clearPromo
           ? null
           : (appliedPromoCode ?? this.appliedPromoCode),
-      appliedOfferId: clearPromo
+      appliedOfferId: (clearPromo || clearOfferId)
           ? null
           : (appliedOfferId ?? this.appliedOfferId),
     );

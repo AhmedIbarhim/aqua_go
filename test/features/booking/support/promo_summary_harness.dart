@@ -57,6 +57,12 @@ const grossWithoutPromoMinor = 11500;
 const grossWithPromoMinor = 9500;
 const promoDiscountMinor = grossWithoutPromoMinor - grossWithPromoMinor;
 
+/// The code the fake backend resolves an offer-driven quote to. An offer-driven
+/// request carries only the offer id; the server looks up the offer's LINKED
+/// promo code and echoes it on the quote, which is what the applied-code chip
+/// and the create call read.
+const offerResolvedPromoCode = 'OFFERCODE';
+
 /// The app's real English strings, read once by [loadTranslations].
 Map<String, dynamic>? _enTranslations;
 
@@ -379,7 +385,12 @@ class RecordingBookingRepo extends BookingRepository {
     if (failure != null) return left(failure);
     return right(
       quotePayload(
-        promoCode: promoCode,
+        // The server resolves an offer to its linked code and echoes THAT — an
+        // offer-driven quote never carries the code on the request, so a fake
+        // that echoed only what it was given would report every offer quote as
+        // carrying no promo at all.
+        promoCode: promoCode ??
+            (offerId == null ? null : offerResolvedPromoCode),
         quoteId: 'quote-${quoteCalls.length}',
         expired: expiredQuotes,
       ),

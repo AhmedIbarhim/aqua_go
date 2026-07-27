@@ -203,6 +203,8 @@
     "promo_released": "Code returned after cancellation",
     "payment_refunded_title": "Booking not completed",
     "payment_refunded_notice": "Your card was charged and the full amount has been refunded. It can take up to 7 days to appear on your statement, depending on your bank.",
+    "payment_unconfirmed_title": "We could not confirm your booking",
+    "payment_unconfirmed_notice": "Please do not pay again. Open My Bookings to check whether the booking went through. If it did not and your card was charged, the amount is returned automatically, and it can take up to 7 days to appear on your statement.",
     "delete_promo_code": "Delete Code",
     "apply_code_hint": "Enter promo code",
     "cancel": "Cancel",
