@@ -73,7 +73,7 @@ class ServerFailure extends Failure {
           dioException.response?.data,
         );
 
-      case DioExceptionType.unknown:
+      default:
         if (dioException.error is SocketException) {
           return ServerFailure(
             LocaleKeys.snackbar_no_internet.tr(),
