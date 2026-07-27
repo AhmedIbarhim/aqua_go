@@ -110,10 +110,11 @@ void main() {
     expect(_text(ar[0]), 'الباقة الذهبية');
   });
 
-  group('offerMinOrderLine — BR-OFR-10 / AC-EXT-06 on the CARD', () {
+  group('offerMinOrderLine — BR-OFR-10 / AC-EXT-06 in the DETAIL view', () {
     test('a promo offer carrying a minimum order states the threshold', () {
       // AC-EXT-06: "an offer carrying a minimum order value is shown, with the
-      // threshold stated on the card and in the detail view."
+      // SAR 100 threshold stated". Since §1.5b the card is its artwork and
+      // nothing else, so the detail view is where it is stated in text.
       final line = offerMinOrderLine(_offer(
         'PROMO_CODE',
         const OfferTermsModel(promoCode: 'SAVE', discountType: 'PERCENTAGE', configuredValue: 20, minOrderMinor: 10000),
@@ -135,7 +136,8 @@ void main() {
 
     test('a PACKAGE offer never carries a minimum order', () {
       // The package half of OfferTerms leaves minOrderMinor at 0, but a future
-      // wire change must not start rendering a min-order chip on a package card.
+      // wire change must not start printing a threshold under a package offer,
+      // which has no minimum to meet.
       expect(
         offerMinOrderLine(_offer(
           'PACKAGE',
@@ -145,17 +147,20 @@ void main() {
       );
     });
 
-    test('the card line and the detail line state the SAME threshold', () {
+    test('the helper and the rendered terms block state the SAME threshold', () {
+      // The helper is reachable on its own, so it has to keep agreeing with the
+      // row `offerTermLines` actually emits — a divergence would put two
+      // different numbers behind one requirement.
       final offer = _offer(
         'PROMO_CODE',
         const OfferTermsModel(promoCode: 'SAVE', discountType: 'FIXED_AMOUNT', configuredValue: 1500, minOrderMinor: 7550),
       );
-      final card = offerMinOrderLine(offer)!;
-      final detail = offerTermLines(offer, isAr: false)
+      final helper = offerMinOrderLine(offer)!;
+      final rendered = offerTermLines(offer, isAr: false)
           .whereType<OfferTermKey>()
           .firstWhere((l) => l.key == LocaleKeys.offers_min_order);
-      expect(card.args, detail.args);
-      expect(card.args, ['75.50']);
+      expect(helper.args, rendered.args);
+      expect(helper.args, ['75.50']);
     });
   });
 

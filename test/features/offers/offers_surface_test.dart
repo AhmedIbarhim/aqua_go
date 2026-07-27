@@ -43,9 +43,9 @@ void main() {
     matching: find.byType(ElevatedButton),
   );
 
-  /// Every remote image on these surfaces goes through the house
-  /// `CustomNetworkImage`, i.e. `cached_network_image` — UCC23's "banner images
-  /// are cached".
+  /// Every remote image on these surfaces goes through the shared
+  /// `OfferBanner`, i.e. `cached_network_image` — UCC23's "banner images are
+  /// cached".
   List<String> bannerUrls(WidgetTester tester) => tester
       .widgetList<CachedNetworkImage>(find.byType(CachedNetworkImage))
       .map((i) => i.imageUrl)
@@ -254,6 +254,21 @@ void main() {
       PendingPromoCode.instance.takeHandoff();
     });
 
+    /// Taps the primary action, scrolling it into view first.
+    ///
+    /// The detail view is a `ListView`: the banner, the summary and a terms
+    /// block that runs to four rows for a package offer, and the action sits
+    /// under all of it. The 800x600 test viewport is shorter than a phone's, so
+    /// the button can be below the fold here while being on screen on a real
+    /// device — a scroll the customer would make anyway, not a relaxed
+    /// assertion.
+    Future<void> tapPrimaryAction(WidgetTester tester) async {
+      final action = find.byKey(const ValueKey('offer-primary-action'));
+      await tester.ensureVisible(action);
+      await tester.pump();
+      await tester.tap(action);
+    }
+
     /// Opens [offer] from the list, taps its primary action, and asserts the
     /// UCC23 A2 blocked outcome: a brief toast, back to the list, nowhere
     /// routed. Reached THROUGH the list because the toast has to survive the
@@ -279,7 +294,7 @@ void main() {
       await settleOffers(tester);
       expect(find.byType(OfferDetailView), findsOneWidget);
 
-      await tester.tap(find.byKey(const ValueKey('offer-primary-action')));
+      await tapPrimaryAction(tester);
       await settleOffers(tester);
 
       expect(find.text(LocaleKeys.offers_expired.tr()), findsOneWidget);
@@ -371,7 +386,7 @@ void main() {
       expect(find.byType(OfferDetailView), findsOneWidget);
 
       repo.answerListWith(const Right(<CustomerOfferModel>[]));
-      await tester.tap(find.byKey(const ValueKey('offer-primary-action')));
+      await tapPrimaryAction(tester);
       await settleOffers(tester);
 
       // "the system re-validates, blocks the action and returns the customer to
@@ -401,7 +416,7 @@ void main() {
         onGenerateRoute: recorder,
       );
 
-      await tester.tap(find.byKey(const ValueKey('offer-primary-action')));
+      await tapPrimaryAction(tester);
       await settleOffers(tester);
 
       // The OFFER id is the only thing that travels: the server resolves the
@@ -429,7 +444,7 @@ void main() {
         onGenerateRoute: recorder,
       );
 
-      await tester.tap(find.byKey(const ValueKey('offer-primary-action')));
+      await tapPrimaryAction(tester);
       await settleOffers(tester);
 
       expect(repo.detailCalls, ['offer-live']);
@@ -452,7 +467,7 @@ void main() {
         onGenerateRoute: recorder,
       );
 
-      await tester.tap(find.byKey(const ValueKey('offer-primary-action')));
+      await tapPrimaryAction(tester);
       await settleOffers(tester);
 
       expect(repo.listCalls, 0, reason: 'nothing died, so nothing to refresh');
@@ -475,7 +490,7 @@ void main() {
         onGenerateRoute: recorder,
       );
 
-      await tester.tap(find.byKey(const ValueKey('offer-primary-action')));
+      await tapPrimaryAction(tester);
       await settleOffers(tester);
 
       expect(pushed.single.name, Routes.packageDetail);

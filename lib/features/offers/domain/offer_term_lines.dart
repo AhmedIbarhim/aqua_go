@@ -40,10 +40,14 @@ String sarFromMinor(int minor) => (minor / 100).toStringAsFixed(2);
 ///
 /// BR-OFR-10 makes the minimum order the one term that is deliberately NOT an
 /// eligibility filter — it cannot be evaluated before a cart exists — so an
-/// offer carrying it is shown anyway, "with the threshold stated on the card
-/// and in the detail view". The card is the half that was missing: a customer
-/// scrolling the rail could reach the booking flow and be refused there without
-/// ever having been told the number. AC-EXT-06 grades exactly that.
+/// offer carrying it is shown anyway, with the threshold stated rather than
+/// used to withhold the offer.
+///
+/// The DETAIL view is the only surface that states it in text, and the only
+/// caller of this helper. Since §1.5b the card is its artwork and nothing else,
+/// so the number reaches a customer scrolling the rail only through the banner
+/// image itself — a brief for whoever produces the artwork, not a code path.
+/// AC-EXT-06's first leg is graded on the detail view.
 ///
 /// Package offers never have one: the package half of `OfferTerms` leaves
 /// `minOrderMinor` at 0, and the offer type — not the value — is what decides,
@@ -102,8 +106,9 @@ List<OfferTermLine> offerTermLines(CustomerOfferModel offer, {required bool isAr
         [sarFromMinor(terms.configuredValue)],
       ));
     }
-    // Same helper the card uses, so the two surfaces AC-EXT-06 grades together
-    // cannot state different thresholds.
+    // BR-OFR-10's threshold, kept in its own helper rather than inlined here:
+    // it is the one term that is stated INSTEAD of being enforced at display
+    // time, so it is worth reading and testing on its own.
     final minOrder = offerMinOrderLine(offer);
     if (minOrder != null) lines.add(minOrder);
 

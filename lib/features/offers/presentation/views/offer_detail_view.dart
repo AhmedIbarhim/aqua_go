@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/components/custom_button.dart';
-import '../../../../core/components/custom_network_image.dart';
 import '../../../../core/components/generic_app_bar.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/route/app_router.dart';
@@ -18,6 +17,8 @@ import '../../domain/offer_revalidation.dart';
 import '../../domain/offer_term_lines.dart';
 import '../../domain/pending_promo_code.dart';
 import '../controllers/offers_controller/offers_cubit.dart';
+import '../widgets/offer_banner.dart';
+import '../widgets/offer_card.dart';
 
 class OfferDetailView extends StatelessWidget {
   const OfferDetailView({super.key, required this.offer});
@@ -42,6 +43,11 @@ class OfferDetailView extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
         children: [
+          // No artwork, no band. The card falls back to the placeholder asset
+          // because it has nothing else to show and would otherwise be a blank
+          // tap target; this screen states the title, the description and the
+          // terms in text, so a stand-in image here would add nothing and take
+          // the top of the screen to say it.
           if (banner != null && banner.isNotEmpty) _Banner(url: banner),
           _Summary(offer: offer),
           _Terms(lines: lines),
@@ -52,37 +58,28 @@ class OfferDetailView extends StatelessWidget {
   }
 }
 
-/// The offer banner, on the same house control and the same tinted plate as the
-/// list card — `CustomNetworkImage` (cached_network_image), which is what UCC23
-/// means by "banner images are cached".
+/// The offer banner, drawn exactly as the card the customer just tapped drew
+/// it — same [OfferBanner], same `cached_network_image` (UCC23's "banner images
+/// are cached"), same `BoxFit.fill`, same corners, same fallback.
 ///
-/// Height-bounded rather than left to the image's own aspect ratio, so a slow,
-/// failed or absent banner leaves a finished-looking block instead of collapsing
-/// the top of the screen to nothing. Slightly taller than the list card's
-/// banner, because here it is the screen's lead image rather than a row in a
-/// list.
+/// It used to reach for `CustomNetworkImage`, whose default fit is `cover`.
+/// Since §1.5b the artwork is the only thing that states the offer's title,
+/// description and BR-OFR-10 threshold, and `cover` CROPS — so the one surface
+/// that has to state the threshold was the one cropping it away.
+///
+/// Ratio-bound rather than left to the image's own dimensions, so a slow,
+/// failed or absent banner leaves a finished-looking block instead of
+/// collapsing the top of the screen to nothing.
 class _Banner extends StatelessWidget {
   const _Banner({required this.url});
-
-  static const double _heightFactor = 0.22;
 
   final String url;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: MediaQuery.sizeOf(context).height * _heightFactor,
-      width: double.infinity,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          ColoredBox(color: context.colors.fields),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            child: CustomNetworkImage(url),
-          ),
-        ],
-      ),
+    return AspectRatio(
+      aspectRatio: OfferCard.aspectRatioFor(context),
+      child: OfferBanner(source: url),
     );
   }
 }

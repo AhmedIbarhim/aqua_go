@@ -88,8 +88,12 @@ class OffersView extends StatelessWidget {
 
   Widget _skeleton(BuildContext context) {
     // The skeleton stands at the real card's height so the handoff doesn't
-    // shift the page under the reader.
-    final cardHeight = OfferCard.heightFor(context);
+    // shift the page under the reader. A card here is full width less this
+    // list's own padding, and its height follows from the pinned banner ratio
+    // rather than from the rail's height — the two surfaces size the same
+    // artwork from different sides of the same ratio.
+    final cardWidth = context.screenWidth - 32;
+    final cardHeight = OfferCard.heightForWidth(context, cardWidth);
     return ListView.separated(
       key: const ValueKey('offers-loading'),
       padding: const EdgeInsets.all(16),
