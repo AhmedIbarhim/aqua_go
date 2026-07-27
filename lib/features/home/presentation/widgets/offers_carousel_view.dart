@@ -11,15 +11,15 @@ import 'offer_card.dart';
 import '../views/offers_view.dart';
 import '../../../../core/helpers/shimmer_helper.dart';
 
-class OffersListView extends StatefulWidget {
+class OffersCarouselView extends StatefulWidget {
   final bool isLoading;
-  const OffersListView({super.key, this.isLoading = false});
+  const OffersCarouselView({super.key, this.isLoading = false});
 
   @override
-  State<OffersListView> createState() => _OffersListViewState();
+  State<OffersCarouselView> createState() => _OffersCarouselViewState();
 }
 
-class _OffersListViewState extends State<OffersListView> {
+class _OffersCarouselViewState extends State<OffersCarouselView> {
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.sizeOf(context).height;
@@ -45,6 +45,7 @@ class _OffersListViewState extends State<OffersListView> {
         ],
       );
     }
+    final offers = getDemoOffers(context);
     return Column(
       children: [
         Padding(
@@ -62,7 +63,7 @@ class _OffersListViewState extends State<OffersListView> {
                 onTap: () {
                   context.pushNamed(
                     Routes.offers,
-                    arguments: OffersArgs(offers: getDemoOffers(context)),
+                    arguments: OffersArgs(offers: offers),
                   );
                 },
                 child: Row(
@@ -103,16 +104,13 @@ class _OffersListViewState extends State<OffersListView> {
         SizedBox(height: height * 0.012),
         SizedBox(
           height: height * 0.21,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            itemCount: getDemoOffers(context).length,
-            separatorBuilder: (context, index) => const SizedBox(width: 16),
-            itemBuilder: (context, index) => GestureDetector(
-              onTap: () =>
-                  _handleOfferTap(context, getDemoOffers(context)[index]),
-              child: OfferCard(offerModel: getDemoOffers(context)[index]),
-            ),
+          child: CarouselView(
+            itemExtent: height * 0.4,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            onTap: (index) => _handleOfferTap(context, offers[index]),
+            children: offers.map((offer) {
+              return OfferCard(offerModel: offer);
+            }).toList(),
           ),
         ),
       ],
