@@ -6,6 +6,7 @@ import '../../../../core/themes/app_text_styles.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../../data/models/customer_offer_model.dart';
 import '../../domain/offer_countdown.dart';
+import '../../domain/offer_term_lines.dart';
 import 'offer_motion.dart';
 
 /// Hero tag shared by the offers-list card banner and the offer detail banner,
@@ -29,6 +30,7 @@ class OfferCard extends StatelessWidget {
     final endsIn = offerEndsInDays(offer.endsAt, DateTime.now());
     final endsAtLabel =
         DateFormat.yMMMd(isAr ? 'ar' : 'en').format(offer.endsAt.toLocal());
+    final minOrder = offerMinOrderLine(offer);
 
     final card = Container(
       clipBehavior: Clip.antiAlias,
@@ -69,6 +71,22 @@ class OfferCard extends StatelessWidget {
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                     style: AppTextStyles.regular14.copyWith(
+                      color: context.colors.textSecondary,
+                    ),
+                  ),
+                ],
+                // BR-OFR-10 / AC-EXT-06 — the threshold is stated on the CARD,
+                // not only in the detail view, because a minimum order is the
+                // one term that survives eligibility and is refused later. It
+                // rides on both the rail and the list card: the rail is a real
+                // route into the booking flow.
+                if (minOrder != null) ...[
+                  SizedBox(height: atHome ? 6 : 10),
+                  Text(
+                    minOrder.localeKey!.tr(context: context, args: minOrder.args),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTextStyles.medium12.copyWith(
                       color: context.colors.textSecondary,
                     ),
                   ),

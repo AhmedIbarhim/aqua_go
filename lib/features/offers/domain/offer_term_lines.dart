@@ -19,6 +19,28 @@ class OfferTermLine {
 /// Two-decimal SAR from minor units. 24900 -> '249.00'.
 String sarFromMinor(int minor) => (minor / 100).toStringAsFixed(2);
 
+/// The BR-OFR-10 minimum-order threshold as ONE line, or null when the offer
+/// carries no threshold.
+///
+/// BR-OFR-10 makes the minimum order the one term that is deliberately NOT an
+/// eligibility filter — it cannot be evaluated before a cart exists — so an
+/// offer carrying it is shown anyway, "with the threshold stated on the card
+/// and in the detail view". The card is the half that was missing: a customer
+/// scrolling the rail could reach the booking flow and be refused there without
+/// ever having been told the number. AC-EXT-06 grades exactly that.
+///
+/// Package offers never have one: the package half of `OfferTerms` leaves
+/// `minOrderMinor` at 0, and the offer type — not the value — is what decides,
+/// so a wire change cannot start printing a threshold on a package card.
+OfferTermLine? offerMinOrderLine(CustomerOfferModel offer) {
+  if (!offer.isPromoCode) return null;
+  if (offer.terms.minOrderMinor <= 0) return null;
+  return OfferTermLine.key(
+    LocaleKeys.offers_min_order,
+    [sarFromMinor(offer.terms.minOrderMinor)],
+  );
+}
+
 /// The term rows for [offer].
 ///
 /// The discount-type literals MUST stay byte-identical to the backend's
@@ -43,12 +65,10 @@ List<OfferTermLine> offerTermLines(CustomerOfferModel offer, {required bool isAr
         [sarFromMinor(terms.configuredValue)],
       ));
     }
-    if (terms.minOrderMinor > 0) {
-      lines.add(OfferTermLine.key(
-        LocaleKeys.offers_min_order,
-        [sarFromMinor(terms.minOrderMinor)],
-      ));
-    }
+    // Same helper the card uses, so the two surfaces AC-EXT-06 grades together
+    // cannot state different thresholds.
+    final minOrder = offerMinOrderLine(offer);
+    if (minOrder != null) lines.add(minOrder);
     return lines;
   }
 

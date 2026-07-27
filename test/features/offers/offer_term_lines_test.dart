@@ -93,6 +93,54 @@ void main() {
     expect(ar[0].literal, 'الباقة الذهبية');
   });
 
+  group('offerMinOrderLine — BR-OFR-10 / AC-EXT-06 on the CARD', () {
+    test('a promo offer carrying a minimum order states the threshold', () {
+      // AC-EXT-06: "an offer carrying a minimum order value is shown, with the
+      // threshold stated on the card and in the detail view."
+      final line = offerMinOrderLine(_offer(
+        'PROMO_CODE',
+        const OfferTermsModel(promoCode: 'SAVE', discountType: 'PERCENTAGE', configuredValue: 20, minOrderMinor: 10000),
+      ));
+      expect(line, isNotNull);
+      expect(line!.localeKey, LocaleKeys.offers_min_order);
+      expect(line.args, ['100.00']);
+    });
+
+    test('an unrestricted promo offer states nothing', () {
+      expect(
+        offerMinOrderLine(_offer(
+          'PROMO_CODE',
+          const OfferTermsModel(promoCode: 'SAVE', discountType: 'PERCENTAGE', configuredValue: 20),
+        )),
+        isNull,
+      );
+    });
+
+    test('a PACKAGE offer never carries a minimum order', () {
+      // The package half of OfferTerms leaves minOrderMinor at 0, but a future
+      // wire change must not start rendering a min-order chip on a package card.
+      expect(
+        offerMinOrderLine(_offer(
+          'PACKAGE',
+          const OfferTermsModel(packageId: 'pkg', packageNameEn: 'Gold', minOrderMinor: 10000),
+        )),
+        isNull,
+      );
+    });
+
+    test('the card line and the detail line state the SAME threshold', () {
+      final offer = _offer(
+        'PROMO_CODE',
+        const OfferTermsModel(promoCode: 'SAVE', discountType: 'FIXED_AMOUNT', configuredValue: 1500, minOrderMinor: 7550),
+      );
+      final card = offerMinOrderLine(offer)!;
+      final detail = offerTermLines(offer, isAr: false)
+          .firstWhere((l) => l.localeKey == LocaleKeys.offers_min_order);
+      expect(card.args, detail.args);
+      expect(card.args, ['75.50']);
+    });
+  });
+
   test('an all-zero terms object yields no lines at all', () {
     expect(offerTermLines(_offer('PACKAGE', const OfferTermsModel()), isAr: true), isEmpty);
     expect(offerTermLines(_offer('PROMO_CODE', const OfferTermsModel()), isAr: true), isEmpty);
