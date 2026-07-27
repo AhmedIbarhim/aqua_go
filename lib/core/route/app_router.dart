@@ -94,17 +94,13 @@ abstract class AppRouter {
         return MaterialPageRoute(builder: (_) => MainLayout(args: args));
 
       case Routes.offers:
-        // Arguments are OPTIONAL and may be null: the home rail's "View more"
-        // pushes bare and the screen loads its own UCC23 feed.
-        final args = settings.arguments as OffersArgs?;
+        // No arguments: the screen always loads its own UCC23 feed, because
+        // eligibility is evaluated at request time and never cached
+        // (BR-OFR-11). The home rail's "View more" pushes bare.
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
-            create: (_) {
-              final cubit = locator<OffersCubit>();
-              if (args == null) cubit.getOffers();
-              return cubit;
-            },
-            child: OffersView(offers: args?.offers),
+            create: (_) => locator<OffersCubit>()..getOffers(),
+            child: const OffersView(),
           ),
         );
 

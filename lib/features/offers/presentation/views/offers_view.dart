@@ -3,9 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/components/generic_app_bar.dart';
+import '../../../../core/config/session/session_state.dart';
 import '../../../../core/extentions/context_extentions.dart';
+import '../../../../core/helpers/fetch_user_data_helper.dart';
 import '../../../../core/helpers/shimmer_helper.dart';
+import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_text_styles.dart';
+import '../../../../features/auth/data/models/user_model.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../../data/models/customer_offer_model.dart';
 import '../../domain/offer_visibility.dart';
@@ -14,21 +18,17 @@ import '../widgets/offer_card.dart';
 import '../widgets/offer_motion.dart';
 import 'offer_detail_view.dart';
 
-/// Optional route arguments for [Routes.offers]. A caller that ALREADY holds
-/// the eligible feed can pass it to skip a second round-trip; the home rail's
-/// "View more" pushes bare and the screen self-fetches instead.
-class OffersArgs {
-  final List<CustomerOfferModel> offers;
-  OffersArgs({required this.offers});
-}
-
+/// The UCC23 offers screen. It ALWAYS renders from the [OffersCubit] above it.
+///
+/// It used to accept a pre-fetched feed as a route argument, to save a caller
+/// a second round-trip. Nothing ever passed one, and the option was actively
+/// wrong: a seeded list ignores the cubit, so the A2 promise to return the
+/// customer "to a refreshed list" after an offer dies would have re-fetched
+/// into a screen that never redrew. Eligibility is evaluated at request time
+/// and never cached (BR-OFR-11) — this screen is one of the two places that
+/// rule is kept, so it fetches for itself.
 class OffersView extends StatelessWidget {
-  const OffersView({super.key, this.offers});
-
-  /// Non-null -> render this list verbatim. Null -> render whatever the
-  /// [OffersCubit] provided above this widget emits (the router kicks off
-  /// `getOffers()` in that case).
-  final List<CustomerOfferModel>? offers;
+  const OffersView({super.key});
 
   /// Card height the skeleton stands in for, as a fraction of the screen. Kept
   /// close to the real card so the handoff doesn't shift the page.
@@ -36,11 +36,15 @@ class OffersView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final seeded = offers;
     return Scaffold(
       backgroundColor: context.colors.background,
       appBar: GenericAppBar(title: LocaleKeys.offers_title.tr(context: context)),
-      body: seeded != null ? _list(context, seeded) : _fromCubit(context),
+      body: Column(
+        children: [
+          const _SignInPrompt(),
+          Expanded(child: _fromCubit(context)),
+        ],
+      ),
     );
   }
 
@@ -58,11 +62,16 @@ class OffersView extends StatelessWidget {
                 key: const ValueKey('offers-loaded'),
                 child: _list(context, loaded),
               ),
+            // UCC23 A6 — an outage gets a RETRY state, never an empty list, so
+            // "the promotions service is down" cannot be read as "there are no
+            // offers". Pull-to-refresh stays as the second affordance, but it
+            // is not discoverable on its own, so the button is the primary one.
             OffersError() => _Refreshable(
                 key: const ValueKey('offers-error'),
-                // Pull-to-retry is the only recovery path this screen offers,
-                // so the error state has to stay scrollable.
-                child: _fill(LocaleKeys.offers_error.tr(context: context)),
+                child: _fill(
+                  LocaleKeys.offers_error.tr(context: context),
+                  onRetry: () => context.read<OffersCubit>().getOffers(),
+                ),
               ),
             OffersInitial() || OffersLoading() => _skeleton(context),
           },
@@ -102,7 +111,7 @@ class OffersView extends StatelessWidget {
       separatorBuilder: (context, index) => const SizedBox(height: 16),
       itemBuilder: (context, index) {
         final card = GestureDetector(
-          onTap: () => _openDetail(context, sorted[index]),
+          onTap: () => openOfferDetail(context, sorted[index]),
           child: OfferCard(offer: sorted[index], atHome: false),
         );
         // Only the opening screenful is staggered; items further down are built
@@ -115,26 +124,39 @@ class OffersView extends StatelessWidget {
 
   /// A single centred message that still fills — and scrolls — the whole body,
   /// so it sits at the optical centre on every screen size and pull-to-refresh
-  /// keeps working.
-  Widget _fill(String text) {
+  /// keeps working. [onRetry] non-null adds the A6 retry button beneath it.
+  Widget _fill(String text, {VoidCallback? onRetry}) {
     return LayoutBuilder(
       builder: (context, constraints) => ListView(
         physics: const AlwaysScrollableScrollPhysics(),
         children: [
           ConstrainedBox(
             constraints: BoxConstraints(minHeight: constraints.maxHeight),
-            child: _Message(text: text),
+            child: _Message(text: text, onRetry: onRetry),
           ),
         ],
       ),
     );
   }
+}
 
-  void _openDetail(BuildContext context, CustomerOfferModel offer) {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => OfferDetailView(offer: offer)),
-    );
-  }
+/// Opens the detail screen for [offer], carrying the caller's [OffersCubit]
+/// down with it.
+///
+/// The cubit has to travel: UCC23 A2 re-validates on the primary action and,
+/// when the offer has gone, "returns the customer to a refreshed list". The
+/// list to refresh is the one they came FROM — the offers screen or the home
+/// rail — and a pushed route is a sibling of the route that provides the cubit,
+/// not a descendant, so without this the detail screen could not reach it.
+Future<void> openOfferDetail(BuildContext context, CustomerOfferModel offer) {
+  return Navigator.of(context).push(
+    MaterialPageRoute(
+      builder: (_) => BlocProvider<OffersCubit>.value(
+        value: context.read<OffersCubit>(),
+        child: OfferDetailView(offer: offer),
+      ),
+    ),
+  );
 }
 
 class _Refreshable extends StatelessWidget {
@@ -151,22 +173,114 @@ class _Refreshable extends StatelessWidget {
   }
 }
 
-class _Message extends StatelessWidget {
-  const _Message({required this.text});
-
-  final String text;
+/// UCC23 A4 — "a sign-in prompt states that more offers may be available once
+/// signed in".
+///
+/// A guest is served the anonymous subset: the server can evaluate BR-OFR-01,
+/// -02 and -03 for them and nothing else, so every offer gated on usage history,
+/// registration date, first booking, saved-address zone or subscription count is
+/// simply missing from their feed. Without this line an empty or short list
+/// reads as "Aqua Go has no offers", which is the same misreading A6 exists to
+/// prevent for outages.
+///
+/// It renders for a guest on EVERY state of the screen, the empty one most of
+/// all. It never says which offers are missing — UCC23 forbids revealing why an
+/// offer was withheld, and "you are not signed in" is a fact about the viewer,
+/// not about any particular campaign.
+class _SignInPrompt extends StatelessWidget {
+  const _SignInPrompt();
 
   @override
   Widget build(BuildContext context) {
+    return ValueListenableBuilder<UserModel?>(
+      valueListenable: currentUser,
+      builder: (context, user, child) {
+        if (!FetchUserData.isGuest()) return const SizedBox.shrink();
+        return Container(
+          key: const ValueKey('offers-sign-in-prompt'),
+          margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: context.colors.cardBackGround,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: context.colors.borderSecondary, width: 1),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  LocaleKeys.offers_sign_in_prompt.tr(context: context),
+                  style: AppTextStyles.regular12.copyWith(
+                    color: context.colors.textSecondary,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              TextButton(
+                key: const ValueKey('offers-sign-in-action'),
+                onPressed: () => context.pushNamedAndRemoveUntil(Routes.login),
+                style: TextButton.styleFrom(
+                  foregroundColor: context.colors.primary,
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                child: Text(
+                  LocaleKeys.auth_login.tr(context: context),
+                  style: AppTextStyles.medium14,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _Message extends StatelessWidget {
+  const _Message({required this.text, this.onRetry});
+
+  final String text;
+
+  /// Non-null renders the UCC23 A6 retry affordance under the message.
+  final VoidCallback? onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final retry = onRetry;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
-        child: Text(
-          text,
-          textAlign: TextAlign.center,
-          style: AppTextStyles.regular14.copyWith(
-            color: context.colors.textSecondary,
-          ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              text,
+              textAlign: TextAlign.center,
+              style: AppTextStyles.regular14.copyWith(
+                color: context.colors.textSecondary,
+              ),
+            ),
+            if (retry != null) ...[
+              const SizedBox(height: 16),
+              OutlinedButton(
+                key: const ValueKey('offers-retry'),
+                onPressed: retry,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: context.colors.primary,
+                  side: BorderSide(color: context.colors.primary),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                child: Text(
+                  LocaleKeys.retry.tr(context: context),
+                  style: AppTextStyles.semiBold16,
+                ),
+              ),
+            ],
+          ],
         ),
       ),
     );

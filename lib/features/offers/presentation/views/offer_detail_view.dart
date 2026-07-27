@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/components/generic_app_bar.dart';
 import '../../../../core/extentions/context_extentions.dart';
@@ -7,10 +8,13 @@ import '../../../../core/route/app_router.dart';
 import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../generated/locale_keys.g.dart';
+import '../../../layout/presentation/views/main_layout.dart';
 import '../../data/models/customer_offer_model.dart';
 import '../../domain/offer_countdown.dart';
+import '../../domain/offer_revalidation.dart';
 import '../../domain/offer_term_lines.dart';
 import '../../domain/pending_promo_code.dart';
+import '../controllers/offers_controller/offers_cubit.dart';
 import '../widgets/offer_card.dart';
 import '../widgets/offer_motion.dart';
 
@@ -23,7 +27,13 @@ class OfferDetailView extends StatelessWidget {
   Widget build(BuildContext context) {
     final isAr = context.isAr;
     final banner = offer.banner(isAr: isAr);
-    final lines = offerTermLines(offer, isAr: isAr);
+    // UCC23 step 6 — "terms (minimum order value, applicable services,
+    // applicable zones, expiry)". The first three come off the linked promo
+    // code or package; the expiry is the offer's own and closes the block.
+    final lines = [
+      ...offerTermLines(offer, isAr: isAr),
+      offerExpiryLine(offer, isAr: isAr),
+    ];
 
     return Scaffold(
       backgroundColor: context.colors.background,
@@ -35,7 +45,7 @@ class OfferDetailView extends StatelessWidget {
           // is deliberately left out of the staggered entrance below.
           if (banner != null && banner.isNotEmpty) _Banner(offer: offer, url: banner),
           OfferEntrance(index: 0, child: _Summary(offer: offer)),
-          if (lines.isNotEmpty) OfferEntrance(index: 1, child: _Terms(lines: lines)),
+          OfferEntrance(index: 1, child: _Terms(lines: lines)),
           OfferEntrance(index: 2, child: _PrimaryAction(offer: offer)),
         ],
       ),
@@ -84,8 +94,6 @@ class _Summary extends StatelessWidget {
   Widget build(BuildContext context) {
     final isAr = context.isAr;
     final endsIn = offerEndsInDays(offer.endsAt, DateTime.now());
-    final endsAtLabel =
-        DateFormat.yMMMd(isAr ? 'ar' : 'en').format(offer.endsAt.toLocal());
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,15 +110,12 @@ class _Summary extends StatelessWidget {
             color: context.colors.textSecondary,
           ),
         ),
-        const SizedBox(height: 16),
-        Text(
-          LocaleKeys.offers_valid_until.tr(context: context, args: [endsAtLabel]),
-          style: AppTextStyles.regular12.copyWith(
-            color: context.colors.textTertiary,
-          ),
-        ),
+        // The end DATE now lives in the terms block below, where UCC23 step 6
+        // enumerates it ("terms … and expiry"). What stays here is the urgency
+        // chip, which is a UI/UX note rather than a term — so the date is
+        // stated once, in the place the requirement puts it.
         if (endsIn != null) ...[
-          const SizedBox(height: 4),
+          const SizedBox(height: 12),
           OfferPopIn(
             child: Text(
               endsIn == 1
@@ -162,10 +167,21 @@ class _Terms extends StatelessWidget {
   }
 }
 
-class _PrimaryAction extends StatelessWidget {
+/// UCC23 step 7 — the single primary action, chosen by offer type, and
+/// re-validated before it fires (A2).
+class _PrimaryAction extends StatefulWidget {
   const _PrimaryAction({required this.offer});
 
   final CustomerOfferModel offer;
+
+  @override
+  State<_PrimaryAction> createState() => _PrimaryActionState();
+}
+
+class _PrimaryActionState extends State<_PrimaryAction> {
+  /// Guards a second tap while the re-validation round-trip is open — two taps
+  /// would fire two navigations off one offer.
+  bool _checking = false;
 
   @override
   Widget build(BuildContext context) {
@@ -174,7 +190,8 @@ class _PrimaryAction extends StatelessWidget {
       child: SizedBox(
         height: 52,
         child: ElevatedButton(
-          onPressed: () => _onPressed(context),
+          key: const ValueKey('offer-primary-action'),
+          onPressed: _checking ? null : _onPressed,
           style: ElevatedButton.styleFrom(
             backgroundColor: context.colors.primary,
             foregroundColor: context.colors.themeColor,
@@ -183,7 +200,7 @@ class _PrimaryAction extends StatelessWidget {
             ),
           ),
           child: Text(
-            offer.isPromoCode
+            widget.offer.isPromoCode
                 ? LocaleKeys.offers_use_code.tr(context: context)
                 : LocaleKeys.offers_view_package.tr(context: context),
             style: AppTextStyles.semiBold16,
@@ -193,21 +210,66 @@ class _PrimaryAction extends StatelessWidget {
     );
   }
 
-  void _onPressed(BuildContext context) {
+  Future<void> _onPressed() async {
+    setState(() => _checking = true);
+    // A2 — eligibility is evaluated at request time and never cached
+    // (BR-OFR-11), so the copy this screen was handed is only as fresh as the
+    // moment the list was fetched, which may be several minutes of reading ago.
+    // Re-check it now, as the customer commits, not when they were browsing.
+    final verdict =
+        await context.read<OffersCubit>().revalidateOffer(widget.offer.id);
+    if (!mounted) return;
+    setState(() => _checking = false);
+
+    switch (verdict) {
+      // The cubit has already refreshed the list, so popping lands the customer
+      // on a corrected one instead of on a list still showing what they lost.
+      case OfferGone():
+        context.showWarningSnackBar(
+          LocaleKeys.offers_expired.tr(context: context),
+        );
+        Navigator.of(context).pop();
+      // A fresh copy supersedes the one the list drew.
+      case OfferStillLive(offer: final fresh):
+        _act(fresh);
+      // An unreachable server leaves the held copy in play: BR-OFR-11 puts the
+      // real gate at apply time, and a flaky connection must not read to the
+      // customer as an expiry.
+      case OfferUncheckable():
+        _act(widget.offer);
+    }
+  }
+
+  void _act(CustomerOfferModel offer) {
     if (offer.isPromoCode) {
       final code = offer.terms.promoCode;
       if (code == null || code.isEmpty) return;
-      // Stash the code for the next quote, then drop the customer back at the
-      // app root (home / service picker) so they can start the booking flow.
-      // booking_summary_view consumes the stash in initState.
-      PendingPromoCode.instance.set(code);
+      // UCC23 step 7 — the code is "pre-applied to the customer's next quote at
+      // the booking review step (UCC16)". The OFFER id travels with it, not
+      // just the code: the server binds the quote to the offer and writes it
+      // onto the redemption row, which is the only way a sale can be attributed
+      // back to the offer that produced it, since two live offers may carry the
+      // same code (UCA22 A6).
+      PendingPromoCode.instance.hold(offerId: offer.id, promoCode: code);
       context.showSuccessSnackBar(
         LocaleKeys.offers_code_saved.tr(context: context, args: [code]),
       );
-      Navigator.of(context).popUntil((route) => route.isFirst);
+      // "…the customer is taken into the booking flow." That flow opens at
+      // Routes.bookingLocation and needs BOTH a service and an address, neither
+      // of which an offer carries, so the landing point is service selection —
+      // the home tab, which hosts the service picker that starts the flow —
+      // with the offer held. Popping to whatever happened to be underneath is
+      // not "taken into the booking flow": from the home rail that is the home
+      // screen, but from a deeper entry it is an unrelated screen.
+      context.pushNamedAndRemoveUntil(
+        Routes.layout,
+        arguments: MainLayoutArgs(initialIndex: 0),
+      );
       return;
     }
 
+    // UCC23 step 7, package half — "the customer is taken to the linked package
+    // in the subscription catalogue (UC-C13)".
     final packageId = offer.terms.packageId;
     if (packageId == null || packageId.isEmpty) return;
     context.pushNamed(
