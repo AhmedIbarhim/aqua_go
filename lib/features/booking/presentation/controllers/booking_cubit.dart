@@ -606,11 +606,61 @@ class BookingCubit extends Cubit<BookingState> {
   /// Re-prices without any promo and clears the applied code.
   Future<QuoteModel?> removePromoCode() => fetchQuote();
 
+  /// Re-prices the current selection with NO promo and NO offer on the wire,
+  /// leaving the applied code ON the state. Display-only.
+  ///
+  /// This is the booking-details screen's re-quote. Per the owner's ruling
+  /// (plan §6.93) the discount does not appear before the payment page: details
+  /// always prices the bare selection, and the summary — which re-quotes WITH
+  /// the applied code on entry and breaks the figure down original → discount →
+  /// total — is where the discount first shows and is explained.
+  ///
+  /// [BookingState.appliedPromoCode] and [BookingState.appliedOfferId] survive
+  /// this call untouched, which is the entire reason it is not [removePromoCode]
+  /// and does not go through [_emitQuote]. Clearing them here would throw away
+  /// the offer the customer took on the offers surface, so the summary would
+  /// have nothing left to apply and they would be charged full price for it.
+  /// [_emitQuote] takes the applied code FROM the quote, and this quote is bare
+  /// by construction, so routing through it would do exactly that.
+  ///
+  /// A dead code cannot be detected here, because none is sent. The summary
+  /// owns that: it re-quotes with the code on entry and states the server's
+  /// rejection through its own drop-reason path.
+  Future<QuoteModel?> repriceForDisplayWithoutPromo() async {
+    if (state.selectedService == null || state.selectedAddress == null) {
+      return null;
+    }
+
+    emit(state.copyWith(status: BookingStatus.loading));
+    final result = await _requestQuote();
+
+    return result.fold(
+      (failure) {
+        emit(
+          state.copyWith(
+            status: BookingStatus.failure,
+            errorMessage: failure.message,
+          ),
+        );
+        return null;
+      },
+      (quote) {
+        emit(state.copyWith(status: BookingStatus.initial, quote: quote));
+        return quote;
+      },
+    );
+  }
+
   /// Re-prices the current selection PRESERVING whatever promo is applied —
-  /// used by every re-quote the customer did not explicitly ask for (the
-  /// details screen's add-on toggles, the summary's price-lock refresh once
-  /// the quote's TTL lapses). Re-quoting bare would silently throw the
-  /// customer's discount away.
+  /// used by every re-quote the SUMMARY makes on the customer's behalf rather
+  /// than at their explicit request (arriving back on the screen with a code
+  /// already applied, the price-lock refresh once the quote's TTL lapses).
+  /// Re-quoting bare there would silently throw the customer's discount away on
+  /// the one screen that is meant to show it.
+  ///
+  /// The booking-details screen deliberately does NOT come here — it prices the
+  /// bare selection through [repriceForDisplayWithoutPromo], because no discount
+  /// shows before the payment page (plan §6.93).
   ///
   /// When the applied code no longer validates — its cap was consumed, the
   /// campaign ended, or the order no longer clears its minimum — retrying with

@@ -60,7 +60,7 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
       if (!mounted) return;
       if (flowConfig.requiresQuote && !_initialQuoteRequested) {
         _initialQuoteRequested = true;
-        _reprice();
+        _repriceForDisplay();
       }
     });
   }
@@ -77,30 +77,33 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
   void _scheduleQuoteRefresh(BookingState state) {
     if (!state.flowConfig.requiresQuote) return;
     _quoteDebounce?.cancel();
-    _quoteDebounce = Timer(const Duration(milliseconds: 350), _reprice);
+    _quoteDebounce = Timer(
+      const Duration(milliseconds: 350),
+      _repriceForDisplay,
+    );
   }
 
-  /// Re-prices the current selection KEEPING whatever promo code is applied.
+  /// Re-prices the current selection WITHOUT any promo or offer — the price
+  /// this screen shows is always the undiscounted one.
   ///
-  /// The customer can reach this screen with a code already applied — they
-  /// applied it on the summary, then came back to change an add-on. Quoting
-  /// bare here would drop their discount without a word, and the applied chip
-  /// waiting for them on the summary would then be describing a quote that no
-  /// longer carries the code.
+  /// The customer can reach this screen with a code already applied: they took
+  /// an offer, or typed a code on the summary, then came back to change an
+  /// add-on. This screen has no promo affordance of any kind, so pricing with
+  /// the code would show a total that nothing on screen explains. The owner's
+  /// ruling (plan §6.93) is that the discount appears only from the payment
+  /// page onward, where the summary's original → discount → total breakdown
+  /// says where it came from.
   ///
-  /// Changing the basket can also legitimately invalidate the code — removing
-  /// an add-on can drop the order under the code's minimum. The cubit then
-  /// re-prices without it and hands back the server's reason, which is what the
-  /// customer is owed rather than a total that silently went up.
-  void _reprice() async {
+  /// Bare is a DISPLAY choice, not a removal: the applied code and offer id stay
+  /// on the cubit state, and the summary re-quotes with them on entry. Dropping
+  /// them here would silently un-take the offer the customer chose.
+  ///
+  /// A code that has gone dead therefore cannot be detected here — nothing is
+  /// sent to reject. That rejection surfaces on the summary, which is where the
+  /// code is actually applied and which already states the server's reason.
+  void _repriceForDisplay() async {
     if (!mounted) return;
-    final refresh = await context.read<BookingCubit>().reprice();
-    if (!mounted) return;
-    final reason = refresh.droppedPromoReason;
-    if (reason == null) return;
-    context.showErrorSnackBar(
-      '$reason\n${LocaleKeys.bookings_promo_code_removed.tr(context: context)}',
-    );
+    await context.read<BookingCubit>().repriceForDisplayWithoutPromo();
   }
 
   /// Returns true if any currently-selected addon in a package flow requires

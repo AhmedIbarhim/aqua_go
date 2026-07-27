@@ -123,7 +123,8 @@ void main() {
   );
 
   testWidgets(
-    'an applied code survives an add-on change made back on the details screen',
+    'an applied code survives an add-on change made back on the details '
+    'screen, WITHOUT that screen quoting the discount',
     (tester) async {
       final repo = RecordingBookingRepo();
       final cubit = buildCubit(repo, withService: serviceWithAddOn);
@@ -134,9 +135,10 @@ void main() {
       expect(cubit.state.appliedPromoCode, promoCode);
 
       // Back to the details screen, where the customer adds an add-on. That
-      // re-prices the order — WITH the code they already applied, or the
-      // discount vanishes without a word and the applied chip on the summary
-      // starts describing a quote that no longer carries it.
+      // re-prices the order — BARE, per the owner's ruling (plan §6.93): no
+      // discount shows before the payment page, and this screen has no promo
+      // affordance that could explain one. The code itself is untouched, so the
+      // summary re-applies it the moment the customer moves forward.
       await pumpDetails(tester, cubit);
       await tester.tap(find.text('تلميع الإطارات'));
       await tester.pump(const Duration(milliseconds: 400));
@@ -144,11 +146,15 @@ void main() {
 
       expect(
         repo.quoteCalls.last,
-        promoCode,
-        reason: 'the add-on re-quote must carry the applied promo code',
+        isNull,
+        reason: 'the add-on re-quote on details must carry no promo code',
       );
-      expect(cubit.state.appliedPromoCode, promoCode);
-      expect(cubit.state.quote!.breakdown!.grossMinor, grossWithPromoMinor);
+      expect(
+        cubit.state.appliedPromoCode,
+        promoCode,
+        reason: 'the code is out of the quote, not out of the order',
+      );
+      expect(cubit.state.quote!.breakdown!.grossMinor, grossWithoutPromoMinor);
     },
   );
 

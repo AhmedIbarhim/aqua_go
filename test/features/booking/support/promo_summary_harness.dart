@@ -124,7 +124,14 @@ Future<void> pumpDetails(WidgetTester tester, BookingCubit cubit) async {
   locator.registerFactory<MyCarsCubit>(
     () => MyCarsCubit(carsRepository: _NoCarsRepository()),
   );
-  addTearDown(() => locator.unregister<MyCarsCubit>());
+  // Guarded, because a test that walks details → summary → details calls this
+  // twice and so queues two teardowns; the second would unregister a type the
+  // first already took out.
+  addTearDown(() async {
+    if (locator.isRegistered<MyCarsCubit>()) {
+      await locator.unregister<MyCarsCubit>();
+    }
+  });
 
   // Blank frame first, so a summary already on screen is torn down exactly as
   // popping its route does rather than being swapped underneath its overlay.
