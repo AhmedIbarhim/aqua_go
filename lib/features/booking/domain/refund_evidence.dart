@@ -21,9 +21,15 @@ import '../../../core/config/networking/exceptions/failure.dart';
 /// the customer as a refund. A transport failure never reached an answer at all
 /// and the booking may in fact have been created; a 5xx rolled the transaction
 /// back but ran no compensation; and several 4xx rejections on the create path
-/// (zone mismatch, saved address gone, schedule window) throw AFTER the charge
-/// was verified without refunding — the reconciliation sweeper is the net for
-/// those, not this screen.
+/// (zone mismatch, saved address gone, schedule window, duplicate booking) throw
+/// AFTER the charge was verified without refunding at all.
+///
+/// **There is no sweeper behind those.** An earlier version of this doc said the
+/// reconciliation job was the net for them. It is not: `MoyasarReconciliationJob`
+/// sweeps `PENDING_PAYMENT` intents, and its orphan-refund arm ships disabled
+/// and — even enabled — only logs; it never calls `paymentsGateway.refund`. So
+/// the copy on this branch must not imply a refund is coming, and closing the
+/// backend gap is a real fix, not a comment change.
 const Set<String> refundEvidenceSlugs = {
   'slot-no-longer-available',
   'payment-verification-failed',

@@ -194,6 +194,7 @@ abstract class  LocaleKeys {
   static const bookings_promo_code_removed = 'bookings.promo_code_removed';
   static const bookings_original_total = 'bookings.original_total';
   static const bookings_promo_discount = 'bookings.promo_discount';
+  static const bookings_promo_discount_before_vat = 'bookings.promo_discount_before_vat';
   static const bookings_promo_released = 'bookings.promo_released';
   static const bookings_payment_refunded_title = 'bookings.payment_refunded_title';
   static const bookings_payment_refunded_notice = 'bookings.payment_refunded_notice';

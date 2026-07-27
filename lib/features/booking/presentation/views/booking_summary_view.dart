@@ -126,10 +126,14 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
               );
             // The card was charged and the create did NOT come back with an
             // answer this client can read as a refund — a dropped connection, a
-            // timeout, a 5xx. The booking may exist; the charge may still be
-            // sitting there awaiting the reconciliation sweeper. So nothing is
-            // asserted about either: the customer is told not to pay again and
-            // to check My Bookings, which is the one action that resolves it.
+            // timeout, a 5xx, or one of the create-path rejections that throws
+            // after the verify without compensating. The booking may exist; the
+            // charge may still be sitting there, and NO job reclaims it (see
+            // `refund_evidence.dart`). So nothing is asserted about either: the
+            // customer is told not to pay again, to check My Bookings, and to
+            // reach support if money left with no booking behind it. The copy
+            // used to promise the amount came back automatically, which on this
+            // branch was not true.
             case PaymentPhase.createUnconfirmed:
               context.showWarningAlert(
                 title: LocaleKeys.bookings_payment_unconfirmed_title.tr(
