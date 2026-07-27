@@ -104,7 +104,12 @@
     "discount_amount": "{} SAR off",
     "package_washes": "{} washes",
     "package_validity": "Valid for {} days",
-    "package_price": "{} SAR"
+    "package_price": "{} SAR",
+    "sign_in_prompt": "Sign in to see the offers available to you — there may be more",
+    "expired": "This offer is no longer available",
+    "expires_on": "Offer ends on {}",
+    "applicable_services": "Valid on {}",
+    "applicable_zones": "Valid in {}"
   },
   "my_cars": {
     "empty_state": "No cars added yet",
@@ -189,6 +194,14 @@
     "promo_code_title": "Promo Code",
     "apply_promo_code": "Apply Promo Code",
     "promo_code_applied": "Promo code applied successfully",
+    "promo_saved": "You saved {} SAR",
+    "promo_code_malformed": "Enter 4 to 20 letters or numbers",
+    "promo_recent_codes": "Recently used",
+    "promo_code_removed": "The promo code was removed. Please review the updated total.",
+    "original_total": "Original Total",
+    "promo_discount": "Promo Discount",
+    "payment_refunded_title": "Booking not completed",
+    "payment_refunded_notice": "Your card was charged and the full amount has been refunded. It can take up to 7 days to appear on your statement, depending on your bank.",
     "delete_promo_code": "Delete Code",
     "apply_code_hint": "Enter promo code",
     "cancel": "Cancel",

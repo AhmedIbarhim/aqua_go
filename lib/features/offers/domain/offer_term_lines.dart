@@ -1,3 +1,7 @@
+// DateFormat, via easy_localization's re-export — `intl` is a transitive
+// dependency and importing it directly is not declared in pubspec.
+import 'package:easy_localization/easy_localization.dart';
+
 import '../../../generated/locale_keys.g.dart';
 import '../data/models/customer_offer_model.dart';
 
@@ -41,6 +45,23 @@ OfferTermLine? offerMinOrderLine(CustomerOfferModel offer) {
   );
 }
 
+/// UCC23 step 6 lists "expiry" among the terms, so the offer's end date is a
+/// term row like any other rather than a footnote on the summary.
+///
+/// Always present: every offer has an end date, and the far-future
+/// [CustomerOfferModel.endsAtFallback] only stands in for an unparseable one,
+/// which the server never sends.
+OfferTermLine offerExpiryLine(CustomerOfferModel offer, {required bool isAr}) {
+  final formatted =
+      DateFormat.yMMMd(isAr ? 'ar' : 'en').format(offer.endsAt.toLocal());
+  return OfferTermLine.key(LocaleKeys.offers_expires_on, [formatted]);
+}
+
+/// Joins restriction names with the separator the reader's script uses — the
+/// Arabic comma U+060C, not the Latin one, which reads as a typo in Arabic.
+String _joinNames(List<String> names, {required bool isAr}) =>
+    names.join(isAr ? '، ' : ', ');
+
 /// The term rows for [offer].
 ///
 /// The discount-type literals MUST stay byte-identical to the backend's
@@ -69,6 +90,28 @@ List<OfferTermLine> offerTermLines(CustomerOfferModel offer, {required bool isAr
     // cannot state different thresholds.
     final minOrder = offerMinOrderLine(offer);
     if (minOrder != null) lines.add(minOrder);
+
+    // UCC23 step 6 — "applicable services, applicable zones". An EMPTY list is
+    // UNRESTRICTED, so it produces no row: printing "Valid on nothing" would
+    // invert the meaning, and printing an empty row would look like a bug.
+    final services = terms.applicableServices(isAr: isAr);
+    if (services.isNotEmpty) {
+      lines.add(OfferTermLine.key(
+        LocaleKeys.offers_applicable_services,
+        [_joinNames(services, isAr: isAr)],
+      ));
+    }
+    // A5 — stated whether or not the customer has a saved address. The zone
+    // rule is SKIPPED for an address-less customer rather than failed, so the
+    // offer reaches them, and the restriction they will meet at apply time has
+    // to be on the card that got them there.
+    final zones = terms.applicableZones(isAr: isAr);
+    if (zones.isNotEmpty) {
+      lines.add(OfferTermLine.key(
+        LocaleKeys.offers_applicable_zones,
+        [_joinNames(zones, isAr: isAr)],
+      ));
+    }
     return lines;
   }
 

@@ -103,6 +103,11 @@ abstract class  LocaleKeys {
   static const offers_package_washes = 'offers.package_washes';
   static const offers_package_validity = 'offers.package_validity';
   static const offers_package_price = 'offers.package_price';
+  static const offers_sign_in_prompt = 'offers.sign_in_prompt';
+  static const offers_expired = 'offers.expired';
+  static const offers_expires_on = 'offers.expires_on';
+  static const offers_applicable_services = 'offers.applicable_services';
+  static const offers_applicable_zones = 'offers.applicable_zones';
   static const offers = 'offers';
   static const my_cars_empty_state = 'my_cars.empty_state';
   static const my_cars_empty_desc = 'my_cars.empty_desc';
@@ -183,6 +188,14 @@ abstract class  LocaleKeys {
   static const bookings_promo_code_title = 'bookings.promo_code_title';
   static const bookings_apply_promo_code = 'bookings.apply_promo_code';
   static const bookings_promo_code_applied = 'bookings.promo_code_applied';
+  static const bookings_promo_saved = 'bookings.promo_saved';
+  static const bookings_promo_code_malformed = 'bookings.promo_code_malformed';
+  static const bookings_promo_recent_codes = 'bookings.promo_recent_codes';
+  static const bookings_promo_code_removed = 'bookings.promo_code_removed';
+  static const bookings_original_total = 'bookings.original_total';
+  static const bookings_promo_discount = 'bookings.promo_discount';
+  static const bookings_payment_refunded_title = 'bookings.payment_refunded_title';
+  static const bookings_payment_refunded_notice = 'bookings.payment_refunded_notice';
   static const bookings_delete_promo_code = 'bookings.delete_promo_code';
   static const bookings_apply_code_hint = 'bookings.apply_code_hint';
   static const bookings_cancel = 'bookings.cancel';

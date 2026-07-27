@@ -20,6 +20,20 @@ class OfferTermsModel {
   final int packageNumWashes;
   final int packageValidityDays;
 
+  /// UCC23 step 6 — the services the linked promo code is restricted to, as
+  /// bilingual NAMES rather than ids, index-aligned across the two languages.
+  /// EMPTY means UNRESTRICTED, never "applies to nothing": a caller renders
+  /// nothing at all for an empty list, not an empty section.
+  final List<String> applicableServiceNamesAr;
+  final List<String> applicableServiceNamesEn;
+
+  /// UCC23 step 6 / A5 — the zones the linked promo code is restricted to.
+  /// Stated whether or not the customer has a saved address: A5 SKIPS the zone
+  /// rule for an address-less customer rather than failing it, and the offer is
+  /// then shown "with its zone terms stated", enforced at apply time.
+  final List<String> applicableZoneNamesAr;
+  final List<String> applicableZoneNamesEn;
+
   const OfferTermsModel({
     this.promoCode,
     this.discountType,
@@ -31,7 +45,18 @@ class OfferTermsModel {
     this.packagePriceMinor = 0,
     this.packageNumWashes = 0,
     this.packageValidityDays = 0,
+    this.applicableServiceNamesAr = const [],
+    this.applicableServiceNamesEn = const [],
+    this.applicableZoneNamesAr = const [],
+    this.applicableZoneNamesEn = const [],
   });
+
+  /// A JSON array of strings, or an empty list for anything else — a missing,
+  /// null or malformed payload reads as "unrestricted" rather than throwing.
+  /// This is a read-reconstruction path: it must never tighten into a failure.
+  static List<String> _names(dynamic raw) => raw is List
+      ? raw.whereType<String>().where((name) => name.isNotEmpty).toList()
+      : const <String>[];
 
   factory OfferTermsModel.fromJson(Map<String, dynamic> json) {
     return OfferTermsModel(
@@ -45,11 +70,21 @@ class OfferTermsModel {
       packagePriceMinor: (json['packagePriceMinor'] as num?)?.toInt() ?? 0,
       packageNumWashes: (json['packageNumWashes'] as num?)?.toInt() ?? 0,
       packageValidityDays: (json['packageValidityDays'] as num?)?.toInt() ?? 0,
+      applicableServiceNamesAr: _names(json['applicableServiceNamesAr']),
+      applicableServiceNamesEn: _names(json['applicableServiceNamesEn']),
+      applicableZoneNamesAr: _names(json['applicableZoneNamesAr']),
+      applicableZoneNamesEn: _names(json['applicableZoneNamesEn']),
     );
   }
 
   String? packageName({required bool isAr}) =>
       isAr ? packageNameAr : packageNameEn;
+
+  List<String> applicableServices({required bool isAr}) =>
+      isAr ? applicableServiceNamesAr : applicableServiceNamesEn;
+
+  List<String> applicableZones({required bool isAr}) =>
+      isAr ? applicableZoneNamesAr : applicableZoneNamesEn;
 }
 
 /// A customer-visible offer served by GET /api/public/offers. Mirrors the

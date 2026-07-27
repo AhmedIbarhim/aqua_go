@@ -104,7 +104,12 @@
     "discount_amount": "خصم {} ريال",
     "package_washes": "{} غسلات",
     "package_validity": "صالحة لمدة {} يوم",
-    "package_price": "{} ريال"
+    "package_price": "{} ريال",
+    "sign_in_prompt": "سجل الدخول لعرض العروض المتاحة لك، فقد يكون هناك المزيد",
+    "expired": "هذا العرض لم يعد متاحا",
+    "expires_on": "ينتهي العرض في {}",
+    "applicable_services": "ساري على {}",
+    "applicable_zones": "ساري في {}"
   },
   "my_cars": {
     "empty_state": "لا توجد سيارات مسجلة",
@@ -189,6 +194,14 @@
     "promo_code_title": "كود الخصم",
     "apply_promo_code": "تطبيق كود خصم",
     "promo_code_applied": "تم تطبيق الكود بنجاح",
+    "promo_saved": "وفرت {} ريال",
+    "promo_code_malformed": "أدخل من 4 إلى 20 حرفا أو رقما",
+    "promo_recent_codes": "المستخدمة مؤخرا",
+    "promo_code_removed": "تمت إزالة كود الخصم. يرجى مراجعة الإجمالي المحدث.",
+    "original_total": "الإجمالي قبل الخصم",
+    "promo_discount": "خصم الكود",
+    "payment_refunded_title": "لم يكتمل الحجز",
+    "payment_refunded_notice": "تم خصم المبلغ من بطاقتك وتمت إعادته بالكامل. قد يستغرق ظهوره في كشف حسابك حتى 7 أيام حسب البنك.",
     "delete_promo_code": "حذف الكود",
     "apply_code_hint": "أدخل كود الخصم",
     "cancel": "إلغاء",

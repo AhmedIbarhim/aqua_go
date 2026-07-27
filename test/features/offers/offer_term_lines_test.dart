@@ -14,6 +14,10 @@ CustomerOfferModel _offer(String type, OfferTermsModel terms) => CustomerOfferMo
       terms: terms,
     );
 
+// `offerExpiryLine` formats a date per locale, which needs the `intl` symbol
+// data that GlobalMaterialLocalizations loads for the app — unavailable to a
+// bare unit test. It is covered in offers_surface_test.dart instead, where the
+// localisation delegates are real.
 void main() {
   test('sarFromMinor renders two decimals', () {
     expect(sarFromMinor(24900), '249.00');
@@ -138,6 +142,81 @@ void main() {
           .firstWhere((l) => l.localeKey == LocaleKeys.offers_min_order);
       expect(card.args, detail.args);
       expect(card.args, ['75.50']);
+    });
+  });
+
+  group('UCC23 step 6 / A5 — applicable services and zones', () {
+    const restricted = OfferTermsModel(
+      promoCode: 'CENTRAL',
+      discountType: 'PERCENTAGE',
+      configuredValue: 10,
+      applicableServiceNamesAr: ['غسيل ممتاز', 'غسيل داخلي'],
+      applicableServiceNamesEn: ['Premium Wash', 'Interior Wash'],
+      applicableZoneNamesAr: ['وسط جدة'],
+      applicableZoneNamesEn: ['Central Jeddah'],
+    );
+
+    test('a restricted code states both, after the discount and threshold', () {
+      final lines = offerTermLines(_offer('PROMO_CODE', restricted), isAr: false);
+      expect(lines, hasLength(3));
+      expect(lines[0].localeKey, LocaleKeys.offers_discount_percent);
+      expect(lines[1].localeKey, LocaleKeys.offers_applicable_services);
+      expect(lines[1].args, ['Premium Wash, Interior Wash']);
+      expect(lines[2].localeKey, LocaleKeys.offers_applicable_zones);
+      expect(lines[2].args, ['Central Jeddah']);
+    });
+
+    test('Arabic reads the Arabic names', () {
+      final lines = offerTermLines(_offer('PROMO_CODE', restricted), isAr: true);
+      expect(lines[1].args, ['غسيل ممتاز، غسيل داخلي'],
+          reason: 'the list separator is the Arabic comma, not the Latin one');
+      expect(lines[2].args, ['وسط جدة']);
+    });
+
+    test('an EMPTY list is UNRESTRICTED — no line at all, not an empty one', () {
+      final lines = offerTermLines(
+        _offer(
+          'PROMO_CODE',
+          const OfferTermsModel(
+            promoCode: 'ANY',
+            discountType: 'PERCENTAGE',
+            configuredValue: 10,
+          ),
+        ),
+        isAr: false,
+      );
+      expect(lines.map((l) => l.localeKey),
+          isNot(contains(LocaleKeys.offers_applicable_services)));
+      expect(lines.map((l) => l.localeKey),
+          isNot(contains(LocaleKeys.offers_applicable_zones)));
+    });
+
+    test('the zone line is stated regardless of any saved address', () {
+      // A5 — "zone-dependent rules are skipped rather than failed; the offer is
+      // shown with its zone terms stated". These lines are pure display data
+      // computed from the offer alone, so no address state can suppress them.
+      final lines = offerTermLines(_offer('PROMO_CODE', restricted), isAr: false);
+      expect(lines.map((l) => l.localeKey),
+          contains(LocaleKeys.offers_applicable_zones));
+    });
+
+    test('a PACKAGE offer states neither — its terms carry no scoping', () {
+      final lines = offerTermLines(
+        _offer(
+          'PACKAGE',
+          const OfferTermsModel(
+            packageId: 'pkg',
+            packageNameEn: 'Gold',
+            applicableServiceNamesEn: ['Premium Wash'],
+            applicableZoneNamesEn: ['Central Jeddah'],
+          ),
+        ),
+        isAr: false,
+      );
+      expect(lines.map((l) => l.localeKey),
+          isNot(contains(LocaleKeys.offers_applicable_services)));
+      expect(lines.map((l) => l.localeKey),
+          isNot(contains(LocaleKeys.offers_applicable_zones)));
     });
   });
 

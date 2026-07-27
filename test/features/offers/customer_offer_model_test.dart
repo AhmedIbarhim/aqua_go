@@ -36,6 +36,72 @@ void main() {
       expect(offer.terms.packageNumWashes, 0);
     });
 
+    test('parses the applicable service and zone names, per language', () {
+      // UCC23 step 6 — "terms (… applicable services, applicable zones …)".
+      // OfferTerms publishes them as bilingual NAMES, index-aligned and equal
+      // in length, so a client picks its locale's list positionally.
+      final offer = CustomerOfferModel.fromJson({
+        'id': '018f-cccc',
+        'offerType': 'PROMO_CODE',
+        'titleAr': 'ع',
+        'titleEn': 'T',
+        'descriptionAr': 'و',
+        'descriptionEn': 'D',
+        'endsAt': '2026-12-31T20:59:59Z',
+        'terms': {
+          'promoCode': 'CENTRAL',
+          'discountType': 'PERCENTAGE',
+          'configuredValue': 10,
+          'applicableServiceNamesAr': ['غسيل ممتاز', 'غسيل داخلي'],
+          'applicableServiceNamesEn': ['Premium Wash', 'Interior Wash'],
+          'applicableZoneNamesAr': ['وسط جدة'],
+          'applicableZoneNamesEn': ['Central Jeddah'],
+        },
+      });
+      expect(offer.terms.applicableServices(isAr: false),
+          ['Premium Wash', 'Interior Wash']);
+      expect(offer.terms.applicableServices(isAr: true),
+          ['غسيل ممتاز', 'غسيل داخلي']);
+      expect(offer.terms.applicableZones(isAr: false), ['Central Jeddah']);
+      expect(offer.terms.applicableZones(isAr: true), ['وسط جدة']);
+    });
+
+    test('absent restriction lists read as UNRESTRICTED, not as null', () {
+      // An empty list means the code is valid everywhere — never "applies to
+      // nothing" — so the read path must not make callers null-check it.
+      final offer = CustomerOfferModel.fromJson({
+        'id': '018f-dddd',
+        'offerType': 'PROMO_CODE',
+        'titleAr': 'ع',
+        'titleEn': 'T',
+        'descriptionAr': 'و',
+        'descriptionEn': 'D',
+        'endsAt': '2026-12-31T20:59:59Z',
+        'terms': {'promoCode': 'ANY', 'discountType': 'PERCENTAGE'},
+      });
+      expect(offer.terms.applicableServices(isAr: false), isEmpty);
+      expect(offer.terms.applicableZones(isAr: true), isEmpty);
+    });
+
+    test('a non-list restriction payload degrades to empty, never throws', () {
+      final offer = CustomerOfferModel.fromJson({
+        'id': '018f-eeee',
+        'offerType': 'PROMO_CODE',
+        'titleAr': 'ع',
+        'titleEn': 'T',
+        'descriptionAr': 'و',
+        'descriptionEn': 'D',
+        'endsAt': '2026-12-31T20:59:59Z',
+        'terms': {
+          'promoCode': 'ANY',
+          'applicableServiceNamesEn': 'Premium Wash',
+          'applicableZoneNamesEn': 42,
+        },
+      });
+      expect(offer.terms.applicableServices(isAr: false), isEmpty);
+      expect(offer.terms.applicableZones(isAr: false), isEmpty);
+    });
+
     test('parses a PACKAGE offer with package terms', () {
       final offer = CustomerOfferModel.fromJson({
         'id': '018f-bbbb',
