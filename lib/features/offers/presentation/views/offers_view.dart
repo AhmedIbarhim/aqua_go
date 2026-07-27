@@ -33,10 +33,6 @@ import 'offer_detail_view.dart';
 class OffersView extends StatelessWidget {
   const OffersView({super.key});
 
-  /// Card height the skeleton stands in for, as a fraction of the screen. Kept
-  /// close to the real card so the handoff doesn't shift the page.
-  static const double _cardHeightFactor = 0.3;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -91,7 +87,9 @@ class OffersView extends StatelessWidget {
   }
 
   Widget _skeleton(BuildContext context) {
-    final cardHeight = MediaQuery.sizeOf(context).height * _cardHeightFactor;
+    // The skeleton stands at the real card's height so the handoff doesn't
+    // shift the page under the reader.
+    final cardHeight = OfferCard.heightFor(context);
     return ListView.separated(
       key: const ValueKey('offers-loading'),
       padding: const EdgeInsets.all(16),
@@ -127,8 +125,9 @@ class OffersView extends StatelessWidget {
       // staggers its items, and this one is not the place to invent a second
       // motion language.
       itemBuilder: (context, index) => GestureDetector(
+        key: ValueKey('offer-card-${sorted[index].id}'),
         onTap: () => openOfferDetail(context, sorted[index]),
-        child: OfferCard(offer: sorted[index], atHome: false),
+        child: OfferCard(offer: sorted[index]),
       ),
     );
   }

@@ -85,7 +85,7 @@ void main() {
 
       expect(repo.listCalls, 2, reason: 'retry must hit the network again');
       expect(find.byKey(const ValueKey('offers-retry')), findsNothing);
-      expect(find.text('Welcome offer'), findsOneWidget);
+      expect(find.byType(OfferCard), findsOneWidget);
     });
 
     testWidgets('a genuinely empty feed says so and offers NO retry', (tester) async {
@@ -178,10 +178,9 @@ void main() {
 
   group('UCC23 step 6 — the home rail opens the offer that was tapped', () {
     testWidgets('a promo card opens ITS detail, not the unfiltered list', (tester) async {
-      // The rail renders soonest-closing first, so the offer the repository
-      // returns SECOND is the one drawn first. Tapping the leading card must
-      // therefore open 'wanted' — which also proves the tap follows what the
-      // customer sees rather than the order the feed arrived in.
+      // Two live offers on the rail: tapping one must open THAT one, not the
+      // offers list and not its neighbour. The card carries no text of its own
+      // any more, so the tap lands on the card itself.
       final tapped = promoOffer(
         id: 'wanted',
         code: 'WANTED10',
@@ -206,7 +205,7 @@ void main() {
       await cubit.getOffers();
       await tester.pump();
 
-      await tester.tap(find.text('Welcome offer').first);
+      await tester.tap(find.byKey(const ValueKey('offer-card-wanted')));
       await settleOffers(tester);
 
       final detail = tester.widget<OfferDetailView>(find.byType(OfferDetailView));
@@ -228,7 +227,7 @@ void main() {
       await cubit.getOffers();
       await tester.pump();
 
-      await tester.tap(find.text('Gold package').first);
+      await tester.tap(find.byKey(const ValueKey('offer-card-offer-pkg')));
       await settleOffers(tester);
 
       expect(find.byType(OfferDetailView), findsOneWidget);
@@ -276,7 +275,7 @@ void main() {
       );
       await cubit.getOffers();
       await tester.pump();
-      await tester.tap(find.text(offer.title(isAr: false)));
+      await tester.tap(find.byKey(ValueKey('offer-card-${offer.id}')));
       await settleOffers(tester);
       expect(find.byType(OfferDetailView), findsOneWidget);
 
@@ -367,7 +366,7 @@ void main() {
       await pumpOffersSurface(tester, child: const OffersView(), cubit: cubit);
       await cubit.getOffers();
       await tester.pump();
-      await tester.tap(find.text('Welcome offer'));
+      await tester.tap(find.byKey(const ValueKey('offer-card-offer-1')));
       await settleOffers(tester);
       expect(find.byType(OfferDetailView), findsOneWidget);
 
@@ -560,8 +559,9 @@ void main() {
       await cubit.getOffers();
       await tester.pump();
 
-      expect(find.text('عرض الترحيب'), findsOneWidget);
-      expect(find.text('Welcome offer'), findsNothing);
+      // The card is the artwork and nothing else, so the language shows in
+      // WHICH artwork it drew — an offer ships a banner per language and the
+      // wrong one is the wrong words.
       expect(
         Directionality.of(tester.element(find.byType(OfferCard))),
         TextDirection.rtl,
@@ -569,6 +569,10 @@ void main() {
       expect(
         bannerUrls(tester),
         contains('https://cdn.example/offer-1-ar.png'),
+      );
+      expect(
+        bannerUrls(tester),
+        isNot(contains('https://cdn.example/offer-1-en.png')),
       );
     });
 
@@ -584,8 +588,6 @@ void main() {
       await cubit.getOffers();
       await tester.pump();
 
-      expect(find.text('Welcome offer'), findsOneWidget);
-      expect(find.text('عرض الترحيب'), findsNothing);
       expect(
         Directionality.of(tester.element(find.byType(OfferCard))),
         TextDirection.ltr,
@@ -594,11 +596,21 @@ void main() {
         bannerUrls(tester),
         contains('https://cdn.example/offer-1-en.png'),
       );
+      expect(
+        bannerUrls(tester),
+        isNot(contains('https://cdn.example/offer-1-ar.png')),
+      );
     });
   });
 
-  group('BR-OFR-10 / AC-EXT-06 — the threshold reaches the card', () {
-    testWidgets('a minimum order is stated on the list card', (tester) async {
+  group('the card is IMAGE ONLY — the terms belong to the detail view', () {
+    /// Anything drawn inside the card that is not the banner.
+    Finder textInCard() => find.descendant(
+          of: find.byType(OfferCard),
+          matching: find.byType(Text),
+        );
+
+    testWidgets('a list card is its banner and nothing else', (tester) async {
       repo = ScriptedOffersRepository(
         listResult: Right([promoOffer(minOrderMinor: 10000)]),
       );
@@ -607,12 +619,18 @@ void main() {
       await cubit.getOffers();
       await tester.pump();
 
-      expect(find.text(LocaleKeys.offers_min_order.tr(args: ['100.00'])), findsOneWidget);
+      expect(bannerUrls(tester), contains('https://cdn.example/offer-1-en.png'));
+      expect(textInCard(), findsNothing);
+      // The title, the description and the BR-OFR-10 threshold all came off the
+      // card; the detail view every card opens is where they are stated now.
+      expect(find.text('Welcome offer'), findsNothing);
+      expect(
+        find.text(LocaleKeys.offers_min_order.tr(args: ['100.00'])),
+        findsNothing,
+      );
     });
 
-    testWidgets('a minimum order is stated on the HOME RAIL card too', (tester) async {
-      // The rail is a real route into the booking flow, so a customer can reach
-      // the refusal from here without ever opening the offers screen.
+    testWidgets('a home rail card is its banner and nothing else', (tester) async {
       repo = ScriptedOffersRepository(
         listResult: Right([promoOffer(minOrderMinor: 7550)]),
       );
@@ -625,15 +643,41 @@ void main() {
       await cubit.getOffers();
       await tester.pump();
 
-      expect(find.text(LocaleKeys.offers_min_order.tr(args: ['75.50'])), findsOneWidget);
+      expect(bannerUrls(tester), contains('https://cdn.example/offer-1-en.png'));
+      expect(textInCard(), findsNothing);
+      expect(
+        find.text(LocaleKeys.offers_min_order.tr(args: ['75.50'])),
+        findsNothing,
+      );
     });
 
-    testWidgets('an unrestricted offer states no threshold', (tester) async {
-      repo = ScriptedOffersRepository(listResult: Right([promoOffer()]));
-      final cubit = cubitFor(repo);
-      await pumpOffersSurface(tester, child: const OffersView(), cubit: cubit);
-      await cubit.getOffers();
-      await tester.pump();
+    testWidgets('BR-OFR-10 — the minimum order is stated in the detail view',
+        (tester) async {
+      // The threshold used to ride on the card as well. With the card down to
+      // its artwork the detail view is the ONLY customer surface stating it,
+      // which is why the terms block must keep carrying it.
+      final offer = promoOffer(minOrderMinor: 7550);
+      repo = ScriptedOffersRepository(listResult: Right([offer]));
+      await pumpOffersSurface(
+        tester,
+        child: OfferDetailView(offer: offer),
+        cubit: cubitFor(repo),
+      );
+
+      expect(
+        find.text(LocaleKeys.offers_min_order.tr(args: ['75.50'])),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('an unrestricted offer states no threshold anywhere', (tester) async {
+      final offer = promoOffer();
+      repo = ScriptedOffersRepository(listResult: Right([offer]));
+      await pumpOffersSurface(
+        tester,
+        child: OfferDetailView(offer: offer),
+        cubit: cubitFor(repo),
+      );
 
       expect(find.textContaining('Minimum order'), findsNothing);
     });

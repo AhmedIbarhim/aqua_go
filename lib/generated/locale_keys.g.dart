@@ -90,7 +90,6 @@ abstract class  LocaleKeys {
   static const offers_title = 'offers.title';
   static const offers_empty = 'offers.empty';
   static const offers_error = 'offers.error';
-  static const offers_valid_until = 'offers.valid_until';
   static const offers_ends_in_days = 'offers.ends_in_days';
   static const offers_ends_in_one_day = 'offers.ends_in_one_day';
   static const offers_terms_title = 'offers.terms_title';

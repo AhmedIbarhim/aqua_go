@@ -92,7 +92,6 @@
     "title": "Offers",
     "empty": "No offers available right now — check back soon.",
     "error": "Could not load offers",
-    "valid_until": "Valid until {}",
     "ends_in_days": "Ends in {} days",
     "ends_in_one_day": "Ends in 1 day",
     "terms_title": "Offer details",

@@ -1,3 +1,4 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -40,7 +41,9 @@ class OffersListView extends StatelessWidget {
             children: [
               const _Header(showViewMore: false),
               SizedBox(height: height * 0.012),
-              ShimmerHelper.offers(height: height * 0.21),
+              // The skeleton stands at the card's own height, so the handoff
+              // from loading to loaded does not jump the page.
+              ShimmerHelper.offers(height: OfferCard.heightFor(context)),
             ],
           );
         }
@@ -91,23 +94,17 @@ class OffersListView extends StatelessWidget {
 
 /// The horizontal strip of offer cards.
 ///
-/// Its height is `max(the Figma fraction, what the cards actually need)`. It
-/// used to be the fraction alone, on a `SizedBox` wrapping a horizontal
-/// `ListView` — which a horizontal list requires, because its cross axis has
-/// to be bounded. That worked only because the compact card happened to fit:
-/// the banner scales with the screen but the text under it does not, so the
-/// slack the fraction leaves shrinks on shorter phones and vanishes entirely
-/// once the card gains a line. Adding the BR-OFR-10 threshold line is exactly
-/// that, and it overflowed and clipped the validity row on a 667pt phone.
+/// Now that a card is its banner and nothing else, the rail is the banner
+/// carousel: the same `CarouselSlider` geometry `HomeBannersCarosal` uses —
+/// its height fractions, its viewport fraction, its centre-page enlargement —
+/// so an offer sits at the same scale, in the same rhythm, as the banner strip
+/// higher up the same screen. It used to be a `SingleChildScrollView` of
+/// 0.72-width cards sized by their text, which no longer has anything to
+/// measure.
 ///
-/// A minimum rather than a replacement: where the fraction is already big
-/// enough — every screen the design was drawn against — the rail keeps the
-/// height it has today, and the cards only push it taller when they would
-/// otherwise be cut off. The same floor keeps the loading skeleton the same
-/// height, so the handoff does not jump.
-///
-/// The list is eagerly built rather than lazy: a rail holds one customer's
-/// eligible offers, and intrinsic sizing needs to measure them all anyway.
+/// Two deliberate departures from the banner strip: no autoplay and no dots.
+/// Offers are a browse list with a "view more" beside them, and a card that
+/// rotates out from under a reader's thumb takes the tap with it.
 class _Rail extends StatelessWidget {
   const _Rail({required this.offers, required this.onTap});
 
@@ -116,32 +113,27 @@ class _Rail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cards = <Widget>[];
-    for (var index = 0; index < offers.length; index++) {
-      if (index > 0) cards.add(const SizedBox(width: 16));
-      cards.add(
-        GestureDetector(
-          onTap: () => onTap(context, offers[index]),
-          child: OfferCard(offer: offers[index]),
-        ),
-      );
-    }
-
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          minHeight: MediaQuery.sizeOf(context).height * 0.21,
-        ),
-        // Every card takes the height of the tallest, so one offer carrying a
-        // threshold line does not leave the rest of the row short.
-        child: IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: cards,
-          ),
-        ),
+    return CarouselSlider.builder(
+      itemCount: offers.length,
+      itemBuilder: (context, index, realIndex) => GestureDetector(
+        // Keyed by the offer, not the slot: an infinite carousel builds the
+        // same offer on either side of the one in the middle, so a positional
+        // handle picks whichever copy the viewport happened to lay out first.
+        key: ValueKey('offer-card-${offers[index].id}'),
+        onTap: () => onTap(context, offers[index]),
+        child: OfferCard(offer: offers[index]),
+      ),
+      options: CarouselOptions(
+        height: OfferCard.heightFor(context),
+        viewportFraction: context.isTablet ? 0.6 : 0.75,
+        initialPage: 0,
+        // A single eligible offer has nothing to wrap around to, and looping it
+        // against itself only offers the customer a scroll that goes nowhere.
+        enableInfiniteScroll: offers.length > 1,
+        enlargeCenterPage: true,
+        enlargeFactor: 0.2,
+        scrollDirection: Axis.horizontal,
+        enlargeStrategy: CenterPageEnlargeStrategy.scale,
       ),
     );
   }
