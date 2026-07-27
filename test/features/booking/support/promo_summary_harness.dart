@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:aqua_go/core/config/networking/api_client.dart';
 import 'package:aqua_go/core/config/networking/exceptions/failure.dart';
+import 'package:aqua_go/core/utils/saudi_wire_format.dart';
 import 'package:aqua_go/core/enums/payment_method_enum.dart';
 import 'package:aqua_go/core/themes/app_colors.dart';
 import 'package:aqua_go/features/address/data/models/address_model.dart';
@@ -301,15 +302,17 @@ QuoteModel quotePayload({
       ? grossWithoutPromoMinor
       : grossWithPromoMinor;
   final vatMinor = (grossMinor * 15 / 115).round();
+  // Riyadh frame, serialised BARE — the only shape the backend emits. A `Z`
+  // here would hide the device-local parse the model is guarded against.
   final expiresAt = expired
-      ? DateTime.now().toUtc().subtract(const Duration(minutes: 1))
-      : DateTime.now().toUtc().add(const Duration(minutes: 15));
+      ? saudiNow().subtract(const Duration(minutes: 1))
+      : saudiNow().add(const Duration(minutes: 15));
   return QuoteModel.fromJson({
     'quoteId': quoteId,
     'totalMinor': grossMinor,
     'vatMinor': vatMinor,
     'currency': 'SAR',
-    'expiresAt': expiresAt.toIso8601String(),
+    'expiresAt': toWireDateTime(expiresAt),
     'promoCode': ?promoCode,
     'promoDiscountMinor': promoCode == null ? 0 : promoDiscountMinor,
     'breakdown': {

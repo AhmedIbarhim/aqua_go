@@ -26,7 +26,7 @@ Map<String, dynamic> offerJson(String id) => {
       'titleEn': 'Title',
       'descriptionAr': 'وصف',
       'descriptionEn': 'Desc',
-      'endsAt': '2026-09-01T00:00:00Z',
+      'endsAt': '2026-09-01T00:00:00',
       'terms': {
         'promoCode': 'X',
         'discountType': 'PERCENTAGE',

@@ -5,6 +5,7 @@ import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../../core/utils/date_time_formatter.dart';
+import '../../../../core/utils/saudi_wire_format.dart';
 import '../../../../core/components/custom_button.dart';
 import '../../../../core/components/generic_app_bar.dart';
 import '../../../../core/components/bottom_action_sheet_container.dart';
@@ -452,7 +453,7 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
             // gross comparison below, making the booking uncompletable.
             final existing = cubit.state.quote;
             if (existing != null &&
-                DateTime.now().isAfter(existing.expiresAt)) {
+                saudiNow().isAfter(existing.expiresAt)) {
               final previousGross = existing.breakdown?.gross;
               final refresh = await cubit.reprice();
               if (!context.mounted) return;

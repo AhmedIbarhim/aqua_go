@@ -5,6 +5,7 @@ import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/helpers/shimmer_helper.dart';
 import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_text_styles.dart';
+import '../../../../core/utils/saudi_wire_format.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../../../offers/data/models/customer_offer_model.dart';
 import '../../../offers/domain/offer_visibility.dart';
@@ -58,7 +59,7 @@ class OffersListView extends StatelessWidget {
         // customer keeps the app open, so an offer that closed since the fetch
         // has to drop out rather than linger at the end of the row.
         final List<CustomerOfferModel> offers = state is OffersLoaded
-            ? visibleOffers(state.offers, DateTime.now())
+            ? visibleOffers(state.offers, saudiNow())
             : const <CustomerOfferModel>[];
 
         if (offers.isEmpty) return const SizedBox.shrink();

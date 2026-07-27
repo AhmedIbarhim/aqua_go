@@ -1,6 +1,15 @@
 import 'package:aqua_go/features/offers/data/models/customer_offer_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+/// Every `endsAt` fixture here is a BARE Asia/Riyadh wall clock — no offset, no
+/// trailing `Z`. That is the only shape the backend emits
+/// (`SaudiTimeSerializers`), and encoding anything else here is what let the
+/// device-local parse bug survive: under a `Z`-suffixed fixture `DateTime.parse`
+/// happens to return a genuine UTC instant and the defect is invisible.
+///
+/// The parsed value lands in the Riyadh frame — UTC-flagged, carrying the
+/// wall-clock fields verbatim — so `DateTime.utc(...)` is the correct
+/// expectation, and `DateTime` equality checks both the instant AND the flag.
 void main() {
   group('CustomerOfferModel.fromJson', () {
     test('parses a PROMO_CODE offer with promo terms', () {
@@ -13,7 +22,7 @@ void main() {
         'descriptionEn': 'English description',
         'bannerArUrl': 'https://cdn/ar.jpg',
         'bannerEnUrl': 'https://cdn/en.jpg',
-        'endsAt': '2026-12-31T20:59:59Z',
+        'endsAt': '2026-12-31T23:59:59',
         'terms': {
           'promoCode': 'WELCOME15',
           'discountType': 'PERCENTAGE',
@@ -27,7 +36,7 @@ void main() {
       expect(offer.isPromoCode, isTrue);
       expect(offer.titleAr, 'خصم الترحيب');
       expect(offer.bannerEnUrl, 'https://cdn/en.jpg');
-      expect(offer.endsAt, DateTime.utc(2026, 12, 31, 20, 59, 59));
+      expect(offer.endsAt, DateTime.utc(2026, 12, 31, 23, 59, 59));
       expect(offer.terms.promoCode, 'WELCOME15');
       expect(offer.terms.discountType, 'PERCENTAGE');
       expect(offer.terms.minOrderMinor, 5000);
@@ -47,7 +56,7 @@ void main() {
         'titleEn': 'T',
         'descriptionAr': 'و',
         'descriptionEn': 'D',
-        'endsAt': '2026-12-31T20:59:59Z',
+        'endsAt': '2026-12-31T23:59:59',
         'terms': {
           'promoCode': 'CENTRAL',
           'discountType': 'PERCENTAGE',
@@ -76,7 +85,7 @@ void main() {
         'titleEn': 'T',
         'descriptionAr': 'و',
         'descriptionEn': 'D',
-        'endsAt': '2026-12-31T20:59:59Z',
+        'endsAt': '2026-12-31T23:59:59',
         'terms': {'promoCode': 'ANY', 'discountType': 'PERCENTAGE'},
       });
       expect(offer.terms.applicableServices(isAr: false), isEmpty);
@@ -91,7 +100,7 @@ void main() {
         'titleEn': 'T',
         'descriptionAr': 'و',
         'descriptionEn': 'D',
-        'endsAt': '2026-12-31T20:59:59Z',
+        'endsAt': '2026-12-31T23:59:59',
         'terms': {
           'promoCode': 'ANY',
           'applicableServiceNamesEn': 'Premium Wash',
@@ -110,7 +119,7 @@ void main() {
         'titleEn': 'Package',
         'descriptionAr': 'وصف',
         'descriptionEn': 'Desc',
-        'endsAt': '2026-08-01T00:00:00Z',
+        'endsAt': '2026-08-01T00:00:00',
         'terms': {
           'packageId': '018f-pkg',
           'packageNameAr': 'الباقة الذهبية',

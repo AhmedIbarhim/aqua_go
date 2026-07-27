@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/themes/app_text_styles.dart';
+import '../../../../core/utils/saudi_wire_format.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../../data/models/customer_offer_model.dart';
 import '../../domain/offer_countdown.dart';
@@ -27,9 +28,11 @@ class OfferCard extends StatelessWidget {
     final isAr = context.isAr;
     final size = MediaQuery.sizeOf(context);
     final banner = offer.banner(isAr: isAr);
-    final endsIn = offerEndsInDays(offer.endsAt, DateTime.now());
+    final endsIn = offerEndsInDays(offer.endsAt, saudiNow());
+    // No `.toLocal()`: `endsAt` is in the Riyadh frame, so its fields already
+    // are the date to print. Same rule as `offerExpiryLine`.
     final endsAtLabel =
-        DateFormat.yMMMd(isAr ? 'ar' : 'en').format(offer.endsAt.toLocal());
+        DateFormat.yMMMd(isAr ? 'ar' : 'en').format(offer.endsAt);
     final minOrder = offerMinOrderLine(offer);
 
     final card = Container(

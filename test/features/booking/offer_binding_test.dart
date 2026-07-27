@@ -5,6 +5,7 @@ import 'package:aqua_go/core/config/networking/exceptions/failure.dart';
 import 'package:aqua_go/features/address/data/models/address_model.dart';
 import 'package:aqua_go/features/booking/data/data_sources/bookings_remote_data_source.dart';
 import 'package:aqua_go/features/booking/data/models/quote_model.dart';
+import 'package:aqua_go/core/utils/saudi_wire_format.dart';
 import 'package:aqua_go/features/booking/data/models/service_booking_request_model.dart';
 import 'package:aqua_go/features/booking/data/repos/booking_repository.dart';
 import 'package:aqua_go/features/booking/domain/strategies/service_booking_submit.dart';
@@ -150,7 +151,7 @@ final _quote = QuoteModel(
   totalMinor: 9500,
   vatMinor: 1239,
   currency: 'SAR',
-  expiresAt: DateTime.now().add(const Duration(minutes: 15)),
+  expiresAt: saudiNow().add(const Duration(minutes: 15)),
   promoCode: 'WELCOME20',
   promoDiscountMinor: 2000,
 );

@@ -14,19 +14,19 @@ import '../data/models/customer_offer_model.dart';
 /// "when the offer stops being shown" — so an offer whose `endsAt` equals [now]
 /// is already over.
 ///
-/// Both instants are normalised to UTC before comparing: `endsAt` arrives UTC
-/// from the API while [now] is typically a local `DateTime.now()`, and comparing
-/// them as-is would drift by the Asia/Riyadh +03:00 offset.
+/// [now] MUST be in the Riyadh frame — `saudiNow()`, never `DateTime.now()`.
+/// `endsAt` arrives as a bare Riyadh wall clock and is parsed into that frame by
+/// [tryParseWireDateTime]; `isAfter` and `compareTo` compare epoch microseconds,
+/// so a `now` from a different frame drifts by the device's own offset. A
+/// `.toUtc()` on either side does NOT rescue that — on an offset-less value it
+/// is a no-op, which is precisely why the drift went unnoticed.
 ///
 /// Returns a NEW list; the caller's feed is never reordered in place.
 List<CustomerOfferModel> visibleOffers(
   List<CustomerOfferModel> offers,
   DateTime now,
 ) {
-  final nowUtc = now.toUtc();
-  final live = offers
-      .where((offer) => offer.endsAt.toUtc().isAfter(nowUtc))
-      .toList();
-  live.sort((a, b) => a.endsAt.toUtc().compareTo(b.endsAt.toUtc()));
+  final live = offers.where((offer) => offer.endsAt.isAfter(now)).toList();
+  live.sort((a, b) => a.endsAt.compareTo(b.endsAt));
   return live;
 }

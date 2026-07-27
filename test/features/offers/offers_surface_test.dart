@@ -5,6 +5,7 @@ import 'package:aqua_go/core/route/app_router.dart';
 import 'package:aqua_go/core/route/routes.dart';
 import 'package:aqua_go/features/home/presentation/widgets/offers_list_view.dart';
 import 'package:aqua_go/features/offers/data/models/customer_offer_model.dart';
+import 'package:aqua_go/core/utils/saudi_wire_format.dart';
 import 'package:aqua_go/features/offers/domain/pending_promo_code.dart';
 import 'package:aqua_go/features/offers/presentation/controllers/offers_controller/offers_cubit.dart';
 import 'package:aqua_go/features/offers/presentation/views/offer_detail_view.dart';
@@ -164,14 +165,14 @@ void main() {
       final tapped = promoOffer(
         id: 'wanted',
         code: 'WANTED10',
-        endsAt: DateTime.now().toUtc().add(const Duration(days: 3)),
+        endsAt: saudiNow().add(const Duration(days: 3)),
       );
       repo = ScriptedOffersRepository(
         listResult: Right([
           promoOffer(
             id: 'other',
             code: 'OTHER',
-            endsAt: DateTime.now().toUtc().add(const Duration(days: 20)),
+            endsAt: saudiNow().add(const Duration(days: 20)),
           ),
           tapped,
         ]),

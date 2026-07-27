@@ -1,3 +1,5 @@
+import '../../../../core/utils/saudi_wire_format.dart';
+
 /// Terms attached to a customer-visible offer. Exactly one half is populated:
 /// the promo half (promoCode / discountType / configuredValue / minOrderMinor)
 /// for a PROMO_CODE offer, the package half for a PACKAGE offer. Mirrors the
@@ -103,6 +105,10 @@ class CustomerOfferModel {
   final String descriptionEn;
   final String? bannerArUrl;
   final String? bannerEnUrl;
+  /// When the offer stops being shown, in the Riyadh frame: UTC-flagged,
+  /// carrying Asia/Riyadh wall-clock fields, exactly like [saudiNow]. Compare it
+  /// only against another value in that frame, and format it WITHOUT `.toLocal()`
+  /// — its fields are already the ones the customer should read.
   final DateTime endsAt;
   final OfferTermsModel terms;
 
@@ -123,6 +129,9 @@ class CustomerOfferModel {
   /// sorts LAST and renders no "Ends in N days" chip, rather than jumping to the
   /// top of the list as an epoch date would. The server always sends `endsAt`;
   /// this exists only so the read path can never throw.
+  ///
+  /// UTC-flagged, like every value in the Riyadh frame — see
+  /// [tryParseWireDateTime].
   static final DateTime endsAtFallback = DateTime.utc(9999, 12, 31);
 
   bool get isPromoCode => offerType == 'PROMO_CODE';
@@ -143,8 +152,7 @@ class CustomerOfferModel {
       descriptionEn: json['descriptionEn'] as String? ?? '',
       bannerArUrl: json['bannerArUrl'] as String?,
       bannerEnUrl: json['bannerEnUrl'] as String?,
-      endsAt: (rawEndsAt == null ? null : DateTime.tryParse(rawEndsAt)) ??
-          endsAtFallback,
+      endsAt: tryParseWireDateTime(rawEndsAt) ?? endsAtFallback,
       terms: rawTerms is Map<String, dynamic>
           ? OfferTermsModel.fromJson(rawTerms)
           : const OfferTermsModel(),

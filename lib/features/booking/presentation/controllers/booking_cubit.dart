@@ -1006,7 +1006,9 @@ class BookingCubit extends Cubit<BookingState> {
       totalMinor: breakdown?.grossMinor ?? chargeTotalMinor,
       vatMinor: breakdown?.vatMinor ?? 0,
       currency: breakdown?.currency ?? 'SAR',
-      expiresAt: DateTime.now().toUtc(),
+      // Riyadh frame, like every parsed `expiresAt` — the summary screen's
+      // price-lock check compares it against `saudiNow()`.
+      expiresAt: saudiNow(),
       promoDiscountMinor: 0,
       breakdown: breakdown,
       lines: lines,

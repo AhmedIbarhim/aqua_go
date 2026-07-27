@@ -51,9 +51,13 @@ OfferTermLine? offerMinOrderLine(CustomerOfferModel offer) {
 /// Always present: every offer has an end date, and the far-future
 /// [CustomerOfferModel.endsAtFallback] only stands in for an unparseable one,
 /// which the server never sends.
+/// Formatted from `endsAt`'s own fields, with NO `.toLocal()`: the value is in
+/// the Riyadh frame, so its fields already ARE the date the customer should
+/// read. Converting would re-interpret them through the device's offset and
+/// print the wrong day either side of midnight.
 OfferTermLine offerExpiryLine(CustomerOfferModel offer, {required bool isAr}) {
   final formatted =
-      DateFormat.yMMMd(isAr ? 'ar' : 'en').format(offer.endsAt.toLocal());
+      DateFormat.yMMMd(isAr ? 'ar' : 'en').format(offer.endsAt);
   return OfferTermLine.key(LocaleKeys.offers_expires_on, [formatted]);
 }
 

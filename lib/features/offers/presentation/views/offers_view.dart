@@ -9,6 +9,7 @@ import '../../../../core/helpers/fetch_user_data_helper.dart';
 import '../../../../core/helpers/shimmer_helper.dart';
 import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_text_styles.dart';
+import '../../../../core/utils/saudi_wire_format.dart';
 import '../../../../features/auth/data/models/user_model.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../../data/models/customer_offer_model.dart';
@@ -100,7 +101,7 @@ class OffersView extends StatelessWidget {
     // UCC23 step 2 — expiry is a FILTER, not just a sort key. A feed held on
     // screen goes stale in the customer's hand, and a dead card at the bottom
     // of the list is a deal they will be refused at apply time.
-    final sorted = visibleOffers(offers, DateTime.now());
+    final sorted = visibleOffers(offers, saudiNow());
     if (sorted.isEmpty) {
       return _fill(LocaleKeys.offers_empty.tr(context: context));
     }

@@ -7,6 +7,7 @@ import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/route/app_router.dart';
 import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_text_styles.dart';
+import '../../../../core/utils/saudi_wire_format.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../../../layout/presentation/views/main_layout.dart';
 import '../../data/models/customer_offer_model.dart';
@@ -93,7 +94,7 @@ class _Summary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isAr = context.isAr;
-    final endsIn = offerEndsInDays(offer.endsAt, DateTime.now());
+    final endsIn = offerEndsInDays(offer.endsAt, saudiNow());
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

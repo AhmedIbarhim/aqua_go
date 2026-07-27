@@ -7,6 +7,7 @@ import 'package:aqua_go/core/config/networking/exceptions/failure.dart';
 import 'package:aqua_go/core/config/session/session_state.dart';
 import 'package:aqua_go/core/constants.dart';
 import 'package:aqua_go/core/themes/app_colors.dart';
+import 'package:aqua_go/core/utils/saudi_wire_format.dart';
 import 'package:aqua_go/features/auth/data/models/user_model.dart';
 import 'package:aqua_go/features/auth/data/repos/auth_repository.dart';
 import 'package:aqua_go/features/auth/data/services/auth_service.dart';
@@ -78,7 +79,7 @@ CustomerOfferModel promoOffer({
       descriptionEn: 'A discount on your first booking',
       bannerArUrl: 'https://cdn.example/$id-ar.png',
       bannerEnUrl: 'https://cdn.example/$id-en.png',
-      endsAt: endsAt ?? DateTime.now().toUtc().add(const Duration(days: 30)),
+      endsAt: endsAt ?? saudiNow().add(const Duration(days: 30)),
       terms: OfferTermsModel(
         promoCode: code,
         discountType: 'PERCENTAGE',
@@ -98,7 +99,7 @@ CustomerOfferModel restrictedPromoOffer({String id = 'offer-restricted'}) =>
       descriptionEn: 'A discount on the premium wash',
       bannerArUrl: 'https://cdn.example/$id-ar.png',
       bannerEnUrl: 'https://cdn.example/$id-en.png',
-      endsAt: DateTime.now().toUtc().add(const Duration(days: 30)),
+      endsAt: saudiNow().add(const Duration(days: 30)),
       terms: const OfferTermsModel(
         promoCode: 'CENTRAL',
         discountType: 'PERCENTAGE',
@@ -124,7 +125,7 @@ CustomerOfferModel packageOffer({
       descriptionEn: 'Four washes',
       bannerArUrl: 'https://cdn.example/$id-ar.png',
       bannerEnUrl: 'https://cdn.example/$id-en.png',
-      endsAt: endsAt ?? DateTime.now().toUtc().add(const Duration(days: 30)),
+      endsAt: endsAt ?? saudiNow().add(const Duration(days: 30)),
       terms: OfferTermsModel(
         packageId: packageId,
         packageNameAr: 'الباقة الذهبية',

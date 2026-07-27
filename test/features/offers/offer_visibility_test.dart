@@ -2,6 +2,9 @@ import 'package:aqua_go/features/offers/data/models/customer_offer_model.dart';
 import 'package:aqua_go/features/offers/domain/offer_visibility.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+/// `endsAt` and `now` both live in the Riyadh frame — UTC-flagged, carrying
+/// Asia/Riyadh wall-clock fields — so `DateTime.utc(...)` is the correct way to
+/// build a fixture here and `DateTime.now()` is never one.
 CustomerOfferModel _offer(String id, DateTime endsAt) => CustomerOfferModel(
       id: id,
       offerType: 'PROMO_CODE',
@@ -50,13 +53,42 @@ void main() {
     expect(visible.map((o) => o.id), ['soon', 'mid', 'late']);
   });
 
-  test('local and UTC instants compare on the same axis', () {
-    // endsAt arrives UTC from the API; `now` is DateTime.now(), which is local.
-    // Comparing without normalising would drift by the +03:00 Riyadh offset and
-    // keep a three-hour-dead offer on screen.
-    final endsAt = now.add(const Duration(hours: 1));
-    expect(visibleOffers([_offer('x', endsAt)], now.toLocal()), hasLength(1));
-    expect(visibleOffers([_offer('x', endsAt.toLocal())], now), hasLength(1));
+  test('an offer expiring at Riyadh midnight dies at Riyadh midnight, on any '
+      'device', () {
+    // The regression this suite previously could not see. The server sends
+    // `endsAt: "2026-08-01T00:00:00"` — bare Riyadh midnight — and the old
+    // pipeline parsed it device-locally, so the card outlived its window by the
+    // device's offset (3 hours on a UTC phone) or died early (6 hours in Tokyo).
+    // Building the fixture from the WIRE STRING is what makes this a real test
+    // of the parse rather than of the comparison alone.
+    final offer = CustomerOfferModel.fromJson({
+      'id': 'midnight',
+      'offerType': 'PROMO_CODE',
+      'titleAr': 'ع',
+      'titleEn': 'T',
+      'descriptionAr': 'و',
+      'descriptionEn': 'D',
+      'endsAt': '2026-08-01T00:00:00',
+      'terms': {'promoCode': 'X'},
+    });
+    final midnight = DateTime.utc(2026, 8, 1);
+
+    expect(
+      visibleOffers([offer], midnight.subtract(const Duration(minutes: 1))),
+      hasLength(1),
+      reason: 'a minute before Riyadh midnight the offer is still live',
+    );
+    expect(
+      visibleOffers([offer], midnight),
+      isEmpty,
+      reason: 'at Riyadh midnight it is over — endsAt is EXCLUSIVE',
+    );
+    // The three hours the old parse handed a UTC device for free.
+    expect(
+      visibleOffers([offer], midnight.add(const Duration(hours: 2, minutes: 59))),
+      isEmpty,
+      reason: 'it must not survive into the device-offset window',
+    );
   });
 
   test('the input list is not mutated', () {
