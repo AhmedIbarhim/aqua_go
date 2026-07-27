@@ -64,7 +64,11 @@ void main() {
 
     test('a 4xx on a path with no compensation does NOT', () {
       // Same 422 shape, thrown after the payment was verified, with no refund
-      // run — the reconciliation sweeper is the net for these, not the client.
+      // run — and NOTHING behind the client runs one either. There is no
+      // sweeper to defer to: MoyasarReconciliationJob's orphan-refund arm ships
+      // disabled, only logs when enabled, and sweeps PENDING_PAYMENT rather
+      // than these. So the charge really does stay where it is, and the client
+      // must not claim otherwise.
       for (final slug in ['zone-mismatch', 'address-outside-service-area',
           'saved-address-not-found', 'invalid-booking-creation-request']) {
         expect(
