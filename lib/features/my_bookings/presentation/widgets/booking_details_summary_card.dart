@@ -230,6 +230,14 @@ class BookingDetailsSummaryCard extends StatelessWidget {
     );
   }
 
+  /// Both halves are [Flexible], so each keeps its natural width while the pair
+  /// fits and gives ground only when it does not. Without that the row is two
+  /// unbounded `Text`s and overflows: an add-on with a long name, a date-and-time
+  /// line, and the Arabic labels — which run longer than the English ones — all
+  /// pushed past the card edge on a phone-width screen.
+  ///
+  /// Nothing here branches on direction. `Flexible` and `spaceBetween` are
+  /// direction-agnostic; Flutter lays the same tree out RTL in Arabic.
   Widget _buildSummaryRow(
     BuildContext context, {
     required String title,
@@ -239,31 +247,43 @@ class BookingDetailsSummaryCard extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SvgPicture.asset(
-              icon,
-              width: 24,
-              height: 24,
-              colorFilter: ColorFilter.mode(
-                context.colors.contentDisabled,
-                BlendMode.srcIn,
+        Flexible(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SvgPicture.asset(
+                icon,
+                width: 24,
+                height: 24,
+                colorFilter: ColorFilter.mode(
+                  context.colors.contentDisabled,
+                  BlendMode.srcIn,
+                ),
               ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              title,
-              style: AppTextStyles.regular14.copyWith(
-                color: context.colors.contentDisabled,
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyles.regular14.copyWith(
+                    color: context.colors.contentDisabled,
+                  ),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-        Text(
-          value,
-          style: AppTextStyles.regular14.copyWith(
-            color: context.colors.contentSecondaryLight,
+        const SizedBox(width: 12),
+        Flexible(
+          child: Text(
+            value,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.end,
+            style: AppTextStyles.regular14.copyWith(
+              color: context.colors.contentSecondaryLight,
+            ),
           ),
         ),
       ],

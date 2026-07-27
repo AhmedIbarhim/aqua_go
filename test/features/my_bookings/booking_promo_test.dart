@@ -28,14 +28,24 @@ Map<String, dynamic> _bookingJson({
   'promo': ?promo,
 };
 
-Future<void> _pumpCard(WidgetTester tester, BookingResponseModel booking) async {
-  await CacheClient.setString(kLanguage, 'en');
+Future<void> _pumpCard(
+  WidgetTester tester,
+  BookingResponseModel booking, {
+  Locale locale = const Locale('en'),
+}) async {
+  // A real phone width, not the 800x600 test default — the summary rows are
+  // unbounded spaceBetween Rows, and 800pt hides every overflow they can have.
+  tester.view.physicalSize = const Size(1125, 2436);
+  tester.view.devicePixelRatio = 3.0;
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
+  await CacheClient.setString(kLanguage, locale.languageCode);
   await tester.pumpWidget(
     EasyLocalization(
       supportedLocales: const [Locale('ar'), Locale('en')],
       path: 'assets/translations',
       fallbackLocale: const Locale('ar'),
-      startLocale: const Locale('en'),
+      startLocale: locale,
       assetLoader: const CodegenLoader(),
       child: BlocProvider(
         create: (_) => LanguageCubit(),
@@ -180,6 +190,74 @@ void main() {
       expect(find.text('WELCOME20'), findsOneWidget);
       expect(find.text('-20.00 SAR'), findsOneWidget);
       expect(find.text('Code returned after cancellation'), findsOneWidget);
+    });
+
+    testWidgets('the Arabic rows fit — the labels are the long ones', (
+      tester,
+    ) async {
+      // `_buildSummaryRow` is an unbounded spaceBetween Row, and the Arabic
+      // labels are longer than the English ones ("الإجمالي قبل الخصم"). No RTL
+      // special-handling anywhere — the same widget is pumped, in ar.
+      await _pumpCard(
+        tester,
+        BookingResponseModel.fromJson(
+          _bookingJson(
+            promo: {
+              'code': 'WELCOME20',
+              'discountMinor': 2000,
+              'redeemedAt': '2026-07-26T14:30:00',
+              'releasedAt': '2026-07-27T09:00:00',
+            },
+          ),
+        ),
+        locale: const Locale('ar'),
+      );
+      expect(find.text('WELCOME20'), findsOneWidget);
+      expect(find.text('الإجمالي قبل الخصم'), findsOneWidget);
+      expect(find.text('تمت إعادة الكود بعد الإلغاء'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('the full card — add-ons, totals AND promo — fits in Arabic', (
+      tester,
+    ) async {
+      // The widest shape the card takes: the Subtotal/VAT block draws too, and a
+      // long add-on name is what used to push a row past the card edge.
+      final json = _bookingJson(
+        promo: {'code': 'WELCOME20', 'discountMinor': 2000},
+      )
+        ..['addOns'] = [
+          {
+            'addonId': 'addon-1',
+            'nameAr': 'تلميع الإطارات وتنظيف المقصورة الداخلية بالبخار',
+            'nameEn': 'Tyre polish and interior steam clean',
+            'charged': 2300,
+          },
+        ]
+        ..['lines'] = [
+          {'kind': 'SERVICE', 'grossMinor': 7200, 'netMinor': 6261, 'vatMinor': 939},
+          {
+            'kind': 'ADDON',
+            'refId': 'addon-1',
+            'grossMinor': 2300,
+            'netMinor': 2000,
+            'vatMinor': 300,
+          },
+        ]
+        ..['breakdown'] = {
+          'grossMinor': 9500,
+          'netMinor': 8261,
+          'vatMinor': 1239,
+          'currency': 'SAR',
+        };
+      await _pumpCard(
+        tester,
+        BookingResponseModel.fromJson(json),
+        locale: const Locale('ar'),
+      );
+      expect(find.text('WELCOME20'), findsOneWidget);
+      expect(find.text('الإجمالي قبل الخصم'), findsOneWidget);
+      expect(tester.takeException(), isNull);
     });
 
     testWidgets('a booking with no promo renders no promo rows', (
