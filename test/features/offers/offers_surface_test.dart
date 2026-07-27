@@ -239,6 +239,43 @@ void main() {
       PendingPromoCode.instance.takeHandoff();
     });
 
+    /// Opens [offer] from the list, taps its primary action, and asserts the
+    /// UCC23 A2 blocked outcome: a brief toast, back to the list, nowhere
+    /// routed. Reached THROUGH the list because the toast has to survive the
+    /// pop, which is the whole behaviour under test.
+    Future<void> expectBlocked(
+      WidgetTester tester,
+      CustomerOfferModel offer,
+    ) async {
+      repo = ScriptedOffersRepository(
+        listResult: Right([offer]),
+        detailResult: Right(offer),
+      );
+      final cubit = cubitFor(repo);
+      await pumpOffersSurface(
+        tester,
+        child: const OffersView(),
+        cubit: cubit,
+        onGenerateRoute: recorder,
+      );
+      await cubit.getOffers();
+      await tester.pump();
+      await tester.tap(find.text(offer.title(isAr: false)));
+      await tester.pumpAndSettle();
+      expect(find.byType(OfferDetailView), findsOneWidget);
+
+      await tester.tap(find.byKey(const ValueKey('offer-primary-action')));
+      await tester.pumpAndSettle();
+
+      expect(find.text(LocaleKeys.offers_expired.tr()), findsOneWidget);
+      expect(find.byType(OfferDetailView), findsNothing);
+      expect(
+        pushed.where((r) => r.name != null),
+        isEmpty,
+        reason: 'there is nothing behind the offer to route to',
+      );
+    }
+
     testWidgets('the terms state the expiry date, in the reader\'s language',
         (tester) async {
       // UCC23 step 6 — "terms (minimum order value, applicable services,
@@ -423,6 +460,28 @@ void main() {
       expect(pushed.single.name, Routes.packageDetail);
       expect((pushed.single.arguments as PackageDetailArgs).packageId, 'pkg-77');
       expect(PendingPromoCode.instance.takeHandoff(), isNull);
+    });
+
+    testWidgets('an offer with no code behind it is blocked, not left dead',
+        (tester) async {
+      // `OfferTermsModel.fromJson` degrades a missing field to null rather than
+      // throwing, so a partial `terms` payload is a supported input. The action
+      // used to run its round-trip and then silently return, leaving a button
+      // that does nothing at all. UCC23 A2 gives it exactly one blocked
+      // outcome: a brief toast, and back to the list.
+      await expectBlocked(
+        tester,
+        offerWithoutItsLink(id: 'offer-live', offerType: 'PROMO_CODE'),
+      );
+      expect(PendingPromoCode.instance.takeHandoff(), isNull);
+    });
+
+    testWidgets('a package offer with no package behind it is blocked too',
+        (tester) async {
+      await expectBlocked(
+        tester,
+        offerWithoutItsLink(id: 'offer-pkg', offerType: 'PACKAGE'),
+      );
     });
   });
 

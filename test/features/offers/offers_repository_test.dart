@@ -3,6 +3,7 @@ import 'package:aqua_go/core/config/networking/endpoints.dart';
 import 'package:aqua_go/core/config/networking/exceptions/failure.dart';
 import 'package:aqua_go/features/offers/data/data_source/offers_remote_data_source.dart';
 import 'package:aqua_go/features/offers/data/repos/offers_repository.dart';
+import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -77,14 +78,22 @@ void main() {
       result.fold((f) => expect(f.message, 'boom'), (_) => fail('expected a Left'));
     });
 
-    test('a non-list payload becomes a parsing ServerFailure', () async {
+    test('a non-list payload becomes a ServerFailure the customer can read',
+        () async {
       final repo = OffersRepository(
         _FakeOffersDataSource(Right<Failure, dynamic>({'not': 'a list'})),
       );
       final result = await repo.fetchOffers();
       expect(result.isLeft(), isTrue);
       result.fold(
-        (f) => expect(f.message, contains('Parsing error')),
+        (f) {
+          // `Failure.message` is customer-facing, so it is the localized
+          // generic and nothing else. The exception detail — English, and the
+          // shape of whatever payload came back — goes to the log.
+          expect(f.message, LocaleKeys.snackbar_default_error);
+          expect(f.message, isNot(contains('type')));
+          expect(f.message, isNot(contains('Exception')));
+        },
         (_) => fail('expected a Left'),
       );
     });

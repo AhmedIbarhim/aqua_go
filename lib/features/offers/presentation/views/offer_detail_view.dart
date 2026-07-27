@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/components/custom_button.dart';
 import '../../../../core/components/generic_app_bar.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/route/app_router.dart';
@@ -186,27 +187,19 @@ class _PrimaryActionState extends State<_PrimaryAction> {
 
   @override
   Widget build(BuildContext context) {
+    // The app's primary action is `CustomButton` — 25 screens use it, and it
+    // owns the full-width shape, the 12pt radius, the type weight and the
+    // disabled treatment. A locally styled `ElevatedButton` here made the one
+    // button on this screen the only one in the product that looks like that.
     return Padding(
       padding: const EdgeInsets.only(top: 32),
-      child: SizedBox(
-        height: 52,
-        child: ElevatedButton(
-          key: const ValueKey('offer-primary-action'),
-          onPressed: _checking ? null : _onPressed,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: context.colors.primary,
-            foregroundColor: context.colors.themeColor,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-          ),
-          child: Text(
-            widget.offer.isPromoCode
-                ? LocaleKeys.offers_use_code.tr(context: context)
-                : LocaleKeys.offers_view_package.tr(context: context),
-            style: AppTextStyles.semiBold16,
-          ),
-        ),
+      child: CustomButton(
+        key: const ValueKey('offer-primary-action'),
+        enabled: !_checking,
+        onPressed: _onPressed,
+        text: widget.offer.isPromoCode
+            ? LocaleKeys.offers_use_code.tr(context: context)
+            : LocaleKeys.offers_view_package.tr(context: context),
       ),
     );
   }
@@ -226,10 +219,7 @@ class _PrimaryActionState extends State<_PrimaryAction> {
       // The cubit has already refreshed the list, so popping lands the customer
       // on a corrected one instead of on a list still showing what they lost.
       case OfferGone():
-        context.showWarningSnackBar(
-          LocaleKeys.offers_expired.tr(context: context),
-        );
-        Navigator.of(context).pop();
+        _leaveUnavailable();
       // A fresh copy supersedes the one the list drew.
       case OfferStillLive(offer: final fresh):
         _act(fresh);
@@ -241,10 +231,29 @@ class _PrimaryActionState extends State<_PrimaryAction> {
     }
   }
 
+  /// The one blocked outcome UCC23 A2 allows: a brief toast, and back to the
+  /// list. It states nothing about WHY — an offer withheld, an offer expired
+  /// and an offer whose linked object is missing all read the same, which is
+  /// what UCC23 requires ("never expose the reason an offer was withheld").
+  void _leaveUnavailable() {
+    context.showWarningSnackBar(
+      LocaleKeys.offers_expired.tr(context: context),
+    );
+    Navigator.of(context).pop();
+  }
+
   void _act(CustomerOfferModel offer) {
     if (offer.isPromoCode) {
       final code = offer.terms.promoCode;
-      if (code == null || code.isEmpty) return;
+      // `OfferTermsModel.fromJson` degrades a missing identity field to null
+      // rather than throwing, so a partial `terms` payload is a supported input
+      // — and one that leaves nothing to act on. Returning silently here is
+      // what made the primary action a dead button: it ran its re-validation
+      // round-trip and then did nothing at all.
+      if (code == null || code.isEmpty) {
+        _leaveUnavailable();
+        return;
+      }
       // UCC23 step 7 — the code is "pre-applied to the customer's next quote at
       // the booking review step (UCC16)". The OFFER id travels with it, not
       // just the code: the server binds the quote to the offer and writes it
@@ -272,7 +281,10 @@ class _PrimaryActionState extends State<_PrimaryAction> {
     // UCC23 step 7, package half — "the customer is taken to the linked package
     // in the subscription catalogue (UC-C13)".
     final packageId = offer.terms.packageId;
-    if (packageId == null || packageId.isEmpty) return;
+    if (packageId == null || packageId.isEmpty) {
+      _leaveUnavailable();
+      return;
+    }
     context.pushNamed(
       Routes.packageDetail,
       arguments: PackageDetailArgs(packageId: packageId),

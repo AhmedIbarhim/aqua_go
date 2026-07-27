@@ -88,6 +88,26 @@ CustomerOfferModel promoOffer({
       ),
     );
 
+/// An offer whose `terms` payload arrived without the identity field its type
+/// needs — no `promoCode` on a PROMO_CODE offer, no `packageId` on a PACKAGE
+/// one. Built through `fromJson` on purpose: that is a read-reconstruction
+/// path, so it degrades the missing field to null rather than throwing, which
+/// makes this a supported input the primary action has to answer for.
+CustomerOfferModel offerWithoutItsLink({
+  required String id,
+  required String offerType,
+}) =>
+    CustomerOfferModel.fromJson({
+      'id': id,
+      'offerType': offerType,
+      'titleAr': 'عرض',
+      'titleEn': 'Offer',
+      'descriptionAr': 'وصف',
+      'descriptionEn': 'Description',
+      'endsAt': toWireDateTime(saudiNow().add(const Duration(days: 30))),
+      'terms': {'discountType': 'PERCENTAGE'},
+    });
+
 /// A promo-code offer scoped to named services and zones (UCC23 step 6 / A5).
 CustomerOfferModel restrictedPromoOffer({String id = 'offer-restricted'}) =>
     CustomerOfferModel(

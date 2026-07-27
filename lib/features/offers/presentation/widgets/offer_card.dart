@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/extentions/context_extentions.dart';
+import '../../../../core/themes/app_colors.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/saudi_wire_format.dart';
 import '../../../../generated/locale_keys.g.dart';
@@ -191,9 +192,17 @@ class _EndsInChip extends StatelessWidget {
           color: context.colors.errorLight,
           borderRadius: BorderRadius.circular(12),
         ),
+        // The app's `errorLight` plate is always paired with
+        // `darkAppColors.themeOpositeColor` — see
+        // `ComplaintStatus.getBgColor`/`getTextColor`, the established chip
+        // pattern. `context.colors.error` on it is dark red on bright red, at
+        // 11pt, which is not readable and is not a pairing this product uses
+        // anywhere else.
         child: Text(
           label,
-          style: AppTextStyles.medium11.copyWith(color: context.colors.error),
+          style: AppTextStyles.medium11.copyWith(
+            color: darkAppColors.themeOpositeColor,
+          ),
         ),
       ),
     );
