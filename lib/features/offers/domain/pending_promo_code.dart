@@ -44,17 +44,14 @@ class PendingPromoCode {
   }
 
   /// Returns what is held and clears it. Null when nothing is held.
+  ///
+  /// Reading is the ONLY way to empty the slot, and it is the whole point: the
+  /// booking summary consumes the handoff at the start of the next quote, and
+  /// a second quote must not silently re-apply an offer the customer picked for
+  /// the first one.
   PendingOfferHandoff? takeHandoff() {
     final value = _pending;
     _pending = null;
     return value;
   }
-
-  /// The code-only view of the same single-shot slot, for callers that only
-  /// need something to display. Consumes the handoff exactly as
-  /// [takeHandoff] does — there is one slot, not two.
-  String? take() => takeHandoff()?.promoCode;
-
-  /// Drops anything held without consuming it (used when a flow is abandoned).
-  void clear() => _pending = null;
 }

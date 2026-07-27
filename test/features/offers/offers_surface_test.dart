@@ -229,7 +229,9 @@ void main() {
 
     setUp(() {
       pushed = <RouteSettings>[];
-      PendingPromoCode.instance.clear();
+      // The handoff is a process-wide single-shot slot; draining it keeps one
+      // test's held offer out of the next test's assertions.
+      PendingPromoCode.instance.takeHandoff();
     });
 
     testWidgets('the terms state the expiry date, in the reader\'s language',
