@@ -137,7 +137,10 @@ class _Rail extends StatelessWidget {
         // Every card takes the height of the tallest, so one offer carrying a
         // threshold line does not leave the rest of the row short.
         child: IntrinsicHeight(
-          child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: cards),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: cards,
+          ),
         ),
       ),
     );
