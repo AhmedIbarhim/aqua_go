@@ -123,6 +123,94 @@ void main() {
   );
 
   testWidgets(
+    'a re-quote the server never answered keeps the code — a dropped '
+    'connection is not a rejection',
+    (tester) async {
+      // The code is fine; the network is not. Dropping it here would remove the
+      // customer's own discount over a blip and re-price them at full price the
+      // moment the connection came back, on the one screen that exists to show
+      // the discount. The offers surface makes the same distinction
+      // (`OfferUncheckable`) for the same reason.
+      late final RecordingBookingRepo repo;
+      repo = RecordingBookingRepo(
+        quoteFailure: (code, _) => repo.quoteCalls.length >= 3
+            ? const ServerFailure(
+                'No internet connection',
+                type: FailureType.network,
+              )
+            : null,
+      );
+      final cubit = buildCubit(repo);
+      addTearDown(cubit.close);
+
+      await pumpSummary(tester, cubit);
+      await applyPromo(tester, promoCode);
+      expect(cubit.state.appliedPromoCode, promoCode);
+
+      // Coming back to the summary re-quotes with the applied code — and the
+      // request never reaches the server.
+      await remountSummary(tester, cubit);
+
+      expect(
+        repo.quoteCalls,
+        [null, promoCode, promoCode],
+        reason:
+            'a transport failure says nothing about the code, so there is no '
+            'second, bare attempt to fall through to',
+      );
+      expect(
+        cubit.state.appliedPromoCode,
+        promoCode,
+        reason: 'the code the server never judged stays applied',
+      );
+      expect(
+        find.textContaining('bookings.promo_code_removed'),
+        findsNothing,
+        reason: 'nothing was removed, so nothing may say it was',
+      );
+    },
+  );
+
+  testWidgets(
+    'an offer whose quote never reached the server is held for the next '
+    'attempt, not spent',
+    (tester) async {
+      // The handoff is single-shot and the summary drains it on the way in.
+      // Only a VERDICT earns that: here the request never got one, so the offer
+      // the customer accepted goes back in the slot instead of vanishing into a
+      // full-price summary with no message saying why.
+      final repo = RecordingBookingRepo(
+        quoteFailure: (_, offerId) => offerId == null
+            ? null
+            : const ServerFailure(
+                'No internet connection',
+                type: FailureType.network,
+              ),
+      );
+      PendingPromoCode.instance.hold(offerId: 'offer-1');
+      addTearDown(PendingPromoCode.instance.takeHandoff);
+
+      final cubit = buildCubit(repo);
+      addTearDown(cubit.close);
+      await pumpSummary(tester, cubit);
+
+      expect(
+        repo.offerCalls,
+        ['offer-1', null],
+        reason:
+            'the offer is tried, and the order is still priced so the summary '
+            'is usable',
+      );
+      expect(
+        PendingPromoCode.instance.takeHandoff()?.offerId,
+        'offer-1',
+        reason:
+            'an unanswered request must not spend the offer the customer took',
+      );
+    },
+  );
+
+  testWidgets(
     'an applied code survives an add-on change made back on the details '
     'screen, WITHOUT that screen quoting the discount',
     (tester) async {

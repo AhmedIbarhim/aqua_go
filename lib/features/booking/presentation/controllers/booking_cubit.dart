@@ -59,6 +59,29 @@ class QuoteRefresh {
   bool get promoDropped => droppedPromoReason != null;
 }
 
+/// Outcome of [BookingCubit.applyOffer].
+///
+/// Three outcomes, not two, for the reason `OfferRevalidation` gives on the
+/// offers surface: "the server refused this offer" and "I could not reach the
+/// server" must not be treated the same. The first is a verdict and consumes
+/// the customer's single-shot offer handoff; the second is a failure to ASK,
+/// and consuming the offer on it charges them full price for a deal they
+/// accepted and were never told they had lost.
+class OfferApplication {
+  const OfferApplication({this.quote, this.settled = false});
+
+  /// The quote priced WITH the offer, or null when it was not applied.
+  final QuoteModel? quote;
+
+  /// True when the offer's fate is decided — it was applied, or it was refused
+  /// on its merits. False when nothing was decided: no network, a timeout, a
+  /// 5xx, or no selection to price yet. A caller holding the offer keeps
+  /// holding it while this is false.
+  final bool settled;
+
+  bool get applied => quote != null;
+}
+
 class BookingCubit extends Cubit<BookingState> {
   final BookingRepository _bookingRepo;
   final SubscriptionsRepository _subscriptionsRepo;
@@ -514,6 +537,21 @@ class BookingCubit extends Cubit<BookingState> {
   /// the applied-code chip and the create call read one authoritative value
   /// instead of a screen-local mirror that dies with the route.
   Future<QuoteModel?> fetchQuote({String? promoCode, String? offerId}) async {
+    final result = await _priceAndPublish(promoCode: promoCode, offerId: offerId);
+    return result?.fold((_) => null, (quote) => quote);
+  }
+
+  /// Prices the current selection and publishes the outcome — the quote on the
+  /// state on success, the server's message on it on rejection.
+  ///
+  /// Returns the raw outcome, and null when there is no selection to price, so
+  /// a caller that has to tell a server VERDICT from a failure to reach the
+  /// server can ([applyOffer]). [fetchQuote] is the quote-or-null face of the
+  /// same call; both go through here so the two cannot drift.
+  Future<Either<Failure, QuoteModel>?> _priceAndPublish({
+    String? promoCode,
+    String? offerId,
+  }) async {
     if (state.selectedService == null || state.selectedAddress == null) {
       return null;
     }
@@ -522,22 +560,28 @@ class BookingCubit extends Cubit<BookingState> {
 
     final result = await _requestQuote(promoCode: promoCode, offerId: offerId);
 
-    return result.fold(
-      (failure) {
-        emit(
-          state.copyWith(
-            status: BookingStatus.failure,
-            errorMessage: failure.message,
-          ),
-        );
-        return null;
-      },
-      (quote) {
-        _emitQuote(quote, offerId);
-        return quote;
-      },
+    result.fold(
+      (failure) => emit(
+        state.copyWith(
+          status: BookingStatus.failure,
+          errorMessage: failure.message,
+        ),
+      ),
+      (quote) => _emitQuote(quote, offerId),
     );
+
+    return result;
   }
+
+  /// Whether [type] is the server's VERDICT on the promo the request carried,
+  /// rather than a failure to obtain one.
+  ///
+  /// A promo rejection comes back 400 / 409 / 422 ([FailureType.validation]);
+  /// an unknown offer comes back 404 ([FailureType.notFound]). Everything else
+  /// — no network, a timeout, a 5xx, a cancelled request — says nothing at all
+  /// about the code or the offer, and must never be read as one being refused.
+  static bool _isPromoVerdict(FailureType type) =>
+      type == FailureType.validation || type == FailureType.notFound;
 
   /// Prices the current selection without touching the emitted state, so a
   /// caller that has to try twice (see [reprice]) does not flash a rejection
@@ -601,7 +645,21 @@ class BookingCubit extends Cubit<BookingState> {
 
   /// Applies a merchandising offer. Only the offer id goes on the wire — the
   /// server resolves its linked code, and sending both is a 400.
-  Future<QuoteModel?> applyOffer(String offerId) => fetchQuote(offerId: offerId);
+  ///
+  /// Reports whether the offer was SETTLED as well as whether it was applied.
+  /// The offer arrives here through a single-shot handoff that the caller has
+  /// already drained, and only a verdict earns that: an unreachable server has
+  /// said nothing about the offer, so the caller puts it back.
+  Future<OfferApplication> applyOffer(String offerId) async {
+    final result = await _priceAndPublish(offerId: offerId);
+    // Nothing to price yet, so nothing was asked of the server and the offer is
+    // untouched.
+    if (result == null) return const OfferApplication();
+    return result.fold(
+      (failure) => OfferApplication(settled: _isPromoVerdict(failure.type)),
+      (quote) => OfferApplication(quote: quote, settled: true),
+    );
+  }
 
   /// Re-prices without any promo and clears the applied code.
   Future<QuoteModel?> removePromoCode() => fetchQuote();
@@ -662,12 +720,21 @@ class BookingCubit extends Cubit<BookingState> {
   /// bare selection through [repriceForDisplayWithoutPromo], because no discount
   /// shows before the payment page (plan §6.93).
   ///
-  /// When the applied code no longer validates — its cap was consumed, the
+  /// When the applied code no longer VALIDATES — its cap was consumed, the
   /// campaign ended, or the order no longer clears its minimum — retrying with
   /// the same dead code repeats the same rejection forever, and the customer
   /// has no way out but to guess. So the code is dropped, the selection is
   /// re-priced WITHOUT it, and the reason the server gave comes back on
   /// [QuoteRefresh.droppedPromoReason] for the caller to state.
+  ///
+  /// That drop is reserved for a VERDICT. A timeout or a 5xx says nothing
+  /// about the code, and dropping it on one would quietly re-price the order at
+  /// full price the moment the connection came back — the customer's own
+  /// discount removed by a network blip, on the screen that exists to show it.
+  /// The offers surface makes the same distinction for the same reason
+  /// (`OfferUncheckable`). On an unanswered request the applied code and offer
+  /// stay exactly where they were and the failure is raised as itself, so the
+  /// customer can retry with their code intact.
   Future<QuoteRefresh> reprice() async {
     if (state.selectedService == null || state.selectedAddress == null) {
       return const QuoteRefresh();
@@ -678,18 +745,32 @@ class BookingCubit extends Cubit<BookingState> {
     emit(state.copyWith(status: BookingStatus.loading));
     final result = await _requestQuote(promoCode: promoCode, offerId: offerId);
 
-    final QuoteModel? quote = result.fold((_) => null, (q) => q);
-    if (quote != null) {
-      _emitQuote(quote, offerId);
-      return QuoteRefresh(quote: quote);
-    }
+    return result.fold(
+      (rejection) => _repriceAfter(rejection, promoCode: promoCode),
+      (quote) async {
+        _emitQuote(quote, offerId);
+        return QuoteRefresh(quote: quote);
+      },
+    );
+  }
 
-    final String rejection = result.fold((f) => f.message, (_) => '');
-    if (promoCode == null) {
+  /// The failing half of [reprice].
+  ///
+  /// [rejection] is the failure the priced-with-promo attempt came back with,
+  /// and [promoCode] whatever was applied when it went out.
+  Future<QuoteRefresh> _repriceAfter(
+    Failure rejection, {
+    required String? promoCode,
+  }) async {
+    // Nothing applied means there is nothing to drop and nothing to retry
+    // differently; an unanswered request means there is nothing to drop it
+    // OVER. Either way the failure is the whole story, and `copyWith` leaves
+    // the applied code and offer exactly where they were.
+    if (promoCode == null || !_isPromoVerdict(rejection.type)) {
       emit(
         state.copyWith(
           status: BookingStatus.failure,
-          errorMessage: rejection,
+          errorMessage: rejection.message,
         ),
       );
       return const QuoteRefresh();
@@ -710,7 +791,10 @@ class BookingCubit extends Cubit<BookingState> {
       },
       (quote) {
         _emitQuote(quote, null);
-        return QuoteRefresh(quote: quote, droppedPromoReason: rejection);
+        return QuoteRefresh(
+          quote: quote,
+          droppedPromoReason: rejection.message,
+        );
       },
     );
   }

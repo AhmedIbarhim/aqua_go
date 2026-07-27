@@ -589,13 +589,29 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
   /// from the code the SERVER echoed on the accepted quote — never from the
   /// offer copy the list drew — so, exactly as on the typed path, only a code
   /// the backend actually accepted is ever suggested again.
+  ///
+  /// The handoff was drained on the way in — `takeHandoff` is single-shot by
+  /// design. Only a VERDICT earns that: the offer was applied, or it was
+  /// refused on its merits and must not follow the customer into a later
+  /// booking. A request that never reached a verdict — no network, a timeout,
+  /// a 5xx — has said nothing about the offer, so it goes back in the slot and
+  /// the next quote this flow makes still carries it. Losing it there would
+  /// charge the customer full price for a deal they accepted, with no message
+  /// saying so and nothing on screen to tell them what happened.
   void _applyOfferFromHandoff(String offerId) async {
     final cubit = context.read<BookingCubit>();
-    final quote = await cubit.applyOffer(offerId);
+    final application = await cubit.applyOffer(offerId);
+    final quote = application.quote;
     if (quote?.promoCode != null) {
       await PromoCodeHistory.remember(quote!.promoCode!);
     }
-    if (!mounted || quote != null) return;
+    if (application.applied) return;
+    if (!application.settled) {
+      PendingPromoCode.instance.hold(offerId: offerId);
+    }
+    if (!mounted) return;
+    // UCC23 A3 — the discount is not granted and the total is unchanged, so the
+    // order is priced without the offer rather than left with no quote at all.
     await cubit.reprice();
   }
 
