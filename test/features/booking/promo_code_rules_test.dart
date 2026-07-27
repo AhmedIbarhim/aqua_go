@@ -76,8 +76,8 @@ void main() {
       expect(PromoCodeHistory.recent(), isEmpty);
     });
 
-    /// Session teardown erases it — sign-out, forced purge, account deletion.
-    /// Account deletion makes it a PDPL erasure obligation, not a nicety.
+    /// Account DELETION erases it — a PDPL obligation, not a nicety: the
+    /// account is gone server-side, so nothing of it may sit on the handset.
     test('forget erases this customer, and the pre-scoping store too', () async {
       await CacheClient.setStringList(
         PromoCodeHistory.legacyStorageKey,
@@ -88,6 +88,29 @@ void main() {
       await PromoCodeHistory.forget();
 
       expect(PromoCodeHistory.recent(), isEmpty);
+      expect(
+        CacheClient.getStringList(PromoCodeHistory.legacyStorageKey),
+        isEmpty,
+      );
+    });
+
+    /// An ordinary sign-out is NOT an erasure. UCC16 asks for "autocomplete of
+    /// previously used codes"; wiping the store whenever the session ends would
+    /// make that last one session and hand a returning customer nothing. The
+    /// per-customer key is what makes keeping it safe — the test above proves
+    /// nobody else can read it. What DOES go is the pre-scoping shared store an
+    /// older build could have left behind.
+    test('the ordinary teardown keeps the customer\'s codes and drops the legacy store',
+        () async {
+      await CacheClient.setStringList(
+        PromoCodeHistory.legacyStorageKey,
+        const ['LEGACY1'],
+      );
+      await PromoCodeHistory.remember('ACODE1');
+
+      await PromoCodeHistory.forgetLegacyDeviceStore();
+
+      expect(PromoCodeHistory.recent(), ['ACODE1']);
       expect(
         CacheClient.getStringList(PromoCodeHistory.legacyStorageKey),
         isEmpty,

@@ -145,9 +145,10 @@ class AuthRepository {
   /// and WITHOUT touching unrelated prefs (kNotFirstUse, language, theme,
   /// install marker).
   Future<void> purgeLocalSession() async {
-    // BEFORE kUserData goes: the promo-code history is keyed by the cached
-    // user's id and cannot be found once that record is removed.
-    await PromoCodeHistory.forget();
+    // The customer's own promo-code history is keyed to their id and STAYS —
+    // a dead refresh token is not an erasure, and they will sign back in on
+    // this handset. Only the pre-scoping shared store is cleared.
+    await PromoCodeHistory.forgetLegacyDeviceStore();
     _cachedUser = null;
     await SecureStorage.clearSecuredData();
     await CacheClient.removeString(kUserData);
@@ -213,10 +214,13 @@ class AuthRepository {
       // becomes absent after an OS-driven reinstall (when SharedPrefs is wiped
       // externally), which is the reinstall-detection scenario it was designed for.
       // The device-local promo-code suggestions belong to the account that
-      // earned them; the next person to sign in on this handset must not be
-      // offered them. Keyed by the cached user's id, so it runs BEFORE that
-      // record is removed.
-      await PromoCodeHistory.forget();
+      // earned them and are keyed by its id, so the next person to sign in on
+      // this handset can never be offered them — which is why they SURVIVE a
+      // sign-out. Erasing them here would make UCC16's autocomplete last one
+      // session and give the customer nothing back when they return. Only the
+      // pre-scoping shared store, which an older build could have left here, is
+      // cleared.
+      await PromoCodeHistory.forgetLegacyDeviceStore();
       _cachedUser = null;
       await SecureStorage.clearSecuredData();
       await CacheClient.removeString(kUserData);

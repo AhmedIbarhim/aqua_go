@@ -11,14 +11,21 @@ import '../../auth/data/models/user_model.dart';
 /// the customer typed them here. Only codes the BACKEND accepted are recorded,
 /// so a suggestion is never a code that has never worked.
 ///
-/// **Scoped per customer, and erased on sign-out.** The store used to sit under
-/// one unscoped key, which meant the reasoning above stopped one step short: the
-/// codes never left the device, but the NEXT person to sign in on the same
-/// handset was offered them, and sharing a phone is ordinary here. Two things
-/// close it — the key carries the customer's local id, so a suggestion can only
-/// come from the account that earned it, and [forget] runs inside the same
-/// targeted teardown as the session tokens, so a deleted account leaves nothing
-/// behind (PDPL erasure reaches the handset, not only the server).
+/// **Scoped per customer, and it SURVIVES a sign-out.** The store used to sit
+/// under one unscoped key, which meant the reasoning above stopped one step
+/// short: the codes never left the device, but the NEXT person to sign in on the
+/// same handset was offered them, and sharing a phone is ordinary here. The key
+/// now carries the customer's local id, so a suggestion can only ever come from
+/// the account that earned it — which is what makes it safe to KEEP the entries
+/// across a logout. Clearing them there instead would have closed the same hole
+/// by deleting the feature: UCC16's "autocomplete of previously used codes"
+/// would last exactly one session, and a customer who signs back in on their own
+/// phone would be offered nothing.
+///
+/// [forget] therefore belongs to account DELETION only, where erasure is the
+/// point (PDPL reaches the handset, not only the server). Ordinary sign-outs
+/// call [forgetLegacyDeviceStore], which clears the pre-scoping shared store and
+/// nothing else.
 class PromoCodeHistory {
   const PromoCodeHistory._();
 
@@ -81,16 +88,28 @@ class PromoCodeHistory {
   /// Erases the signed-in customer's history, plus the unscoped store older
   /// builds wrote.
   ///
-  /// Called from every session teardown — sign-out, the forced purge on a dead
-  /// refresh token, and account deletion — so a handset holds no record of a
-  /// customer who is no longer signed in on it. **Call it BEFORE the cached
-  /// user record is removed**: the key is derived from that record, and after
-  /// it is gone there is nothing left to derive.
+  /// **Account deletion only.** A sign-out is not an erasure — the codes are
+  /// keyed to the account that earned them, so nobody else can be offered them,
+  /// and wiping them would reduce UCC16's autocomplete to a single session. Use
+  /// [forgetLegacyDeviceStore] on the ordinary teardown paths.
+  ///
+  /// **Call it BEFORE the cached user record is removed**: the key is derived
+  /// from that record, and after it is gone there is nothing left to derive.
   static Future<void> forget() async {
     final customerId = _currentCustomerId();
     if (customerId != null) {
       await CacheClient.removeString(_keyFor(customerId));
     }
+    await forgetLegacyDeviceStore();
+  }
+
+  /// Removes ONLY the pre-scoping unscoped store.
+  ///
+  /// Nothing writes that key any more, but a handset upgraded from an older
+  /// build still carries whatever the previous signed-in customer left there.
+  /// Clearing it on every session teardown gets it off the device without
+  /// touching the current customer's own, correctly-scoped history.
+  static Future<void> forgetLegacyDeviceStore() async {
     await CacheClient.removeString(legacyStorageKey);
   }
 }
