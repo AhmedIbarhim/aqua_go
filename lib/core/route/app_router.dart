@@ -107,9 +107,21 @@ abstract class AppRouter {
       case Routes.packageDetail:
         final args = settings.arguments as PackageDetailArgs;
         return MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (_) =>
-                locator<PackageDetailCubit>()..getPackage(args.packageId),
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (_) =>
+                    locator<PackageDetailCubit>()..getPackage(args.packageId),
+              ),
+              // This screen renders a PackageCard, and that card owns the
+              // subscribe tap — which reads SubscriptionsCubit. A pushed route
+              // is a SIBLING of the route that provides the cubit (home, or
+              // Routes.packages), never a descendant, so without this the tap
+              // from the offer path throws ProviderNotFoundException.
+              // Shared lazy singleton — provide by value so popping this route
+              // does not close the instance the other surfaces read from.
+              BlocProvider.value(value: locator<SubscriptionsCubit>()),
+            ],
             child: PackageDetailView(packageId: args.packageId),
           ),
         );
