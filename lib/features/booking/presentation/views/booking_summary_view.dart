@@ -595,9 +595,21 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
   /// refused on its merits and must not follow the customer into a later
   /// booking. A request that never reached a verdict — no network, a timeout,
   /// a 5xx — has said nothing about the offer, so it goes back in the slot and
-  /// the next quote this flow makes still carries it. Losing it there would
-  /// charge the customer full price for a deal they accepted, with no message
-  /// saying so and nothing on screen to tell them what happened.
+  /// the next entry to this flow tries it again. Losing it there would charge
+  /// the customer full price for a deal they accepted, with no message saying
+  /// so and nothing on screen to tell them what happened.
+  ///
+  /// **The retry that matters happens inside [BookingCubit.applyOffer], not
+  /// here.** This method used to claim the re-hold meant "the next quote this
+  /// flow makes still carries it" — it did not, and could not: the very next
+  /// quote is the bare [BookingCubit.reprice] below, and the slot is drained
+  /// nowhere in this widget's lifetime (`takeHandoff` is called once, from
+  /// `initState`). So an unanswered attempt priced the order at full price with
+  /// only a network error to explain it, and the offer sat in a slot until the
+  /// customer happened to re-enter the flow. `applyOffer` now re-attempts the
+  /// offer itself before reporting a verdict-less outcome; the slot is what
+  /// survives a genuine outage, on the next entry, and nothing more is claimed
+  /// for it.
   void _applyOfferFromHandoff(String offerId) async {
     final cubit = context.read<BookingCubit>();
     final application = await cubit.applyOffer(offerId);
@@ -612,6 +624,8 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
     if (!mounted) return;
     // UCC23 A3 — the discount is not granted and the total is unchanged, so the
     // order is priced without the offer rather than left with no quote at all.
+    // Nothing is applied on this path, so there is no discount for this bare
+    // quote to throw away.
     await cubit.reprice();
   }
 

@@ -179,6 +179,12 @@ void main() {
       // Only a VERDICT earns that: here the request never got one, so the offer
       // the customer accepted goes back in the slot instead of vanishing into a
       // full-price summary with no message saying why.
+      //
+      // And before it settles for that, `applyOffer` tries the offer ONCE more.
+      // The screen has to quote again either way to stay usable, and pricing
+      // that attempt bare threw away a deal the customer accepted over a single
+      // dropped connection — the re-hold could not rescue it, because the slot
+      // is drained only from `initState` and this flow never returns there.
       final repo = RecordingBookingRepo(
         quoteFailure: (_, offerId) => offerId == null
             ? null
@@ -196,10 +202,10 @@ void main() {
 
       expect(
         repo.offerCalls,
-        ['offer-1', null],
+        ['offer-1', 'offer-1', null],
         reason:
-            'the offer is tried, and the order is still priced so the summary '
-            'is usable',
+            'the offer is tried, RETRIED still carrying the offer, and only '
+            'then is the order priced without it so the summary is usable',
       );
       expect(
         PendingPromoCode.instance.takeHandoff()?.offerId,
@@ -207,6 +213,62 @@ void main() {
         reason:
             'an unanswered request must not spend the offer the customer took',
       );
+      // ONE message, not two: both attempts go through the non-emitting quote
+      // path, so the customer is not shown a failure that is immediately
+      // overwritten by the next one.
+      expect(find.textContaining('No internet connection'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'an offer whose first quote went unanswered is APPLIED by the retry, and '
+    'not held',
+    (tester) async {
+      // The blip case, which is the common one: one dropped connection or a
+      // single 5xx, and the next attempt goes through. Before the retry existed
+      // this priced the order bare and the customer paid full price for a deal
+      // they had accepted — the re-hold could not save them, because the only
+      // `takeHandoff` in the flow runs in `initState`.
+      var offerAttempts = 0;
+      final repo = RecordingBookingRepo(
+        quoteFailure: (_, offerId) {
+          if (offerId == null) return null;
+          offerAttempts += 1;
+          return offerAttempts == 1
+              ? const ServerFailure(
+                  'No internet connection',
+                  type: FailureType.network,
+                )
+              : null;
+        },
+      );
+      PendingPromoCode.instance.hold(offerId: 'offer-1');
+      addTearDown(PendingPromoCode.instance.takeHandoff);
+
+      final cubit = buildCubit(repo);
+      addTearDown(cubit.close);
+      await pumpSummary(tester, cubit);
+
+      expect(
+        repo.offerCalls,
+        ['offer-1', 'offer-1'],
+        reason: 'tried, retried, and no bare re-price because it applied',
+      );
+      expect(cubit.state.appliedOfferId, 'offer-1');
+      expect(cubit.state.appliedPromoCode, offerResolvedPromoCode);
+      expect(
+        cubit.state.quote!.breakdown!.grossMinor,
+        grossWithPromoMinor,
+        reason: 'the customer gets the discount they accepted',
+      );
+      expect(
+        PendingPromoCode.instance.takeHandoff(),
+        isNull,
+        reason: 'the offer is spent — it reached a verdict and was applied',
+      );
+      // The first attempt never reaches the emitted state, so no rejection is
+      // flashed before the price the customer actually gets.
+      expect(find.textContaining('No internet connection'), findsNothing);
     },
   );
 

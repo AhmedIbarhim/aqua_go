@@ -650,14 +650,50 @@ class BookingCubit extends Cubit<BookingState> {
   /// The offer arrives here through a single-shot handoff that the caller has
   /// already drained, and only a verdict earns that: an unreachable server has
   /// said nothing about the offer, so the caller puts it back.
+  ///
+  /// An unanswered first attempt is retried ONCE, still carrying the offer,
+  /// before that verdict-less outcome is reported. The caller's next move is a
+  /// quote either way — it re-prices the order so the summary stays usable —
+  /// and pricing that one bare would drop a deal the customer accepted over a
+  /// dropped connection or a single 5xx, which the retry usually survives.
+  /// Exactly once: a second silence is a real outage, and looping would sit on
+  /// the loading overlay with nothing to show for it.
+  ///
+  /// Both attempts go through [_requestQuote], which does NOT touch the emitted
+  /// state, so the customer is shown ONE outcome rather than a rejection that
+  /// is immediately overwritten.
   Future<OfferApplication> applyOffer(String offerId) async {
-    final result = await _priceAndPublish(offerId: offerId);
     // Nothing to price yet, so nothing was asked of the server and the offer is
     // untouched.
-    if (result == null) return const OfferApplication();
+    if (state.selectedService == null || state.selectedAddress == null) {
+      return const OfferApplication();
+    }
+
+    emit(state.copyWith(status: BookingStatus.loading));
+
+    var result = await _requestQuote(offerId: offerId);
+    final unanswered = result.fold(
+      (failure) => !_isPromoVerdict(failure.type),
+      (_) => false,
+    );
+    if (unanswered) {
+      result = await _requestQuote(offerId: offerId);
+    }
+
     return result.fold(
-      (failure) => OfferApplication(settled: _isPromoVerdict(failure.type)),
-      (quote) => OfferApplication(quote: quote, settled: true),
+      (failure) {
+        emit(
+          state.copyWith(
+            status: BookingStatus.failure,
+            errorMessage: failure.message,
+          ),
+        );
+        return OfferApplication(settled: _isPromoVerdict(failure.type));
+      },
+      (quote) {
+        _emitQuote(quote, offerId);
+        return OfferApplication(quote: quote, settled: true);
+      },
     );
   }
 
