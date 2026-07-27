@@ -112,8 +112,7 @@ class BookingDetailsSummaryCard extends StatelessWidget {
                   title: LocaleKeys.bookings_promo_discount_before_vat.tr(
                     context: context,
                   ),
-                  value:
-                      '${_discountNet()!.toStringAsFixed(2)} $currency',
+                  value: '${_discountNet()!.toStringAsFixed(2)} $currency',
                   icon: AppAssets.money,
                 ),
               if (showNetVatSummary) ...[
@@ -154,7 +153,7 @@ class BookingDetailsSummaryCard extends StatelessWidget {
                     context: context,
                   ),
                   value: promo.code!,
-                  icon: AppAssets.gift,
+                  icon: AppAssets.promoCode,
                 ),
                 if (promo.hasDiscount) ...[
                   _buildSummaryRow(
@@ -172,7 +171,7 @@ class BookingDetailsSummaryCard extends StatelessWidget {
                       context: context,
                     ),
                     value: '-${promo.discount.toStringAsFixed(2)} $currency',
-                    icon: AppAssets.money,
+                    icon: AppAssets.promotion,
                   ),
                 ],
                 // A released redemption no longer counts against the campaign,

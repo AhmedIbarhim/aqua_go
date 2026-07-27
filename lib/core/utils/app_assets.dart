@@ -165,6 +165,10 @@ abstract class AppAssets {
   static const String gps = 'assets/svg/gps.svg';
   static const String noAddresses = 'assets/svg/no_addresses.svg';
 
+  //Promotions
+  static const String promotion = 'assets/svg/promotion.svg';
+  static const String promoCode = 'assets/svg/promo_code.svg';
+
   //Demos
   static const String demoBanner = 'assets/demos/banner_demo.webp';
 }
