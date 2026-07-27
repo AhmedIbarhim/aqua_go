@@ -51,7 +51,7 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
         // needed.
         final handoff = PendingPromoCode.instance.takeHandoff();
         if (handoff != null) {
-          context.read<BookingCubit>().applyOffer(handoff.offerId);
+          _applyOfferFromHandoff(handoff.offerId);
         } else {
           // Coming BACK to this screen (pop → forward) must re-price with the
           // code that is already applied. Quoting bare here would drop the
@@ -543,6 +543,29 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
   /// the chip clears itself.
   void _removePromoCode() {
     context.read<BookingCubit>().removePromoCode();
+  }
+
+  /// Prices this order with the offer the customer tapped "Use this code" on.
+  ///
+  /// The offer was eligible when the feed rendered it and may not be by the
+  /// time they arrive here — its cap can be consumed by a concurrent booking,
+  /// the campaign can end, they can turn out ineligible (UCC23 A3,
+  /// BR-OFR-11). When that happens the quote fails and there is NO quote at
+  /// all, so the summary would render 0.00 and gate Confirm: a dead screen with
+  /// the basket, address, vehicle and slot all still chosen and no way forward.
+  /// UCC23 A3 requires the opposite — the discount is not granted and the total
+  /// is unchanged — so the order is re-priced without the offer.
+  ///
+  /// The rejection itself is already on screen: the cubit's failure state
+  /// raises it through the BlocConsumer above. Nothing is added on top of it,
+  /// and deliberately so — an unknown, deactivated or out-of-window offer all
+  /// return the same `promo-not-recognised` a mistyped code returns, and any
+  /// message this screen invented would be claiming to know which.
+  void _applyOfferFromHandoff(String offerId) async {
+    final cubit = context.read<BookingCubit>();
+    final quote = await cubit.applyOffer(offerId);
+    if (!mounted || quote != null) return;
+    await cubit.reprice();
   }
 
   /// Re-prices the current selection, keeping whatever promo is applied, and

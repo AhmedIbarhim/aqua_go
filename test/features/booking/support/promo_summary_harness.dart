@@ -332,8 +332,9 @@ QuoteModel quotePayload({
 
 /// Booking repository that records the promo code each quote call carried.
 ///
-/// [quoteFailure] lets a test make a specific code fail the way the backend
-/// does when it stops being applicable between quotes (422 → validation).
+/// [quoteFailure] lets a test reject a specific promo code OR a specific offer
+/// id the way the backend does when it stops being applicable between the feed
+/// and the tap (422 / 400 -> validation).
 class RecordingBookingRepo extends BookingRepository {
   RecordingBookingRepo({this.expiredQuotes = true, this.quoteFailure})
     : super(
@@ -346,7 +347,7 @@ class RecordingBookingRepo extends BookingRepository {
 
   /// Returns the failure a given promo code should be rejected with, or null to
   /// let the quote succeed.
-  final Failure? Function(String? promoCode)? quoteFailure;
+  final Failure? Function(String? promoCode, String? offerId)? quoteFailure;
 
   /// One entry per [getQuote] call, holding the promo code it was given.
   final List<String?> quoteCalls = [];
@@ -371,7 +372,7 @@ class RecordingBookingRepo extends BookingRepository {
     quoteCalls.add(promoCode);
     offerCalls.add(offerId);
     await networkTick();
-    final failure = quoteFailure?.call(promoCode);
+    final failure = quoteFailure?.call(promoCode, offerId);
     if (failure != null) return left(failure);
     return right(
       quotePayload(

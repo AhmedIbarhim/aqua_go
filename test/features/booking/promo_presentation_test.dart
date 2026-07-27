@@ -173,7 +173,7 @@ void main() {
 
     testWidgets('remembers only codes the backend accepted', (tester) async {
       final repo = RecordingBookingRepo(
-        quoteFailure: (code) => code == null
+        quoteFailure: (code, _) => code == null
             ? null
             : const ServerFailure(
                 'Code not recognised or expired',
@@ -237,7 +237,7 @@ void main() {
       tester,
     ) async {
       final repo = RecordingBookingRepo(
-        quoteFailure: (code) => code == null
+        quoteFailure: (code, _) => code == null
             ? null
             : const ServerFailure(
                 'Code not recognised or expired',

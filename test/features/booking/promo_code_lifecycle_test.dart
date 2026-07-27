@@ -3,6 +3,7 @@ import 'package:aqua_go/core/config/networking/exceptions/failure.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:aqua_go/features/offers/domain/pending_promo_code.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'support/promo_summary_harness.dart';
@@ -62,7 +63,7 @@ void main() {
       // The code applies cleanly, then stops being applicable — exactly what a
       // usage cap consumed by another customer between quotes looks like.
       repo = RecordingBookingRepo(
-        quoteFailure: (code) => code != null && repo.quoteCalls.length >= 3
+        quoteFailure: (code, _) => code != null && repo.quoteCalls.length >= 3
             ? const ServerFailure(
                 'This promo code is not available to you.',
                 type: FailureType.validation,
@@ -148,6 +149,53 @@ void main() {
       );
       expect(cubit.state.appliedPromoCode, promoCode);
       expect(cubit.state.quote!.breakdown!.grossMinor, grossWithPromoMinor);
+    },
+  );
+
+  testWidgets(
+    'an offer that no longer applies still leaves the customer a payable total',
+    (tester) async {
+      // The offer was eligible when the feed rendered it and is not by the time
+      // the customer taps through — its cap was consumed by a concurrent
+      // booking (UCC23 A3 / BR-OFR-11). The server answers the same
+      // `promo-not-recognised` it gives a garbage code; nothing in the copy
+      // below claims to know which of those happened.
+      const rejection = 'Code not recognised or expired';
+      final repo = RecordingBookingRepo(
+        quoteFailure: (_, offerId) => offerId == null
+            ? null
+            : const ServerFailure(rejection, type: FailureType.validation),
+      );
+      PendingPromoCode.instance.hold(offerId: 'offer-1', promoCode: promoCode);
+      // Drain the single-shot slot so a failed test cannot leak a handoff into
+      // the next one.
+      addTearDown(PendingPromoCode.instance.takeHandoff);
+
+      final cubit = buildCubit(repo);
+      addTearDown(cubit.close);
+      await pumpSummary(tester, cubit);
+
+      expect(
+        repo.offerCalls,
+        ['offer-1', null],
+        reason:
+            'the offer is tried first, then the order is re-priced WITHOUT it '
+            'so the customer has a total they can actually pay',
+      );
+      expect(cubit.state.appliedPromoCode, isNull);
+      expect(
+        cubit.state.quote!.breakdown!.grossMinor,
+        grossWithoutPromoMinor,
+        reason: 'UCC23 A3 — the discount is not granted, the total is unchanged',
+      );
+      // The rejection is raised once, by the cubit's failure state. Nothing
+      // adds a second message on top of it.
+      expect(find.textContaining(rejection), findsOneWidget);
+      expect(
+        find.textContaining('bookings.promo_code_removed'),
+        findsNothing,
+        reason: 'no code was ever applied, so none was removed',
+      );
     },
   );
 }
