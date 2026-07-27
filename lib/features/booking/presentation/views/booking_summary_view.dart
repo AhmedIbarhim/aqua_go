@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/extentions/context_extentions.dart';
+import '../../../../core/pricing/gross_price_breakdown.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../../core/utils/date_time_formatter.dart';
@@ -182,11 +183,11 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
     final config = bookingState.flowConfig;
 
     // Backend-rendered per-line breakdown (quote.lines) is the source of truth
-    // for displayed amounts — no client-side VAT/base math. Each line carries a
-    // NET (VAT-exclusive) netMinor; per Option B we render one row per line at
-    // its NET amount so the line rows sum to the net subtotal (breakdown.net),
-    // labelling the SERVICE line with the selected service name and each ADDON
-    // by mapping its refId to the selected add-on's localized name.
+    // for displayed amounts — no client-side VAT math. Each line's GROSS
+    // (VAT-inclusive) grossMinor is what the customer sees, so the rows carry
+    // the catalogue prices they recognise and sum to the pre-discount subtotal.
+    // The SERVICE line is labelled with the selected service name and each
+    // ADDON by mapping its refId to the selected add-on's localized name.
     // Package wash: show the CHOSEN included service (selectedPackageService);
     // fall back to selectedService — which holds the PACKAGE name — only when
     // the bundle has a single service (no picker, so package name is the wash
@@ -196,17 +197,19 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
     final availableAddons = bookingState.selectedService?.addons ?? [];
 
     final lines = bookingState.quote?.lines ?? const [];
+    final quoteBreakdown = bookingState.quote?.breakdown;
 
-    // Service row (label + gross price) and add-on rows for the summary card.
-    double servicePrice;
-    final List<Map<String, dynamic>> selectedAddons = [];
+    GrossLine? serviceLine;
+    final List<GrossLine> addonLines = [];
 
     if (lines.isNotEmpty) {
-      // Per-line rows render NET (line.net = netMinor/100); add-on rows come
-      // from ADDON lines, each labelled by refId → catalog add-on name. Line
-      // rows sum to the net subtotal (breakdown.net) — no client-side math.
-      final serviceLine = lines.where((l) => l.isService).firstOrNull;
-      servicePrice = serviceLine?.net ?? 0.0;
+      final service = lines.where((l) => l.isService).firstOrNull;
+      if (service != null) {
+        serviceLine = GrossLine(
+          label: serviceName,
+          grossMinor: service.grossMinor,
+        );
+      }
       for (final line in lines.where((l) => l.isAddon)) {
         final addon = availableAddons
             .where((a) => a.id == line.refId)
@@ -216,43 +219,35 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
             : (context.isAr
                   ? (addon.nameAr ?? addon.nameEn ?? '')
                   : (addon.nameEn ?? addon.nameAr ?? ''));
-        selectedAddons.add({'name': title, 'price': line.net});
+        addonLines.add(GrossLine(label: title, grossMinor: line.grossMinor));
       }
-    } else {
-      // No quote/lines yet (still loading / fetch failed / expired). Do NOT
-      // render a live catalog price — show 0.00 and let the Confirm gate block.
-      // The covered-wash zero-total path also lands here and correctly shows 0.
-      servicePrice = 0.0;
     }
+    // When lines are absent (still loading / fetch failed / expired, or the
+    // covered-wash zero-total path) we deliberately render NO line rows and no
+    // live catalog price — the totals below come out as 0.00 and the Confirm
+    // gate blocks.
 
-    final quoteBreakdown = bookingState.quote?.breakdown;
-
-    // PRICE LOCK: subtotal/vat/total come STRAIGHT from the backend quote
-    // breakdown frozen at booking initiation — never from the live catalog.
-    // When the quote is absent (still loading / fetch failed / expired) we
-    // render zeros and the Confirm gate below blocks, rather than silently
-    // falling back to live selectedService prices (which would mismatch the
-    // eventual charge and break the locked-at-initiation guarantee).
-    final double subtotal;
-    final double vat;
-    final double total;
-
-    if (quoteBreakdown != null) {
-      subtotal = quoteBreakdown.net;
-      vat = quoteBreakdown.vat;
-      total = quoteBreakdown.gross;
-    } else {
-      subtotal = 0.0;
-      vat = 0.0;
-      total = 0.0;
-    }
-
-    // What the applied code took off THIS order, straight from the locked
-    // quote — the same figure the server subtracted before splitting VAT. It
-    // drives both the amount saved on the promo chip and the original/discount
-    // pair in the payment summary; 0 when no code is applied, which is what
-    // suppresses them.
+    // PRICE LOCK: every figure comes STRAIGHT from the backend quote frozen at
+    // booking initiation — never from the live catalog. When the quote is
+    // absent we render zeros and the Confirm gate below blocks, rather than
+    // silently falling back to live selectedService prices (which would
+    // mismatch the eventual charge and break the locked-at-initiation
+    // guarantee).
+    //
+    // `promoDiscountMinor` is what the applied code took off THIS order — the
+    // same figure the server subtracted from the VAT-inclusive gross. It drives
+    // the amount saved on the promo chip and the subtotal/discount pair in the
+    // payment summary; 0 when no code is applied, which is what suppresses
+    // both rows.
     final int promoDiscountMinor = bookingState.quote?.promoDiscountMinor ?? 0;
+    final summary = GrossPriceBreakdown.fromQuoteLines(
+      serviceLine: serviceLine,
+      addonLines: addonLines,
+      promoDiscountMinor: promoDiscountMinor,
+      promoCode: bookingState.quote?.promoCode,
+      totalMinor: quoteBreakdown?.grossMinor ?? 0,
+      vatMinor: quoteBreakdown?.vatMinor ?? 0,
+    );
 
     return Container(
       padding: EdgeInsets.all(width * 0.06),
@@ -319,15 +314,7 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
               LocaleKeys.bookings_payment_summary.tr(context: context),
             ),
             const SizedBox(height: 16),
-            PaymentSummaryCard(
-              serviceName: serviceName,
-              servicePrice: servicePrice,
-              additionalItems: selectedAddons,
-              subtotal: subtotal,
-              vat: vat,
-              total: total,
-              promoDiscount: promoDiscountMinor / 100,
-            ),
+            PaymentSummaryCard(breakdown: summary),
           ],
           const SizedBox(height: 30),
         ],

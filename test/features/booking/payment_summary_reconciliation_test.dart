@@ -1,5 +1,5 @@
+import 'package:aqua_go/core/pricing/gross_price_breakdown.dart';
 import 'package:aqua_go/core/themes/app_colors.dart';
-import 'package:aqua_go/features/booking/data/models/quote_model.dart';
 import 'package:aqua_go/features/booking/presentation/widgets/payment_summary_card.dart';
 import 'package:aqua_go/generated/codegen_loader.g.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -7,107 +7,246 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Locks the invariant PaymentSummaryCard depends on: the backend quote
-/// breakdown is ALREADY net of any applied promo, so Subtotal + VAT == Total
-/// with `promoDiscountMinor` playing NO part in the arithmetic. The second
-/// test spells out exactly how far off the column would be if someone
-/// reintroduced a `-promoDiscount` row between Subtotal and VAT.
+/// Locks the VAT-INCLUSIVE breakdown the customer sees, and guards the two
+/// defects it replaced:
 ///
-/// The render group below covers the other half: that the rows the promo adds
-/// actually FIT. `promo_summary_harness` deliberately pumps the whole summary
-/// screen on a 1400pt canvas so its behaviour tests are not layout tests, which
-/// means no test there can ever see a phone-width overflow — so the card is
-/// pumped here on its own, at a real device size, in Arabic.
+///   * a NET line item or a NET "before tax" subtotal reappearing, and
+///   * the SAME discount appearing twice in two different bases.
+///
+/// The worked example throughout is the owner's: a 120.00 wash plus a 55.00
+/// add-on, a 50.00 code, 15% VAT-inclusive. Gross subtotal 175.00, charged
+/// 125.00, VAT within that 16.30. The old layout showed the same order as
+/// 104.35 / 47.83 / −43.48 / 108.70 / 16.30 / −50.00 / 175.00 / 125.00 — every
+/// figure reconciling, none of it followable by eye.
 void main() {
-  group('promo-applied quote breakdown', () {
-    // Base gross 11500 minor, promo 2000 minor, 15% VAT-inclusive:
-    // discountedGross 9500 -> vat 1239, net 8261.
-    final promoQuote = QuoteModel.fromJson({
-      'quoteId': 'q-promo-1',
-      'totalMinor': 9500,
-      'vatMinor': 1239,
-      'currency': 'SAR',
-      // Bare Asia/Riyadh local — the only shape the backend emits. A `Z` here
-      // would send `QuoteModel.fromJson` down the anchored branch the server
-      // never produces, hiding the device-local parse it is guarded against.
-      'expiresAt': '2026-07-24T10:00:00',
-      'promoCode': 'WELCOME15',
-      'promoDiscountMinor': 2000,
-      'breakdown': {
-        'grossMinor': 9500,
-        'netMinor': 8261,
-        'vatMinor': 1239,
-        'currency': 'SAR',
-      },
+  // What the BACKEND puts on the wire for that order, per surface.
+  //
+  // A QUOTE nets the discount INTO its lines and emits no DISCOUNT row, so the
+  // SERVICE line arrives at 120.00 − 50.00 = 70.00.
+  GrossPriceBreakdown quoteCase() => GrossPriceBreakdown.fromQuoteLines(
+    serviceLine: const GrossLine(label: 'تنظيف السقف الداخلي', grossMinor: 7000),
+    addonLines: const [GrossLine(label: 'معالجة بالأوزون', grossMinor: 5500)],
+    promoDiscountMinor: 5000,
+    promoCode: 'NEWCUST50',
+    totalMinor: 12500,
+    vatMinor: 1630,
+  );
+
+  // A BOOKING DETAIL already states the pre-discount price on the SERVICE row
+  // and carries the saving as its own negative DISCOUNT line.
+  GrossPriceBreakdown bookingCase() => GrossPriceBreakdown.fromBookingLines(
+    itemLines: const [
+      GrossLine(label: 'تنظيف السقف الداخلي', grossMinor: 12000),
+      GrossLine(label: 'معالجة بالأوزون', grossMinor: 5500),
+    ],
+    discountMinor: 5000,
+    promoCode: 'NEWCUST50',
+    totalMinor: 12500,
+    vatMinor: 1630,
+  );
+
+  group('the gross breakdown reconciles', () {
+    test('a quote recovers the PRE-discount service price', () {
+      final b = quoteCase();
+      // 70.00 on the wire + the 50.00 that was taken off it == the real 120.00.
+      expect(b.lines.map((l) => l.grossMinor), [12000, 5500]);
+      expect(b.subtotalMinor, 17500);
+      expect(b.discountMinor, 5000);
+      expect(b.totalMinor, 12500);
     });
 
-    test('subtotal + vat reconciles to total with no discount row', () {
-      final b = promoQuote.breakdown!;
-      expect(b.netMinor! + b.vatMinor!, b.grossMinor);
-      expect(b.net + b.vat, closeTo(b.gross, 0.001));
+    test('a booking detail reads the pre-discount lines verbatim', () {
+      final b = bookingCase();
+      expect(b.lines.map((l) => l.grossMinor), [12000, 5500]);
+      expect(b.subtotalMinor, 17500);
     });
 
-    test('subtracting the promo a second time breaks the column', () {
-      final b = promoQuote.breakdown!;
-      final doubleSubtracted =
-          b.netMinor! - promoQuote.promoDiscountMinor + b.vatMinor!;
-      expect(doubleSubtracted, isNot(b.grossMinor));
-      expect(doubleSubtracted, 7500);
+    test('both surfaces state the SAME figures', () {
+      final q = quoteCase();
+      final d = bookingCase();
+      expect(q.lines.map((l) => l.grossMinor), d.lines.map((l) => l.grossMinor));
+      expect(q.subtotalMinor, d.subtotalMinor);
+      expect(q.discountMinor, d.discountMinor);
+      expect(q.totalMinor, d.totalMinor);
+      expect(q.vatMinor, d.vatMinor);
+    });
+
+    test('the lines sum EXACTLY to the subtotal — not within a halala', () {
+      for (final b in [quoteCase(), bookingCase()]) {
+        expect(b.lines.fold<int>(0, (s, l) => s + l.grossMinor), 17500);
+        expect(b.linesReconcile, isTrue);
+      }
+    });
+
+    test('subtotal − discount == total, the one sum the layout states', () {
+      for (final b in [quoteCase(), bookingCase()]) {
+        expect(b.totalReconciles, isTrue);
+        expect(b.subtotalMinor - b.discountMinor, b.totalMinor);
+      }
+    });
+
+    test('VAT is NOT an addend — it is already inside the total', () {
+      final b = quoteCase();
+      // The disclosed VAT is what was charged on the DISCOUNTED gross (15% of
+      // 108.70), NOT 15% of the 175.00 subtotal (22.83). Adding it to the total
+      // would double-count it.
+      expect(b.vatMinor, 1630);
+      expect(b.totalMinor + b.vatMinor, isNot(b.subtotalMinor));
+    });
+
+    test('no promo: no subtotal, no discount, no −0.00', () {
+      final b = GrossPriceBreakdown.fromQuoteLines(
+        serviceLine: const GrossLine(label: 'wash', grossMinor: 12000),
+        addonLines: const [],
+        promoDiscountMinor: 0,
+        promoCode: null,
+        totalMinor: 12000,
+        vatMinor: 1565,
+      );
+      expect(b.hasDiscount, isFalse);
+      expect(b.lines.single.grossMinor, 12000);
+      // "Before discount" would just restate the total, which is why the row is
+      // suppressed rather than rendered as an equal pair.
+      expect(b.subtotalMinor, b.totalMinor);
+      expect(b.linesReconcile, isTrue);
     });
   });
 
-  group('the card fits a phone', () {
+  group('the card renders gross, once', () {
     setUpAll(() async {
       TestWidgetsFlutterBinding.ensureInitialized();
       SharedPreferences.setMockInitialValues({});
       await EasyLocalization.ensureInitialized();
     });
 
-    testWidgets('the widest Arabic shape — add-on, promo rows and all', (
-      tester,
-    ) async {
-      // The two rows UCC16 step 4 adds carry the longest labels on the card
-      // ("الإجمالي قبل الخصم", "خصم الكود"), and the row helper was two
-      // unbounded `Text`s in a spaceBetween Row. No RTL special-handling
-      // anywhere — the same widget is pumped, in ar.
-      await _pumpCard(
-        tester,
-        const PaymentSummaryCard(
-          serviceName: 'غسيل خارجي وداخلي شامل تلميع الإطارات',
-          servicePrice: 62.61,
-          additionalItems: [
-            {
-              'name': 'تلميع الإطارات وتنظيف المقصورة الداخلية بالبخار',
-              'price': 20.0,
-            },
-          ],
-          subtotal: 82.61,
-          vat: 12.39,
-          total: 95.0,
-          promoDiscount: 20.0,
-        ),
-      );
+    testWidgets('every visible figure is VAT-inclusive', (tester) async {
+      await _pumpCard(tester, PaymentSummaryCard(breakdown: quoteCase()));
 
-      expect(find.text('الإجمالي قبل الخصم'), findsOneWidget);
-      expect(find.text('خصم الكود'), findsOneWidget);
-      expect(find.text('-20.00'), findsOneWidget);
+      expect(find.text('120.00'), findsOneWidget); // service, gross
+      expect(find.text('55.00'), findsOneWidget); // add-on, gross
+      expect(find.text('175.00'), findsOneWidget); // subtotal, gross
+      expect(find.text('-50.00'), findsOneWidget); // discount, full value
+      expect(find.text('125.00'), findsOneWidget); // total
+      expect(find.text('16.30'), findsOneWidget); // VAT, disclosed
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('and with no promo applied', (tester) async {
+    testWidgets('the code is folded into the discount row', (tester) async {
+      await _pumpCard(tester, PaymentSummaryCard(breakdown: quoteCase()));
+
+      expect(find.text('خصم NEWCUST50'), findsOneWidget);
+      // The standalone "كود الخصم" row it replaced must not come back.
+      expect(find.text('كود الخصم'), findsNothing);
+    });
+
+    // GUARD 1 — a NET figure must never reappear on this card.
+    //
+    // Red-proof: delete `+ promoDiscountMinor` from
+    // GrossPriceBreakdown.fromQuoteLines (the line that recovers the
+    // pre-discount service gross) and this test fails on 70.00 rendering where
+    // 120.00 belongs.
+    testWidgets('GUARD: no net figure is rendered', (tester) async {
+      await _pumpCard(tester, PaymentSummaryCard(breakdown: quoteCase()));
+
+      for (final net in const [
+        '104.35', // service net
+        '47.83', // add-on net
+        '108.70', // net subtotal — the second, competing base
+        '-43.48', // the discount restated pre-VAT
+        '43.48',
+        '152.18', // what the old net line items summed to: shown nowhere
+        '70.00', // the post-discount service gross the quote puts on the wire
+      ]) {
+        expect(
+          find.text(net),
+          findsNothing,
+          reason: '$net is a net/post-discount figure and must not be shown',
+        );
+      }
+    });
+
+    // GUARD 2 — the discount appears EXACTLY once.
+    //
+    // The old card stated it twice in two bases (−43.48 pre-VAT and −50.00
+    // gross). Counting every negative amount on the card catches any second
+    // discount row regardless of the label it is given.
+    testWidgets('GUARD: exactly one negative amount on the card', (
+      tester,
+    ) async {
+      await _pumpCard(tester, PaymentSummaryCard(breakdown: quoteCase()));
+
+      final negatives = tester.widgetList<Text>(find.byType(Text))
+          .map((t) => t.data)
+          .whereType<String>()
+          .where((s) => s.startsWith('-'))
+          .toList();
+      expect(negatives, ['-50.00']);
+    });
+
+    testWidgets('no promo: neither the subtotal nor the discount row', (
+      tester,
+    ) async {
       await _pumpCard(
         tester,
-        const PaymentSummaryCard(
-          serviceName: 'غسيل خارجي وداخلي شامل تلميع الإطارات',
-          servicePrice: 100.0,
-          additionalItems: [],
-          subtotal: 100.0,
-          vat: 15.0,
-          total: 115.0,
+        PaymentSummaryCard(
+          breakdown: GrossPriceBreakdown.fromQuoteLines(
+            // Two lines, so the total is its own figure and cannot be
+            // confused with a line item.
+            serviceLine: const GrossLine(label: 'غسيل خارجي', grossMinor: 9000),
+            addonLines: const [
+              GrossLine(label: 'تلميع الإطارات', grossMinor: 2500),
+            ],
+            promoDiscountMinor: 0,
+            promoCode: null,
+            totalMinor: 11500,
+            vatMinor: 1500,
+          ),
         ),
       );
 
       expect(find.text('الإجمالي قبل الخصم'), findsNothing);
+      expect(find.text('-0.00'), findsNothing);
+      expect(find.text('90.00'), findsOneWidget); // line items, gross
+      expect(find.text('25.00'), findsOneWidget);
+      expect(find.text('115.00'), findsOneWidget); // total, once
+      expect(find.text('15.00'), findsOneWidget); // VAT footnote
+      // Nothing negative at all when nothing was discounted.
+      final negatives = tester.widgetList<Text>(find.byType(Text))
+          .map((t) => t.data)
+          .whereType<String>()
+          .where((s) => s.startsWith('-'));
+      expect(negatives, isEmpty);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('the widest Arabic shape fits a phone', (tester) async {
+      // The Arabic labels run longer than the English ones, and the row helper
+      // is a spaceBetween Row of two Texts. No RTL special-handling anywhere —
+      // the same widget is pumped, in ar.
+      await _pumpCard(
+        tester,
+        PaymentSummaryCard(
+          breakdown: GrossPriceBreakdown.fromQuoteLines(
+            serviceLine: const GrossLine(
+              label: 'غسيل خارجي وداخلي شامل تلميع الإطارات',
+              grossMinor: 7000,
+            ),
+            addonLines: const [
+              GrossLine(
+                label: 'تلميع الإطارات وتنظيف المقصورة الداخلية بالبخار',
+                grossMinor: 5500,
+              ),
+            ],
+            promoDiscountMinor: 5000,
+            promoCode: 'NEWCUSTOMER50',
+            totalMinor: 12500,
+            vatMinor: 1630,
+          ),
+        ),
+      );
+
+      expect(find.text('الإجمالي قبل الخصم'), findsOneWidget);
+      expect(find.text('شامل ضريبة القيمة المضافة'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   });

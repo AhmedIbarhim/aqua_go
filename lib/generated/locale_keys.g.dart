@@ -182,8 +182,6 @@ abstract class  LocaleKeys {
   static const bookings_selected_car = 'bookings.selected_car';
   static const bookings_notes_for_biker = 'bookings.notes_for_biker';
   static const bookings_payment_summary = 'bookings.payment_summary';
-  static const bookings_subtotal = 'bookings.subtotal';
-  static const bookings_vat = 'bookings.vat';
   static const bookings_promo_code_title = 'bookings.promo_code_title';
   static const bookings_apply_promo_code = 'bookings.apply_promo_code';
   static const bookings_promo_code_applied = 'bookings.promo_code_applied';
@@ -193,7 +191,8 @@ abstract class  LocaleKeys {
   static const bookings_promo_code_removed = 'bookings.promo_code_removed';
   static const bookings_original_total = 'bookings.original_total';
   static const bookings_promo_discount = 'bookings.promo_discount';
-  static const bookings_promo_discount_before_vat = 'bookings.promo_discount_before_vat';
+  static const bookings_promo_discount_named = 'bookings.promo_discount_named';
+  static const bookings_vat_inclusive = 'bookings.vat_inclusive';
   static const bookings_promo_released = 'bookings.promo_released';
   static const bookings_payment_refunded_title = 'bookings.payment_refunded_title';
   static const bookings_payment_refunded_notice = 'bookings.payment_refunded_notice';

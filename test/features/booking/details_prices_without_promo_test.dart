@@ -150,9 +150,11 @@ void main() {
       );
       expect(cubit.state.quote!.breakdown!.grossMinor, grossWithPromoMinor);
 
-      // The three-value breakdown is what explains the step down — nothing else
-      // is added to soften it.
-      expect(find.text('115.00'), findsOneWidget);
+      // The subtotal → discount → total breakdown is what explains the step
+      // down — nothing else is added to soften it. This basket is a single
+      // service with no add-ons, so the one line item and the "before discount"
+      // subtotal it sums to are necessarily the same 115.00, stated twice.
+      expect(find.text('115.00'), findsNWidgets(2));
       expect(find.text('-20.00'), findsOneWidget);
       expect(find.text('95.00'), findsOneWidget);
     },

@@ -203,8 +203,11 @@ void main() {
           ),
         ),
       );
-      expect(find.text('WELCOME20'), findsOneWidget);
-      // original == total + discount, exactly: the backend subtracts the
+      // The code is folded INTO the discount row — there is no separate
+      // "Promo Code" row to state it twice.
+      expect(find.text('WELCOME20 discount'), findsOneWidget);
+      expect(find.text('Promo Code'), findsNothing);
+      // subtotal == total + discount, exactly: the backend subtracts the
       // discount from the VAT-inclusive gross to reach the charged total.
       expect(find.text('115.00 SAR'), findsOneWidget);
       expect(find.text('-20.00 SAR'), findsOneWidget);
@@ -228,7 +231,7 @@ void main() {
           ),
         ),
       );
-      expect(find.text('WELCOME20'), findsOneWidget);
+      expect(find.text('WELCOME20 discount'), findsOneWidget);
       expect(find.text('-20.00 SAR'), findsOneWidget);
       expect(find.text('Code returned after cancellation'), findsOneWidget);
     });
@@ -253,7 +256,7 @@ void main() {
         ),
         locale: const Locale('ar'),
       );
-      expect(find.text('WELCOME20'), findsOneWidget);
+      expect(find.text('خصم WELCOME20'), findsOneWidget);
       expect(find.text('الإجمالي قبل الخصم'), findsOneWidget);
       expect(find.text('تمت إعادة الكود بعد الإلغاء'), findsOneWidget);
       expect(tester.takeException(), isNull);
@@ -287,19 +290,21 @@ void main() {
         BookingResponseModel.fromJson(json),
         locale: const Locale('ar'),
       );
-      expect(find.text('WELCOME20'), findsOneWidget);
+      expect(find.text('خصم WELCOME20'), findsOneWidget);
       expect(find.text('الإجمالي قبل الخصم'), findsOneWidget);
+      expect(find.text('شامل ضريبة القيمة المضافة'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
-    /// The defect this closes: the backend states the wash's PRE-discount price
-    /// on the SERVICE row and carries the saving as its own negative row, so a
-    /// card that renders the item rows and drops the discount shows a column
-    /// adding up to more than the Subtotal printed directly beneath it.
+    /// Every visible figure is VAT-INCLUSIVE, and the item rows sum EXACTLY to
+    /// the "before discount" subtotal printed beneath them:
+    /// 92.00 service + 23.00 add-on == 115.00, − 20.00 == the 95.00 charged.
+    /// Each is the backend's own `grossMinor`; nothing here is recomputed.
     ///
-    /// 80.00 service + 20.00 add-on − 17.39 discount == 82.61 subtotal. Every
-    /// figure is the backend's own `netMinor`; nothing here is recomputed.
-    testWidgets('the item rows still reconcile with the Subtotal beneath them', (
+    /// This also guards the defect it replaced: the same discount stated twice
+    /// in two bases (−17.39 net and −20.00 gross), against two competing
+    /// subtotals (82.61 net and 115.00 gross), in one column.
+    testWidgets('the item rows reconcile with the subtotal, all gross', (
       tester,
     ) async {
       final json = _bookingJson(
@@ -322,18 +327,38 @@ void main() {
         };
       await _pumpCard(tester, BookingResponseModel.fromJson(json));
 
-      expect(find.text('80.00 SAR'), findsOneWidget, reason: 'the wash, before the code');
-      expect(find.text('20.00 SAR'), findsOneWidget, reason: 'the add-on');
+      expect(find.text('92.00 SAR'), findsOneWidget, reason: 'the wash, gross, before the code');
+      expect(find.text('23.00 SAR'), findsOneWidget, reason: 'the add-on, gross');
+      expect(find.text('115.00 SAR'), findsOneWidget, reason: 'the subtotal they sum to');
       expect(
-        find.text('-17.39 SAR'),
+        find.text('-20.00 SAR'),
         findsOneWidget,
-        reason: 'the saving, stated NET like every other row in this column',
+        reason: 'the saving, at its FULL value, stated exactly once',
       );
-      expect(find.text('82.61 SAR'), findsOneWidget, reason: 'the subtotal they sum to');
-      // The VAT-inclusive promo statement below is unchanged and separate.
-      expect(find.text('-20.00 SAR'), findsOneWidget);
-      expect(find.text('115.00 SAR'), findsOneWidget);
-      expect(find.text('95.00 SAR'), findsOneWidget);
+      expect(find.text('95.00 SAR'), findsOneWidget, reason: 'the charged total');
+      expect(find.text('12.39 SAR'), findsOneWidget, reason: 'VAT, disclosed under the total');
+
+      // GUARD — no net figure, and no second discount row. Red-proof: revert
+      // the item rows to `line.net` in BookingDetailsSummaryCard._breakdown and
+      // 80.00 / 20.00 render where 92.00 / 23.00 belong.
+      for (final net in const [
+        '80.00 SAR', // service net
+        '20.00 SAR', // add-on net
+        '82.61 SAR', // net subtotal — the second, competing base
+        '-17.39 SAR', // the discount restated pre-VAT
+      ]) {
+        expect(
+          find.text(net),
+          findsNothing,
+          reason: '$net is a net figure and must not be shown',
+        );
+      }
+      final negatives = tester.widgetList<Text>(find.byType(Text))
+          .map((t) => t.data)
+          .whereType<String>()
+          .where((s) => s.startsWith('-'))
+          .toList();
+      expect(negatives, ['-20.00 SAR'], reason: 'exactly one discount row');
       expect(tester.takeException(), isNull);
     });
 
@@ -370,24 +395,35 @@ void main() {
           'currency': 'SAR',
         };
       await _pumpCard(tester, BookingResponseModel.fromJson(json));
-      expect(find.text('Promo discount (before VAT)'), findsNothing);
+      // No code, so neither the discount row nor the "before discount"
+      // subtotal it explains: the lines run straight into the total.
+      expect(find.text('Original Total'), findsNothing);
+      expect(find.text('72.00 SAR'), findsOneWidget, reason: 'the wash, gross');
+      expect(find.text('23.00 SAR'), findsOneWidget, reason: 'the add-on, gross');
+      expect(find.text('95.00 SAR'), findsOneWidget, reason: 'the total');
+      final negatives = tester.widgetList<Text>(find.byType(Text))
+          .map((t) => t.data)
+          .whereType<String>()
+          .where((s) => s.startsWith('-'));
+      expect(negatives, isEmpty);
     });
 
-    testWidgets('a zero-discount code is NAMED, with no original/discount pair', (
+    testWidgets('a code that saved nothing states no discount and no subtotal', (
       tester,
     ) async {
-      // Both surfaces answer the same state the same way: the review screen
-      // falls back to "promo code applied", and the booking detail keeps the
-      // code row. What is suppressed is only the saving.
+      // A discount row worth 0.00, and a "before discount" total equal to the
+      // total, both read as bugs. The code is surfaced only where it has a
+      // value to state, so with no saving there is nothing to show.
       await _pumpCard(
         tester,
         BookingResponseModel.fromJson(
           _bookingJson(promo: {'code': 'WELCOME20', 'discountMinor': 0}),
         ),
       );
-      expect(find.text('WELCOME20'), findsOneWidget);
       expect(find.text('Original Total'), findsNothing);
+      expect(find.text('WELCOME20 discount'), findsNothing);
       expect(find.text('-0.00 SAR'), findsNothing);
+      expect(find.text('95.00 SAR'), findsOneWidget);
     });
 
     testWidgets('a booking with no promo renders no promo rows', (
