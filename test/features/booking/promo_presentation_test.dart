@@ -1,5 +1,7 @@
 import 'package:aqua_go/core/config/local_storage/shared_prefs.dart';
 import 'package:aqua_go/core/config/networking/exceptions/failure.dart';
+import 'package:aqua_go/core/constants.dart';
+import 'package:aqua_go/features/auth/data/models/user_model.dart';
 import 'package:aqua_go/features/booking/data/repos/booking_repository.dart';
 import 'package:aqua_go/features/booking/domain/promo_code_history.dart';
 import 'package:aqua_go/features/booking/domain/strategies/booking_submit_strategy.dart';
@@ -35,6 +37,13 @@ void main() {
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
     await CacheClient.init();
+    // The code history is keyed by the signed-in customer's local id, so the
+    // suggestion assertions need somebody signed in. Same cached-user record
+    // the app writes — and the same one session teardown removes.
+    await CacheClient.setString(
+      kUserData,
+      UserModel(id: 'customer-under-test').toEncodedJson(),
+    );
   });
 
   group('the three-value breakdown (UCC16 step 4)', () {

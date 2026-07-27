@@ -267,7 +267,9 @@ class _PromoCodeDialog extends StatefulWidget {
 class _PromoCodeDialogState extends State<_PromoCodeDialog> {
   final TextEditingController _controller = TextEditingController();
 
-  /// Codes applied before on this device, most recent first (UCC16 UI/UX).
+  /// Codes THIS customer applied before on this device, most recent first
+  /// (UCC16 UI/UX). Scoped by account: a shared handset must not offer one
+  /// person the codes another earned.
   late final List<String> _history = PromoCodeHistory.recent();
 
   /// Only judge the input once the customer has typed something: an empty field

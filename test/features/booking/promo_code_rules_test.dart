@@ -1,4 +1,6 @@
 import 'package:aqua_go/core/config/local_storage/shared_prefs.dart';
+import 'package:aqua_go/core/constants.dart';
+import 'package:aqua_go/features/auth/data/models/user_model.dart';
 import 'package:aqua_go/features/booking/domain/promo_code_history.dart';
 import 'package:aqua_go/features/booking/domain/promo_code_rules.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -29,14 +31,67 @@ void main() {
   });
 
   group('previously used codes', () {
+    // The store is keyed by the signed-in customer's local id, so these tests
+    // need somebody signed in. `signIn` writes the same cached-user record the
+    // app writes, which is also what the session teardown removes.
+    Future<void> signIn(String customerId) async {
+      await CacheClient.setString(
+        kUserData,
+        UserModel(id: customerId).toEncodedJson(),
+      );
+    }
+
     setUp(() async {
       TestWidgetsFlutterBinding.ensureInitialized();
       SharedPreferences.setMockInitialValues({});
       await CacheClient.init();
+      await signIn('customer-a');
     });
 
     test('starts empty', () {
       expect(PromoCodeHistory.recent(), isEmpty);
+    });
+
+    /// The defect this closes: one unscoped key meant the next person to sign
+    /// in on a shared handset was offered the previous customer's codes.
+    test('one customer is never offered another customer\'s codes', () async {
+      await PromoCodeHistory.remember('ACODE1');
+
+      await signIn('customer-b');
+      expect(PromoCodeHistory.recent(), isEmpty);
+
+      await PromoCodeHistory.remember('BCODE2');
+      expect(PromoCodeHistory.recent(), ['BCODE2']);
+
+      await signIn('customer-a');
+      expect(PromoCodeHistory.recent(), ['ACODE1']);
+    });
+
+    test('a signed-out viewer has no history and records none', () async {
+      await PromoCodeHistory.remember('ACODE1');
+      await CacheClient.removeString(kUserData);
+
+      expect(PromoCodeHistory.recent(), isEmpty);
+      await PromoCodeHistory.remember('GUEST1');
+      expect(PromoCodeHistory.recent(), isEmpty);
+    });
+
+    /// Session teardown erases it — sign-out, forced purge, account deletion.
+    /// Account deletion makes it a PDPL erasure obligation, not a nicety.
+    test('forget erases this customer, and the pre-scoping store too', () async {
+      await CacheClient.setStringList(
+        PromoCodeHistory.legacyStorageKey,
+        const ['LEGACY1'],
+      );
+      await PromoCodeHistory.remember('ACODE1');
+
+      await PromoCodeHistory.forget();
+
+      expect(PromoCodeHistory.recent(), isEmpty);
+      expect(
+        CacheClient.getStringList(PromoCodeHistory.legacyStorageKey),
+        isEmpty,
+      );
     });
 
     test('most recent first', () async {
