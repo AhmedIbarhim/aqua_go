@@ -126,6 +126,16 @@ class PaymentSummaryCard extends StatelessWidget {
     );
   }
 
+  /// Both halves are [Flexible], so each keeps its natural width while the pair
+  /// fits and gives ground only when it does not. Without that the row is two
+  /// unbounded `Text`s and overflows on a phone: a long add-on name, and the
+  /// Arabic labels — which run longer than the English ones, the two promo rows
+  /// most of all — push past the card edge. Same fix, and the same reason, as
+  /// `BookingDetailsSummaryCard._buildSummaryRow`.
+  ///
+  /// Nothing here branches on direction. [Flexible] and [MainAxisAlignment
+  /// .spaceBetween] are direction-agnostic; Flutter lays the same tree out RTL
+  /// in Arabic.
   Widget _buildPaymentRow(
     BuildContext context, {
     required String label,
@@ -133,45 +143,53 @@ class PaymentSummaryCard extends StatelessWidget {
     bool isTotal = false,
     bool negative = false,
   }) {
+    final style = (isTotal ? AppTextStyles.medium16 : AppTextStyles.regular16)
+        .copyWith(
+          color: isTotal
+              ? context.colors.textPrimary
+              : context.colors.textSecondary,
+        );
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: (isTotal ? AppTextStyles.medium16 : AppTextStyles.regular16)
-              .copyWith(
-                color: isTotal
-                    ? context.colors.textPrimary
-                    : context.colors.textSecondary,
-              ),
+        Flexible(
+          child: Text(
+            label,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: style,
+          ),
         ),
-        Row(
-          children: [
-            Text(
-              '${negative ? '-' : ''}${value.toStringAsFixed(2)}',
-              style:
-                  (isTotal ? AppTextStyles.medium16 : AppTextStyles.regular16)
-                      .copyWith(
-                        color: isTotal
-                            ? context.colors.textPrimary
-                            : context.colors.textSecondary,
-                      ),
-            ),
-
-            const SizedBox(width: 4),
-
-            SvgPicture.asset(
-              AppAssets.currency,
-              width: 24,
-              height: 24,
-              colorFilter: ColorFilter.mode(
-                isTotal
-                    ? context.colors.textPrimary
-                    : context.colors.textSecondary,
-                BlendMode.srcIn,
+        const SizedBox(width: 12),
+        Flexible(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Flexible(
+                child: Text(
+                  '${negative ? '-' : ''}${value.toStringAsFixed(2)}',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.end,
+                  style: style,
+                ),
               ),
-            ),
-          ],
+
+              const SizedBox(width: 4),
+
+              SvgPicture.asset(
+                AppAssets.currency,
+                width: 24,
+                height: 24,
+                colorFilter: ColorFilter.mode(
+                  isTotal
+                      ? context.colors.textPrimary
+                      : context.colors.textSecondary,
+                  BlendMode.srcIn,
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );
