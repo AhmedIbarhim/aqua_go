@@ -27,6 +27,10 @@ abstract class AppAssets {
   static const String emptyCars = 'assets/svg/empty_folder.svg';
   static const String emptyBookings = 'assets/svg/empty_bookings.svg';
   static const String emptyComplaints = 'assets/svg/no_complaints.svg';
+  // The same generic "nothing here" illustration `emptyCars` uses — the app has
+  // no offers-specific one, and inventing a second style for one screen is the
+  // opposite of what an empty state should do.
+  static const String emptyOffers = 'assets/svg/empty_folder.svg';
 
   // Auth
   static const String logo = 'assets/images/app_logo.png';

@@ -83,6 +83,9 @@ void main() {
       // customer something went wrong when nothing did.
       expect(find.text(LocaleKeys.offers_empty.tr()), findsOneWidget);
       expect(find.byKey(const ValueKey('offers-retry')), findsNothing);
+      // A1 also asks for "an illustration AND the line" — the line alone reads
+      // as a screen that failed to draw rather than as a finished state.
+      expect(find.byKey(const ValueKey('offers-empty-art')), findsOneWidget);
     });
 
     testWidgets('loading is a third state, neither empty nor error', (tester) async {
@@ -95,6 +98,7 @@ void main() {
       expect(find.byType(ShimmerHelper), findsWidgets);
       expect(find.text(LocaleKeys.offers_empty.tr()), findsNothing);
       expect(find.byKey(const ValueKey('offers-retry')), findsNothing);
+      expect(find.byKey(const ValueKey('offers-empty-art')), findsNothing);
     });
   });
 

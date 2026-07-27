@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:svg_flutter/svg.dart';
 
 import '../../../../core/components/generic_app_bar.dart';
 import '../../../../core/config/session/session_state.dart';
@@ -9,6 +10,7 @@ import '../../../../core/helpers/fetch_user_data_helper.dart';
 import '../../../../core/helpers/shimmer_helper.dart';
 import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_text_styles.dart';
+import '../../../../core/utils/app_assets.dart';
 import '../../../../core/utils/saudi_wire_format.dart';
 import '../../../../features/auth/data/models/user_model.dart';
 import '../../../../generated/locale_keys.g.dart';
@@ -103,7 +105,13 @@ class OffersView extends StatelessWidget {
     // of the list is a deal they will be refused at apply time.
     final sorted = visibleOffers(offers, saudiNow());
     if (sorted.isEmpty) {
-      return _fill(LocaleKeys.offers_empty.tr(context: context));
+      // UCC23 A1 — "an illustration and the line". The illustration is what
+      // makes an empty list read as a finished state rather than as a screen
+      // that failed to draw; A6 is the separate state for an actual outage.
+      return _fill(
+        LocaleKeys.offers_empty.tr(context: context),
+        illustration: AppAssets.emptyOffers,
+      );
     }
     return ListView.separated(
       padding: const EdgeInsets.all(16),
@@ -125,15 +133,20 @@ class OffersView extends StatelessWidget {
 
   /// A single centred message that still fills — and scrolls — the whole body,
   /// so it sits at the optical centre on every screen size and pull-to-refresh
-  /// keeps working. [onRetry] non-null adds the A6 retry button beneath it.
-  Widget _fill(String text, {VoidCallback? onRetry}) {
+  /// keeps working. [onRetry] non-null adds the A6 retry button beneath it;
+  /// [illustration] non-null adds the A1 artwork above it.
+  Widget _fill(String text, {VoidCallback? onRetry, String? illustration}) {
     return LayoutBuilder(
       builder: (context, constraints) => ListView(
         physics: const AlwaysScrollableScrollPhysics(),
         children: [
           ConstrainedBox(
             constraints: BoxConstraints(minHeight: constraints.maxHeight),
-            child: _Message(text: text, onRetry: onRetry),
+            child: _Message(
+              text: text,
+              onRetry: onRetry,
+              illustration: illustration,
+            ),
           ),
         ],
       ),
@@ -240,22 +253,33 @@ class _SignInPrompt extends StatelessWidget {
 }
 
 class _Message extends StatelessWidget {
-  const _Message({required this.text, this.onRetry});
+  const _Message({required this.text, this.onRetry, this.illustration});
 
   final String text;
 
   /// Non-null renders the UCC23 A6 retry affordance under the message.
   final VoidCallback? onRetry;
 
+  /// Non-null renders the UCC23 A1 illustration above the message. Same shape
+  /// as every other empty state in the app — a bare `SvgPicture.asset` at its
+  /// natural size, 40pt of air, then the line (`EmptyCarsWidget`,
+  /// `EmptyBookingsWidget`).
+  final String? illustration;
+
   @override
   Widget build(BuildContext context) {
     final retry = onRetry;
+    final art = illustration;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            if (art != null) ...[
+              SvgPicture.asset(art, key: const ValueKey('offers-empty-art')),
+              const SizedBox(height: 40),
+            ],
             Text(
               text,
               textAlign: TextAlign.center,

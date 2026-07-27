@@ -106,7 +106,7 @@ class CodegenLoader extends AssetLoader{
   },
   "offers": {
     "title": "Offers",
-    "empty": "There are no offers available right now",
+    "empty": "No offers available right now — check back soon.",
     "error": "Could not load offers",
     "valid_until": "Valid until {}",
     "ends_in_days": "Ends in {} days",
@@ -660,7 +660,7 @@ static const Map<String,dynamic> _ar = {
   },
   "offers": {
     "title": "العروض",
-    "empty": "لا توجد عروض متاحة حاليا",
+    "empty": "لا توجد عروض متاحة حاليا، تحقق مرة أخرى قريبا.",
     "error": "تعذر تحميل العروض",
     "valid_until": "ساري حتى {}",
     "ends_in_days": "ينتهي خلال {} أيام",

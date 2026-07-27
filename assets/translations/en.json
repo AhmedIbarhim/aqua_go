@@ -90,7 +90,7 @@
   },
   "offers": {
     "title": "Offers",
-    "empty": "There are no offers available right now",
+    "empty": "No offers available right now — check back soon.",
     "error": "Could not load offers",
     "valid_until": "Valid until {}",
     "ends_in_days": "Ends in {} days",
