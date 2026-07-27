@@ -243,4 +243,44 @@ void main() {
     expect(offerTermLines(_offer('PACKAGE', const OfferTermsModel()), isAr: true), isEmpty);
     expect(offerTermLines(_offer('PROMO_CODE', const OfferTermsModel()), isAr: true), isEmpty);
   });
+
+  group('offerLastLiveDay — the EXCLUSIVE endsAt bound, back to a real day', () {
+    // `offerExpiryLine` itself needs the app's intl symbol data to format, so it
+    // is asserted in offers_surface_test.dart. The day arithmetic underneath it
+    // is pure, and this is where it is pinned.
+
+    test('a bound on KSA midnight names the PREVIOUS day', () {
+      // An operator running a campaign through 31 August stores 1 September's
+      // midnight. Printing the bound verbatim named a day the offer is gone on.
+      expect(
+        offerLastLiveDay(DateTime.utc(2026, 9, 1)),
+        DateTime.utc(2026, 8, 31),
+      );
+    });
+
+    test('it rolls back across a month and a year boundary', () {
+      expect(offerLastLiveDay(DateTime.utc(2026, 3, 1)), DateTime.utc(2026, 2, 28));
+      expect(offerLastLiveDay(DateTime.utc(2027, 1, 1)), DateTime.utc(2026, 12, 31));
+    });
+
+    test('a bound carrying a time of day is already inside its own last day', () {
+      // Shifting this would move a date nobody picked.
+      final withTime = DateTime.utc(2026, 12, 31, 20, 59, 59);
+      expect(offerLastLiveDay(withTime), withTime);
+      expect(
+        offerLastLiveDay(DateTime.utc(2026, 9, 1, 0, 0, 0, 0, 1)),
+        DateTime.utc(2026, 9, 1, 0, 0, 0, 0, 1),
+      );
+    });
+
+    test('it agrees with the visibility filter at the boundary', () {
+      // The card disappears at `endsAt` (offer_visibility uses isAfter), so the
+      // last day this line may print is the last day a card can still be shown.
+      final endsAt = DateTime.utc(2026, 9, 1);
+      final lastMomentLive = endsAt.subtract(const Duration(microseconds: 1));
+      expect(offerLastLiveDay(endsAt).day, lastMomentLive.day);
+      expect(offerLastLiveDay(endsAt).month, lastMomentLive.month);
+      expect(offerLastLiveDay(endsAt).year, lastMomentLive.year);
+    });
+  });
 }

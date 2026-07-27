@@ -322,10 +322,42 @@ void main() {
       // No `.toLocal()`: `endsAt` is in the Riyadh frame, so its fields already
       // ARE the date to print. Converting here would expect a different day
       // from the one the screen renders on any device off UTC+3.
+      // The bound carries a time of day, so it is already inside its own last
+      // live day and `offerLastLiveDay` leaves it alone.
       final en = DateFormat.yMMMd('en').format(offer.endsAt);
       expect(
         find.text(LocaleKeys.offers_expires_on.tr(args: [en])),
         findsOneWidget,
+      );
+    });
+
+    testWidgets('an offer ending at KSA midnight states the LAST LIVE day',
+        (tester) async {
+      // The admin picker submits the end day as the start of the NEXT day —
+      // `endsAt` is EXCLUSIVE and the feed query is `endsAt > now` — so an
+      // operator running a campaign through 31 December stores 1 January's
+      // midnight. Printing the bound verbatim named "Jan 1, 2027", a day on
+      // which `visibleOffers` has already dropped the card, while the admin
+      // console's own window column said 31 December.
+      //
+      // The expectation is a LITERAL, not `DateFormat(...).format(...)` of the
+      // same value the widget formats: the previous two assertions were built
+      // from the widget's own call and could not fail on a wrong day.
+      final offer = promoOffer(endsAt: DateTime.utc(2027, 1, 1));
+      repo = ScriptedOffersRepository(listResult: Right([offer]));
+      await pumpOffersSurface(
+        tester,
+        child: OfferDetailView(offer: offer),
+        cubit: cubitFor(repo),
+      );
+
+      expect(
+        find.text(LocaleKeys.offers_expires_on.tr(args: ['Dec 31, 2026'])),
+        findsOneWidget,
+      );
+      expect(
+        find.text(LocaleKeys.offers_expires_on.tr(args: ['Jan 1, 2027'])),
+        findsNothing,
       );
     });
 
@@ -340,6 +372,7 @@ void main() {
         locale: const Locale('ar'),
       );
 
+      // Same non-midnight bound as above, so the last live day IS the bound.
       final ar = DateFormat.yMMMd('ar').format(offer.endsAt);
       expect(
         find.text(LocaleKeys.offers_expires_on.tr(args: [ar])),

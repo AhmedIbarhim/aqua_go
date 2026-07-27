@@ -61,19 +61,48 @@ OfferTermKey? offerMinOrderLine(CustomerOfferModel offer) {
   );
 }
 
+/// The last KSA day the offer is actually usable on, from its EXCLUSIVE
+/// `endsAt` bound.
+///
+/// `endsAt` is documented on the backend record as "when the offer stops being
+/// shown (exclusive)" and the feed query is `o.endsAt > :now`, so a bound
+/// sitting on a KSA midnight excludes that whole day: an operator who runs a
+/// campaign THROUGH 31 August stores 1 September's midnight. Printing the bound
+/// verbatim names a day the offer is already gone on — the console shows
+/// "31 August" and the customer app said "1 September", for a date on which
+/// [visibleOffers] has already dropped the card.
+///
+/// A bound that carries a real time of day is already INSIDE its own last day
+/// and is reported as-is; shifting it would move a date nobody picked. This is
+/// the exact mirror of admin-web's `isoToEndDay`, and the two must stay one
+/// rule — the operator's picker and the customer's terms line are describing
+/// the same calendar day.
+///
+/// `endsAt` is UTC-flagged with Asia/Riyadh wall-clock fields
+/// ([tryParseWireDateTime]), so "midnight" is read off the fields directly and
+/// the day arithmetic never passes through a device offset.
+DateTime offerLastLiveDay(DateTime endsAt) {
+  final atMidnight = endsAt.hour == 0 &&
+      endsAt.minute == 0 &&
+      endsAt.second == 0 &&
+      endsAt.millisecond == 0 &&
+      endsAt.microsecond == 0;
+  return atMidnight ? endsAt.subtract(const Duration(days: 1)) : endsAt;
+}
+
 /// UCC23 step 6 lists "expiry" among the terms, so the offer's end date is a
 /// term row like any other rather than a footnote on the summary.
 ///
 /// Always present: every offer has an end date, and the far-future
 /// [CustomerOfferModel.endsAtFallback] only stands in for an unparseable one,
 /// which the server never sends.
-/// Formatted from `endsAt`'s own fields, with NO `.toLocal()`: the value is in
-/// the Riyadh frame, so its fields already ARE the date the customer should
-/// read. Converting would re-interpret them through the device's offset and
-/// print the wrong day either side of midnight.
+/// Formatted from the [offerLastLiveDay] fields, with NO `.toLocal()`: the
+/// value is in the Riyadh frame, so its fields already ARE the date the
+/// customer should read. Converting would re-interpret them through the
+/// device's offset and print the wrong day either side of midnight.
 OfferTermKey offerExpiryLine(CustomerOfferModel offer, {required bool isAr}) {
   final formatted =
-      DateFormat.yMMMd(isAr ? 'ar' : 'en').format(offer.endsAt);
+      DateFormat.yMMMd(isAr ? 'ar' : 'en').format(offerLastLiveDay(offer.endsAt));
   return OfferTermKey(LocaleKeys.offers_expires_on, [formatted]);
 }
 
