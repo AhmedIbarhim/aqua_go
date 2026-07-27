@@ -8,6 +8,7 @@ import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../../../offers/data/models/customer_offer_model.dart';
+import '../../../offers/domain/offer_visibility.dart';
 import '../../../offers/presentation/controllers/offers_controller/offers_cubit.dart';
 import '../../../offers/presentation/widgets/offer_card.dart';
 
@@ -32,8 +33,11 @@ class OffersListView extends StatelessWidget {
           );
         }
 
+        // UCC23 step 2 — the rail sits on the home screen for as long as the
+        // customer keeps the app open, so an offer that closed since the fetch
+        // has to drop out rather than linger at the end of the row.
         final List<CustomerOfferModel> offers = state is OffersLoaded
-            ? state.offers
+            ? visibleOffers(state.offers, DateTime.now())
             : const <CustomerOfferModel>[];
 
         if (offers.isEmpty) return const SizedBox.shrink();

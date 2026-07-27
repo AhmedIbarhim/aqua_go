@@ -8,6 +8,7 @@ import '../../../../core/helpers/shimmer_helper.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../../data/models/customer_offer_model.dart';
+import '../../domain/offer_visibility.dart';
 import '../controllers/offers_controller/offers_cubit.dart';
 import '../widgets/offer_card.dart';
 import '../widgets/offer_motion.dart';
@@ -87,12 +88,13 @@ class OffersView extends StatelessWidget {
   }
 
   Widget _list(BuildContext context, List<CustomerOfferModel> offers) {
-    if (offers.isEmpty) {
+    // UCC23 step 2 — expiry is a FILTER, not just a sort key. A feed held on
+    // screen goes stale in the customer's hand, and a dead card at the bottom
+    // of the list is a deal they will be refused at apply time.
+    final sorted = visibleOffers(offers, DateTime.now());
+    if (sorted.isEmpty) {
       return _fill(LocaleKeys.offers_empty.tr(context: context));
     }
-    // Defensive: the API already returns endsAt ASC, but this screen owns the
-    // ordering the design pins, so it re-sorts locally.
-    final sorted = [...offers]..sort((a, b) => a.endsAt.compareTo(b.endsAt));
     return ListView.separated(
       padding: const EdgeInsets.all(16),
       physics: const AlwaysScrollableScrollPhysics(),
