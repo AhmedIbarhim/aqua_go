@@ -199,16 +199,20 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
     final lines = bookingState.quote?.lines ?? const [];
     final quoteBreakdown = bookingState.quote?.breakdown;
 
-    GrossLine? serviceLine;
-    final List<GrossLine> addonLines = [];
+    // SERVICE + ADDON only. The DISCOUNT row is deliberately NOT an item line:
+    // it is `discountMinor`, rendered once below the subtotal. Modelling it as
+    // a `GrossLine` would let it be summed into the very subtotal it is meant
+    // to be subtracted from — the trap `QuoteLine`'s own javadoc warns about,
+    // and the reason this filter is explicit rather than incidental.
+    final List<GrossLine> itemLines = [];
 
     if (lines.isNotEmpty) {
       final service = lines.where((l) => l.isService).firstOrNull;
       if (service != null) {
-        serviceLine = GrossLine(
+        itemLines.add(GrossLine(
           label: serviceName,
           grossMinor: service.grossMinor,
-        );
+        ));
       }
       for (final line in lines.where((l) => l.isAddon)) {
         final addon = availableAddons
@@ -219,7 +223,7 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
             : (context.isAr
                   ? (addon.nameAr ?? addon.nameEn ?? '')
                   : (addon.nameEn ?? addon.nameAr ?? ''));
-        addonLines.add(GrossLine(label: title, grossMinor: line.grossMinor));
+        itemLines.add(GrossLine(label: title, grossMinor: line.grossMinor));
       }
     }
     // When lines are absent (still loading / fetch failed / expired, or the
@@ -240,10 +244,16 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
     // payment summary; 0 when no code is applied, which is what suppresses
     // both rows.
     final int promoDiscountMinor = bookingState.quote?.promoDiscountMinor ?? 0;
-    final summary = GrossPriceBreakdown.fromQuoteLines(
-      serviceLine: serviceLine,
-      addonLines: addonLines,
-      promoDiscountMinor: promoDiscountMinor,
+    // The quote's own DISCOUNT row, when it has one. Its gross is NEGATIVE, so
+    // the display value is its magnitude. `promoDiscountMinor` is the fallback
+    // for a quote whose lines the backend omitted — the same figure, stated in
+    // a different place.
+    final discountLine = lines.where((l) => l.isDiscount).firstOrNull;
+    final summary = GrossPriceBreakdown.fromBookingLines(
+      itemLines: itemLines,
+      discountMinor: discountLine != null
+          ? -discountLine.grossMinor
+          : promoDiscountMinor,
       promoCode: bookingState.quote?.promoCode,
       totalMinor: quoteBreakdown?.grossMinor ?? 0,
       vatMinor: quoteBreakdown?.vatMinor ?? 0,

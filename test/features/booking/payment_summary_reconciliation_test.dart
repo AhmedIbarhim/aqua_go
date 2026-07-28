@@ -19,21 +19,30 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// 104.35 / 47.83 / −43.48 / 108.70 / 16.30 / −50.00 / 175.00 / 125.00 — every
 /// figure reconciling, none of it followable by eye.
 void main() {
-  // What the BACKEND puts on the wire for that order, per surface.
+  // What the BACKEND puts on the wire for that order — ONE shape now, for both
+  // surfaces.
   //
-  // A QUOTE nets the discount INTO its lines and emits no DISCOUNT row, so the
-  // SERVICE line arrives at 120.00 − 50.00 = 70.00.
-  GrossPriceBreakdown quoteCase() => GrossPriceBreakdown.fromQuoteLines(
-    serviceLine: const GrossLine(label: 'تنظيف السقف الداخلي', grossMinor: 7000),
-    addonLines: const [GrossLine(label: 'معالجة بالأوزون', grossMinor: 5500)],
-    promoDiscountMinor: 5000,
+  // A quote used to net the discount INTO its lines and emit no DISCOUNT row,
+  // so its SERVICE line arrived at 120.00 − 50.00 = 70.00 and the client added
+  // the 50.00 back. It no longer does: `PriceQuoteServiceImpl.buildLines` emits
+  // the same three-kind shape the booking detail always emitted — pre-discount
+  // SERVICE + ADDON rows and one negative DISCOUNT row — so `fromQuoteLines`
+  // and the arithmetic inside it are both gone. A quote's DISCOUNT row is
+  // filtered out of `itemLines` by the caller and passed as `discountMinor`,
+  // exactly as the booking detail does it.
+  GrossPriceBreakdown quoteCase() => GrossPriceBreakdown.fromBookingLines(
+    itemLines: const [
+      GrossLine(label: 'تنظيف السقف الداخلي', grossMinor: 12000),
+      GrossLine(label: 'معالجة بالأوزون', grossMinor: 5500),
+    ],
+    discountMinor: 5000,
     promoCode: 'NEWCUST50',
     totalMinor: 12500,
     vatMinor: 1630,
   );
 
-  // A BOOKING DETAIL already states the pre-discount price on the SERVICE row
-  // and carries the saving as its own negative DISCOUNT line.
+  // A BOOKING DETAIL states the pre-discount price on the SERVICE row and
+  // carries the saving as its own negative DISCOUNT line — unchanged.
   GrossPriceBreakdown bookingCase() => GrossPriceBreakdown.fromBookingLines(
     itemLines: const [
       GrossLine(label: 'تنظيف السقف الداخلي', grossMinor: 12000),
@@ -46,13 +55,35 @@ void main() {
   );
 
   group('the gross breakdown reconciles', () {
-    test('a quote recovers the PRE-discount service price', () {
+    test('a quote reads the PRE-discount lines verbatim, adding nothing back',
+        () {
       final b = quoteCase();
-      // 70.00 on the wire + the 50.00 that was taken off it == the real 120.00.
+      // 120.00 arrives ON THE WIRE. Nothing is reconstructed here, which is the
+      // point: a TARGET_PRICE code makes the pre-discount figure impossible to
+      // recover from the charged one.
       expect(b.lines.map((l) => l.grossMinor), [12000, 5500]);
       expect(b.subtotalMinor, 17500);
       expect(b.discountMinor, 5000);
       expect(b.totalMinor, 12500);
+    });
+
+    test('a TARGET_PRICE quote states both figures without arithmetic', () {
+      // 175.00 wash sold at 35.00. Under the old shape the wire carried a
+      // 35.00 SERVICE row and a 140.00 discount, and adding them back happened
+      // to work; under a LINE-scoped discount that coincidence is not something
+      // to rely on. The backend now states 175.00 and −140.00 outright.
+      final b = GrossPriceBreakdown.fromBookingLines(
+        itemLines: const [GrossLine(label: 'غسيل كامل', grossMinor: 17500)],
+        discountMinor: 14000,
+        promoCode: 'OFFERCODE',
+        totalMinor: 3500,
+        vatMinor: 457,
+      );
+      expect(b.subtotalMinor, 17500);
+      expect(b.discountMinor, 14000);
+      expect(b.totalMinor, 3500);
+      expect(b.linesReconcile, isTrue);
+      expect(b.totalReconciles, isTrue);
     });
 
     test('a booking detail reads the pre-discount lines verbatim', () {
@@ -95,10 +126,9 @@ void main() {
     });
 
     test('no promo: no subtotal, no discount, no −0.00', () {
-      final b = GrossPriceBreakdown.fromQuoteLines(
-        serviceLine: const GrossLine(label: 'wash', grossMinor: 12000),
-        addonLines: const [],
-        promoDiscountMinor: 0,
+      final b = GrossPriceBreakdown.fromBookingLines(
+        itemLines: const [GrossLine(label: 'wash', grossMinor: 12000)],
+        discountMinor: 0,
         promoCode: null,
         totalMinor: 12000,
         vatMinor: 1565,
@@ -141,10 +171,9 @@ void main() {
 
     // GUARD 1 — a NET figure must never reappear on this card.
     //
-    // Red-proof: delete `+ promoDiscountMinor` from
-    // GrossPriceBreakdown.fromQuoteLines (the line that recovers the
-    // pre-discount service gross) and this test fails on 70.00 rendering where
-    // 120.00 belongs.
+    // Red-proof: have the caller pass the DISCOUNT row's own gross through as
+    // an item line instead of filtering it out, and this test fails — the
+    // negative row lands in the column and the subtotal stops reconciling.
     testWidgets('GUARD: no net figure is rendered', (tester) async {
       await _pumpCard(tester, PaymentSummaryCard(breakdown: quoteCase()));
 
@@ -189,14 +218,14 @@ void main() {
       await _pumpCard(
         tester,
         PaymentSummaryCard(
-          breakdown: GrossPriceBreakdown.fromQuoteLines(
+          breakdown: GrossPriceBreakdown.fromBookingLines(
             // Two lines, so the total is its own figure and cannot be
             // confused with a line item.
-            serviceLine: const GrossLine(label: 'غسيل خارجي', grossMinor: 9000),
-            addonLines: const [
+            itemLines: const [
+              GrossLine(label: 'غسيل خارجي', grossMinor: 9000),
               GrossLine(label: 'تلميع الإطارات', grossMinor: 2500),
             ],
-            promoDiscountMinor: 0,
+            discountMinor: 0,
             promoCode: null,
             totalMinor: 11500,
             vatMinor: 1500,
@@ -226,18 +255,18 @@ void main() {
       await _pumpCard(
         tester,
         PaymentSummaryCard(
-          breakdown: GrossPriceBreakdown.fromQuoteLines(
-            serviceLine: const GrossLine(
-              label: 'غسيل خارجي وداخلي شامل تلميع الإطارات',
-              grossMinor: 7000,
-            ),
-            addonLines: const [
+          breakdown: GrossPriceBreakdown.fromBookingLines(
+            itemLines: const [
+              GrossLine(
+                label: 'غسيل خارجي وداخلي شامل تلميع الإطارات',
+                grossMinor: 12000,
+              ),
               GrossLine(
                 label: 'تلميع الإطارات وتنظيف المقصورة الداخلية بالبخار',
                 grossMinor: 5500,
               ),
             ],
-            promoDiscountMinor: 5000,
+            discountMinor: 5000,
             promoCode: 'NEWCUSTOMER50',
             totalMinor: 12500,
             vatMinor: 1630,

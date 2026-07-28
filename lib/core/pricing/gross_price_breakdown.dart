@@ -114,58 +114,25 @@ class GrossPriceBreakdown {
     );
   }
 
-  /// A quote's breakdown, for the review screen before payment.
-  ///
-  /// **The quote nets the discount INTO its lines.** Unlike a booking detail,
-  /// `PriceQuoteServiceImpl` emits `serviceGross = surgedGross − serviceDiscount`
-  /// and no DISCOUNT line at all, so a quote's SERVICE row is POST-discount and
-  /// cannot be rendered as-is next to a pre-discount subtotal.
-  ///
-  /// The pre-discount service gross is recovered by adding the discount back:
-  /// `serviceGrossPre = serviceLine.gross + promoDiscount`. This is exact
-  /// integer arithmetic on two backend figures — the backend subtracted that
-  /// same discount from the VAT-inclusive gross, so adding it back returns the
-  /// original, not an estimate. No VAT rate is touched.
-  ///
-  /// **Known limit — line-level attribution when the discount exceeds the whole
-  /// service line.** The backend absorbs the discount on the service row first
-  /// and spills the remainder pro-rata onto the add-on rows. When it spills
-  /// (only possible once the discount is larger than the entire surged service
-  /// price), the service/add-on split of that spill is not on the wire and
-  /// cannot be recovered here. The column still reconciles exactly — Σ lines
-  /// still equals the subtotal, and subtotal − discount still equals the total
-  /// — but the service row is then overstated and the add-on rows understated
-  /// by the spilt amount. The fix is a backend one: have the quote emit the
-  /// same three-kind shape the booking detail already emits (pre-discount
-  /// SERVICE gross + a negative DISCOUNT line), after which this factory
-  /// collapses into [fromBookingLines].
-  factory GrossPriceBreakdown.fromQuoteLines({
-    required GrossLine? serviceLine,
-    required List<GrossLine> addonLines,
-    required int promoDiscountMinor,
-    required String? promoCode,
-    required int totalMinor,
-    required int vatMinor,
-  }) {
-    final lines = <GrossLine>[
-      if (serviceLine != null)
-        GrossLine(
-          label: serviceLine.label,
-          grossMinor: serviceLine.grossMinor + promoDiscountMinor,
-        ),
-      ...addonLines,
-    ];
-    return GrossPriceBreakdown(
-      lines: lines,
-      // Exact: the backend reached `totalMinor` by subtracting this very
-      // discount from the pre-discount VAT-inclusive gross.
-      subtotalMinor: totalMinor + promoDiscountMinor,
-      discountMinor: promoDiscountMinor,
-      promoCode: promoCode,
-      totalMinor: totalMinor,
-      vatMinor: vatMinor,
-    );
-  }
+  // There is deliberately no `fromQuoteLines`.
+  //
+  // A quote used to net the discount INTO its lines and emit no DISCOUNT row,
+  // so its SERVICE row was POST-discount and this file recovered the real price
+  // as `serviceLine.gross + promoDiscount`. `PriceQuoteServiceImpl.buildLines`
+  // now emits the SAME three-kind shape the booking detail always emitted —
+  // pre-discount SERVICE + ADDON rows plus one negative DISCOUNT row — so both
+  // surfaces go through [fromBookingLines] and the client adds nothing back.
+  //
+  // Two things went with it. The arithmetic: no figure on this type is derived
+  // from another any more. And the "known limit" it carried — when the discount
+  // outgrew the whole service line the backend spilled the remainder onto the
+  // add-on rows, and the split was not on the wire, so the service row read too
+  // high and the add-on rows too low while the column still reconciled. With
+  // the saving on its own row there is no spill to attribute.
+  //
+  // It could not have survived TARGET_PRICE in any case: that discount is
+  // LINE-scoped and sets the wash to a fixed price, so `charged + discount`
+  // stops being a statement about the service line at all.
 
   /// True when a discount row should render. Also gates the subtotal row: a
   /// "before discount" figure is meaningless — and equal to the total — when

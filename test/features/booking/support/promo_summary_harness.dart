@@ -350,17 +350,37 @@ QuoteModel quotePayload({
       'vatMinor': vatMinor,
       'currency': 'SAR',
     },
+    // The wire's three-kind shape, mirrored EXACTLY as
+    // `PriceQuoteServiceImpl.buildLines` emits it: the SERVICE row states the
+    // PRE-discount wash price and a negative DISCOUNT row carries the saving,
+    // so Σ gross == totalMinor and Σ vat == vatMinor. A fixture that netted the
+    // discount into the service row (the shape the quote used to send) would
+    // put the client's reconciliation one discount out and quietly pass.
     'lines': [
       {
         'kind': 'SERVICE',
         'refId': 'svc-1',
-        'grossMinor': grossMinor,
-        'netMinor': grossMinor - vatMinor,
-        'vatMinor': vatMinor,
+        'grossMinor': grossWithoutPromoMinor,
+        'netMinor': grossWithoutPromoMinor - serviceVatMinor,
+        'vatMinor': serviceVatMinor,
       },
+      // The DISCOUNT row's VAT is a RESIDUAL, exactly as the server derives it:
+      // whatever makes the rows sum to the charged VAT.
+      if (promoCode != null)
+        {
+          'kind': 'DISCOUNT',
+          'refId': null,
+          'grossMinor': -promoDiscountMinor,
+          'netMinor': -promoDiscountMinor - (vatMinor - serviceVatMinor),
+          'vatMinor': vatMinor - serviceVatMinor,
+        },
     ],
   });
 }
+
+/// VAT contained within the UNDISCOUNTED wash price — what the SERVICE row
+/// carries now that it states the pre-discount figure.
+const serviceVatMinor = 1500; // 15% inclusive of 115.00
 
 /// Booking repository that records the promo code each quote call carried.
 ///
