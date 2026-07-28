@@ -95,6 +95,9 @@ class _MoyasarPaymentViewState extends State<MoyasarPaymentView>
     debugPrint('Moyasar payment result (${result.runtimeType}): $result');
     if (!mounted) return;
     if (result is moyasar.PaymentResponse) {
+      print(result.status);
+      print(result.description);
+      print(result.metadata);
       switch (result.status) {
         case moyasar.PaymentStatus.paid:
           Navigator.of(context).pop(MoyasarPaymentResult.paid(result.id));
