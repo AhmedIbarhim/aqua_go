@@ -4,12 +4,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/components/custom_button.dart';
 import '../../../../core/components/generic_app_bar.dart';
+import '../../../../core/config/di/service_locator.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/route/app_router.dart';
 import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/saudi_wire_format.dart';
 import '../../../../generated/locale_keys.g.dart';
+import '../../../home/data/models/service_model.dart';
+import '../../../home/data/repos/services_repository.dart';
 import '../../../layout/presentation/views/main_layout.dart';
 import '../../data/models/customer_offer_model.dart';
 import '../../domain/offer_countdown.dart';
@@ -198,6 +201,8 @@ class _PrimaryActionState extends State<_PrimaryAction> {
         onPressed: _onPressed,
         text: widget.offer.isPromoCode
             ? LocaleKeys.offers_use_code.tr(context: context)
+            : widget.offer.isService
+            ? LocaleKeys.offers_book_now.tr(context: context)
             : LocaleKeys.offers_view_package.tr(context: context),
       ),
     );
@@ -212,21 +217,31 @@ class _PrimaryActionState extends State<_PrimaryAction> {
     final verdict =
         await context.read<OffersCubit>().revalidateOffer(widget.offer.id);
     if (!mounted) return;
-    setState(() => _checking = false);
 
-    switch (verdict) {
-      // The cubit has already refreshed the list, so popping lands the customer
-      // on a corrected one instead of on a list still showing what they lost.
-      case OfferGone():
-        _leaveUnavailable();
-      // A fresh copy supersedes the one the list drew.
-      case OfferStillLive(offer: final fresh):
-        _act(fresh);
-      // An unreachable server leaves the held copy in play: BR-OFR-11 puts the
-      // real gate at apply time, and a flaky connection must not read to the
-      // customer as an expiry.
-      case OfferUncheckable():
-        _act(widget.offer);
+    // The guard is HELD across `_act`, not released here. A SERVICE offer's
+    // action fetches the wash catalogue before it navigates, and releasing at
+    // this point re-enabled the button mid-fetch — a second tap then fired a
+    // second navigation off one offer, which is precisely what `_checking`
+    // exists to prevent.
+    try {
+      switch (verdict) {
+        // The cubit has already refreshed the list, so popping lands the
+        // customer on a corrected one instead of on a list still showing what
+        // they lost.
+        case OfferGone():
+          _leaveUnavailable();
+        // A fresh copy supersedes the one the list drew.
+        case OfferStillLive(offer: final fresh):
+          await _act(fresh);
+        // An unreachable server leaves the held copy in play: BR-OFR-11 puts
+        // the real gate at apply time, and a flaky connection must not read to
+        // the customer as an expiry.
+        case OfferUncheckable():
+          await _act(widget.offer);
+      }
+    } finally {
+      // `_leaveUnavailable` pops this screen, so the State may already be gone.
+      if (mounted) setState(() => _checking = false);
     }
   }
 
@@ -241,7 +256,44 @@ class _PrimaryActionState extends State<_PrimaryAction> {
     Navigator.of(context).pop();
   }
 
-  void _act(CustomerOfferModel offer) {
+  Future<void> _act(CustomerOfferModel offer) async {
+    // UCC23 step 7, service half — a SERVICE offer deep-links straight into
+    // the booking flow at the wash it names. Checked BEFORE the promo branch:
+    // a SERVICE offer with a deal also carries a code, but that code is the
+    // server's to resolve, not the client's to apply.
+    if (offer.isService) {
+      final serviceId = offer.terms.serviceId;
+      if (serviceId == null || serviceId.isEmpty) {
+        _leaveUnavailable();
+        return;
+      }
+      // There is no by-id service read: `ServicesRepository` exposes only
+      // `fetchServices()`. It is a `registerLazySingleton`, so the locator is
+      // the right handle — `ServicesCubit` is a `registerFactory` and would
+      // hand back a fresh, EMPTY instance.
+      final services = await locator<ServicesRepository>().fetchServices();
+      final service = services.fold<ServiceModel?>(
+        (_) => null,
+        (list) => list.where((s) => s.id == serviceId).firstOrNull,
+      );
+      if (!mounted) return;
+      if (service == null) {
+        _leaveUnavailable();
+        return;
+      }
+      // Hold the OFFER, not the code: the server resolves the managed code
+      // itself, and a client-supplied code carries no evidence of which offer
+      // produced the sale. A shortcut offer (no deal) holds nothing.
+      if (offer.hasTargetPrice) {
+        PendingPromoCode.instance.hold(offerId: offer.id);
+      }
+      context.pushNamed(
+        Routes.bookingLocation,
+        arguments: BookingFlowStartArgs(service: service),
+      );
+      return;
+    }
+
     if (offer.isPromoCode) {
       final code = offer.terms.promoCode;
       // `OfferTermsModel.fromJson` degrades a missing identity field to null

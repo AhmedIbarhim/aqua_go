@@ -95,6 +95,7 @@ abstract class  LocaleKeys {
   static const offers_terms_title = 'offers.terms_title';
   static const offers_use_code = 'offers.use_code';
   static const offers_view_package = 'offers.view_package';
+  static const offers_book_now = 'offers.book_now';
   static const offers_code_saved = 'offers.code_saved';
   static const offers_min_order = 'offers.min_order';
   static const offers_discount_percent = 'offers.discount_percent';
