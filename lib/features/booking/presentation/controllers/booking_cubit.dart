@@ -657,7 +657,15 @@ class BookingCubit extends Cubit<BookingState> {
   /// any id held from an earlier quote is dropped rather than retained. A typed
   /// code applied over a live offer must not inherit that offer — the
   /// redemption's `offer_id` is the only record of which offer drove the sale.
-  void _emitQuote(QuoteModel quote, String? offerId) {
+  /// [clearOfferPrices] drops the two display figures the offer card handed in,
+  /// and is set ONLY by a caller holding the server's REFUSAL of that offer (see
+  /// [_repriceAfter]). Defaulted off because every other caller is publishing a
+  /// quote, which says nothing about the offer's fate.
+  void _emitQuote(
+    QuoteModel quote,
+    String? offerId, {
+    bool clearOfferPrices = false,
+  }) {
     final applied = quote.promoCode;
     emit(
       state.copyWith(
@@ -667,6 +675,7 @@ class BookingCubit extends Cubit<BookingState> {
         appliedOfferId: applied == null ? null : offerId,
         clearPromo: applied == null,
         clearOfferId: offerId == null,
+        clearOfferPrices: clearOfferPrices,
       ),
     );
   }
@@ -824,7 +833,8 @@ class BookingCubit extends Cubit<BookingState> {
     final result = await _requestQuote(promoCode: promoCode, offerId: offerId);
 
     return result.fold(
-      (rejection) => _repriceAfter(rejection, promoCode: promoCode),
+      (rejection) =>
+          _repriceAfter(rejection, promoCode: promoCode, offerId: offerId),
       (quote) async {
         _emitQuote(quote, offerId);
         return QuoteRefresh(quote: quote);
@@ -835,10 +845,23 @@ class BookingCubit extends Cubit<BookingState> {
   /// The failing half of [reprice].
   ///
   /// [rejection] is the failure the priced-with-promo attempt came back with,
-  /// and [promoCode] whatever was applied when it went out.
+  /// and [promoCode] whatever was applied when it went out. [offerId] is the
+  /// offer that request carried, and it decides whether the two display figures
+  /// the offer card handed in are still true: a SETTLED rejection of a request
+  /// that carried an offer is the server REFUSING that offer, exactly as it is
+  /// on the handoff-apply path ([applyOffer]), and the pair stops being true the
+  /// moment it does. This is the SECOND way that refusal reaches the customer —
+  /// the offer applied cleanly on the way in, and the cap was consumed before
+  /// they came back — and leaving the figures behind here left details promising
+  /// a deal the summary then declined to honour.
+  ///
+  /// The same discipline as [applyOffer]: only a VERDICT clears them. The guard
+  /// below returns before that on an unanswered request, so a timeout or a 5xx
+  /// leaves the pair exactly where it was.
   Future<QuoteRefresh> _repriceAfter(
     Failure rejection, {
     required String? promoCode,
+    required String? offerId,
   }) async {
     // Nothing applied means there is nothing to drop and nothing to retry
     // differently; an unanswered request means there is nothing to drop it
@@ -854,6 +877,11 @@ class BookingCubit extends Cubit<BookingState> {
       return const QuoteRefresh();
     }
 
+    // Past the guard the rejection is a VERDICT, so a request that carried an
+    // offer has had that offer refused. What the second attempt goes on to do
+    // cannot change that, so both branches below drop the figures.
+    final offerRefused = offerId != null;
+
     // Second attempt WITHOUT the code. Its own failure is the one worth
     // surfacing — at that point nothing about the promo is left to explain.
     final clean = await _requestQuote();
@@ -863,12 +891,13 @@ class BookingCubit extends Cubit<BookingState> {
           state.copyWith(
             status: BookingStatus.failure,
             errorMessage: failure.message,
+            clearOfferPrices: offerRefused,
           ),
         );
         return const QuoteRefresh();
       },
       (quote) {
-        _emitQuote(quote, null);
+        _emitQuote(quote, null, clearOfferPrices: offerRefused);
         return QuoteRefresh(
           quote: quote,
           droppedPromoReason: rejection.message,

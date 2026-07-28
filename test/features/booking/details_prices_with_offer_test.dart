@@ -248,4 +248,75 @@ void main() {
       );
     },
   );
+
+  testWidgets(
+    'an offer the summary RE-QUOTE refused stops pricing this screen',
+    (tester) async {
+      // The sibling above covers the offer being refused on the HANDOFF apply —
+      // the first entry to the summary. This is the second way the same refusal
+      // reaches the customer, and it is the ordinary one: the offer applied
+      // cleanly, they walked back to details and forward again, and the summary
+      // re-quoted with the code already on the state. Between those two entries
+      // the cap was consumed, so THIS request is the one the server refuses.
+      //
+      // `reprice` drops the dead code and re-prices bare, which is right, but
+      // the offer's two display figures are the same lie they are on the other
+      // path: details would still promise "175.00 struck through, then 35.00"
+      // and Book now would land on 115.00.
+      var offerStillLive = true;
+      final repo = RecordingBookingRepo(
+        quoteFailure: (_, offerId) {
+          if (offerId == null) return null;
+          if (offerStillLive) {
+            // The first entry gets the deal. Someone else takes the last slot
+            // while the customer is on the details screen.
+            offerStillLive = false;
+            return null;
+          }
+          return const ServerFailure(
+            'This code is no longer valid',
+            type: FailureType.validation,
+          );
+        },
+      );
+      PendingPromoCode.instance.hold(offerId: 'offer-1');
+      addTearDown(PendingPromoCode.instance.takeHandoff);
+
+      final cubit = buildCubit(
+        repo,
+        offerListPriceMinor: 17500,
+        offerTargetPriceMinor: 3500,
+      );
+      addTearDown(cubit.close);
+
+      // First entry: the handoff applies the offer and the server grants it.
+      await pumpSummary(tester, cubit);
+      expect(cubit.state.appliedOfferId, 'offer-1');
+      expect(cubit.state.appliedPromoCode, offerResolvedPromoCode);
+
+      // Back to details, then forward again — the handoff is drained, so the
+      // summary re-quotes with the applied code instead of applying an offer.
+      await pumpDetails(tester, cubit);
+      await pumpSummary(tester, cubit);
+      expect(
+        cubit.state.appliedPromoCode,
+        isNull,
+        reason: 'the re-quote dropped the dead code and priced bare',
+      );
+
+      await pumpDetails(tester, cubit);
+
+      expect(
+        find.text('35.00'),
+        findsNothing,
+        reason: 'a refused offer prices nothing, whichever request carried it',
+      );
+      expect(find.text('175.00'), findsNothing);
+      expect(
+        find.text('115.00'),
+        findsOneWidget,
+        reason: 'the same figure the summary charges',
+      );
+    },
+  );
 }
