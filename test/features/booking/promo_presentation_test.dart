@@ -6,6 +6,7 @@ import 'package:aqua_go/features/booking/data/repos/booking_repository.dart';
 import 'package:aqua_go/features/booking/domain/promo_code_history.dart';
 import 'package:aqua_go/features/booking/domain/strategies/booking_submit_strategy.dart';
 import 'package:aqua_go/features/booking/presentation/controllers/booking_state.dart';
+import 'package:aqua_go/features/booking/presentation/widgets/payment_summary_card.dart';
 import 'package:aqua_go/features/my_bookings/data/models/booking_response_model/booking_response_model.dart';
 import 'package:aqua_go/features/offers/domain/pending_promo_code.dart';
 import 'package:dartz/dartz.dart';
@@ -23,6 +24,25 @@ import 'support/promo_summary_harness.dart';
 /// asserted by localization KEY, because `tr(context: context)` resolves to the
 /// key under this harness. That keeps the assertions about WHICH message fires
 /// rather than about its wording.
+/// The figure rendered in the payment-summary row whose label contains
+/// [labelKey].
+///
+/// A bare `find.text('115.00')` is AMBIGUOUS on this screen: the card itemises
+/// every line, so a single-service order shows 115.00 twice — once as the
+/// SERVICE line and once as the "original total" it sums to. Scoping to the row
+/// makes each assertion about the row it is actually about, which is also what
+/// stops a future second line item from breaking it again.
+Finder summaryRowValue(String labelKey, String value) {
+  final label = find.descendant(
+    of: find.byType(PaymentSummaryCard),
+    matching: find.textContaining(labelKey),
+  );
+  return find.descendant(
+    of: find.ancestor(of: label, matching: find.byType(Row)).first,
+    matching: find.text(value),
+  );
+}
+
 void main() {
   const promoCode = 'WELCOME15';
 
@@ -61,7 +81,7 @@ void main() {
       // Subtotal/VAT column above is a SEPARATE statement over the same total
       // and is untouched: 82.61 + 12.39 == 95.00.
       expect(
-        find.text('115.00'),
+        summaryRowValue('bookings.original_total', '115.00'),
         findsOneWidget,
         reason: 'the customer must see what the order cost before the code',
       );
@@ -87,7 +107,10 @@ void main() {
 
       expect(find.textContaining('bookings.original_total'), findsNothing);
       expect(find.textContaining('bookings.promo_discount'), findsNothing);
-      expect(find.text('115.00'), findsOneWidget); // the total, undiscounted
+      // The total, undiscounted — read off the TOTAL row. The SERVICE line
+      // above it carries the same figure, which is exactly right for a
+      // single-service order and exactly why the finder is scoped.
+      expect(summaryRowValue('bookings.total_amount', '115.00'), findsOneWidget);
     });
   });
 
