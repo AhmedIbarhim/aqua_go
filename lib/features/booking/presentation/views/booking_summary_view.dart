@@ -581,11 +581,21 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
   /// return the same `promo-not-recognised` a mistyped code returns, and any
   /// message this screen invented would be claiming to know which.
   ///
-  /// A code redeemed THROUGH an offer is a previously used code like any other,
-  /// so it feeds the same UCC16 autocomplete the typed path feeds. It is taken
-  /// from the code the SERVER echoed on the accepted quote — never from the
-  /// offer copy the list drew — so, exactly as on the typed path, only a code
-  /// the backend actually accepted is ever suggested again.
+  /// **A code that arrived through an offer is NOT remembered.** It used to
+  /// feed the same UCC16 autocomplete the typed path feeds, on the reasoning
+  /// that an accepted code is an accepted code. That was wrong in both
+  /// directions. The code the server echoes on an offer-driven quote is the
+  /// offer's own MANAGED code, and a managed code is rejected the moment it is
+  /// TYPED — so the suggestion is permanently dead, offered for a code the
+  /// customer appeared to use minutes earlier. And it leaves a durable copy of
+  /// an offer-bound code on the handset, which is precisely what
+  /// `promo_code_history.dart` says the store never holds: codes the customer
+  /// typed here, and nothing else.
+  ///
+  /// The client cannot tell a managed code from the ordinary one a PROMO_CODE
+  /// offer links, and it does not need to: an offer is applied by TAPPING it,
+  /// never by typing its code, so nothing that came through a handoff belongs
+  /// in an autocomplete of things to type.
   ///
   /// The handoff was drained on the way in — `takeHandoff` is single-shot by
   /// design. Only a VERDICT earns that: the offer was applied, or it was
@@ -610,10 +620,6 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
   void _applyOfferFromHandoff(String offerId) async {
     final cubit = context.read<BookingCubit>();
     final application = await cubit.applyOffer(offerId);
-    final quote = application.quote;
-    if (quote?.promoCode != null) {
-      await PromoCodeHistory.remember(quote!.promoCode!);
-    }
     if (application.applied) return;
     if (!application.settled) {
       PendingPromoCode.instance.hold(offerId: offerId);

@@ -1,5 +1,8 @@
 import 'package:aqua_go/core/config/local_storage/shared_prefs.dart';
 import 'package:aqua_go/core/config/networking/exceptions/failure.dart';
+import 'package:aqua_go/core/constants.dart';
+import 'package:aqua_go/features/auth/data/models/user_model.dart';
+import 'package:aqua_go/features/booking/domain/promo_code_history.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -354,4 +357,58 @@ void main() {
       );
     },
   );
+
+  group('UCC16 autocomplete — what the device is allowed to keep', () {
+    /// The autocomplete is scoped to the signed-in customer, so a handset with
+    /// nobody on it records nothing at all and every assertion below would pass
+    /// vacuously. This is the account that earns the entries.
+    Future<void> signIn() => CacheClient.setString(
+          kUserData,
+          const UserModel(id: 'customer-a').toEncodedJson(),
+        );
+
+    setUp(() async {
+      SharedPreferences.setMockInitialValues({});
+      await CacheClient.init();
+      await signIn();
+    });
+
+    testWidgets('a code the customer TYPED is remembered', (tester) async {
+      // The control. Without it the offer assertion below could pass because
+      // nothing is ever recorded, rather than because the offer path stopped.
+      final repo = RecordingBookingRepo();
+      final cubit = buildCubit(repo);
+      addTearDown(cubit.close);
+
+      await pumpSummary(tester, cubit);
+      await applyPromo(tester, promoCode);
+
+      expect(PromoCodeHistory.recent(), [promoCode]);
+    });
+
+    testWidgets(
+      'a code that arrived through an OFFER is never remembered',
+      (tester) async {
+        // The server echoes the offer's own managed code on the quote. It is
+        // the offer's, not the customer's: typing it is refused, so a
+        // suggestion built from it is permanently dead — and it leaves a
+        // durable copy of an offer-bound code on the handset, which is exactly
+        // what `promo_code_history.dart` says the store never holds.
+        final repo = RecordingBookingRepo();
+        PendingPromoCode.instance.hold(offerId: 'offer-1');
+        addTearDown(PendingPromoCode.instance.takeHandoff);
+
+        final cubit = buildCubit(repo);
+        addTearDown(cubit.close);
+        await pumpSummary(tester, cubit);
+
+        expect(
+          cubit.state.appliedPromoCode,
+          offerResolvedPromoCode,
+          reason: 'the offer WAS applied — this is not a vacuous pass',
+        );
+        expect(PromoCodeHistory.recent(), isEmpty);
+      },
+    );
+  });
 }
