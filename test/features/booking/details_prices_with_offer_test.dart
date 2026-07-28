@@ -127,12 +127,20 @@ void main() {
   );
 
   testWidgets(
-    'a list price that is NOT above the target is never struck through',
+    'an inverted offer is priced off the QUOTE — a stale target is never the '
+    'Total',
     (tester) async {
-      // An admin dropped the wash below an already published target. The server
-      // clamps the discount to 0 and charges the lower list price; striking
-      // through 79.00 beside 99.00 would advertise a deal priced ABOVE the
-      // number it crossed out.
+      // An admin published a 99.00 target on a 175.00 wash, then dropped the
+      // wash to 79.00. The server clamps the discount to 0 and charges the
+      // lower list price, so the target is a figure nobody will be charged.
+      //
+      // Suppressing only the strikethrough left 99.00 standing alone under the
+      // label "Total" — HIGHER than the summary's own total, which is the one
+      // direction a displayed price must never be wrong in. The D-4 override
+      // exists to stop a step-change between this screen and the summary; an
+      // inverted pair is exactly the case it cannot honour, so the whole
+      // override switches off and the screen prices off the quote like any
+      // booking that never came through an offer.
       final repo = RecordingBookingRepo();
       final cubit = buildCubit(
         repo,
@@ -143,8 +151,22 @@ void main() {
 
       await pumpDetails(tester, cubit);
 
-      expect(find.text('79.00'), findsNothing);
-      expect(find.text('99.00'), findsOneWidget);
+      expect(
+        find.text('79.00'),
+        findsNothing,
+        reason: 'nothing to strike through when nothing is discounted',
+      );
+      expect(
+        find.text('99.00'),
+        findsNothing,
+        reason: 'the stale target is above what the summary charges — showing '
+            'it as the Total quotes a price the customer never pays',
+      );
+      expect(
+        find.text('115.00'),
+        findsOneWidget,
+        reason: 'the plain quote total, exactly as an offer-less booking',
+      );
     },
   );
 

@@ -503,18 +503,31 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
     // offer's two prices, and the quote's own add-on rows.
     final int addOnsGross = bookingState.quote?.addOnsGrossMinor ?? 0;
     final int? offerTargetBase = bookingState.offerTargetPriceMinor;
-    final int? offerTarget =
-        offerTargetBase == null ? null : offerTargetBase + addOnsGross;
     final int? offerListBase = bookingState.offerListPriceMinor;
-    // Struck through only when the list price is genuinely ABOVE the target.
-    // An admin who drops the wash below an already published target leaves the
-    // pair inverted — the server clamps the discount to 0 and charges the lower
-    // list price — and crossing out 79.00 beside 99.00 would advertise a deal
-    // priced above the number it crossed out. Compared on the WASH figures, so
-    // the add-ons common to both sides cannot decide it.
-    final int? offerList = (offerListBase == null ||
-            offerTargetBase == null ||
-            offerListBase <= offerTargetBase)
+    // AN INVERTED PAIR TURNS THE WHOLE OVERRIDE OFF, strikethrough and Total
+    // alike. An admin who drops the wash below an already published target
+    // leaves a target nobody will ever be charged: the server clamps the
+    // discount to 0 and charges the LOWER list price. Suppressing only the
+    // strikethrough left 99.00 standing alone under the label "Total" while
+    // the summary charged 79.00 — a displayed price ABOVE what is taken, which
+    // is the one direction it must never be wrong in. D-4 exists to remove a
+    // step-change between this screen and the summary, and an inverted pair is
+    // precisely the case it cannot honour, so the screen falls back to the
+    // plain quote total exactly as a booking that never came through an offer.
+    //
+    // Decided on the WASH figures, so the add-ons common to both sides cannot
+    // decide it. Detecting a STALE TARGET SERVER-SIDE is a separate, owner-level
+    // question; this is the client refusing to quote a number it can see is
+    // wrong.
+    final bool offerTargetIsStale = offerTargetBase != null &&
+        offerListBase != null &&
+        offerListBase <= offerTargetBase;
+    final int? offerTarget = (offerTargetBase == null || offerTargetIsStale)
+        ? null
+        : offerTargetBase + addOnsGross;
+    // Struck through only beside a target that survived the check above — never
+    // on its own, and never as the lower of the two figures.
+    final int? offerList = (offerListBase == null || offerTarget == null)
         ? null
         : offerListBase + addOnsGross;
     final bool showOfferPrice = config.showPricingInDetails && offerTarget != null;
