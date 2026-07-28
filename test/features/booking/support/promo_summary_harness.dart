@@ -326,11 +326,15 @@ QuoteModel quotePayload({
   required String? promoCode,
   required String quoteId,
   bool expired = true,
+  int addOnGrossMinor = 0,
 }) {
-  final grossMinor = promoCode == null
-      ? grossWithoutPromoMinor
-      : grossWithPromoMinor;
+  final grossMinor =
+      (promoCode == null ? grossWithoutPromoMinor : grossWithPromoMinor) +
+          addOnGrossMinor;
   final vatMinor = (grossMinor * 15 / 115).round();
+  // VAT contained within the add-on's own gross, exactly as the server states
+  // it on the ADDON row. The DISCOUNT row's VAT stays the residual below.
+  final addOnVatMinor = (addOnGrossMinor * 15 / 115).round();
   // Riyadh frame, serialised BARE — the only shape the backend emits. A `Z`
   // here would hide the device-local parse the model is guarded against.
   final expiresAt = expired
@@ -364,6 +368,14 @@ QuoteModel quotePayload({
         'netMinor': grossWithoutPromoMinor - serviceVatMinor,
         'vatMinor': serviceVatMinor,
       },
+      if (addOnGrossMinor > 0)
+        {
+          'kind': 'ADDON',
+          'refId': 'addon-1',
+          'grossMinor': addOnGrossMinor,
+          'netMinor': addOnGrossMinor - addOnVatMinor,
+          'vatMinor': addOnVatMinor,
+        },
       // The DISCOUNT row's VAT is a RESIDUAL, exactly as the server derives it:
       // whatever makes the rows sum to the charged VAT.
       if (promoCode != null)
@@ -371,8 +383,9 @@ QuoteModel quotePayload({
           'kind': 'DISCOUNT',
           'refId': null,
           'grossMinor': -promoDiscountMinor,
-          'netMinor': -promoDiscountMinor - (vatMinor - serviceVatMinor),
-          'vatMinor': vatMinor - serviceVatMinor,
+          'netMinor': -promoDiscountMinor -
+              (vatMinor - serviceVatMinor - addOnVatMinor),
+          'vatMinor': vatMinor - serviceVatMinor - addOnVatMinor,
         },
     ],
   });
@@ -388,10 +401,19 @@ const serviceVatMinor = 1500; // 15% inclusive of 115.00
 /// id the way the backend does when it stops being applicable between the feed
 /// and the tap (422 / 400 -> validation).
 class RecordingBookingRepo extends BookingRepository {
-  RecordingBookingRepo({this.expiredQuotes = true, this.quoteFailure})
-    : super(
+  RecordingBookingRepo({
+    this.expiredQuotes = true,
+    this.quoteFailure,
+    this.addOnGrossMinor = 0,
+  }) : super(
         bookingsRemoteDataSource: BookingsRemoteDataSource(APIClient(Dio())),
       );
+
+  /// What ONE selected add-on adds to the quoted gross, as an ADDON row.
+  ///
+  /// OFF by default: most tests here never touch the add-on grid, and a fixture
+  /// that priced add-ons unconditionally would move totals they assert on.
+  final int addOnGrossMinor;
 
   /// Answers every quote with an ALREADY-EXPIRED quote, so Confirm always takes
   /// the price-lock refresh branch.
@@ -436,6 +458,7 @@ class RecordingBookingRepo extends BookingRepository {
             (offerId == null ? null : offerResolvedPromoCode),
         quoteId: 'quote-${quoteCalls.length}',
         expired: expiredQuotes,
+        addOnGrossMinor: addOnIds.isEmpty ? 0 : addOnGrossMinor,
       ),
     );
   }

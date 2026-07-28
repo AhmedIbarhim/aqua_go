@@ -54,6 +54,16 @@ class QuoteModel {
     this.lines = const [],
   });
 
+  /// The VAT-inclusive gross of every ADDON row on this quote, in halala.
+  ///
+  /// A plain sum of backend figures — no VAT arithmetic, nothing derived. It
+  /// exists because a SERVICE offer prices the WASH only, so a screen stating
+  /// the offer's price has to add back what the add-ons on that same screen
+  /// cost; the quote's own add-on rows are the only server-blessed source for
+  /// that. 0 when nothing is selected, and 0 on a quote that carries no lines.
+  int get addOnsGrossMinor =>
+      lines.where((l) => l.isAddon).fold<int>(0, (sum, l) => sum + l.grossMinor);
+
   /// True when any multiplier moved the price off its base — i.e. the surged
   /// subtotal is not simply the base subtotal. The unscaled default is 10 000,
   /// so an absent multiplier reads as "no surge" rather than as free pricing.

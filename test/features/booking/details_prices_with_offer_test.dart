@@ -87,6 +87,46 @@ void main() {
   );
 
   testWidgets(
+    'an add-on picked on this screen moves the figure labelled Total',
+    (tester) async {
+      // The offer prices the WASH. The add-on grid is on the SAME screen, so a
+      // Total that a purchase made here does not move is a mislabelled number:
+      // the summary would charge 90.00 against a displayed 35.00.
+      final repo = RecordingBookingRepo(addOnGrossMinor: 5500);
+      final cubit = buildCubit(
+        repo,
+        withService: serviceWithAddOn,
+        offerListPriceMinor: 17500,
+        offerTargetPriceMinor: 3500,
+      );
+      addTearDown(cubit.close);
+
+      await pumpDetails(tester, cubit);
+      expect(find.text('35.00'), findsOneWidget);
+
+      // The grid titles off `context.isAr`, which reads the LanguageCubit and
+      // not the widget locale, so the label under test is the Arabic one.
+      await tester.tap(find.text('تلميع الإطارات'));
+      await tester.pump(const Duration(milliseconds: 400));
+      await settle(tester);
+
+      expect(
+        find.text('90.00'),
+        findsOneWidget,
+        reason: 'offer price 35.00 + the 55.00 add-on the customer just picked',
+      );
+      expect(find.text('35.00'), findsNothing);
+      expect(
+        find.text('230.00'),
+        findsOneWidget,
+        reason: 'the struck figure is what the same basket costs without the '
+            'offer, so the gap between the two stays the offer own saving',
+      );
+      expect(find.text('175.00'), findsNothing);
+    },
+  );
+
+  testWidgets(
     'the offer price survives a return from the payment page',
     (tester) async {
       // It is state, not a one-shot handoff: walking forward to the summary

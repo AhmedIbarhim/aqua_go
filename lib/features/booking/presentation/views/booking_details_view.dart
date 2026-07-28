@@ -490,12 +490,24 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
     // is derived — no VAT maths, no subtraction — for the reason
     // `gross_price_breakdown.dart` gives: rounding in a second place.
     //
-    // KNOWN LIMIT: add-ons are not in either figure. The details quote is
-    // deliberately bare (it carries no offer), so there is no server total for
-    // "offer price + add-ons" to show, and this pair states the WASH's price,
-    // which is what the offer discounts. The summary is where the full,
-    // server-computed basket is broken down.
-    final int? offerTarget = bookingState.offerTargetPriceMinor;
+    // ADD-ONS ARE IN BOTH FIGURES. The offer prices the WASH only, but the
+    // add-on grid is on THIS screen, so a row labelled Total that a purchase
+    // made on the same screen does not move is a mislabelled number, not a
+    // limitation: pick a 55.00 add-on and the summary would charge 90.00
+    // against a displayed 35.00. The details quote is deliberately bare (it
+    // carries no offer), so its ADDON rows are exactly the add-on cost with no
+    // offer folded into them — added to BOTH figures, which leaves the gap
+    // between them equal to the offer's own saving.
+    //
+    // Integer halala throughout, and every addend is a backend figure: the
+    // offer's two prices, and the quote's own add-on rows.
+    final int addOnsGross = bookingState.quote?.addOnsGrossMinor ?? 0;
+    final int? offerTargetBase = bookingState.offerTargetPriceMinor;
+    final int? offerTarget =
+        offerTargetBase == null ? null : offerTargetBase + addOnsGross;
+    final int? offerListBase = bookingState.offerListPriceMinor;
+    final int? offerList =
+        offerListBase == null ? null : offerListBase + addOnsGross;
     final bool showOfferPrice = config.showPricingInDetails && offerTarget != null;
 
     return BottomActionSheetContainer(
@@ -513,10 +525,9 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
                 ),
                 const Spacer(),
                 if (showOfferPrice) ...[
-                  if (bookingState.offerListPriceMinor != null) ...[
+                  if (offerList != null) ...[
                     Text(
-                      (bookingState.offerListPriceMinor! / 100)
-                          .toStringAsFixed(2),
+                      (offerList / 100).toStringAsFixed(2),
                       style: AppTextStyles.regular14.copyWith(
                         color: context.colors.textSecondary,
                         decoration: TextDecoration.lineThrough,
