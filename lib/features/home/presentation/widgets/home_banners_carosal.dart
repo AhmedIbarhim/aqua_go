@@ -3,7 +3,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../../../core/route/routes.dart';
+// import '../../../../core/route/routes.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../data/models/banner_model.dart';
@@ -154,7 +154,7 @@ class _HomeBannersCarosalState extends State<HomeBannersCarosal> {
       case 'DEEPLINK':
         switch (banner.ctaTarget) {
           case 'packages':
-            Navigator.pushNamed(context, Routes.packages);
+            // Navigator.pushNamed(context, Routes.packages);
             break;
           default:
             // Unknown deeplink target — safe no-op.
