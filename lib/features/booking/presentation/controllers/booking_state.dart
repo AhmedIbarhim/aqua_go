@@ -99,6 +99,21 @@ class BookingState extends Equatable {
   /// say which offer drove the sale.
   final String? appliedOfferId;
 
+  /// The wash's VAT-INCLUSIVE gross LIST price in halala, as the SERVICE offer
+  /// the customer came through stated it. Null when the booking did not start
+  /// from an offer.
+  ///
+  /// Display only, and a SERVER figure carried verbatim — never recomputed and
+  /// never used to price anything. It exists so the details screen can strike
+  /// it through beside the offer price (owner decision D-4).
+  final int? offerListPriceMinor;
+
+  /// The VAT-INCLUSIVE gross price the wash BECOMES through that offer, in
+  /// halala. Null for a booking with no offer AND for a SHORTCUT offer, which
+  /// carries no deal at all — 0 on the wire means "no deal", never "free", so
+  /// it is normalised to null on the way in rather than rendered as 0.00.
+  final int? offerTargetPriceMinor;
+
   const BookingState({
     this.status = BookingStatus.initial,
     this.flowConfig = const BookingFlowConfig(
@@ -130,6 +145,8 @@ class BookingState extends Equatable {
     this.paymentInit,
     this.appliedPromoCode,
     this.appliedOfferId,
+    this.offerListPriceMinor,
+    this.offerTargetPriceMinor,
   });
 
   BookingState copyWith({
@@ -161,6 +178,8 @@ class BookingState extends Equatable {
     PaymentInitModel? paymentInit,
     String? appliedPromoCode,
     String? appliedOfferId,
+    int? offerListPriceMinor,
+    int? offerTargetPriceMinor,
     bool clearSelectedDate = false,
     bool clearSelectedSlotStart = false,
     bool clearError = false,
@@ -217,6 +236,14 @@ class BookingState extends Equatable {
       appliedOfferId: (clearPromo || clearOfferId)
           ? null
           : (appliedOfferId ?? this.appliedOfferId),
+      // Deliberately NOT tied to clearPromo/clearOfferId. These two are what
+      // the offer CARD promised, not what the current quote was priced with:
+      // the details screen quotes bare on purpose (§6.93's mechanism), and
+      // clearing them alongside the applied code would blank the very figures
+      // D-4 exists to keep on screen.
+      offerListPriceMinor: offerListPriceMinor ?? this.offerListPriceMinor,
+      offerTargetPriceMinor:
+          offerTargetPriceMinor ?? this.offerTargetPriceMinor,
     );
   }
 
@@ -250,5 +277,7 @@ class BookingState extends Equatable {
     paymentInit,
     appliedPromoCode,
     appliedOfferId,
+    offerListPriceMinor,
+    offerTargetPriceMinor,
   ];
 }

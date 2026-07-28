@@ -205,6 +205,8 @@ abstract class AppRouter {
                   existingSlotStart: args.existingSlotStart,
                   subscriptionId: args.subscriptionId,
                   washId: args.washId,
+                  offerListPriceMinor: args.offerListPriceMinor,
+                  offerTargetPriceMinor: args.offerTargetPriceMinor,
                 ),
             child: const BookingLocationView(),
           ),
@@ -343,6 +345,19 @@ class BookingFlowStartArgs {
   final String? subscriptionId;
   final String? washId;
 
+  /// The wash's VAT-inclusive gross LIST price in halala, when the flow was
+  /// started from a SERVICE offer card. Null otherwise.
+  final int? offerListPriceMinor;
+
+  /// The VAT-inclusive gross price that offer sells the wash at, in halala.
+  /// Null when there is no offer, or when the offer is a pure shortcut with no
+  /// deal behind it.
+  ///
+  /// Both are carried so the details screen can show the price the customer
+  /// tapped instead of the list price (owner decision D-4) — server figures,
+  /// passed through verbatim, never recomputed on device.
+  final int? offerTargetPriceMinor;
+
   BookingFlowStartArgs({
     this.service,
     this.existingCar,
@@ -353,6 +368,8 @@ class BookingFlowStartArgs {
     BookingSubmitStrategy? submitStrategy,
     this.subscriptionId,
     this.washId,
+    this.offerListPriceMinor,
+    this.offerTargetPriceMinor,
   }) : submitStrategy = submitStrategy ?? ServiceBookingSubmit();
 }
 

@@ -472,6 +472,32 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
         !config.showPricingInDetails || lockedTotal != null;
     final bool canProceed = isComplete && priceLocked;
 
+    // Owner decision D-4 — the ONE bounded override of §6.93 above.
+    //
+    // §6.93 is right about the case it was written for: a promo code applied
+    // AT PAYMENT makes the total jump, and this screen has nothing on it that
+    // could explain a number that moved. A SERVICE offer is the opposite
+    // shape. Its price is known BEFORE the flow starts — the customer tapped a
+    // card that said 35.00 — so showing the list price here and the offer
+    // price two screens later would CREATE the step-change §6.93 exists to
+    // avoid rather than prevent one.
+    //
+    // Scoped by DATA, not by a flag: these two figures only exist when the
+    // flow was started from a SERVICE offer card. A manually-typed promo code
+    // leaves both null and takes the §6.93 path unchanged.
+    //
+    // Both are the offer's own halala figures rendered verbatim. Nothing here
+    // is derived — no VAT maths, no subtraction — for the reason
+    // `gross_price_breakdown.dart` gives: rounding in a second place.
+    //
+    // KNOWN LIMIT: add-ons are not in either figure. The details quote is
+    // deliberately bare (it carries no offer), so there is no server total for
+    // "offer price + add-ons" to show, and this pair states the WASH's price,
+    // which is what the offer discounts. The summary is where the full,
+    // server-computed basket is broken down.
+    final int? offerTarget = bookingState.offerTargetPriceMinor;
+    final bool showOfferPrice = config.showPricingInDetails && offerTarget != null;
+
     return BottomActionSheetContainer(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -486,7 +512,32 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
                   ),
                 ),
                 const Spacer(),
-                if (lockedTotal == null)
+                if (showOfferPrice) ...[
+                  if (bookingState.offerListPriceMinor != null) ...[
+                    Text(
+                      (bookingState.offerListPriceMinor! / 100)
+                          .toStringAsFixed(2),
+                      style: AppTextStyles.regular14.copyWith(
+                        color: context.colors.textSecondary,
+                        decoration: TextDecoration.lineThrough,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                  ],
+                  Text(
+                    (offerTarget / 100).toStringAsFixed(2),
+                    style: AppTextStyles.medium24,
+                  ),
+                  const SizedBox(width: 4),
+                  SvgPicture.asset(
+                    AppAssets.currency,
+                    width: width * 0.06,
+                    colorFilter: ColorFilter.mode(
+                      context.colors.textPrimary,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                ] else if (lockedTotal == null)
                   Text(
                     LocaleKeys.bookings_calculating_price.tr(context: context),
                     style: AppTextStyles.regular14.copyWith(

@@ -6,7 +6,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'support/promo_summary_harness.dart';
 
-/// The owner's ruling (plan §6.93): **no discount before the payment page.**
+/// The owner's ruling (plan §6.93): **no discount before the payment page** —
+/// NARROWED, 2026-07-28, to "for a booking that carries no offer PRICE".
+///
+/// Owner decision D-4 carved out exactly one exception, and it is a different
+/// shape rather than a softening of this one. A SERVICE offer states its price
+/// on the card, BEFORE the flow starts, and carries it into the flow as data
+/// (`BookingFlowStartArgs.offerTargetPriceMinor`); showing the list price here
+/// and the offer price two screens later would CREATE the step-change §6.93
+/// exists to avoid. Every case in THIS file leaves those figures null — the
+/// offer taken below is a PROMO_CODE offer, whose discount is only known once
+/// the server prices it — so every ruling pinned here is untouched by D-4.
+/// The exception is pinned by its sibling, `details_prices_with_offer_test.dart`.
 ///
 /// Taking an offer applies its code, and the booking-DETAILS screen used to
 /// re-quote with it — so after the customer closed the summary, details sat
@@ -46,12 +57,16 @@ void main() {
   }
 
   testWidgets(
-    'an offer taken on the offers surface leaves the details screen quoting '
-    'BARE — no code, no offer id, undiscounted total',
+    'a PROMO_CODE offer, which carries no price of its own, leaves the details '
+    'screen quoting BARE — no code, no offer id, undiscounted total',
     (tester) async {
       final repo = RecordingBookingRepo();
+      // No offer price: this offer's discount is the server's to compute, so
+      // there was never a figure on the card to keep on screen. D-4 does not
+      // reach this case.
       final cubit = buildCubit(repo);
       addTearDown(cubit.close);
+      expect(cubit.state.offerTargetPriceMinor, isNull);
 
       takeOffer();
       await pumpSummary(tester, cubit);

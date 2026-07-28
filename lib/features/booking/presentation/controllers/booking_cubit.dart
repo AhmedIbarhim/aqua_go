@@ -110,6 +110,8 @@ class BookingCubit extends Cubit<BookingState> {
     DateTime? existingSlotStart,
     String? subscriptionId,
     String? washId,
+    int? offerListPriceMinor,
+    int? offerTargetPriceMinor,
   }) {
     emit(
       BookingState(
@@ -122,6 +124,15 @@ class BookingCubit extends Cubit<BookingState> {
         flowConfig: _flowConfig,
         subscriptionId: subscriptionId,
         washId: washId,
+        // Both are DISPLAY figures the SERVICE offer card handed over, and
+        // they enter the flow here because that is the only moment the offer
+        // is in scope. A 0 target means the offer carries no deal at all (a
+        // shortcut card), which is not the same statement as "free" — it is
+        // normalised away so no caller downstream has to know the difference.
+        offerListPriceMinor:
+            (offerListPriceMinor ?? 0) > 0 ? offerListPriceMinor : null,
+        offerTargetPriceMinor:
+            (offerTargetPriceMinor ?? 0) > 0 ? offerTargetPriceMinor : null,
       ),
     );
 

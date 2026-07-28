@@ -289,7 +289,14 @@ class _PrimaryActionState extends State<_PrimaryAction> {
       }
       context.pushNamed(
         Routes.bookingLocation,
-        arguments: BookingFlowStartArgs(service: service),
+        arguments: BookingFlowStartArgs(
+          service: service,
+          // The two figures the card promised, carried into the flow so the
+          // details screen shows the price the customer tapped rather than the
+          // list price (owner decision D-4). Server figures, passed through.
+          offerListPriceMinor: offer.terms.serviceListPriceMinor,
+          offerTargetPriceMinor: offer.terms.targetPriceMinor,
+        ),
       );
       return;
     }

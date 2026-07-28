@@ -233,6 +233,11 @@ BookingCubit buildCubit(
   BookingRepository repo, {
   BookingSubmitStrategy? submitStrategy,
   ServiceModel? withService,
+  /// The two display figures a SERVICE offer card hands into the flow. Left
+  /// null, the cubit is an ordinary booking that never came through an offer —
+  /// which is what every pre-existing caller of this helper is.
+  int? offerListPriceMinor,
+  int? offerTargetPriceMinor,
 }) {
   final apiClient = APIClient(Dio());
   final cubit = BookingCubit(
@@ -248,6 +253,8 @@ BookingCubit buildCubit(
     withService ?? service,
     existingCar: car,
     existingAddress: address,
+    offerListPriceMinor: offerListPriceMinor,
+    offerTargetPriceMinor: offerTargetPriceMinor,
   );
   final date = DateTime.now().add(const Duration(days: 2));
   final slotStart = DateTime(date.year, date.month, date.day, 10, 0);
