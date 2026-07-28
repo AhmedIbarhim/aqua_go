@@ -124,11 +124,18 @@ String _joinNames(List<String> names, {required bool isAr}) =>
 /// at all; the type is what selects the arm, never the values.
 ///
 /// The discount-type literals MUST stay byte-identical to the backend's
-/// com.aquago.promo.internal.application.PromoServiceImpl constants —
-/// DISCOUNT_TYPE_PERCENTAGE = "PERCENTAGE" and
-/// DISCOUNT_TYPE_FIXED_AMOUNT = "FIXED_AMOUNT". A drift renders an EMPTY terms
-/// block with no error anywhere, which is why this is a pure, unit-tested
-/// function instead of an inline branch in the widget.
+/// com.aquago.promo.internal.application.PromoServiceImpl constants, and there
+/// are THREE of them, not two — "PERCENTAGE", "FIXED_AMOUNT" and
+/// "TARGET_PRICE". A literal with no arm renders an EMPTY terms block with no
+/// error anywhere, which is why this is a pure, unit-tested function instead of
+/// an inline branch in the widget: `offer_term_lines_test.dart` walks the whole
+/// backend set and fails on the first literal that emits no discount row.
+///
+/// The three do NOT share a unit. `configuredValue` is whole percentage points
+/// for PERCENTAGE, halala OFF the order for FIXED_AMOUNT, and for TARGET_PRICE
+/// the VAT-INCLUSIVE GROSS PRICE IN HALALA THE WASH BECOMES — never an amount
+/// off it. Wording a target as a reduction states the deal an order of
+/// magnitude wrong in the customer's favour, so each arm owns its own key.
 List<OfferTermLine> offerTermLines(CustomerOfferModel offer, {required bool isAr}) {
   final terms = offer.terms;
   final lines = <OfferTermLine>[];
@@ -142,6 +149,21 @@ List<OfferTermLine> offerTermLines(CustomerOfferModel offer, {required bool isAr
     } else if (terms.discountType == 'FIXED_AMOUNT') {
       lines.add(OfferTermKey(
         LocaleKeys.offers_discount_amount,
+        [sarFromMinor(terms.configuredValue)],
+      ));
+    } else if (terms.discountType == 'TARGET_PRICE') {
+      // A PROMO_CODE offer may link a STANDALONE target-price code — nothing
+      // rejects one: `OfferServiceImpl.requireUnmanagedPromoLink` refuses only
+      // ANOTHER offer's MANAGED code, and the discount type is passed through
+      // verbatim. Without this arm the terms block said nothing at all about
+      // what the code does.
+      //
+      // TARGET_PRICE is LINE-scoped: `configuredValue` is the FINAL gross the
+      // wash BECOMES, so the row states a PRICE. It must never be worded as a
+      // reduction — "35.00 off" for a code that sets a 175.00 wash to 35.00
+      // reads as a 35.00 saving instead of a 140.00 one.
+      lines.add(OfferTermKey(
+        LocaleKeys.offers_discount_target_price,
         [sarFromMinor(terms.configuredValue)],
       ));
     }

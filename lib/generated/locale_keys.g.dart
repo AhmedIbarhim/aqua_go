@@ -100,6 +100,7 @@ abstract class  LocaleKeys {
   static const offers_min_order = 'offers.min_order';
   static const offers_discount_percent = 'offers.discount_percent';
   static const offers_discount_amount = 'offers.discount_amount';
+  static const offers_discount_target_price = 'offers.discount_target_price';
   static const offers_package_washes = 'offers.package_washes';
   static const offers_package_validity = 'offers.package_validity';
   static const offers_package_price = 'offers.package_price';

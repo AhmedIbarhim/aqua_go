@@ -102,6 +102,7 @@
     "min_order": "الحد الأدنى للطلب {} ريال",
     "discount_percent": "خصم {}%",
     "discount_amount": "خصم {} ريال",
+    "discount_target_price": "سعر الغسيل بهذا الكود {} ريال",
     "package_washes": "{} غسلات",
     "package_validity": "صالحة لمدة {} يوم",
     "package_price": "سعر الباقة {} ريال",

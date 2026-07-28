@@ -75,7 +75,65 @@ void main() {
     expect(_args(lines[0]), ['20.00']);
   });
 
-  test('an unknown discount type yields no discount line (drift detector)', () {
+  test('a TARGET_PRICE promo states the price the wash BECOMES, not an amount '
+      'off', () {
+    // A PROMO_CODE offer may link a STANDALONE target-price code — nothing on
+    // the backend rejects one (requireUnmanagedPromoLink refuses only ANOTHER
+    // offer's MANAGED code) and the discount type reaches the client verbatim.
+    // Before this arm existed the whole terms block was silent about it.
+    final lines = offerTermLines(
+      _offer(
+        'PROMO_CODE',
+        const OfferTermsModel(
+          promoCode: 'FLAT35',
+          discountType: 'TARGET_PRICE',
+          configuredValue: 3500,
+        ),
+      ),
+      isAr: false,
+    );
+    expect(lines, hasLength(1));
+    expect(_key(lines[0]), LocaleKeys.offers_discount_target_price);
+    expect(_args(lines[0]), ['35.00']);
+    expect(
+      _key(lines[0]),
+      isNot(LocaleKeys.offers_discount_amount),
+      reason: 'configuredValue is the FINAL gross the wash becomes; rendering '
+          'it as "35.00 off" understates a 140.00 saving as a 35.00 one',
+    );
+  });
+
+  test('EVERY backend discount literal renders a discount row — a literal with '
+      'no arm FAILS here instead of blanking the terms block', () {
+    // The whole set com.aquago.promo.internal.application.PromoServiceImpl can
+    // put on the wire. TWO gaps shipped because an unhandled literal fell
+    // through to an empty list and every test agreed with it, so this walks the
+    // set and names the literal that emitted nothing.
+    const backendDiscountTypes = ['PERCENTAGE', 'FIXED_AMOUNT', 'TARGET_PRICE'];
+    for (final type in backendDiscountTypes) {
+      final lines = offerTermLines(
+        _offer(
+          'PROMO_CODE',
+          OfferTermsModel(
+            promoCode: 'X',
+            discountType: type,
+            configuredValue: 3500,
+          ),
+        ),
+        isAr: false,
+      );
+      expect(lines, isNotEmpty,
+          reason: '$type is a backend discount literal and offerTermLines has '
+              'no arm for it — the offer detail screen renders an "Offer '
+              'details" heading that never says what the discount is');
+    }
+  });
+
+  test('a literal that is NOT on the wire renders nothing rather than throwing',
+      () {
+    // The read path never tightens into a failure: an unrecognised value is a
+    // deployment-skew artefact, not a reason to crash the detail screen. The
+    // drift itself is caught by the test above, which walks the real set.
     final lines = offerTermLines(
       _offer(
         'PROMO_CODE',
@@ -83,10 +141,7 @@ void main() {
       ),
       isAr: false,
     );
-    expect(lines, isEmpty,
-        reason: 'PERCENT is NOT a backend literal — PromoServiceImpl emits '
-            'PERCENTAGE / FIXED_AMOUNT. If this ever passes with a non-empty '
-            'list the literals drifted.');
+    expect(lines, isEmpty);
   });
 
   test('a PACKAGE offer yields name, washes, validity and price, localised', () {

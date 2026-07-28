@@ -102,6 +102,7 @@
     "min_order": "Minimum order {} SAR",
     "discount_percent": "{}% off",
     "discount_amount": "{} SAR off",
+    "discount_target_price": "Wash price with this code {} SAR",
     "package_washes": "{} washes",
     "package_validity": "Valid for {} days",
     "package_price": "Package price {} SAR",
