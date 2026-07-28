@@ -1,8 +1,10 @@
 import '../../../../core/utils/saudi_wire_format.dart';
 
-/// Terms attached to a customer-visible offer. Exactly one half is populated:
-/// the promo half (promoCode / discountType / configuredValue / minOrderMinor)
-/// for a PROMO_CODE offer, the package half for a PACKAGE offer. Mirrors the
+/// Terms attached to a customer-visible offer. Exactly one THIRD is populated:
+/// the promo third (promoCode / discountType / configuredValue / minOrderMinor)
+/// for a PROMO_CODE offer, the package third for a PACKAGE offer, and the
+/// service third (serviceId / serviceNameAr / serviceNameEn /
+/// serviceListPriceMinor / targetPriceMinor) for a SERVICE offer. Mirrors the
 /// backend record com.aquago.offer.api.records.OfferTerms.
 ///
 /// The numeric fields are non-nullable with a 0 default so every consumer can
@@ -36,6 +38,23 @@ class OfferTermsModel {
   final List<String> applicableZoneNamesAr;
   final List<String> applicableZoneNamesEn;
 
+  /// The wash a SERVICE offer deep-links into. Null for the other two types.
+  final String? serviceId;
+  final String? serviceNameAr;
+  final String? serviceNameEn;
+
+  /// The service's current VAT-INCLUSIVE gross list price, in halala. 0 when
+  /// this is not a SERVICE offer.
+  final int serviceListPriceMinor;
+
+  /// The VAT-INCLUSIVE gross price the wash BECOMES through this offer, in
+  /// halala.
+  ///
+  /// 0 means there is NO deal — a SHORTCUT card that just jumps into booking
+  /// the service at its list price. It never means "free". Ask
+  /// [CustomerOfferModel.hasTargetPrice] rather than testing this number.
+  final int targetPriceMinor;
+
   const OfferTermsModel({
     this.promoCode,
     this.discountType,
@@ -51,6 +70,11 @@ class OfferTermsModel {
     this.applicableServiceNamesEn = const [],
     this.applicableZoneNamesAr = const [],
     this.applicableZoneNamesEn = const [],
+    this.serviceId,
+    this.serviceNameAr,
+    this.serviceNameEn,
+    this.serviceListPriceMinor = 0,
+    this.targetPriceMinor = 0,
   });
 
   /// A JSON array of strings, or an empty list for anything else — a missing,
@@ -76,11 +100,20 @@ class OfferTermsModel {
       applicableServiceNamesEn: _names(json['applicableServiceNamesEn']),
       applicableZoneNamesAr: _names(json['applicableZoneNamesAr']),
       applicableZoneNamesEn: _names(json['applicableZoneNamesEn']),
+      serviceId: json['serviceId'] as String?,
+      serviceNameAr: json['serviceNameAr'] as String?,
+      serviceNameEn: json['serviceNameEn'] as String?,
+      serviceListPriceMinor:
+          (json['serviceListPriceMinor'] as num?)?.toInt() ?? 0,
+      targetPriceMinor: (json['targetPriceMinor'] as num?)?.toInt() ?? 0,
     );
   }
 
   String? packageName({required bool isAr}) =>
       isAr ? packageNameAr : packageNameEn;
+
+  String? serviceName({required bool isAr}) =>
+      isAr ? serviceNameAr : serviceNameEn;
 
   List<String> applicableServices({required bool isAr}) =>
       isAr ? applicableServiceNamesAr : applicableServiceNamesEn;
@@ -135,6 +168,13 @@ class CustomerOfferModel {
   static final DateTime endsAtFallback = DateTime.utc(9999, 12, 31);
 
   bool get isPromoCode => offerType == 'PROMO_CODE';
+
+  bool get isService => offerType == 'SERVICE';
+
+  /// True when this offer actually discounts something. A SERVICE offer with a
+  /// zero target is a pure shortcut card, NOT a free wash — 0 means "nothing to
+  /// show", which is why callers must ask this rather than testing the number.
+  bool get hasTargetPrice => isService && terms.targetPriceMinor > 0;
 
   String title({required bool isAr}) => isAr ? titleAr : titleEn;
   String description({required bool isAr}) => isAr ? descriptionAr : descriptionEn;

@@ -182,5 +182,120 @@ void main() {
       expect(offer.description(isAr: true), 'وصف');
       expect(offer.banner(isAr: true), isNull);
     });
+
+    test('parses a SERVICE offer carrying a target-price deal', () {
+      final offer = CustomerOfferModel.fromJson({
+        'id': '018f-dddd',
+        'offerType': 'SERVICE',
+        'titleAr': 'غسيل كامل بـ 35',
+        'titleEn': 'Full wash for 35',
+        'descriptionAr': 'وصف',
+        'descriptionEn': 'Description',
+        // Bare Asia/Riyadh wall clock — no offset, no trailing Z.
+        'endsAt': '2026-08-31T21:59:59',
+        'terms': {
+          'serviceId': 'svc-1',
+          'serviceNameAr': 'غسيل كامل',
+          'serviceNameEn': 'Full wash',
+          'serviceListPriceMinor': 17500,
+          'targetPriceMinor': 3500,
+        },
+      });
+      expect(offer.offerType, 'SERVICE');
+      expect(offer.isService, isTrue);
+      expect(offer.isPromoCode, isFalse);
+      expect(offer.endsAt, DateTime.utc(2026, 8, 31, 21, 59, 59));
+      expect(offer.terms.serviceId, 'svc-1');
+      expect(offer.terms.serviceNameAr, 'غسيل كامل');
+      expect(offer.terms.serviceNameEn, 'Full wash');
+      expect(offer.terms.serviceListPriceMinor, 17500);
+      expect(offer.terms.targetPriceMinor, 3500);
+      expect(offer.hasTargetPrice, isTrue);
+    });
+
+    test('a SHORTCUT service offer has a zero target and no deal', () {
+      // A SERVICE offer may carry no deal at all — it is then a pure shortcut
+      // card that jumps into booking the wash at its list price. 0 means
+      // "nothing to show", NOT a free wash, which is exactly why callers must
+      // ask `hasTargetPrice` rather than testing the number themselves.
+      final offer = CustomerOfferModel.fromJson({
+        'id': '018f-eeee',
+        'offerType': 'SERVICE',
+        'titleAr': 'احجز غسيل كامل',
+        'titleEn': 'Book a full wash',
+        'descriptionAr': 'وصف',
+        'descriptionEn': 'Description',
+        'endsAt': '2026-08-31T21:59:59',
+        'terms': {
+          'serviceId': 'svc-1',
+          'serviceNameAr': 'غسيل كامل',
+          'serviceNameEn': 'Full wash',
+          'serviceListPriceMinor': 17500,
+          'targetPriceMinor': 0,
+        },
+      });
+      expect(offer.isService, isTrue);
+      expect(offer.terms.targetPriceMinor, 0);
+      expect(offer.hasTargetPrice, isFalse);
+      // The list price is still there — a shortcut card can still say what the
+      // wash costs.
+      expect(offer.terms.serviceListPriceMinor, 17500);
+    });
+
+    test('hasTargetPrice is false for a non-SERVICE offer, whatever the terms', () {
+      // Defensive: `targetPriceMinor` is documented as 0 on the other two
+      // types, but a client must not start discounting a PROMO_CODE card if a
+      // future server ever sends one.
+      final offer = CustomerOfferModel.fromJson({
+        'id': 'x',
+        'offerType': 'PROMO_CODE',
+        'titleAr': 'a',
+        'titleEn': 'b',
+        'descriptionAr': 'c',
+        'descriptionEn': 'd',
+        'terms': {'promoCode': 'WELCOME', 'targetPriceMinor': 3500},
+      });
+      expect(offer.isService, isFalse);
+      expect(offer.hasTargetPrice, isFalse);
+    });
+
+    test('a partial SERVICE terms payload degrades rather than throwing', () {
+      // Read-reconstruction path: it must never tighten into a failure. An
+      // absent service half is all-null identity + all-zero numbers, exactly
+      // like the promo and package halves.
+      final offer = CustomerOfferModel.fromJson({
+        'id': 'x',
+        'offerType': 'SERVICE',
+        'titleAr': 'a',
+        'titleEn': 'b',
+        'descriptionAr': 'c',
+        'descriptionEn': 'd',
+        'terms': {'serviceId': 'svc-1'},
+      });
+      expect(offer.terms.serviceId, 'svc-1');
+      expect(offer.terms.serviceNameAr, isNull);
+      expect(offer.terms.serviceNameEn, isNull);
+      expect(offer.terms.serviceListPriceMinor, 0);
+      expect(offer.terms.targetPriceMinor, 0);
+      expect(offer.hasTargetPrice, isFalse);
+    });
+
+    test('the service name resolves by locale flag', () {
+      final offer = CustomerOfferModel.fromJson({
+        'id': 'x',
+        'offerType': 'SERVICE',
+        'titleAr': 'a',
+        'titleEn': 'b',
+        'descriptionAr': 'c',
+        'descriptionEn': 'd',
+        'terms': {
+          'serviceId': 'svc-1',
+          'serviceNameAr': 'غسيل كامل',
+          'serviceNameEn': 'Full wash',
+        },
+      });
+      expect(offer.terms.serviceName(isAr: true), 'غسيل كامل');
+      expect(offer.terms.serviceName(isAr: false), 'Full wash');
+    });
   });
 }
