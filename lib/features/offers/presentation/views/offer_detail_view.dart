@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/components/currency_amount.dart';
 import '../../../../core/components/custom_button.dart';
 import '../../../../core/components/generic_app_bar.dart';
 import '../../../../core/config/di/service_locator.dart';
@@ -154,26 +155,85 @@ class _Terms extends StatelessWidget {
         ...lines.map(
           (line) => Padding(
             padding: const EdgeInsets.only(bottom: 6),
-            child: Text(
-              switch (line) {
-                OfferTermLiteral(text: final text) => text,
-                OfferTermKey(key: final key, args: final args) =>
-                  key.tr(context: context, args: args),
-              },
-              style: AppTextStyles.regular14.copyWith(
-                color: context.colors.textSecondary,
-                // A SERVICE offer's superseded list price is crossed out, the
-                // same treatment the booking details screen gives it, so the
-                // two figures read as one move rather than as two prices.
-                decoration: line is OfferTermKey && line.struckThrough
-                    ? TextDecoration.lineThrough
-                    : null,
-              ),
-            ),
+            child: _TermRow(line: line),
           ),
         ),
       ],
     );
+  }
+}
+
+/// One term row.
+///
+/// A row that states money is drawn as a `Text.rich` so the riyal glyph can be
+/// spliced in immediately after the figure — the same currency the booking
+/// price breakdown draws. Everything else is a plain `Text`.
+class _TermRow extends StatelessWidget {
+  const _TermRow({required this.line});
+
+  final OfferTermLine line;
+
+  /// Stands in for the money argument while the sentence is translated, so the
+  /// glyph can be placed by SPLITTING the finished string instead of guessing
+  /// where the figure ended up. U+FFFC (OBJECT REPLACEMENT CHARACTER) is the
+  /// Unicode placeholder for exactly this — an inline object inside text — and
+  /// cannot occur in a translation.
+  static const String _amountSlot = '￼';
+
+  @override
+  Widget build(BuildContext context) {
+    // A SERVICE offer's superseded list price is crossed out, the same
+    // treatment the booking details screen gives it, so the two figures read as
+    // one move rather than as two prices.
+    final struckThrough = switch (line) {
+      OfferTermKey(struckThrough: final struck) => struck,
+      OfferTermLiteral() => false,
+    };
+    final color = context.colors.textSecondary;
+    final style = AppTextStyles.regular14.copyWith(
+      color: color,
+      decoration: struckThrough ? TextDecoration.lineThrough : null,
+    );
+
+    switch (line) {
+      case OfferTermLiteral(text: final text):
+        return Text(text, style: style);
+      case OfferTermKey(key: final key, args: final args, moneyArgIndex: final money):
+        final plain = Text(key.tr(context: context, args: args), style: style);
+        // Defensive on BOTH reads, and deliberately not a failure: an index the
+        // args cannot answer, or a translation that dropped its `{}`, is a
+        // shape this screen must still render. The fallback loses the glyph,
+        // never the terms.
+        if (money == null || money < 0 || money >= args.length) return plain;
+
+        final slotted = [...args]..[money] = _amountSlot;
+        final sentence = key.tr(context: context, args: slotted);
+        final at = sentence.indexOf(_amountSlot);
+        if (at < 0) return plain;
+
+        final before = sentence.substring(0, at);
+        final after = sentence.substring(at + _amountSlot.length);
+        // Position-independent by construction: whatever the translator wrapped
+        // around the figure stays around it, in either language, with no
+        // direction branching anywhere.
+        return Text.rich(
+          TextSpan(
+            children: [
+              if (before.isNotEmpty) TextSpan(text: before),
+              ...currencyAmountSpans(
+                amount: args[money],
+                color: color,
+                struckThrough: struckThrough,
+              ),
+              if (after.isNotEmpty) TextSpan(text: after),
+            ],
+          ),
+          // On the Text, not on the root span: `Text.style` is what the rest of
+          // the app — and the tests — read a row's treatment off, and it is
+          // inherited by the spans either way.
+          style: style,
+        );
+    }
   }
 }
 

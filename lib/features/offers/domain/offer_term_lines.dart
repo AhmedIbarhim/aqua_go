@@ -26,10 +26,26 @@ class OfferTermLiteral extends OfferTermLine {
 
 /// A row rendered from a locale [key] and its positional [args].
 class OfferTermKey extends OfferTermLine {
-  const OfferTermKey(this.key, this.args, {this.struckThrough = false});
+  const OfferTermKey(
+    this.key,
+    this.args, {
+    this.struckThrough = false,
+    this.moneyArgIndex,
+  });
 
   final String key;
   final List<String> args;
+
+  /// Which of [args] is a SAR figure, or null when the row states no money.
+  ///
+  /// The row DECLARES it rather than letting the view sniff for it: the
+  /// currency is drawn as the riyal glyph, and deciding at render time which
+  /// part of a translated sentence is a price would mean pattern-matching
+  /// localised text — a rule that breaks the first time a translator moves a
+  /// word. It is an INDEX, not a flag, because the money is not always the only
+  /// argument, and it is not always in the same place in the sentence: English
+  /// puts it mid-string in "{} off" and at the end in "Minimum order {}".
+  final int? moneyArgIndex;
 
   /// Whether the row is drawn crossed out — true only for the price an offer
   /// REPLACES, so the saving is legible without arithmetic. It is a property of
@@ -65,6 +81,7 @@ OfferTermKey? offerMinOrderLine(CustomerOfferModel offer) {
   return OfferTermKey(
     LocaleKeys.offers_min_order,
     [sarFromMinor(offer.terms.minOrderMinor)],
+    moneyArgIndex: 0,
   );
 }
 
@@ -150,6 +167,7 @@ List<OfferTermLine> offerTermLines(CustomerOfferModel offer, {required bool isAr
       lines.add(OfferTermKey(
         LocaleKeys.offers_discount_amount,
         [sarFromMinor(terms.configuredValue)],
+        moneyArgIndex: 0,
       ));
     } else if (terms.discountType == 'TARGET_PRICE') {
       // A PROMO_CODE offer may link a STANDALONE target-price code — nothing
@@ -165,6 +183,7 @@ List<OfferTermLine> offerTermLines(CustomerOfferModel offer, {required bool isAr
       lines.add(OfferTermKey(
         LocaleKeys.offers_discount_target_price,
         [sarFromMinor(terms.configuredValue)],
+        moneyArgIndex: 0,
       ));
     }
     // BR-OFR-10's threshold, kept in its own helper rather than inlined here:
@@ -225,11 +244,13 @@ List<OfferTermLine> offerTermLines(CustomerOfferModel offer, {required bool isAr
           LocaleKeys.offers_service_list_price,
           [sarFromMinor(terms.serviceListPriceMinor)],
           struckThrough: true,
+          moneyArgIndex: 0,
         ));
       }
       lines.add(OfferTermKey(
         LocaleKeys.offers_service_price,
         [sarFromMinor(terms.targetPriceMinor)],
+        moneyArgIndex: 0,
       ));
     }
     return lines;
@@ -253,6 +274,7 @@ List<OfferTermLine> offerTermLines(CustomerOfferModel offer, {required bool isAr
     lines.add(OfferTermKey(
       LocaleKeys.offers_package_price,
       [sarFromMinor(terms.packagePriceMinor)],
+      moneyArgIndex: 0,
     ));
   }
   return lines;

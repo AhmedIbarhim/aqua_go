@@ -27,6 +27,10 @@ List<String> _args(OfferTermLine line) =>
 String? _text(OfferTermLine line) =>
     line is OfferTermLiteral ? line.text : null;
 
+/// Which arg of a row is a SAR figure, or null when the row states no money.
+int? _money(OfferTermLine line) =>
+    line is OfferTermKey ? line.moneyArgIndex : null;
+
 // `offerExpiryLine` formats a date per locale, which needs the `intl` symbol
 // data that GlobalMaterialLocalizations loads for the app — unavailable to a
 // bare unit test. It is covered in offers_surface_test.dart instead, where the
@@ -367,6 +371,98 @@ void main() {
           isNot(contains(LocaleKeys.offers_package_price)));
       expect(lines, isNotEmpty,
           reason: 'the terms block must never be a heading over an expiry row');
+    });
+  });
+
+  group('every SAR row DECLARES which arg is money', () {
+    // The view draws the riyal glyph immediately after the figure, and it finds
+    // the figure from this index rather than by pattern-matching a translated
+    // sentence. A money row that forgets to declare it renders the amount with
+    // no currency at all — legible, and silently wrong — so the whole set is
+    // walked here instead of one row at a time.
+    const moneyKeys = {
+      LocaleKeys.offers_min_order,
+      LocaleKeys.offers_discount_amount,
+      LocaleKeys.offers_discount_target_price,
+      LocaleKeys.offers_package_price,
+      LocaleKeys.offers_service_list_price,
+      LocaleKeys.offers_service_price,
+    };
+
+    /// Every keyed row the six offer shapes between them can emit.
+    List<OfferTermKey> allKeyedRows() => [
+          for (final terms in <(String, OfferTermsModel)>[
+            (
+              'PROMO_CODE',
+              const OfferTermsModel(
+                promoCode: 'X',
+                discountType: 'FIXED_AMOUNT',
+                configuredValue: 2000,
+                minOrderMinor: 10000,
+                applicableServiceNamesEn: ['Premium Wash'],
+                applicableZoneNamesEn: ['Central Jeddah'],
+              )
+            ),
+            (
+              'PROMO_CODE',
+              const OfferTermsModel(
+                promoCode: 'X',
+                discountType: 'TARGET_PRICE',
+                configuredValue: 3500,
+              )
+            ),
+            (
+              'PROMO_CODE',
+              const OfferTermsModel(
+                promoCode: 'X',
+                discountType: 'PERCENTAGE',
+                configuredValue: 15,
+              )
+            ),
+            (
+              'SERVICE',
+              const OfferTermsModel(
+                serviceId: 'svc-1',
+                serviceNameEn: 'Full wash',
+                serviceListPriceMinor: 17500,
+                targetPriceMinor: 3500,
+              )
+            ),
+            (
+              'PACKAGE',
+              const OfferTermsModel(
+                packageId: 'pkg',
+                packageNameEn: 'Gold',
+                packagePriceMinor: 24900,
+                packageNumWashes: 8,
+                packageValidityDays: 30,
+              )
+            ),
+          ])
+            ...offerTermLines(_offer(terms.$1, terms.$2), isAr: false)
+                .whereType<OfferTermKey>(),
+        ];
+
+    test('all six money rows point at their figure', () {
+      final seen = <String>{};
+      for (final row in allKeyedRows().where((r) => moneyKeys.contains(r.key))) {
+        seen.add(row.key);
+        expect(row.moneyArgIndex, 0,
+            reason: '${row.key} states a SAR amount and must say so, or the '
+                'detail view prints the figure with no currency');
+        expect(row.args[row.moneyArgIndex!], matches(r'^\d+\.\d{2}$'),
+            reason: 'the declared index must land on the amount itself');
+      }
+      expect(seen, moneyKeys,
+          reason: 'a money key no fixture reaches is a key nothing checks');
+    });
+
+    test('a row that states no money declares none', () {
+      // "{}% off", "{} washes", "Valid on {}" — a glyph on any of these would
+      // price a percentage, a count or a service name.
+      for (final row in allKeyedRows().where((r) => !moneyKeys.contains(r.key))) {
+        expect(_money(row), isNull, reason: '${row.key} carries no SAR figure');
+      }
     });
   });
 

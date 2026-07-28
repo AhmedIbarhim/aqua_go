@@ -25,6 +25,21 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// Where the riyal glyph sits inside a rendered money line.
+///
+/// A terms row that states an amount is a `Text.rich` — text, then a
+/// `WidgetSpan` holding the glyph, then whatever the sentence puts after it —
+/// and `find.text` matches such a row on `textSpan.toPlainText()`, which writes
+/// U+FFFC (OBJECT REPLACEMENT CHARACTER) wherever a placeholder span sits. So
+/// the expected string carries [glyphSlot] at the exact position the glyph is
+/// expected to land, and a glyph that drifted to the end of the sentence fails
+/// the assertion instead of passing it.
+///
+/// Expectations using it are written as LITERALS rather than built from
+/// `.tr(args:)` — a string assembled by the same call the widget makes cannot
+/// fail on the wrong wording.
+const String glyphSlot = '\u{FFFC}';
+
 /// An [OffersRepository] whose two reads are scripted per call, so a test can
 /// say "the list loads, then the re-validation 404s" without a network.
 class ScriptedOffersRepository extends OffersRepository {

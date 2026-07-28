@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:aqua_go/core/components/currency_amount.dart';
 import 'package:aqua_go/core/config/di/service_locator.dart';
 import 'package:aqua_go/core/config/networking/api_client.dart';
 import 'package:aqua_go/core/config/networking/exceptions/failure.dart';
@@ -67,6 +68,24 @@ CustomerOfferModel serviceOffer({
         'targetPriceMinor': targetPriceMinor,
       },
     });
+
+/// A promo-code offer whose discount is a flat amount — the one term whose
+/// English wording puts the money MID-SENTENCE ("20.00 off").
+CustomerOfferModel fixedAmountPromoOffer({int configuredValue = 2000}) =>
+    CustomerOfferModel(
+      id: 'offer-flat',
+      offerType: 'PROMO_CODE',
+      titleAr: 'خصم ثابت',
+      titleEn: 'Flat discount',
+      descriptionAr: 'وصف',
+      descriptionEn: 'Description',
+      endsAt: saudiNow().add(const Duration(days: 30)),
+      terms: OfferTermsModel(
+        promoCode: 'FLAT20',
+        discountType: 'FIXED_AMOUNT',
+        configuredValue: configuredValue,
+      ),
+    );
 
 const ServiceModel _fullWash = ServiceModel(id: 'svc-1', code: 'FULL');
 
@@ -143,32 +162,57 @@ void main() {
       await pumpDetail(tester, serviceOffer());
 
       expect(find.text('Full wash'), findsWidgets);
-      expect(
-        find.text(LocaleKeys.offers_service_list_price.tr(args: ['175.00'])),
-        findsOneWidget,
-      );
-      final struck = tester.widget<Text>(
-        find.text(LocaleKeys.offers_service_list_price.tr(args: ['175.00'])),
-      );
+      // The currency is the riyal GLYPH, not the word "SAR" — the same currency
+      // the booking price breakdown draws. [glyphSlot] marks where it sits, so
+      // these read the wording AND the glyph's position in one assertion.
+      expect(find.text('Original price 175.00$glyphSlot'), findsOneWidget);
+      final struck =
+          tester.widget<Text>(find.text('Original price 175.00$glyphSlot'));
       expect(struck.style?.decoration, TextDecoration.lineThrough);
-      expect(
-        find.text(LocaleKeys.offers_service_price.tr(args: ['35.00'])),
-        findsOneWidget,
-      );
+      expect(find.text('Offer price 35.00$glyphSlot'), findsOneWidget);
+      // Nothing on this screen spells the currency out any more.
+      expect(find.textContaining('SAR'), findsNothing);
+    });
+
+    testWidgets('the strike crosses the glyph as well as the figure',
+        (tester) async {
+      // `TextDecoration.lineThrough` on the row's style does not reach inside a
+      // WidgetSpan, so the superseded price used to be crossed out up to the
+      // currency and no further. The glyph draws its own strike.
+      await pumpDetail(tester, serviceOffer());
+
+      CurrencyGlyph glyphIn(String rowText) => tester.widget<CurrencyGlyph>(
+            find.descendant(
+              of: find.text(rowText),
+              matching: find.byType(CurrencyGlyph),
+            ),
+          );
+
+      expect(glyphIn('Original price 175.00$glyphSlot').struckThrough, isTrue);
+      // …and the price the customer actually pays is NOT crossed out.
+      expect(glyphIn('Offer price 35.00$glyphSlot').struckThrough, isFalse);
+    });
+
+    testWidgets('a non-money term row carries no glyph at all', (tester) async {
+      // The wash name is a literal row and the expiry is a keyed row with no
+      // money in it; neither may sprout a currency.
+      await pumpDetail(tester, serviceOffer(targetPriceMinor: 0));
+
+      expect(find.byType(CurrencyGlyph), findsNothing);
+      expect(find.text('Full wash'), findsWidgets);
+      expect(find.textContaining('Offer ends on'), findsOneWidget);
     });
 
     testWidgets('a SHORTCUT offer prices nothing — 0 is no deal, not free',
         (tester) async {
       await pumpDetail(tester, serviceOffer(targetPriceMinor: 0));
 
-      expect(
-        find.text(LocaleKeys.offers_service_list_price.tr(args: ['175.00'])),
-        findsNothing,
-      );
-      expect(
-        find.text(LocaleKeys.offers_service_price.tr(args: ['0.00'])),
-        findsNothing,
-      );
+      // Written against the WORDING rather than a `.tr()` of the money key: a
+      // money row is a `Text.rich` whose plain text carries the glyph slot, so
+      // a `find.text` built from `.tr(args:)` alone can no longer match one and
+      // would pass here whether or not the row was drawn.
+      expect(find.textContaining('Original price'), findsNothing);
+      expect(find.textContaining('Offer price'), findsNothing);
     });
 
     testWidgets('opens the booking flow at the resolved service',
@@ -278,6 +322,48 @@ void main() {
 
       expect(pushed.where((r) => r.name != null), isEmpty);
       expect(PendingPromoCode.instance.takeHandoff(), isNull);
+    });
+  });
+
+  group('the currency is the riyal glyph, wherever the figure falls', () {
+    Future<void> pumpPromo(
+      WidgetTester tester, {
+      Locale locale = const Locale('en'),
+    }) async {
+      final offer = fixedAmountPromoOffer();
+      repo = ScriptedOffersRepository(
+        listResult: Right([offer]),
+        detailResult: Right(offer),
+      );
+      await pumpOffersSurface(
+        tester,
+        child: OfferDetailView(offer: offer),
+        cubit: cubitFor(repo),
+        locale: locale,
+      );
+    }
+
+    testWidgets('it lands after the figure, not at the end of the sentence',
+        (tester) async {
+      // "{} off" is the case that makes appending the currency wrong: the money
+      // is MID-string here and terminal in "Minimum order {}". [glyphSlot] is
+      // asserted in position, so a glyph parked at the end fails.
+      await pumpPromo(tester);
+
+      expect(find.text('20.00$glyphSlot off'), findsOneWidget);
+      expect(find.text('20.00 off$glyphSlot'), findsNothing);
+      expect(find.textContaining('SAR'), findsNothing);
+    });
+
+    testWidgets('Arabic states the same figure with the same glyph, no word',
+        (tester) async {
+      await pumpPromo(tester, locale: const Locale('ar'));
+
+      // Same span ORDER as the English row — figure, then glyph — and Flutter
+      // lays it out RTL from that; nothing in the widget branches on direction.
+      // (The RTL layout itself is pinned in offers_surface_test.dart.)
+      expect(find.text('خصم 20.00$glyphSlot'), findsOneWidget);
+      expect(find.textContaining('ريال'), findsNothing);
     });
   });
 }

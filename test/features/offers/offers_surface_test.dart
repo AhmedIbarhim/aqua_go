@@ -672,10 +672,11 @@ void main() {
       // The title, the description and the BR-OFR-10 threshold all came off the
       // card; the detail view every card opens is where they are stated now.
       expect(find.text('Welcome offer'), findsNothing);
-      expect(
-        find.text(LocaleKeys.offers_min_order.tr(args: ['100.00'])),
-        findsNothing,
-      );
+      // Written against the WORDING, not `.tr(args:)`: the threshold row is now
+      // a `Text.rich` whose plain text carries the glyph slot, so a `find.text`
+      // built from `.tr()` alone can no longer match one and would pass here
+      // whether or not the card drew it.
+      expect(find.textContaining('Minimum order'), findsNothing);
     });
 
     testWidgets('a home rail card is its banner and nothing else', (tester) async {
@@ -693,10 +694,7 @@ void main() {
 
       expect(bannerUrls(tester), contains('https://cdn.example/offer-1-en.png'));
       expect(textInCard(), findsNothing);
-      expect(
-        find.text(LocaleKeys.offers_min_order.tr(args: ['75.50'])),
-        findsNothing,
-      );
+      expect(find.textContaining('Minimum order'), findsNothing);
     });
 
     testWidgets('BR-OFR-10 — the minimum order is stated in the detail view',
@@ -712,10 +710,12 @@ void main() {
         cubit: cubitFor(repo),
       );
 
-      expect(
-        find.text(LocaleKeys.offers_min_order.tr(args: ['75.50'])),
-        findsOneWidget,
-      );
+      // A LITERAL, with [glyphSlot] where the riyal glyph sits: the threshold
+      // is stated with the same currency the booking price breakdown draws, and
+      // the currency is terminal in THIS sentence (it is mid-sentence in
+      // "20.00 off"), so its position is part of what is asserted.
+      expect(find.text('Minimum order 75.50$glyphSlot'), findsOneWidget);
+      expect(find.textContaining('SAR'), findsNothing);
     });
 
     testWidgets('an unrestricted offer states no threshold anywhere', (tester) async {
