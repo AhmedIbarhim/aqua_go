@@ -127,6 +127,28 @@ void main() {
   );
 
   testWidgets(
+    'a list price that is NOT above the target is never struck through',
+    (tester) async {
+      // An admin dropped the wash below an already published target. The server
+      // clamps the discount to 0 and charges the lower list price; striking
+      // through 79.00 beside 99.00 would advertise a deal priced ABOVE the
+      // number it crossed out.
+      final repo = RecordingBookingRepo();
+      final cubit = buildCubit(
+        repo,
+        offerListPriceMinor: 7900,
+        offerTargetPriceMinor: 9900,
+      );
+      addTearDown(cubit.close);
+
+      await pumpDetails(tester, cubit);
+
+      expect(find.text('79.00'), findsNothing);
+      expect(find.text('99.00'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
     'the offer price survives a return from the payment page',
     (tester) async {
       // It is state, not a one-shot handoff: walking forward to the summary

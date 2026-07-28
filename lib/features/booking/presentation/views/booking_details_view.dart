@@ -506,8 +506,17 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
     final int? offerTarget =
         offerTargetBase == null ? null : offerTargetBase + addOnsGross;
     final int? offerListBase = bookingState.offerListPriceMinor;
-    final int? offerList =
-        offerListBase == null ? null : offerListBase + addOnsGross;
+    // Struck through only when the list price is genuinely ABOVE the target.
+    // An admin who drops the wash below an already published target leaves the
+    // pair inverted — the server clamps the discount to 0 and charges the lower
+    // list price — and crossing out 79.00 beside 99.00 would advertise a deal
+    // priced above the number it crossed out. Compared on the WASH figures, so
+    // the add-ons common to both sides cannot decide it.
+    final int? offerList = (offerListBase == null ||
+            offerTargetBase == null ||
+            offerListBase <= offerTargetBase)
+        ? null
+        : offerListBase + addOnsGross;
     final bool showOfferPrice = config.showPricingInDetails && offerTarget != null;
 
     return BottomActionSheetContainer(
