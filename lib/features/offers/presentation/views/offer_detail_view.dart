@@ -162,6 +162,12 @@ class _Terms extends StatelessWidget {
               },
               style: AppTextStyles.regular14.copyWith(
                 color: context.colors.textSecondary,
+                // A SERVICE offer's superseded list price is crossed out, the
+                // same treatment the booking details screen gives it, so the
+                // two figures read as one move rather than as two prices.
+                decoration: line is OfferTermKey && line.struckThrough
+                    ? TextDecoration.lineThrough
+                    : null,
               ),
             ),
           ),

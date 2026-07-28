@@ -105,6 +105,8 @@
     "package_washes": "{} غسلات",
     "package_validity": "صالحة لمدة {} يوم",
     "package_price": "سعر الباقة {} ريال",
+    "service_list_price": "السعر الأصلي {} ريال",
+    "service_price": "سعر العرض {} ريال",
     "sign_in_prompt": "سجل الدخول لعرض العروض المتاحة لك، فقد يكون هناك المزيد",
     "expired": "هذا العرض لم يعد متاحا",
     "expires_on": "ينتهي العرض في {}",

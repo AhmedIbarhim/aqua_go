@@ -239,6 +239,82 @@ void main() {
     });
   });
 
+  group('a SERVICE offer states the wash and what the offer prices it at', () {
+    const deal = OfferTermsModel(
+      serviceId: 'svc-1',
+      serviceNameAr: 'غسيل كامل',
+      serviceNameEn: 'Full wash',
+      serviceListPriceMinor: 17500,
+      targetPriceMinor: 3500,
+    );
+
+    test('name, the list price struck through, then the offer price', () {
+      final lines = offerTermLines(_offer('SERVICE', deal), isAr: false);
+      expect(lines, hasLength(3));
+      expect(_text(lines[0]), 'Full wash');
+      expect(_key(lines[1]), LocaleKeys.offers_service_list_price);
+      expect(_args(lines[1]), ['175.00']);
+      expect((lines[1] as OfferTermKey).struckThrough, isTrue);
+      expect(_key(lines[2]), LocaleKeys.offers_service_price);
+      expect(_args(lines[2]), ['35.00']);
+      expect((lines[2] as OfferTermKey).struckThrough, isFalse);
+    });
+
+    test('Arabic reads the Arabic service name', () {
+      final lines = offerTermLines(_offer('SERVICE', deal), isAr: true);
+      expect(_text(lines[0]), 'غسيل كامل');
+    });
+
+    test('a SHORTCUT offer states the wash and NO price', () {
+      // targetPriceMinor 0 is "no deal", never "free" — a shortcut card is a
+      // deep-link into booking the wash at its list price, so pricing it here
+      // would invent a discount the offer does not carry.
+      final lines = offerTermLines(
+        _offer(
+          'SERVICE',
+          const OfferTermsModel(
+            serviceId: 'svc-1',
+            serviceNameEn: 'Full wash',
+            serviceListPriceMinor: 17500,
+          ),
+        ),
+        isAr: false,
+      );
+      expect(lines, hasLength(1));
+      expect(_text(lines[0]), 'Full wash');
+    });
+
+    test('a list price that is NOT above the target is never struck through', () {
+      // An admin who drops the wash below a published target leaves the two
+      // figures inverted. Striking through 79.00 next to 99.00 advertises a
+      // deal priced ABOVE the number it crossed out.
+      final lines = offerTermLines(
+        _offer(
+          'SERVICE',
+          const OfferTermsModel(
+            serviceId: 'svc-1',
+            serviceNameEn: 'Full wash',
+            serviceListPriceMinor: 7900,
+            targetPriceMinor: 9900,
+          ),
+        ),
+        isAr: false,
+      );
+      expect(lines.map(_key),
+          isNot(contains(LocaleKeys.offers_service_list_price)));
+      expect(_key(lines[1]), LocaleKeys.offers_service_price);
+      expect(_args(lines[1]), ['99.00']);
+    });
+
+    test('a SERVICE offer never falls through to the package rows', () {
+      final lines = offerTermLines(_offer('SERVICE', deal), isAr: false);
+      expect(lines.map(_key),
+          isNot(contains(LocaleKeys.offers_package_price)));
+      expect(lines, isNotEmpty,
+          reason: 'the terms block must never be a heading over an expiry row');
+    });
+  });
+
   test('an all-zero terms object yields no lines at all', () {
     expect(offerTermLines(_offer('PACKAGE', const OfferTermsModel()), isAr: true), isEmpty);
     expect(offerTermLines(_offer('PROMO_CODE', const OfferTermsModel()), isAr: true), isEmpty);

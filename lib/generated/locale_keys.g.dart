@@ -103,6 +103,8 @@ abstract class  LocaleKeys {
   static const offers_package_washes = 'offers.package_washes';
   static const offers_package_validity = 'offers.package_validity';
   static const offers_package_price = 'offers.package_price';
+  static const offers_service_list_price = 'offers.service_list_price';
+  static const offers_service_price = 'offers.service_price';
   static const offers_sign_in_prompt = 'offers.sign_in_prompt';
   static const offers_expired = 'offers.expired';
   static const offers_expires_on = 'offers.expires_on';

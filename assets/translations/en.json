@@ -105,6 +105,8 @@
     "package_washes": "{} washes",
     "package_validity": "Valid for {} days",
     "package_price": "Package price {} SAR",
+    "service_list_price": "Original price {} SAR",
+    "service_price": "Offer price {} SAR",
     "sign_in_prompt": "Sign in to see the offers available to you — there may be more",
     "expired": "This offer is no longer available",
     "expires_on": "Offer ends on {}",

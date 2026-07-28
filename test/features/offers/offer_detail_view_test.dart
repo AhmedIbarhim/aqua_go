@@ -135,6 +135,42 @@ void main() {
       expect(find.text(LocaleKeys.offers_view_package.tr()), findsNothing);
     });
 
+    testWidgets('states the wash and both prices under "Offer details"',
+        (tester) async {
+      // The terms block used to be a heading over an expiry row: the SERVICE
+      // third of `OfferTerms` shares no field with the package third, so the
+      // offer fell through the package tail and emitted nothing.
+      await pumpDetail(tester, serviceOffer());
+
+      expect(find.text('Full wash'), findsWidgets);
+      expect(
+        find.text(LocaleKeys.offers_service_list_price.tr(args: ['175.00'])),
+        findsOneWidget,
+      );
+      final struck = tester.widget<Text>(
+        find.text(LocaleKeys.offers_service_list_price.tr(args: ['175.00'])),
+      );
+      expect(struck.style?.decoration, TextDecoration.lineThrough);
+      expect(
+        find.text(LocaleKeys.offers_service_price.tr(args: ['35.00'])),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('a SHORTCUT offer prices nothing — 0 is no deal, not free',
+        (tester) async {
+      await pumpDetail(tester, serviceOffer(targetPriceMinor: 0));
+
+      expect(
+        find.text(LocaleKeys.offers_service_list_price.tr(args: ['175.00'])),
+        findsNothing,
+      );
+      expect(
+        find.text(LocaleKeys.offers_service_price.tr(args: ['0.00'])),
+        findsNothing,
+      );
+    });
+
     testWidgets('opens the booking flow at the resolved service',
         (tester) async {
       await pumpDetail(tester, serviceOffer());

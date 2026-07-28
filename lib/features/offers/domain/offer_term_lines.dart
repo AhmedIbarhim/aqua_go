@@ -26,10 +26,17 @@ class OfferTermLiteral extends OfferTermLine {
 
 /// A row rendered from a locale [key] and its positional [args].
 class OfferTermKey extends OfferTermLine {
-  const OfferTermKey(this.key, this.args);
+  const OfferTermKey(this.key, this.args, {this.struckThrough = false});
 
   final String key;
   final List<String> args;
+
+  /// Whether the row is drawn crossed out — true only for the price an offer
+  /// REPLACES, so the saving is legible without arithmetic. It is a property of
+  /// the row rather than of the render site because only this function knows
+  /// which of two price rows is the superseded one, and it is only ever set
+  /// where the struck figure is genuinely the higher of the two.
+  final bool struckThrough;
 }
 
 /// Two-decimal SAR from minor units. 24900 -> '249.00'.
@@ -111,7 +118,10 @@ OfferTermKey offerExpiryLine(CustomerOfferModel offer, {required bool isAr}) {
 String _joinNames(List<String> names, {required bool isAr}) =>
     names.join(isAr ? '، ' : ', ');
 
-/// The term rows for [offer].
+/// The term rows for [offer] — one arm per offer type, each of which returns
+/// rather than falling through. The three thirds of `OfferTerms` share no
+/// field, so an arm reached by the wrong type reads all-zero and emits nothing
+/// at all; the type is what selects the arm, never the values.
 ///
 /// The discount-type literals MUST stay byte-identical to the backend's
 /// com.aquago.promo.internal.application.PromoServiceImpl constants —
@@ -160,6 +170,44 @@ List<OfferTermLine> offerTermLines(CustomerOfferModel offer, {required bool isAr
       lines.add(OfferTermKey(
         LocaleKeys.offers_applicable_zones,
         [_joinNames(zones, isAr: isAr)],
+      ));
+    }
+    return lines;
+  }
+
+  // The SERVICE third. It has its OWN arm because it shares no field with the
+  // package third: `packageName` is null and packageNumWashes /
+  // packageValidityDays / packagePriceMinor are all 0 by construction, so a
+  // SERVICE offer falling through to the tail below emitted ZERO rows — the
+  // "Offer details" heading over nothing but the expiry, on the one screen that
+  // states in text what the deal actually is.
+  if (offer.isService) {
+    final serviceName = terms.serviceName(isAr: isAr);
+    if (serviceName != null && serviceName.isNotEmpty) {
+      lines.add(OfferTermLiteral(serviceName));
+    }
+    // A SHORTCUT card carries no deal — `targetPriceMinor` 0 means "nothing to
+    // show", never "free" — so it names the wash and stops. Pricing it here
+    // would state a discount the offer does not carry. `hasTargetPrice` is the
+    // documented way to ask, rather than testing the number.
+    if (offer.hasTargetPrice) {
+      // The list price is struck through ONLY when it is genuinely above what
+      // the offer charges. An admin who drops the wash below an already
+      // published target leaves the pair inverted, and the server then clamps
+      // the discount to 0 and charges the LOWER list price — so crossing out
+      // 79.00 beside 99.00 would advertise a deal priced above the number it
+      // crossed out. Verbatim server figures either way: nothing here is
+      // derived, no VAT arithmetic, no subtraction.
+      if (terms.serviceListPriceMinor > terms.targetPriceMinor) {
+        lines.add(OfferTermKey(
+          LocaleKeys.offers_service_list_price,
+          [sarFromMinor(terms.serviceListPriceMinor)],
+          struckThrough: true,
+        ));
+      }
+      lines.add(OfferTermKey(
+        LocaleKeys.offers_service_price,
+        [sarFromMinor(terms.targetPriceMinor)],
       ));
     }
     return lines;
