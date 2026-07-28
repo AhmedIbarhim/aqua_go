@@ -186,6 +186,7 @@ class BookingState extends Equatable {
     bool clearPaymentInit = false,
     bool clearPromo = false,
     bool clearOfferId = false,
+    bool clearOfferPrices = false,
   }) {
     return BookingState(
       status: status ?? (clearError ? BookingStatus.initial : this.status),
@@ -241,9 +242,23 @@ class BookingState extends Equatable {
       // the details screen quotes bare on purpose (§6.93's mechanism), and
       // clearing them alongside the applied code would blank the very figures
       // D-4 exists to keep on screen.
-      offerListPriceMinor: offerListPriceMinor ?? this.offerListPriceMinor,
-      offerTargetPriceMinor:
-          offerTargetPriceMinor ?? this.offerTargetPriceMinor,
+      //
+      // [clearOfferPrices] is the ONE case that does drop them, and it is a
+      // different fact: the server was ASKED for the offer and REFUSED it (cap
+      // consumed, campaign over, the customer ineligible — UCC23 A3). The card
+      // no longer promises anything, so keeping the pair left the customer
+      // reading "175.00 struck through, then 35.00" on details and being
+      // charged 115.00 at the summary — the step-change D-4 exists to remove,
+      // pointing the wrong way. It is a FLAG rather than a null argument for
+      // the same reason [clearPromo] is: `??` cannot express "set to null".
+      // Never set from the bare display re-quote, which says nothing about the
+      // offer's fate.
+      offerListPriceMinor: clearOfferPrices
+          ? null
+          : (offerListPriceMinor ?? this.offerListPriceMinor),
+      offerTargetPriceMinor: clearOfferPrices
+          ? null
+          : (offerTargetPriceMinor ?? this.offerTargetPriceMinor),
     );
   }
 

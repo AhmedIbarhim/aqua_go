@@ -706,13 +706,22 @@ class BookingCubit extends Cubit<BookingState> {
 
     return result.fold(
       (failure) {
+        final settled = _isPromoVerdict(failure.type);
         emit(
           state.copyWith(
             status: BookingStatus.failure,
             errorMessage: failure.message,
+            // A SETTLED failure is the server REFUSING the offer, and the two
+            // display figures the offer card handed in stop being true the
+            // moment it does: the order will be priced without the offer, so
+            // details would otherwise still promise a deal the customer cannot
+            // have and then charge more at the summary. Only here — an
+            // unanswered request (settled false) has said nothing about the
+            // offer, and the caller puts it back for the next entry.
+            clearOfferPrices: settled,
           ),
         );
-        return OfferApplication(settled: _isPromoVerdict(failure.type));
+        return OfferApplication(settled: settled);
       },
       (quote) {
         _emitQuote(quote, offerId);

@@ -1,4 +1,6 @@
 import 'package:aqua_go/core/config/local_storage/shared_prefs.dart';
+import 'package:aqua_go/core/config/networking/exceptions/failure.dart';
+import 'package:aqua_go/features/offers/domain/pending_promo_code.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -189,6 +191,61 @@ void main() {
 
       expect(find.text('35.00'), findsOneWidget);
       expect(find.text('175.00'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'an offer the server REFUSED stops pricing this screen',
+    (tester) async {
+      // The figures survive navigation ON PURPOSE (the test above), because
+      // the details re-quote is deliberately bare and clearing them alongside
+      // the applied code would blank the very numbers D-4 keeps on screen.
+      //
+      // A REFUSAL is the other thing entirely. The summary asked for the offer
+      // and the server said no — cap consumed, campaign over, the customer
+      // ineligible (UCC23 A3) — so the order is priced without it and 115.00 is
+      // charged. Keeping the pair here left the customer bounced back to
+      // "175.00 struck through, then 35.00", tapping Book now, and landing on
+      // 115.00: the exact step-change the whole override exists to remove,
+      // pointing the wrong way.
+      final repo = RecordingBookingRepo(
+        quoteFailure: (_, offerId) => offerId == null
+            ? null
+            : const ServerFailure(
+                'This code is no longer valid',
+                type: FailureType.validation,
+              ),
+      );
+      PendingPromoCode.instance.hold(offerId: 'offer-1');
+      addTearDown(PendingPromoCode.instance.takeHandoff);
+
+      final cubit = buildCubit(
+        repo,
+        offerListPriceMinor: 17500,
+        offerTargetPriceMinor: 3500,
+      );
+      addTearDown(cubit.close);
+
+      // The summary is where the offer is asked for, and refused.
+      await pumpSummary(tester, cubit);
+      expect(cubit.state.appliedOfferId, isNull);
+      expect(cubit.state.appliedPromoCode, isNull);
+
+      await pumpDetails(tester, cubit);
+
+      expect(
+        find.text('35.00'),
+        findsNothing,
+        reason: 'a refused offer prices nothing — the card promised a deal the '
+            'server has since taken away',
+      );
+      expect(find.text('175.00'), findsNothing);
+      expect(
+        find.text('115.00'),
+        findsOneWidget,
+        reason: 'the same figure the summary charges, so Book now no longer '
+            'walks into a higher number',
+      );
     },
   );
 }
