@@ -118,10 +118,19 @@ class BookingCubit extends Cubit<BookingState> {
         status: BookingStatus.initial,
         // WHY THERE IS NO "changing the service drops the held offer" BRANCH.
         // The service is fixed HERE, once, for the whole flow: a SERVICE offer
-        // deep-links at the wash it names, and the only other write to
-        // `selectedService` in this cubit is `refreshCatalog` re-reading the
-        // SAME id — a fresh copy of the same wash, never a different one. So
-        // the case is vacuous rather than missing, and nothing recorded that.
+        // deep-links at the wash it names. `selectedService` is written in
+        // exactly THREE places in this cubit, and neither of the other two can
+        // re-point an offer-driven booking at a different wash:
+        //  1. HERE, from the offer's own service.
+        //  2. `refreshCatalog` — re-reads the SAME id and swaps in a fresh copy
+        //     of the same wash, never a different one.
+        //  3. `fetchSubscriptionDetails` — synthesises a PACKAGE pseudo-service
+        //     from the subscription. It runs only in the package flow, which is
+        //     entered with a subscriptionId and never carries the two offer
+        //     figures below (a SERVICE offer hands in a serviceId, not a
+        //     subscription), so there is nothing of the offer's for it to
+        //     invalidate.
+        // So the case is vacuous rather than missing, and nothing recorded that.
         //
         // It stops being vacuous the moment a picker can re-point an in-flight
         // booking at a DIFFERENT service. An offer prices ONE wash, so that
