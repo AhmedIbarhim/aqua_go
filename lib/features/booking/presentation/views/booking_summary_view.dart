@@ -316,6 +316,19 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
               promoDiscountMinor: promoDiscountMinor,
               onApplyPromoCode: _applyPromoCode,
               onRemovePromoCode: _removePromoCode,
+              // An offer this flow already took, and that nothing is pricing
+              // the order with right now. Both halves matter: an offer still
+              // applied has nothing to restore, and a code the customer typed
+              // is their own more recent choice — the card would be inviting
+              // them to overwrite it with no way of knowing they had.
+              canReapplyOffer:
+                  bookingState.rememberedOfferId != null &&
+                  bookingState.appliedOfferId == null &&
+                  bookingState.appliedPromoCode == null,
+              reapplyOfferTitle: context.isAr
+                  ? bookingState.offerTitleAr
+                  : bookingState.offerTitleEn,
+              onReapplyOffer: _reapplyOffer,
             ),
             const SizedBox(height: 24),
           ],
@@ -560,8 +573,31 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
 
   /// Re-quote WITHOUT the code; the quote that comes back carries no code, so
   /// the chip clears itself.
+  ///
+  /// An OFFER removed this way is not thereby over — the customer took it off,
+  /// which is not the server ending it — so `rememberedOfferId` survives and
+  /// the re-apply card appears in the chip's place.
   void _removePromoCode() {
     context.read<BookingCubit>().removePromoCode();
+  }
+
+  /// Puts back the offer this flow already took, after the customer removed it
+  /// or typed a code over it.
+  ///
+  /// Straight through the SAME [BookingCubit.applyOffer] the handoff uses, so
+  /// the wire rule holds without restating it: the offer id goes out alone and
+  /// the server resolves its own code (the pair is a 400), and a refusal here
+  /// is settled exactly as it is on the way in — the offer is forgotten and the
+  /// card stops being offered rather than re-running the same rejection.
+  ///
+  /// Nothing is re-priced without the tap. The removal that led here left the
+  /// order priced bare on purpose; re-applying silently would move a total the
+  /// customer had just chosen to move the other way.
+  void _reapplyOffer() {
+    final cubit = context.read<BookingCubit>();
+    final offerId = cubit.state.rememberedOfferId;
+    if (offerId == null) return;
+    cubit.applyOffer(offerId);
   }
 
   /// Prices this order with the offer the customer tapped "Use this code" on.

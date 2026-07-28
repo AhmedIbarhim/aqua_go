@@ -209,6 +209,8 @@
     "payment_unconfirmed_title": "We could not confirm your booking",
     "payment_unconfirmed_notice": "Please do not pay again. Open My Bookings to check whether the booking went through. If your card was charged and no booking appears there, contact support with the payment details and we will resolve it for you.",
     "delete_promo_code": "Delete Code",
+    "reapply_offer": "Re-apply {}",
+    "reapply_offer_generic": "Re-apply your offer",
     "apply_code_hint": "Enter promo code",
     "cancel": "Cancel",
     "apply": "Apply",

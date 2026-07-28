@@ -319,4 +319,104 @@ void main() {
       );
     },
   );
+
+  testWidgets(
+    'a typed code applied over the offer stops pricing this screen',
+    (tester) async {
+      // The offer is not gone — it is REMEMBERED and the summary offers it
+      // back — but it is not what prices the order any more, and the two
+      // figures state a price the customer will not be charged. Details goes
+      // back to §6.93's bare quote for as long as the typed code stands.
+      final repo = RecordingBookingRepo();
+      PendingPromoCode.instance.hold(offerId: 'offer-1');
+      addTearDown(PendingPromoCode.instance.takeHandoff);
+
+      final cubit = buildCubit(
+        repo,
+        offerListPriceMinor: 17500,
+        offerTargetPriceMinor: 3500,
+      );
+      addTearDown(cubit.close);
+
+      await pumpSummary(tester, cubit);
+      // The promo box carries the applied chip while the offer stands, so a
+      // typed code is reached through the remove action — the route that used
+      // to destroy the offer outright.
+      await tester.tap(find.text('bookings.delete_promo_code'));
+      await settle(tester);
+      await applyPromo(tester, 'OTHERCODE');
+      expect(cubit.state.appliedOfferId, isNull);
+      expect(cubit.state.rememberedOfferId, 'offer-1');
+
+      await pumpDetails(tester, cubit);
+
+      expect(find.text('35.00'), findsNothing);
+      expect(find.text('175.00'), findsNothing);
+      expect(
+        find.text('115.00'),
+        findsOneWidget,
+        reason: 'the bare quote §6.93 asks for — the discount the typed code '
+            'earns is stated on the payment page, not here',
+      );
+    },
+  );
+
+  testWidgets(
+    'an offer the customer took off stops pricing this screen',
+    (tester) async {
+      // Same shape as the typed-code case: the offer survives on the state so
+      // it can be restored, but nothing is priced with it, so nothing here may
+      // quote it.
+      final repo = RecordingBookingRepo();
+      PendingPromoCode.instance.hold(offerId: 'offer-1');
+      addTearDown(PendingPromoCode.instance.takeHandoff);
+
+      final cubit = buildCubit(
+        repo,
+        offerListPriceMinor: 17500,
+        offerTargetPriceMinor: 3500,
+      );
+      addTearDown(cubit.close);
+
+      await pumpSummary(tester, cubit);
+      await tester.tap(find.text('bookings.delete_promo_code'));
+      await settle(tester);
+
+      await pumpDetails(tester, cubit);
+
+      expect(find.text('35.00'), findsNothing);
+      expect(find.text('175.00'), findsNothing);
+      expect(find.text('115.00'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'restoring the offer prices this screen again',
+    (tester) async {
+      // The pair is suspended, not destroyed. Re-applying the offer at the
+      // summary brings the D-4 figures straight back — no second trip through
+      // the offers surface, and no re-entry of the flow.
+      final repo = RecordingBookingRepo();
+      PendingPromoCode.instance.hold(offerId: 'offer-1');
+      addTearDown(PendingPromoCode.instance.takeHandoff);
+
+      final cubit = buildCubit(
+        repo,
+        offerListPriceMinor: 17500,
+        offerTargetPriceMinor: 3500,
+      );
+      addTearDown(cubit.close);
+
+      await pumpSummary(tester, cubit);
+      await tester.tap(find.text('bookings.delete_promo_code'));
+      await settle(tester);
+      await tester.tap(find.byKey(const ValueKey('offer-reapply')));
+      await settle(tester);
+
+      await pumpDetails(tester, cubit);
+
+      expect(find.text('35.00'), findsOneWidget);
+      expect(find.text('175.00'), findsOneWidget);
+    },
+  );
 }

@@ -502,8 +502,35 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
     // Integer halala throughout, and every addend is a backend figure: the
     // offer's two prices, and the quote's own add-on rows.
     final int addOnsGross = bookingState.quote?.addOnsGrossMinor ?? 0;
-    final int? offerTargetBase = bookingState.offerTargetPriceMinor;
-    final int? offerListBase = bookingState.offerListPriceMinor;
+    // THE PAIR IS SUSPENDED WHILE SOMETHING ELSE PRICES THE ORDER.
+    //
+    // The two figures survive a bare re-quote deliberately (they are what the
+    // offer CARD promised, not what the current quote carries), and that is
+    // right for the details screen's own bare quote. It is wrong the moment the
+    // offer stops being what the customer will actually be charged under: type
+    // a 10%-off code over a 35.00 offer and the summary charges 157.50, and
+    // this screen went on rendering "175.00 struck through, then 35.00" — a
+    // step-change pointing the wrong way, which is the exact defect D-4 exists
+    // to remove.
+    //
+    // `rememberedOfferId` is what makes the two indistinguishable cases
+    // distinguishable. All three of `appliedOfferId`, `appliedPromoCode` and
+    // the remembered id are null on the way IN — the offer is applied at the
+    // SUMMARY, one screen later, so gating on `appliedOfferId` alone would
+    // blank the D-4 figures for the whole of the customer's first pass through
+    // this screen. Remembered-but-not-applied is the superseded case, and only
+    // that one suspends.
+    //
+    // Suspended, not cleared: nothing here touches the state. Restore the offer
+    // at the summary and the pair comes straight back. A REFUSED offer is the
+    // other thing — `clearOfferPrices` nulls both for good, and that fix stands
+    // untouched below.
+    final bool offerSuperseded = bookingState.rememberedOfferId != null &&
+        bookingState.appliedOfferId == null;
+    final int? offerTargetBase =
+        offerSuperseded ? null : bookingState.offerTargetPriceMinor;
+    final int? offerListBase =
+        offerSuperseded ? null : bookingState.offerListPriceMinor;
     // AN INVERTED PAIR TURNS THE WHOLE OVERRIDE OFF, strikethrough and Total
     // alike. An admin who drops the wash below an already published target
     // leaves a target nobody will ever be charged: the server clamps the

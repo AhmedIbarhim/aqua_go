@@ -110,6 +110,8 @@ class BookingCubit extends Cubit<BookingState> {
     DateTime? existingSlotStart,
     String? subscriptionId,
     String? washId,
+    String? offerTitleAr,
+    String? offerTitleEn,
     int? offerListPriceMinor,
     int? offerTargetPriceMinor,
   }) {
@@ -155,6 +157,12 @@ class BookingCubit extends Cubit<BookingState> {
             (offerListPriceMinor ?? 0) > 0 ? offerListPriceMinor : null,
         offerTargetPriceMinor:
             (offerTargetPriceMinor ?? 0) > 0 ? offerTargetPriceMinor : null,
+        // Both languages of the offer's own name, so the summary's re-apply
+        // card can say WHICH offer it is putting back rather than "your offer".
+        // A fresh state also means `rememberedOfferId` starts null: an offer
+        // belongs to the booking it was taken for and never to the next one.
+        offerTitleAr: offerTitleAr,
+        offerTitleEn: offerTitleEn,
       ),
     );
 
@@ -661,10 +669,19 @@ class BookingCubit extends Cubit<BookingState> {
   /// and is set ONLY by a caller holding the server's REFUSAL of that offer (see
   /// [_repriceAfter]). Defaulted off because every other caller is publishing a
   /// quote, which says nothing about the offer's fate.
+  ///
+  /// [rememberOffer] records [offerId] as the offer THIS FLOW took, which is a
+  /// different fact from the one `appliedOfferId` carries and outlives it: the
+  /// attribution is dropped the moment a quote comes back that the offer did
+  /// not drive, and without a record beside it a typed code applied over a live
+  /// offer destroyed it for the session. Set by [applyOffer] on the way in and
+  /// on a re-apply; never unset here — dropping it takes the server's refusal.
   void _emitQuote(
     QuoteModel quote,
     String? offerId, {
     bool clearOfferPrices = false,
+    bool clearRememberedOffer = false,
+    bool rememberOffer = false,
   }) {
     final applied = quote.promoCode;
     emit(
@@ -673,9 +690,14 @@ class BookingCubit extends Cubit<BookingState> {
         quote: quote,
         appliedPromoCode: applied,
         appliedOfferId: applied == null ? null : offerId,
+        // Only an offer that actually PRICED something is worth offering back;
+        // a quote the server answered without a code carries no deal to
+        // restore, whatever it was asked for.
+        rememberedOfferId: (rememberOffer && applied != null) ? offerId : null,
         clearPromo: applied == null,
         clearOfferId: offerId == null,
         clearOfferPrices: clearOfferPrices,
+        clearRememberedOffer: clearRememberedOffer,
       ),
     );
   }
@@ -737,12 +759,18 @@ class BookingCubit extends Cubit<BookingState> {
             // unanswered request (settled false) has said nothing about the
             // offer, and the caller puts it back for the next entry.
             clearOfferPrices: settled,
+            // The same verdict, applied to the same fact from the other side:
+            // an offer the server has refused is not one to keep offering back
+            // from the summary. A card that re-runs the identical rejection is
+            // a dead button, and the customer has no way to tell it is dead.
+            // Unsettled changes nothing — see the note above.
+            clearRememberedOffer: settled,
           ),
         );
         return OfferApplication(settled: settled);
       },
       (quote) {
-        _emitQuote(quote, offerId);
+        _emitQuote(quote, offerId, rememberOffer: true);
         return OfferApplication(quote: quote, settled: true);
       },
     );
@@ -879,7 +907,9 @@ class BookingCubit extends Cubit<BookingState> {
 
     // Past the guard the rejection is a VERDICT, so a request that carried an
     // offer has had that offer refused. What the second attempt goes on to do
-    // cannot change that, so both branches below drop the figures.
+    // cannot change that, so both branches below drop the figures — and the
+    // remembered offer with them, for the reason [applyOffer] gives: the
+    // summary must not keep offering back an offer the server has ended.
     final offerRefused = offerId != null;
 
     // Second attempt WITHOUT the code. Its own failure is the one worth
@@ -892,12 +922,18 @@ class BookingCubit extends Cubit<BookingState> {
             status: BookingStatus.failure,
             errorMessage: failure.message,
             clearOfferPrices: offerRefused,
+            clearRememberedOffer: offerRefused,
           ),
         );
         return const QuoteRefresh();
       },
       (quote) {
-        _emitQuote(quote, null, clearOfferPrices: offerRefused);
+        _emitQuote(
+          quote,
+          null,
+          clearOfferPrices: offerRefused,
+          clearRememberedOffer: offerRefused,
+        );
         return QuoteRefresh(
           quote: quote,
           droppedPromoReason: rejection.message,
@@ -925,6 +961,9 @@ class BookingCubit extends Cubit<BookingState> {
         state.copyWith(
           status: BookingStatus.success,
           createdBooking: bookingResponse,
+          // The offer has been spent on THIS booking. Nothing downstream of a
+          // created booking may offer it back.
+          clearRememberedOffer: true,
         ),
       ),
     );
@@ -1312,6 +1351,8 @@ class BookingCubit extends Cubit<BookingState> {
           paymentPhase: PaymentPhase.none,
           createdBooking: bookingResponse,
           clearPaymentInit: true,
+          // Spent on this booking — see [submitBooking].
+          clearRememberedOffer: true,
         ),
       ),
     );

@@ -41,12 +41,28 @@ class PromoCodeSection extends StatelessWidget {
   final Function(String) onApplyPromoCode;
   final VoidCallback onRemovePromoCode;
 
+  /// Whether an offer this flow already took is currently NOT what prices the
+  /// order — the customer removed it, or typed a code over it — and so can be
+  /// put back. The caller decides; this widget only renders the affordance.
+  final bool canReapplyOffer;
+
+  /// The offer's own name, so the card says which offer it restores. Null or
+  /// blank falls back to generic copy rather than naming nothing.
+  final String? reapplyOfferTitle;
+
+  /// Re-applies that offer. Nothing here re-prices on its own: a re-price the
+  /// customer did not ask for is worse than a visible offer to restore one.
+  final VoidCallback? onReapplyOffer;
+
   const PromoCodeSection({
     super.key,
     required this.appliedPromoCode,
     required this.onApplyPromoCode,
     required this.onRemovePromoCode,
     this.promoDiscountMinor = 0,
+    this.canReapplyOffer = false,
+    this.reapplyOfferTitle,
+    this.onReapplyOffer,
   });
 
   static const Duration _swap = Duration(milliseconds: 300);
@@ -88,6 +104,19 @@ class PromoCodeSection extends StatelessWidget {
                   ),
           ),
         ),
+        // Sits under the promo box because it is the same decision from the
+        // other side: what prices this order. It shows only while NOTHING
+        // does — an offer still applied has nothing to restore, and a typed
+        // code is the customer's own more recent choice, which this must not
+        // quietly overrule.
+        if (canReapplyOffer && onReapplyOffer != null) ...[
+          const SizedBox(height: 12),
+          _ReapplyOffer(
+            key: const ValueKey('offer-reapply'),
+            offerTitle: reapplyOfferTitle,
+            onTap: onReapplyOffer!,
+          ),
+        ],
       ],
     );
   }
@@ -229,6 +258,54 @@ class _AppliedCode extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Puts back an offer that something else displaced.
+///
+/// Named, not generic, whenever the flow was handed the offer's title: "your
+/// offer" asks a customer who has been trying codes to remember which deal they
+/// came in on. The tap is the whole affordance — the offer is re-applied
+/// through the ordinary apply path, on the wire as an id alone.
+class _ReapplyOffer extends StatelessWidget {
+  const _ReapplyOffer({super.key, required this.offerTitle, required this.onTap});
+
+  final String? offerTitle;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final title = offerTitle?.trim() ?? '';
+    final label = title.isEmpty
+        ? LocaleKeys.bookings_reapply_offer_generic.tr(context: context)
+        : LocaleKeys.bookings_reapply_offer.tr(context: context, args: [title]);
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+        decoration: BoxDecoration(
+          color: context.colors.themeColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: context.colors.primary, width: 1),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.local_offer_outlined, color: context.colors.primary),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                label,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: AppTextStyles.medium14.copyWith(
+                  color: context.colors.primary,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

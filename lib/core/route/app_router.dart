@@ -205,6 +205,8 @@ abstract class AppRouter {
                   existingSlotStart: args.existingSlotStart,
                   subscriptionId: args.subscriptionId,
                   washId: args.washId,
+                  offerTitleAr: args.offerTitleAr,
+                  offerTitleEn: args.offerTitleEn,
                   offerListPriceMinor: args.offerListPriceMinor,
                   offerTargetPriceMinor: args.offerTargetPriceMinor,
                 ),
@@ -345,6 +347,14 @@ class BookingFlowStartArgs {
   final String? subscriptionId;
   final String? washId;
 
+  /// The offer's own title in each language, when the flow was started from a
+  /// SERVICE offer card. Carried so the summary's re-apply affordance can name
+  /// the offer it is putting back instead of calling it "your offer"; both
+  /// languages travel rather than one pre-localised string so switching
+  /// language mid-flow renames it with everything else.
+  final String? offerTitleAr;
+  final String? offerTitleEn;
+
   /// The wash's VAT-inclusive gross LIST price in halala, when the flow was
   /// started from a SERVICE offer card. Null otherwise.
   final int? offerListPriceMinor;
@@ -368,6 +378,8 @@ class BookingFlowStartArgs {
     BookingSubmitStrategy? submitStrategy,
     this.subscriptionId,
     this.washId,
+    this.offerTitleAr,
+    this.offerTitleEn,
     this.offerListPriceMinor,
     this.offerTargetPriceMinor,
   }) : submitStrategy = submitStrategy ?? ServiceBookingSubmit();

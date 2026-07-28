@@ -99,6 +99,37 @@ class BookingState extends Equatable {
   /// say which offer drove the sale.
   final String? appliedOfferId;
 
+  /// The offer this flow applied at least once, whether or not it is what
+  /// prices the order NOW.
+  ///
+  /// [appliedOfferId] answers "which offer is this quote priced with", and it
+  /// is rightly dropped the moment a quote comes back that the offer did not
+  /// drive — `promo_redemptions.offer_id` is the whole of the sale attribution.
+  /// That left no record at all that an offer had ever been in play, so a typed
+  /// code applied over a live offer DESTROYED it for the session: removing the
+  /// typed code could not bring it back, and the customer's only route to the
+  /// deal they had accepted was to leave the flow and find the offer again.
+  ///
+  /// This is that record. It survives BOTH ways an offer stops pricing the
+  /// order — the customer removes it, or a typed code supersedes it — which is
+  /// the entire point, and it drives the summary's re-apply affordance.
+  ///
+  /// It is dropped ONLY when the server SETTLES the offer's fate against it:
+  /// the cap is consumed, the campaign is over, the customer is ineligible. A
+  /// transport failure decides nothing and drops nothing, exactly as it does
+  /// for [offerListPriceMinor] / [offerTargetPriceMinor] — see
+  /// `BookingCubit._isPromoVerdict`. A flow restart ([BookingCubit.initBooking])
+  /// and a completed booking drop it too: it describes THIS booking.
+  final String? rememberedOfferId;
+
+  /// The offer's own title, in both languages, when the flow was started from a
+  /// SERVICE offer card. Both are carried rather than one pre-localised string
+  /// so a language switch mid-flow renames the card with everything else.
+  /// Empty / null when the flow did not come through an offer, which is what
+  /// puts the re-apply card on its generic copy.
+  final String? offerTitleAr;
+  final String? offerTitleEn;
+
   /// The wash's VAT-INCLUSIVE gross LIST price in halala, as the SERVICE offer
   /// the customer came through stated it. Null when the booking did not start
   /// from an offer.
@@ -145,6 +176,9 @@ class BookingState extends Equatable {
     this.paymentInit,
     this.appliedPromoCode,
     this.appliedOfferId,
+    this.rememberedOfferId,
+    this.offerTitleAr,
+    this.offerTitleEn,
     this.offerListPriceMinor,
     this.offerTargetPriceMinor,
   });
@@ -178,6 +212,9 @@ class BookingState extends Equatable {
     PaymentInitModel? paymentInit,
     String? appliedPromoCode,
     String? appliedOfferId,
+    String? rememberedOfferId,
+    String? offerTitleAr,
+    String? offerTitleEn,
     int? offerListPriceMinor,
     int? offerTargetPriceMinor,
     bool clearSelectedDate = false,
@@ -187,6 +224,7 @@ class BookingState extends Equatable {
     bool clearPromo = false,
     bool clearOfferId = false,
     bool clearOfferPrices = false,
+    bool clearRememberedOffer = false,
   }) {
     return BookingState(
       status: status ?? (clearError ? BookingStatus.initial : this.status),
@@ -237,6 +275,15 @@ class BookingState extends Equatable {
       appliedOfferId: (clearPromo || clearOfferId)
           ? null
           : (appliedOfferId ?? this.appliedOfferId),
+      // Deliberately NOT tied to clearPromo/clearOfferId — the two flags above
+      // say "this quote was not priced by that offer", which is exactly the
+      // moment this field has to survive. Only [clearRememberedOffer] drops it,
+      // and only a caller holding the server's REFUSAL of the offer sets that.
+      rememberedOfferId: clearRememberedOffer
+          ? null
+          : (rememberedOfferId ?? this.rememberedOfferId),
+      offerTitleAr: offerTitleAr ?? this.offerTitleAr,
+      offerTitleEn: offerTitleEn ?? this.offerTitleEn,
       // Deliberately NOT tied to clearPromo/clearOfferId. These two are what
       // the offer CARD promised, not what the current quote was priced with:
       // the details screen quotes bare on purpose (§6.93's mechanism), and
@@ -292,6 +339,9 @@ class BookingState extends Equatable {
     paymentInit,
     appliedPromoCode,
     appliedOfferId,
+    rememberedOfferId,
+    offerTitleAr,
+    offerTitleEn,
     offerListPriceMinor,
     offerTargetPriceMinor,
   ];

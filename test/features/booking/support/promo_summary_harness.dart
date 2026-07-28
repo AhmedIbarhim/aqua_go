@@ -238,6 +238,10 @@ BookingCubit buildCubit(
   /// which is what every pre-existing caller of this helper is.
   int? offerListPriceMinor,
   int? offerTargetPriceMinor,
+  /// The offer's own name, as the offer detail screen hands it in. Left null,
+  /// the re-apply card falls back to its generic copy.
+  String? offerTitleAr,
+  String? offerTitleEn,
 }) {
   final apiClient = APIClient(Dio());
   final cubit = BookingCubit(
@@ -255,6 +259,8 @@ BookingCubit buildCubit(
     existingAddress: address,
     offerListPriceMinor: offerListPriceMinor,
     offerTargetPriceMinor: offerTargetPriceMinor,
+    offerTitleAr: offerTitleAr,
+    offerTitleEn: offerTitleEn,
   );
   final date = DateTime.now().add(const Duration(days: 2));
   final slotStart = DateTime(date.year, date.month, date.day, 10, 0);

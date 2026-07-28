@@ -302,6 +302,11 @@ class _PrimaryActionState extends State<_PrimaryAction> {
           // list price (owner decision D-4). Server figures, passed through.
           offerListPriceMinor: offer.terms.serviceListPriceMinor,
           offerTargetPriceMinor: offer.terms.targetPriceMinor,
+          // The offer's own name, both languages, so the summary can offer it
+          // back BY NAME after a typed code has displaced it. This screen is
+          // the only place the offer object is in scope.
+          offerTitleAr: offer.titleAr,
+          offerTitleEn: offer.titleEn,
         ),
       );
       return;
