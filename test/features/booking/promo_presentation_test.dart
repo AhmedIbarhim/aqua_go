@@ -204,13 +204,17 @@ void main() {
           'OLDCODE1');
     });
 
-    testWidgets('a code redeemed through an OFFER joins the same history', (
+    testWidgets('a code that arrived through an OFFER is never remembered', (
       tester,
     ) async {
-      // UCC16 UI/UX — "autocomplete of previously used codes". A code the
-      // customer redeemed by tapping "Use this code" on an offer IS a
-      // previously used code; the offer path was the one route into a
-      // redemption that never fed the suggestions.
+      // This used to assert the opposite, on the reasoning that an accepted
+      // code is an accepted code. The code the server echoes on an offer-driven
+      // quote is the offer's own MANAGED code, and a managed code is refused
+      // the moment it is TYPED — so the suggestion was permanently dead, for a
+      // code the customer appeared to use minutes earlier, and it left a
+      // durable copy of an offer-bound code on the handset. An offer is applied
+      // by TAPPING it, never by typing its code, so nothing that arrived
+      // through a handoff belongs in an autocomplete of things to type.
       PendingPromoCode.instance.hold(offerId: 'offer-1');
       addTearDown(PendingPromoCode.instance.takeHandoff);
 
@@ -219,10 +223,10 @@ void main() {
 
       await pumpSummary(tester, cubit);
 
-      // The code is the one the SERVER resolved the offer to and echoed back —
-      // an offer-driven quote never carries a code on the request.
+      // The offer WAS applied — the code the SERVER resolved it to is on the
+      // quote, so this is not a vacuous pass.
       expect(cubit.state.appliedPromoCode, offerResolvedPromoCode);
-      expect(PromoCodeHistory.recent(), [offerResolvedPromoCode]);
+      expect(PromoCodeHistory.recent(), isEmpty);
     });
 
     testWidgets('an offer the backend refused leaves the history empty', (
