@@ -116,6 +116,19 @@ class BookingCubit extends Cubit<BookingState> {
     emit(
       BookingState(
         status: BookingStatus.initial,
+        // WHY THERE IS NO "changing the service drops the held offer" BRANCH.
+        // The service is fixed HERE, once, for the whole flow: a SERVICE offer
+        // deep-links at the wash it names, and the only other write to
+        // `selectedService` in this cubit is `refreshCatalog` re-reading the
+        // SAME id — a fresh copy of the same wash, never a different one. So
+        // the case is vacuous rather than missing, and nothing recorded that.
+        //
+        // It stops being vacuous the moment a picker can re-point an in-flight
+        // booking at a DIFFERENT service. An offer prices ONE wash, so that
+        // change would have to drop all three things below that describe it:
+        // the two display figures, and the offer id
+        // (`PendingPromoCode` / `BookingState.appliedOfferId`) the summary
+        // prices with. Leaving them would show a wash at another wash's deal.
         selectedService: service,
         selectedCar: existingCar,
         selectedAddress: existingAddress,
