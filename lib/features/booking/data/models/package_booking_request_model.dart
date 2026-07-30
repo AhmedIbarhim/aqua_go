@@ -1,11 +1,12 @@
 import '../../../address/data/models/address_model.dart';
 import '../../../home/data/models/add_on_model.dart';
-import 'day_time_model.dart';
+import '../../../../core/utils/saudi_wire_format.dart';
 
 class PackageBookingRequestModel {
   final AddressModel? address;
-  final DateTime? date;
-  final String? time;
+  /// The picked availability slot's own `start` instant. Serialised verbatim
+  /// as the bare Asia/Riyadh `scheduledAt` — no display string in between.
+  final DateTime? slotStart;
   final List<String> vehicleIds;
   final List<AddOnModel> serviceAddOns;
   final List<String> workerNotes;
@@ -22,8 +23,7 @@ class PackageBookingRequestModel {
 
   PackageBookingRequestModel({
     this.address,
-    this.date,
-    this.time,
+    this.slotStart,
     this.vehicleIds = const [],
     this.serviceAddOns = const [],
     this.workerNotes = const [],
@@ -32,13 +32,8 @@ class PackageBookingRequestModel {
   });
 
   Map<String, dynamic> toJson() {
-    String scheduledAt = '';
-    if (date != null && time != null) {
-      scheduledAt = DayTimeModel(
-        date: date!,
-        rawTime: time!,
-      ).toScheduledAtString();
-    }
+    final start = slotStart;
+    final String scheduledAt = start != null ? toWireDateTime(start) : '';
 
     final addr = address;
     final isSavedAddress =

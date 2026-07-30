@@ -6,6 +6,7 @@ import 'package:aqua_go/core/route/app_router.dart';
 import 'package:aqua_go/core/route/routes.dart';
 import 'package:aqua_go/core/config/networking/endpoints.dart';
 import 'package:aqua_go/features/auth/data/repos/auth_repository.dart';
+import 'package:aqua_go/core/config/networking/anonymous_session_policy.dart';
 
 class RefreshTokenInterceptor extends Interceptor {
   final Dio dio;
@@ -34,7 +35,17 @@ class RefreshTokenInterceptor extends Interceptor {
     final refreshToken = await SecureStorage.getSecuredString(kRefreshToken);
     if ((accessToken == null || accessToken.isEmpty) &&
         (refreshToken == null || refreshToken.isEmpty)) {
-      await _clearSessionAndRedirect();
+      // No credentials at all — this is a signed-out user. Only a 401 from an
+      // endpoint that was NOT declared anonymous justifies wiping state and
+      // bouncing to login; a 404 / 5xx / timeout on a public browse must leave
+      // the guest exactly where they are (UCC23 A4).
+      final allowAnonymous = err.requestOptions.extra[kAllowAnonymous] == true;
+      if (shouldTearDownTokenlessSession(
+        allowAnonymous: allowAnonymous,
+        statusCode: err.response?.statusCode,
+      )) {
+        await _clearSessionAndRedirect();
+      }
       return handler.next(err);
     }
 

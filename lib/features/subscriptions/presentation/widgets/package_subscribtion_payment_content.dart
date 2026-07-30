@@ -65,24 +65,22 @@ class _PackageSubscribtionPaymentContentState
           isTextValue: true,
         ),
         const Divider(height: 24),
-        _buildSummaryRow(
-          context,
-          label: LocaleKeys.bookings_subtotal.tr(context: context),
-          value: widget.packageModel.subtotalBeforeVat,
-        ),
-        const Divider(height: 24),
-        _buildSummaryRow(
-          context,
-          label: LocaleKeys.bookings_vat.tr(context: context),
-          value: widget.packageModel.vat,
-        ),
-        const Divider(height: 24),
+        // Exactly ONE total, VAT-INCLUSIVE, emphasised — the same shape the
+        // booking review screen and the booking detail render. There is
+        // deliberately no VAT-exclusive "before tax" subtotal: showing a net
+        // figure the customer never pays, above a gross one they do, is the
+        // two-competing-bases defect this replaces.
         _buildSummaryRow(
           context,
           label: LocaleKeys.bookings_total_amount.tr(context: context),
           value: widget.packageModel.total,
           isTotal: true,
         ),
+        const SizedBox(height: 8),
+        // VAT is a DISCLOSURE, not a step in the sum: it is already inside the
+        // total above. Smaller and muted, under the total, so it cannot be read
+        // as an addend. Backend-sourced; never recomputed here.
+        _buildVatFootnote(context),
         const SizedBox(height: 32),
         CustomButton(
           enabled: !widget.isLoading && _selectedMethod != null,
@@ -104,6 +102,54 @@ class _PackageSubscribtionPaymentContentState
               : null,
         ),
         const SizedBox(height: 16),
+      ],
+    );
+  }
+
+  /// The inclusive-VAT disclosure under the total: smaller and muted, so it
+  /// cannot be read as an addend.
+  Widget _buildVatFootnote(BuildContext context) {
+    final style = AppTextStyles.regular12.copyWith(
+      color: context.colors.contentDisabled,
+    );
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Flexible(
+          child: Text(
+            LocaleKeys.bookings_vat_inclusive.tr(context: context),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: style,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Flexible(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Flexible(
+                child: Text(
+                  widget.packageModel.vat,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.end,
+                  style: style,
+                ),
+              ),
+              const SizedBox(width: 4),
+              SvgPicture.asset(
+                AppAssets.currency,
+                width: 16,
+                height: 16,
+                colorFilter: ColorFilter.mode(
+                  context.colors.contentDisabled,
+                  BlendMode.srcIn,
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }

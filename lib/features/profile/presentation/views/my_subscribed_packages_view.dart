@@ -10,6 +10,7 @@ import 'package:aqua_go/core/extentions/context_extentions.dart';
 import 'package:aqua_go/core/route/routes.dart';
 import 'package:aqua_go/core/themes/app_text_styles.dart';
 import 'package:aqua_go/core/utils/app_assets.dart';
+import 'package:aqua_go/core/utils/date_time_formatter.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:aqua_go/features/subscriptions/data/models/subscription_response_model/subscription_response_model.dart';
 import 'package:aqua_go/features/subscriptions/presentation/controllers/subscriptions_controller/subscriptions_cubit.dart';
@@ -368,9 +369,7 @@ class _MySubscribedPackagesViewState extends State<MySubscribedPackagesView> {
     double Function(double) sw,
     double Function(double) sh,
   ) {
-    final formattedDate = DateFormat(
-      'yyyy - MM - dd',
-    ).format(package.expiryDate);
+    final formattedDate = formatNumericDate(package.expiryDate);
     return Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(vertical: sh(16), horizontal: sw(16)),

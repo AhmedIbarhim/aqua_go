@@ -15,11 +15,33 @@ import 'package:flutter/material.dart';
 part 'language_state.dart';
 
 class LanguageCubit extends Cubit<LanguageState> {
-  LanguageCubit() : super(LanguageInitial(_getInitialLocale()));
+  LanguageCubit() : super(LanguageInitial(initialLocale));
 
-  static Locale _getInitialLocale() {
-    final isArabic = CacheClient.getString(kLanguage, defaultValue: kArabicLang) == kArabicLang;
+  /// The app's start locale, read from the persisted language preference.
+  ///
+  /// THE single source: `launch_app` derives both easy_localization's
+  /// `startLocale` and the boot-time [Intl.defaultLocale] pin from this getter,
+  /// so no second, independently-maintained copy can drift out of sync with the
+  /// locale `context.isAr` reports.
+  static Locale get initialLocale {
+    final isArabic =
+        CacheClient.getString(kLanguage, defaultValue: kArabicLang) ==
+        kArabicLang;
     return isArabic ? const Locale('ar') : const Locale('en');
+  }
+
+  /// Persists [newLocale], applies it to easy_localization, and re-pins
+  /// [Intl.defaultLocale] so every `DateFormat` built without an explicit
+  /// locale follows the language the customer picked in-app rather than the
+  /// phone's OS locale. Also re-registers the device token so the backend
+  /// renders future notifications in the new locale (no-op when not logged in /
+  /// no token yet — `syncDeviceToken` guards on `getIsLoggedIn()`).
+  Future<void> _applyLocale(BuildContext context, Locale newLocale) async {
+    await CacheClient.setString(kLanguage, newLocale.languageCode);
+    await context.setLocale(newLocale);
+    Intl.defaultLocale = newLocale.languageCode;
+    unawaited(syncDeviceToken());
+    emit(LanguageChanged(newLocale));
   }
 
   Future<void> toggleLanguage(BuildContext context) async {
@@ -39,23 +61,11 @@ class LanguageCubit extends Cubit<LanguageState> {
           emit(LanguageError(state.locale, failure.message));
         },
         (_) async {
-          await CacheClient.setString(kLanguage, newLocale.languageCode);
-          await context.setLocale(newLocale);
-          // Re-register the device token so the backend renders future
-          // notifications in the new locale. No-op when not logged in / no
-          // token yet (syncDeviceToken guards on getIsLoggedIn()).
-          unawaited(syncDeviceToken());
-          emit(LanguageChanged(newLocale));
+          await _applyLocale(context, newLocale);
         },
       );
     } else {
-      await CacheClient.setString(kLanguage, newLocale.languageCode);
-      await context.setLocale(newLocale);
-      // Re-register the device token so the backend renders future
-      // notifications in the new locale. No-op when not logged in / no
-      // token yet (syncDeviceToken guards on getIsLoggedIn()).
-      unawaited(syncDeviceToken());
-      emit(LanguageChanged(newLocale));
+      await _applyLocale(context, newLocale);
     }
   }
 
@@ -75,23 +85,11 @@ class LanguageCubit extends Cubit<LanguageState> {
           emit(LanguageError(state.locale, failure.message));
         },
         (_) async {
-          await CacheClient.setString(kLanguage, newLocale.languageCode);
-          await context.setLocale(newLocale);
-          // Re-register the device token so the backend renders future
-          // notifications in the new locale. No-op when not logged in / no
-          // token yet (syncDeviceToken guards on getIsLoggedIn()).
-          unawaited(syncDeviceToken());
-          emit(LanguageChanged(newLocale));
+          await _applyLocale(context, newLocale);
         },
       );
     } else {
-      await CacheClient.setString(kLanguage, newLocale.languageCode);
-      await context.setLocale(newLocale);
-      // Re-register the device token so the backend renders future
-      // notifications in the new locale. No-op when not logged in / no
-      // token yet (syncDeviceToken guards on getIsLoggedIn()).
-      unawaited(syncDeviceToken());
-      emit(LanguageChanged(newLocale));
+      await _applyLocale(context, newLocale);
     }
   }
 }

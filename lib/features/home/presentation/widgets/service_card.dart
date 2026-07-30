@@ -175,25 +175,28 @@ class _ServiceCardState extends State<ServiceCard> {
                           ],
                         ),
                       ),
-                      Expanded(
+                      Flexible(
                         flex: 5,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child:
-                              serviceModel.imageUrl != null &&
-                                  serviceModel.imageUrl!.isNotEmpty
-                              ? CustomNetworkImage(serviceModel.imageUrl!)
-                              : Image.asset(
-                                  context.isDarkTheme
-                                      ? (context.isEn
-                                            ? AppAssets.baseServiceDark
-                                            : AppAssets.baseServiceDarkEnverted)
-                                      : (context.isEn
-                                            ? AppAssets.baseServiceLight
-                                            : AppAssets
-                                                  .baseServiceLightEnverted),
-                                  fit: BoxFit.fill,
-                                ),
+                        child: Align(
+                          alignment: .centerEnd,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child:
+                                serviceModel.imageUrl != null &&
+                                    serviceModel.imageUrl!.isNotEmpty
+                                ? CustomNetworkImage(serviceModel.imageUrl!)
+                                : Image.asset(
+                                    context.isDarkTheme
+                                        ? (context.isEn
+                                              ? AppAssets.baseServiceDark
+                                              : AppAssets.baseServiceDarkEnverted)
+                                        : (context.isEn
+                                              ? AppAssets.baseServiceLight
+                                              : AppAssets
+                                                    .baseServiceLightEnverted),
+                                    fit: BoxFit.fill,
+                                  ),
+                          ),
                         ),
                       ),
                     ],

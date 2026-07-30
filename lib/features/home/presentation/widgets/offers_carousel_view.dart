@@ -1,204 +1,228 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/extentions/context_extentions.dart';
+import '../../../../core/helpers/shimmer_helper.dart';
 import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_text_styles.dart';
-import '../../../../core/utils/app_assets.dart';
+import '../../../../core/utils/saudi_wire_format.dart';
 import '../../../../generated/locale_keys.g.dart';
-import '../../data/models/offer_model.dart';
-import 'offer_card.dart';
-import '../views/offers_view.dart';
-import '../../../../core/helpers/shimmer_helper.dart';
+import '../../../offers/data/models/customer_offer_model.dart';
+import '../../../offers/domain/offer_visibility.dart';
+import '../../../offers/presentation/controllers/offers_controller/offers_cubit.dart';
+import '../../../offers/presentation/views/offers_view.dart';
+import '../../../offers/presentation/widgets/offer_card.dart';
 
-class OffersCarouselView extends StatefulWidget {
-  final bool isLoading;
-  const OffersCarouselView({super.key, this.isLoading = false});
+class OffersCarouselView extends StatelessWidget {
+  const OffersCarouselView({super.key});
 
-  @override
-  State<OffersCarouselView> createState() => _OffersCarouselViewState();
-}
-
-class _OffersCarouselViewState extends State<OffersCarouselView> {
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.sizeOf(context).height;
-    if (widget.isLoading) {
-      return Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  LocaleKeys.home_best_offers.tr(context: context),
-                  style: !context.isTablet
-                      ? AppTextStyles.bold16
-                      : AppTextStyles.bold18,
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: height * 0.012),
-          ShimmerHelper.offers(height: height * 0.21),
-        ],
-      );
-    }
-    final offers = getDemoOffers(context);
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return BlocBuilder<OffersCubit, OffersState>(
+      builder: (context, state) {
+        if (state is OffersInitial || state is OffersLoading) {
+          return Column(
             children: [
-              Text(
-                LocaleKeys.home_best_offers.tr(context: context),
-                style: !context.isTablet
-                    ? AppTextStyles.bold16
-                    : AppTextStyles.bold18,
-              ),
-              GestureDetector(
-                onTap: () {
-                  context.pushNamed(
-                    Routes.offers,
-                    arguments: OffersArgs(offers: offers),
-                  );
-                },
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      LocaleKeys.home_view_more.tr(context: context),
-                      style: AppTextStyles.regular12.copyWith(
-                        color: context.colors.primary,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 2,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(4),
-                        border: Border.all(
-                          color: context.colors.primary,
-                          width: 1,
-                        ),
-                      ),
-                      child: Icon(
-                        Icons.arrow_forward_ios,
-                        size: 10,
-                        color: context.colors.primary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              const _Header(showViewMore: false),
+              SizedBox(height: height * 0.012),
+              ShimmerHelper.offers(height: OfferCard.heightFor(context)),
             ],
-          ),
-        ),
+          );
+        }
 
-        SizedBox(height: height * 0.012),
-        SizedBox(
-          height: height * 0.21,
-          child: CarouselView(
-            itemExtent: height * 0.4,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            onTap: (index) => _handleOfferTap(context, offers[index]),
-            children: offers.map((offer) {
-              return OfferCard(offerModel: offer);
-            }).toList(),
-          ),
-        ),
-      ],
+        if (state is OffersError) {
+          return Column(
+            children: [
+              const _Header(showViewMore: false),
+              SizedBox(height: height * 0.012),
+              const _RailRetry(),
+            ],
+          );
+        }
+
+        final List<CustomerOfferModel> offers = state is OffersLoaded
+            ? visibleOffers(state.offers, saudiNow())
+            : const <CustomerOfferModel>[];
+
+        if (offers.isEmpty) return const SizedBox.shrink();
+
+        return Column(
+          children: [
+            const _Header(showViewMore: true),
+            SizedBox(height: height * 0.012),
+            _Rail(offers: offers, onTap: _handleOfferTap),
+          ],
+        );
+      },
     );
   }
 
-  List<String> demoOffers() {
-    if (context.isAr) {
-      return [
-        AppAssets.offersOneAr,
-        AppAssets.offersTwoAr,
-        AppAssets.offersThreeAr,
-      ];
-    } else {
-      return [
-        AppAssets.offersOneEn,
-        AppAssets.offersTwoEn,
-        AppAssets.offersThreeEn,
-      ];
-    }
+  /// UCC23 step 6 — "customer taps an offer to open its detail view". Every
+  /// card, of either type, opens the offer the customer actually touched.
+  ///
+  /// It used to send a promo offer to the unfiltered offers LIST, which loses
+  /// the tap: the customer picked one card and got back the whole set, with the
+  /// one they wanted somewhere in it. A package offer jumped straight past the
+  /// detail view into the subscription catalogue, skipping the terms and the
+  /// A2 re-validation the primary action performs. Both now go through the
+  /// detail view, which owns the type-specific primary action.
+  void _handleOfferTap(BuildContext context, CustomerOfferModel offer) {
+    openOfferDetail(context, offer);
   }
+}
 
-  List<OfferModel> getDemoOffers(BuildContext context) {
-    final List<OfferModel> offers = [
-      OfferModel(
-        id: '1',
-        locale: context.isAr ? 'ar' : 'en',
-        imageUrl: demoOffers()[0],
-        ctaType: 'URL',
-        ctaTarget: 'https://aquago.sa/',
-        sortOrder: 1,
+/// The horizontal strip of offer cards.
+///
+/// Now that a card is its banner and nothing else, the rail is the banner
+/// carousel: the same `CarouselSlider` geometry `HomeBannersCarosal` uses —
+/// its height fractions, its viewport fraction, its centre-page enlargement —
+/// so an offer sits at the same scale, in the same rhythm, as the banner strip
+/// higher up the same screen. It used to be a `SingleChildScrollView` of
+/// 0.72-width cards sized by their text, which no longer has anything to
+/// measure.
+///
+/// Two deliberate departures from the banner strip: no autoplay and no dots.
+/// Offers are a browse list with a "view more" beside them, and a card that
+/// rotates out from under a reader's thumb takes the tap with it.
+class _Rail extends StatelessWidget {
+  const _Rail({required this.offers, required this.onTap});
+
+  final List<CustomerOfferModel> offers;
+  final void Function(BuildContext, CustomerOfferModel) onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return CarouselSlider.builder(
+      itemCount: offers.length,
+      itemBuilder: (context, index, realIndex) => GestureDetector(
+        // Keyed by the offer, not the slot: an infinite carousel builds the
+        // same offer on either side of the one in the middle, so a positional
+        // handle picks whichever copy the viewport happened to lay out first.
+        key: ValueKey('offer-card-${offers[index].id}'),
+        onTap: () => onTap(context, offers[index]),
+        child: OfferCard(offer: offers[index]),
       ),
-      OfferModel(
-        id: '2',
-        locale: context.isAr ? 'ar' : 'en',
-        imageUrl: demoOffers()[1],
-        ctaType: 'DEEPLINK',
-        ctaTarget: 'packages',
-        sortOrder: 2,
+      options: CarouselOptions(
+        height: OfferCard.heightFor(context),
+        viewportFraction: context.isTablet ? 0.6 : 0.75,
+        initialPage: 0,
+        // A single eligible offer has nothing to wrap around to, and looping it
+        // against itself only offers the customer a scroll that goes nowhere.
+        enableInfiniteScroll: offers.length > 1,
+        enlargeCenterPage: true,
+        enlargeFactor: 0.2,
+        scrollDirection: Axis.horizontal,
+        enlargeStrategy: CenterPageEnlargeStrategy.scale,
       ),
-      OfferModel(
-        id: '3',
-        locale: context.isAr ? 'ar' : 'en',
-        imageUrl: demoOffers()[2],
-        ctaType: 'DEEPLINK',
-        ctaTarget: 'packages',
-        sortOrder: 3,
-      ),
-    ];
-    return offers;
+    );
   }
+}
 
-  Future<void> _handleOfferTap(BuildContext context, OfferModel banner) async {
-    switch (banner.ctaType) {
-      case 'URL':
-        final target = banner.ctaTarget;
-        if (target == null || target.isEmpty) return;
-        try {
-          final ok = await launchUrl(
-            Uri.parse(target),
-            mode: LaunchMode.externalApplication,
-          );
-          if (!ok && context.mounted) {
-            context.showWarningSnackBar(
-              context.isAr ? 'تعذّر فتح الرابط.' : 'Could not open the link.',
-            );
-          }
-        } catch (_) {
-          if (context.mounted) {
-            context.showWarningSnackBar(
-              context.isAr ? 'تعذّر فتح الرابط.' : 'Could not open the link.',
-            );
-          }
-        }
-        break;
-      case 'DEEPLINK':
-        switch (banner.ctaTarget) {
-          case 'packages':
-            Navigator.pushNamed(context, Routes.packages);
-            break;
-          default:
-            // Unknown deeplink target — safe no-op.
-            break;
-        }
-        break;
-      default:
-        // 'NONE' / null / unknown — no-op.
-        break;
-    }
+/// UCC23 A6 — the rail's retry state. Deliberately the same shape as a card so
+/// the row does not collapse and re-expand when the retry succeeds.
+class _RailRetry extends StatelessWidget {
+  const _RailRetry();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: context.colors.cardBackGround,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: context.colors.borderSecondary, width: 1),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                LocaleKeys.offers_error.tr(context: context),
+                style: AppTextStyles.regular12.copyWith(
+                  color: context.colors.textSecondary,
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            TextButton(
+              key: const ValueKey('home-offers-retry'),
+              onPressed: () => context.read<OffersCubit>().getOffers(),
+              style: TextButton.styleFrom(
+                foregroundColor: context.colors.primary,
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: Text(
+                LocaleKeys.retry.tr(context: context),
+                style: AppTextStyles.medium14,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Header extends StatelessWidget {
+  const _Header({required this.showViewMore});
+
+  final bool showViewMore;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            LocaleKeys.home_best_offers.tr(context: context),
+            style: !context.isTablet
+                ? AppTextStyles.bold16
+                : AppTextStyles.bold18,
+          ),
+          if (showViewMore)
+            GestureDetector(
+              onTap: () => context.pushNamed(Routes.offers),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    LocaleKeys.home_view_more.tr(context: context),
+                    style: AppTextStyles.regular12.copyWith(
+                      color: context.colors.primary,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 2,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(
+                        color: context.colors.primary,
+                        width: 1,
+                      ),
+                    ),
+                    child: Icon(
+                      Icons.arrow_forward_ios,
+                      size: 10,
+                      color: context.colors.primary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
   }
 }

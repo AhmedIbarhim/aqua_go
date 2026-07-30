@@ -21,8 +21,7 @@ class PackageRescheduleBookingSubmit implements BookingSubmitStrategy {
     }
 
     final rescheduleRequest = PackageRescheduleRequestModel(
-      date: state.selectedDate!,
-      time: state.selectedTime!,
+      slotStart: state.selectedSlotStart!,
       address: state.selectedAddress,
       vehicleIds: vehicleIds,
     );

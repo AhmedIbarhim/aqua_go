@@ -2,16 +2,17 @@ import '../../../address/data/models/address_model.dart';
 import '../../../my_cars/data/models/my_car_model.dart';
 import '../../../home/data/models/service_model.dart';
 import '../../../home/data/models/add_on_model.dart';
-import 'day_time_model.dart';
 import '../../../../core/enums/payment_method_enum.dart';
+import '../../../../core/utils/saudi_wire_format.dart';
 import 'quote_model.dart';
 
 class ServiceBookingRequestModel {
   final ServiceModel? service;
   final MyCarModel? car;
   final AddressModel? address;
-  final DateTime? date;
-  final String? time;
+  /// The picked availability slot's own `start` instant. Serialised verbatim
+  /// as the bare Asia/Riyadh `scheduledAt` — no display string in between.
+  final DateTime? slotStart;
   final List<AddOnModel> serviceAddOns;
   final List<String> workerNotes;
   final PaymentMethod? paymentMethod;
@@ -25,55 +26,51 @@ class ServiceBookingRequestModel {
   /// Soft slot-hold token returned by POST /api/customer/bookings/payment-init.
   final String? holdToken;
 
+  /// The merchandising offer this booking came through — the SAME offerId the
+  /// quote was priced with. Null for a manually typed code. Carried purely for
+  /// redemption attribution (`promo.promo_redemptions.offer_id`): the discount
+  /// itself is already frozen in the quote, and the server rejects a create
+  /// whose offer resolves to a different code than the quote was priced with.
+  final String? offerId;
+
   ServiceBookingRequestModel({
     this.service,
     this.car,
     this.address,
-    this.date,
-    this.time,
+    this.slotStart,
     this.serviceAddOns = const [],
     this.workerNotes = const [],
     this.paymentMethod,
     this.quote,
     this.moyasarPaymentId,
     this.holdToken,
+    this.offerId,
   });
 
   ServiceBookingRequestModel copyWith({
     String? moyasarPaymentId,
     String? holdToken,
+    String? offerId,
   }) {
     return ServiceBookingRequestModel(
       service: service,
       car: car,
       address: address,
-      date: date,
-      time: time,
+      slotStart: slotStart,
       serviceAddOns: serviceAddOns,
       workerNotes: workerNotes,
       paymentMethod: paymentMethod,
       quote: quote,
       moyasarPaymentId: moyasarPaymentId ?? this.moyasarPaymentId,
       holdToken: holdToken ?? this.holdToken,
+      offerId: offerId ?? this.offerId,
     );
   }
 
-  bool get isComplete =>
-      service != null &&
-      car != null &&
-      address != null &&
-      date != null &&
-      time != null;
-
   Map<String, dynamic> toJson() {
     final addr = address;
-    String? scheduledAt;
-    if (date != null && time != null) {
-      scheduledAt = DayTimeModel(
-        date: date!,
-        rawTime: time!,
-      ).toScheduledAtString();
-    }
+    final start = slotStart;
+    final String? scheduledAt = start != null ? toWireDateTime(start) : null;
 
     final isSavedAddress =
         addr?.id != null &&
@@ -107,13 +104,14 @@ class ServiceBookingRequestModel {
         },
       ],
       'type': 'SCHEDULED',
-      'scheduledAt': ?scheduledAt,
+      if (scheduledAt != null) 'scheduledAt': scheduledAt,
       if (workerNotes.isNotEmpty) 'workerNotes': workerNotes,
       if (serviceAddOns.isNotEmpty)
         'addOns': serviceAddOns.map((e) => {'addonId': e.id}).toList(),
       if (paymentMethod != null) 'paymentMethod': paymentMethod!.name,
-      'moyasarPaymentId': ?moyasarPaymentId,
-      'holdToken': ?holdToken,
+      if (moyasarPaymentId != null) 'moyasarPaymentId': moyasarPaymentId,
+      if (holdToken != null) 'holdToken': holdToken,
+      if (offerId != null) 'offerId': offerId,
     };
   }
 }

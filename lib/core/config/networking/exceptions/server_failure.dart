@@ -7,8 +7,27 @@ import 'failure.dart';
 class ServerFailure extends Failure {
   static String get _defaultMessage => LocaleKeys.snackbar_default_error.tr();
 
-  const ServerFailure(String message, {FailureType type = FailureType.unknown})
-    : super(message, type);
+  /// The last segment of the RFC 9457 `type` URI the server answered with —
+  /// e.g. `slot-no-longer-available` for
+  /// `https://api.aquago.sa/errors/slot-no-longer-available`. Null when the
+  /// body carried no `type` (a transport failure, a non-ProblemDetail body, a
+  /// gateway 5xx).
+  ///
+  /// This is the ONLY machine-readable statement of WHICH rejection fired.
+  /// `message` is localized prose for the customer and `type` is a coarse
+  /// transport class; neither can distinguish two rejections that share a
+  /// status code, and some of those differ in whether money moved. Logic that
+  /// turns on a specific server rejection reads this, never the message.
+  final String? slug;
+
+  const ServerFailure(
+    String message, {
+    FailureType type = FailureType.unknown,
+    this.slug,
+  }) : super(message, type);
+
+  @override
+  List<Object?> get props => [...super.props, slug];
 
   factory ServerFailure.fromDioException(DioException dioException) {
     switch (dioException.type) {
@@ -54,7 +73,7 @@ class ServerFailure extends Failure {
           dioException.response?.data,
         );
 
-      case DioExceptionType.unknown:
+      default:
         if (dioException.error is SocketException) {
           return ServerFailure(
             LocaleKeys.snackbar_no_internet.tr(),
@@ -67,16 +86,16 @@ class ServerFailure extends Failure {
   }
 
   factory ServerFailure.fromResponse(int? statusCode, dynamic response) {
+    final slug = _extractSlug(response);
+
     if (response is Map) {
       final title = response['title']?.toString();
-      final type = response['type']?.toString();
       if (title == 'Address outside service area' ||
-          // host-agnostic: match the error-type URI suffix regardless of the API host
-          (type?.endsWith('/errors/address-outside-service-area') ?? false)
-      ) {
+          slug == 'address-outside-service-area') {
         return const ServerFailure(
           'address-outside-service-area',
           type: FailureType.validation,
+          slug: 'address-outside-service-area',
         );
       }
     }
@@ -87,19 +106,23 @@ class ServerFailure extends Failure {
       case StatusCodes.badRequest:
       case StatusCodes.unprocessableEntity:
       case StatusCodes.conflict:
-        return ServerFailure(message, type: FailureType.validation);
+        return ServerFailure(message, type: FailureType.validation, slug: slug);
 
       case StatusCodes.unauthorized:
-        return ServerFailure(message, type: FailureType.unauthorized);
+        return ServerFailure(
+          message,
+          type: FailureType.unauthorized,
+          slug: slug,
+        );
 
       case StatusCodes.forbidden:
-        return ServerFailure(message, type: FailureType.forbidden);
+        return ServerFailure(message, type: FailureType.forbidden, slug: slug);
 
       case StatusCodes.notFound:
         // Surface the localized server `detail`/`title` when the body carries a
         // ProblemDetail; otherwise `_extractErrorMessage` already returns the
         // localized generic (`snackbar_default_error`) — no English literal.
-        return ServerFailure(message, type: FailureType.notFound);
+        return ServerFailure(message, type: FailureType.notFound, slug: slug);
 
       case StatusCodes.internalServerError:
       case StatusCodes.badGateway:
@@ -111,11 +134,24 @@ class ServerFailure extends Failure {
               ? message
               : LocaleKeys.errors_internal_error.tr(),
           type: FailureType.server,
+          slug: slug,
         );
 
       default:
-        return ServerFailure(_defaultMessage);
+        return ServerFailure(_defaultMessage, slug: slug);
     }
+  }
+
+  /// Reads the last path segment of the RFC 9457 `type` URI, host-agnostically
+  /// so a change of API host cannot silently stop a rejection being recognised.
+  /// Returns null for the RFC's `about:blank` default and for any body that
+  /// carries no usable `type`.
+  static String? _extractSlug(dynamic response) {
+    if (response is! Map) return null;
+    final raw = response['type']?.toString();
+    if (raw == null || raw.isEmpty || raw == 'about:blank') return null;
+    final segment = raw.split('/').last.trim();
+    return segment.isEmpty ? null : segment;
   }
 
   /// Joins the server-localized `message` strings from an RFC 9457

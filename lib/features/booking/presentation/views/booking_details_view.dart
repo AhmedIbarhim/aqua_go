@@ -52,7 +52,7 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
       if (!mounted) return;
       if (flowConfig.requiresQuote && !_initialQuoteRequested) {
         _initialQuoteRequested = true;
-        cubit.fetchQuote();
+        _repriceForDisplay();
       }
     });
   }
@@ -69,10 +69,33 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
   void _scheduleQuoteRefresh(BookingState state) {
     if (!state.flowConfig.requiresQuote) return;
     _quoteDebounce?.cancel();
-    _quoteDebounce = Timer(const Duration(milliseconds: 350), () {
-      if (!mounted) return;
-      context.read<BookingCubit>().fetchQuote();
-    });
+    _quoteDebounce = Timer(
+      const Duration(milliseconds: 350),
+      _repriceForDisplay,
+    );
+  }
+
+  /// Re-prices the current selection WITHOUT any promo or offer — the price
+  /// this screen shows is always the undiscounted one.
+  ///
+  /// The customer can reach this screen with a code already applied: they took
+  /// an offer, or typed a code on the summary, then came back to change an
+  /// add-on. This screen has no promo affordance of any kind, so pricing with
+  /// the code would show a total that nothing on screen explains. The owner's
+  /// ruling (plan §6.93) is that the discount appears only from the payment
+  /// page onward, where the summary's original → discount → total breakdown
+  /// says where it came from.
+  ///
+  /// Bare is a DISPLAY choice, not a removal: the applied code and offer id stay
+  /// on the cubit state, and the summary re-quotes with them on entry. Dropping
+  /// them here would silently un-take the offer the customer chose.
+  ///
+  /// A code that has gone dead therefore cannot be detected here — nothing is
+  /// sent to reject. That rejection surfaces on the summary, which is where the
+  /// code is actually applied and which already states the server's reason.
+  void _repriceForDisplay() async {
+    if (!mounted) return;
+    await context.read<BookingCubit>().repriceForDisplayWithoutPromo();
   }
 
 
@@ -214,19 +237,19 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
           SizedBox(height: height * 0.02),
           BookingDateTimePicker(
             initialDate: bookingState.selectedDate,
-            initialTime: bookingState.selectedTime,
+            initialSlotStart: bookingState.selectedSlotStart,
             availabilitySlots: bookingState.availabilitySlots,
             isLoading: bookingState.isAvailabilityLoading,
             onDateChanged: (date) {
               context.read<BookingCubit>().updateDateTime(
                 date,
-                bookingState.selectedTime,
+                bookingState.selectedSlotStart,
               );
             },
-            onTimeChanged: (time) {
+            onSlotSelected: (slotStart) {
               context.read<BookingCubit>().updateDateTime(
                 bookingState.selectedDate,
-                time,
+                slotStart,
               );
             },
           ),
@@ -234,5 +257,6 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
       ),
     );
   }
+
 }
 

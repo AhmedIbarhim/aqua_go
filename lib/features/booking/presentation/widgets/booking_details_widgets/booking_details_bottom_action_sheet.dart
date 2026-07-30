@@ -51,8 +51,7 @@ class BookingDetailsBottomActionSheet extends StatelessWidget {
         bookingState.selectedPackageService != null;
     final isComplete =
         bookingState.selectedCar != null &&
-        bookingState.selectedDate != null &&
-        bookingState.selectedTime != null &&
+        bookingState.selectedSlotStart != null &&
         servicePicked;
 
     // For reschedule flow: submit directly from details view

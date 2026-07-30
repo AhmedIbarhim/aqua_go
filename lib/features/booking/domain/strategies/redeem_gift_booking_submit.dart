@@ -21,7 +21,7 @@ class RedeemGiftBookingSubmit implements BookingSubmitStrategy {
       address: state.selectedAddress,
       car: state.selectedCar,
       date: state.selectedDate,
-      time: state.selectedTime,
+      slotStart: state.selectedSlotStart,
     );
 
     return repo.redeemGiftBooking(request);

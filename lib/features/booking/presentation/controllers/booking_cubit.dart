@@ -1,16 +1,19 @@
+import 'package:dartz/dartz.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
+import '../../../../core/config/networking/exceptions/failure.dart';
 import '../../../address/data/models/address_model.dart';
 import '../../../my_cars/data/models/my_car_model.dart';
 import '../../../home/data/models/service_model.dart';
 import '../../domain/configs/booking_flow_config.dart';
+import '../../domain/refund_evidence.dart';
 import '../../data/models/quote_model.dart';
 import '../../../my_bookings/data/models/booking_response_model/breakdown.dart';
 import '../../../my_bookings/data/models/booking_response_model/quote_line.dart';
 import '../../data/models/payment_init_model.dart';
-import '../../data/models/day_time_model.dart';
 import '../../data/repos/booking_repository.dart';
+import '../../../../core/utils/saudi_wire_format.dart';
 import '../../../../core/enums/payment_method_enum.dart';
 import '../../domain/strategies/booking_submit_strategy.dart';
 import 'booking_state.dart';
@@ -40,6 +43,45 @@ Set<int> remapAddonSelections(
   return remapped;
 }
 
+/// Outcome of [BookingCubit.reprice]: the fresh quote, plus the rejection the
+/// server gave for the promo it had to drop to get one.
+class QuoteRefresh {
+  const QuoteRefresh({this.quote, this.droppedPromoReason});
+
+  /// The re-priced quote, or null when pricing failed outright.
+  final QuoteModel? quote;
+
+  /// Non-null when the applied promo no longer validated and was removed to
+  /// obtain [quote] — the server's own reason, which is what the customer is
+  /// owed as an explanation.
+  final String? droppedPromoReason;
+
+  bool get promoDropped => droppedPromoReason != null;
+}
+
+/// Outcome of [BookingCubit.applyOffer].
+///
+/// Three outcomes, not two, for the reason `OfferRevalidation` gives on the
+/// offers surface: "the server refused this offer" and "I could not reach the
+/// server" must not be treated the same. The first is a verdict and consumes
+/// the customer's single-shot offer handoff; the second is a failure to ASK,
+/// and consuming the offer on it charges them full price for a deal they
+/// accepted and were never told they had lost.
+class OfferApplication {
+  const OfferApplication({this.quote, this.settled = false});
+
+  /// The quote priced WITH the offer, or null when it was not applied.
+  final QuoteModel? quote;
+
+  /// True when the offer's fate is decided — it was applied, or it was refused
+  /// on its merits. False when nothing was decided: no network, a timeout, a
+  /// 5xx, or no selection to price yet. A caller holding the offer keeps
+  /// holding it while this is false.
+  final bool settled;
+
+  bool get applied => quote != null;
+}
+
 class BookingCubit extends Cubit<BookingState> {
   final BookingRepository _bookingRepo;
   final SubscriptionsRepository _subscriptionsRepo;
@@ -65,23 +107,64 @@ class BookingCubit extends Cubit<BookingState> {
     MyCarModel? existingCar,
     AddressModel? existingAddress,
     DateTime? existingDate,
-    String? existingTime,
+    DateTime? existingSlotStart,
     String? subscriptionId,
     String? washId,
     String? giftCode,
+    String? offerTitleAr,
+    String? offerTitleEn,
+    int? offerListPriceMinor,
+    int? offerTargetPriceMinor,
   }) {
     emit(
       BookingState(
         status: BookingStatus.initial,
+        // WHY THERE IS NO "changing the service drops the held offer" BRANCH.
+        // The service is fixed HERE, once, for the whole flow: a SERVICE offer
+        // deep-links at the wash it names. `selectedService` is written in
+        // exactly THREE places in this cubit, and neither of the other two can
+        // re-point an offer-driven booking at a different wash:
+        //  1. HERE, from the offer's own service.
+        //  2. `refreshCatalog` — re-reads the SAME id and swaps in a fresh copy
+        //     of the same wash, never a different one.
+        //  3. `fetchSubscriptionDetails` — synthesises a PACKAGE pseudo-service
+        //     from the subscription. It runs only in the package flow, which is
+        //     entered with a subscriptionId and never carries the two offer
+        //     figures below (a SERVICE offer hands in a serviceId, not a
+        //     subscription), so there is nothing of the offer's for it to
+        //     invalidate.
+        // So the case is vacuous rather than missing, and nothing recorded that.
+        //
+        // It stops being vacuous the moment a picker can re-point an in-flight
+        // booking at a DIFFERENT service. An offer prices ONE wash, so that
+        // change would have to drop all three things below that describe it:
+        // the two display figures, and the offer id
+        // (`PendingPromoCode` / `BookingState.appliedOfferId`) the summary
+        // prices with. Leaving them would show a wash at another wash's deal.
         selectedService: service,
         selectedCar: existingCar,
         selectedAddress: existingAddress,
         selectedDate: existingDate,
-        selectedTime: existingTime,
+        selectedSlotStart: existingSlotStart,
         flowConfig: _flowConfig,
         subscriptionId: subscriptionId,
         washId: washId,
         giftCode: giftCode,
+        // Both are DISPLAY figures the SERVICE offer card handed over, and
+        // they enter the flow here because that is the only moment the offer
+        // is in scope. A 0 target means the offer carries no deal at all (a
+        // shortcut card), which is not the same statement as "free" — it is
+        // normalised away so no caller downstream has to know the difference.
+        offerListPriceMinor:
+            (offerListPriceMinor ?? 0) > 0 ? offerListPriceMinor : null,
+        offerTargetPriceMinor:
+            (offerTargetPriceMinor ?? 0) > 0 ? offerTargetPriceMinor : null,
+        // Both languages of the offer's own name, so the summary's re-apply
+        // card can say WHICH offer it is putting back rather than "your offer".
+        // A fresh state also means `rememberedOfferId` starts null: an offer
+        // belongs to the booking it was taken for and never to the next one.
+        offerTitleAr: offerTitleAr,
+        offerTitleEn: offerTitleEn,
       ),
     );
 
@@ -357,14 +440,16 @@ class BookingCubit extends Cubit<BookingState> {
     );
   }
 
-  void updateDateTime(DateTime? date, String? time) {
+  /// [slotStart] is the availability slot's own `start` instant — never a
+  /// display label.
+  void updateDateTime(DateTime? date, DateTime? slotStart) {
     final dateChanged = date != state.selectedDate;
     emit(
       state.copyWith(
         selectedDate: date,
-        selectedTime: dateChanged ? null : time,
+        selectedSlotStart: dateChanged ? null : slotStart,
         clearSelectedDate: date == null,
-        clearSelectedTime: dateChanged || time == null,
+        clearSelectedSlotStart: dateChanged || slotStart == null,
         clearError: true,
       ),
     );
@@ -425,8 +510,9 @@ class BookingCubit extends Cubit<BookingState> {
       return;
     }
 
-    // Format date as YYYY-MM-DD
-    final dateStr = DateFormat('yyyy-MM-dd').format(date);
+    // Wire value — built locale-independently so a ZERODIGIT device locale
+    // can never send Arabic-Indic digits as the `date` query parameter.
+    final dateStr = toWireDate(date);
 
     // Get zoneId
     String? zoneId = address.zoneId;
@@ -487,8 +573,25 @@ class BookingCubit extends Cubit<BookingState> {
     );
   }
 
+  /// Prices the current selection, optionally with a promo/offer/points.
   Future<QuoteModel?> fetchQuote({
     String? promoCode,
+    String? offerId,
+    int? pointsToApply,
+  }) async {
+    final result = await _priceAndPublish(
+      promoCode: promoCode,
+      offerId: offerId,
+      pointsToApply: pointsToApply,
+    );
+    return result?.fold((_) => null, (quote) => quote);
+  }
+
+  /// Prices the current selection and publishes the outcome — the quote on the
+  /// state on success, the server's message on it on rejection.
+  Future<Either<Failure, QuoteModel>?> _priceAndPublish({
+    String? promoCode,
+    String? offerId,
     int? pointsToApply,
   }) async {
     if (state.selectedService == null || state.selectedAddress == null) {
@@ -497,6 +600,43 @@ class BookingCubit extends Cubit<BookingState> {
 
     emit(state.copyWith(status: BookingStatus.loading));
 
+    final result = await _requestQuote(
+      promoCode: promoCode,
+      offerId: offerId,
+      pointsToApply: pointsToApply,
+    );
+
+    result.fold(
+      (failure) => emit(
+        state.copyWith(
+          status: BookingStatus.failure,
+          errorMessage: failure.message,
+        ),
+      ),
+      (quote) => _emitQuote(quote, offerId),
+    );
+
+    return result;
+  }
+
+  /// Whether [type] is the server's VERDICT on the promo the request carried,
+  /// rather than a failure to obtain one.
+  ///
+  /// A promo rejection comes back 400 / 409 / 422 ([FailureType.validation]);
+  /// an unknown offer comes back 404 ([FailureType.notFound]). Everything else
+  /// — no network, a timeout, a 5xx, a cancelled request — says nothing at all
+  /// about the code or the offer, and must never be read as one being refused.
+  static bool _isPromoVerdict(FailureType type) =>
+      type == FailureType.validation || type == FailureType.notFound;
+
+  /// Prices the current selection without touching the emitted state, so a
+  /// caller that has to try twice (see [reprice]) does not flash a rejection
+  /// the customer is about to be given a resolution for.
+  Future<Either<Failure, QuoteModel>> _requestQuote({
+    String? promoCode,
+    String? offerId,
+    int? pointsToApply,
+  }) {
     final availableAddons = state.selectedService?.addons ?? [];
     final List<String> addOnIds = [];
     for (final idx in state.selectedServiceIndices) {
@@ -508,15 +648,171 @@ class BookingCubit extends Cubit<BookingState> {
     // A service booking carries a single vehicle, so car count is 1.
     const int carCount = 1;
 
-    final result = await _bookingRepo.getQuote(
+    return _bookingRepo.getQuote(
       packageId: state.selectedService!.id!,
       lat: state.selectedAddress!.lat,
       lng: state.selectedAddress!.lng,
       promoCode: promoCode,
+      offerId: offerId,
       addOnIds: addOnIds,
       carCount: carCount,
       pointsToApply: pointsToApply,
     );
+  }
+
+  /// Publishes a freshly priced quote and the promo it was priced with.
+  ///
+  /// The quote echoes the code the server actually applied — normalised to
+  /// upper case, and resolved from the offer when an offerId was sent — so it,
+  /// not the request, is what the applied state is taken from. A quote that
+  /// came back without a code clears both halves of the promo.
+  ///
+  /// [offerId] is the offer this quote was priced FOR, and it is authoritative
+  /// in both directions: null means the order carries no offer attribution, so
+  /// any id held from an earlier quote is dropped rather than retained. A typed
+  /// code applied over a live offer must not inherit that offer — the
+  /// redemption's `offer_id` is the only record of which offer drove the sale.
+  /// [clearOfferPrices] drops the two display figures the offer card handed in,
+  /// and is set ONLY by a caller holding the server's REFUSAL of that offer (see
+  /// [_repriceAfter]). Defaulted off because every other caller is publishing a
+  /// quote, which says nothing about the offer's fate.
+  ///
+  /// [rememberOffer] records [offerId] as the offer THIS FLOW took, which is a
+  /// different fact from the one `appliedOfferId` carries and outlives it: the
+  /// attribution is dropped the moment a quote comes back that the offer did
+  /// not drive, and without a record beside it a typed code applied over a live
+  /// offer destroyed it for the session. Set by [applyOffer] on the way in and
+  /// on a re-apply; never unset here — dropping it takes the server's refusal.
+  void _emitQuote(
+    QuoteModel quote,
+    String? offerId, {
+    bool clearOfferPrices = false,
+    bool clearRememberedOffer = false,
+    bool rememberOffer = false,
+  }) {
+    final applied = quote.promoCode;
+    emit(
+      state.copyWith(
+        status: BookingStatus.initial,
+        quote: quote,
+        appliedPromoCode: applied,
+        appliedOfferId: applied == null ? null : offerId,
+        // Only an offer that actually PRICED something is worth offering back;
+        // a quote the server answered without a code carries no deal to
+        // restore, whatever it was asked for.
+        rememberedOfferId: (rememberOffer && applied != null) ? offerId : null,
+        clearPromo: applied == null,
+        clearOfferId: offerId == null,
+        clearOfferPrices: clearOfferPrices,
+        clearRememberedOffer: clearRememberedOffer,
+      ),
+    );
+  }
+
+  /// Applies a manually typed code to the current selection. The chip only
+  /// lights up once the backend has returned a quote priced with it.
+  Future<QuoteModel?> applyPromoCode(String code) =>
+      fetchQuote(promoCode: code);
+
+  /// Applies a merchandising offer. Only the offer id goes on the wire — the
+  /// server resolves its linked code, and sending both is a 400.
+  ///
+  /// Reports whether the offer was SETTLED as well as whether it was applied.
+  /// The offer arrives here through a single-shot handoff that the caller has
+  /// already drained, and only a verdict earns that: an unreachable server has
+  /// said nothing about the offer, so the caller puts it back.
+  ///
+  /// An unanswered first attempt is retried ONCE, still carrying the offer,
+  /// before that verdict-less outcome is reported. The caller's next move is a
+  /// quote either way — it re-prices the order so the summary stays usable —
+  /// and pricing that one bare would drop a deal the customer accepted over a
+  /// dropped connection or a single 5xx, which the retry usually survives.
+  /// Exactly once: a second silence is a real outage, and looping would sit on
+  /// the loading overlay with nothing to show for it.
+  ///
+  /// Both attempts go through [_requestQuote], which does NOT touch the emitted
+  /// state, so the customer is shown ONE outcome rather than a rejection that
+  /// is immediately overwritten.
+  Future<OfferApplication> applyOffer(String offerId) async {
+    // Nothing to price yet, so nothing was asked of the server and the offer is
+    // untouched.
+    if (state.selectedService == null || state.selectedAddress == null) {
+      return const OfferApplication();
+    }
+
+    emit(state.copyWith(status: BookingStatus.loading));
+
+    var result = await _requestQuote(offerId: offerId);
+    final unanswered = result.fold(
+      (failure) => !_isPromoVerdict(failure.type),
+      (_) => false,
+    );
+    if (unanswered) {
+      result = await _requestQuote(offerId: offerId);
+    }
+
+    return result.fold(
+      (failure) {
+        final settled = _isPromoVerdict(failure.type);
+        emit(
+          state.copyWith(
+            status: BookingStatus.failure,
+            errorMessage: failure.message,
+            // A SETTLED failure is the server REFUSING the offer, and the two
+            // display figures the offer card handed in stop being true the
+            // moment it does: the order will be priced without the offer, so
+            // details would otherwise still promise a deal the customer cannot
+            // have and then charge more at the summary. Only here — an
+            // unanswered request (settled false) has said nothing about the
+            // offer, and the caller puts it back for the next entry.
+            clearOfferPrices: settled,
+            // The same verdict, applied to the same fact from the other side:
+            // an offer the server has refused is not one to keep offering back
+            // from the summary. A card that re-runs the identical rejection is
+            // a dead button, and the customer has no way to tell it is dead.
+            // Unsettled changes nothing — see the note above.
+            clearRememberedOffer: settled,
+          ),
+        );
+        return OfferApplication(settled: settled);
+      },
+      (quote) {
+        _emitQuote(quote, offerId, rememberOffer: true);
+        return OfferApplication(quote: quote, settled: true);
+      },
+    );
+  }
+
+  /// Re-prices without any promo and clears the applied code.
+  Future<QuoteModel?> removePromoCode() => fetchQuote();
+
+  /// Re-prices the current selection with NO promo and NO offer on the wire,
+  /// leaving the applied code ON the state. Display-only.
+  ///
+  /// This is the booking-details screen's re-quote. Per the owner's ruling
+  /// (plan §6.93) the discount does not appear before the payment page: details
+  /// always prices the bare selection, and the summary — which re-quotes WITH
+  /// the applied code on entry and breaks the figure down original → discount →
+  /// total — is where the discount first shows and is explained.
+  ///
+  /// [BookingState.appliedPromoCode] and [BookingState.appliedOfferId] survive
+  /// this call untouched, which is the entire reason it is not [removePromoCode]
+  /// and does not go through [_emitQuote]. Clearing them here would throw away
+  /// the offer the customer took on the offers surface, so the summary would
+  /// have nothing left to apply and they would be charged full price for it.
+  /// [_emitQuote] takes the applied code FROM the quote, and this quote is bare
+  /// by construction, so routing through it would do exactly that.
+  ///
+  /// A dead code cannot be detected here, because none is sent. The summary
+  /// owns that: it re-quotes with the code on entry and states the server's
+  /// rejection through its own drop-reason path.
+  Future<QuoteModel?> repriceForDisplayWithoutPromo() async {
+    if (state.selectedService == null || state.selectedAddress == null) {
+      return null;
+    }
+
+    emit(state.copyWith(status: BookingStatus.loading));
+    final result = await _requestQuote();
 
     return result.fold(
       (failure) {
@@ -535,7 +831,125 @@ class BookingCubit extends Cubit<BookingState> {
     );
   }
 
-  Future<void> submitBooking({String? promoCode}) async {
+  /// Re-prices the current selection PRESERVING whatever promo is applied —
+  /// used by every re-quote the SUMMARY makes on the customer's behalf rather
+  /// than at their explicit request (arriving back on the screen with a code
+  /// already applied, the price-lock refresh once the quote's TTL lapses).
+  /// Re-quoting bare there would silently throw the customer's discount away on
+  /// the one screen that is meant to show it.
+  ///
+  /// The booking-details screen deliberately does NOT come here — it prices the
+  /// bare selection through [repriceForDisplayWithoutPromo], because no discount
+  /// shows before the payment page (plan §6.93).
+  ///
+  /// When the applied code no longer VALIDATES — its cap was consumed, the
+  /// campaign ended, or the order no longer clears its minimum — retrying with
+  /// the same dead code repeats the same rejection forever, and the customer
+  /// has no way out but to guess. So the code is dropped, the selection is
+  /// re-priced WITHOUT it, and the reason the server gave comes back on
+  /// [QuoteRefresh.droppedPromoReason] for the caller to state.
+  ///
+  /// That drop is reserved for a VERDICT. A timeout or a 5xx says nothing
+  /// about the code, and dropping it on one would quietly re-price the order at
+  /// full price the moment the connection came back — the customer's own
+  /// discount removed by a network blip, on the screen that exists to show it.
+  /// The offers surface makes the same distinction for the same reason
+  /// (`OfferUncheckable`). On an unanswered request the applied code and offer
+  /// stay exactly where they were and the failure is raised as itself, so the
+  /// customer can retry with their code intact.
+  Future<QuoteRefresh> reprice() async {
+    if (state.selectedService == null || state.selectedAddress == null) {
+      return const QuoteRefresh();
+    }
+    final promoCode = state.appliedPromoCode;
+    final offerId = state.appliedOfferId;
+
+    emit(state.copyWith(status: BookingStatus.loading));
+    final result = await _requestQuote(promoCode: promoCode, offerId: offerId);
+
+    return result.fold(
+      (rejection) =>
+          _repriceAfter(rejection, promoCode: promoCode, offerId: offerId),
+      (quote) async {
+        _emitQuote(quote, offerId);
+        return QuoteRefresh(quote: quote);
+      },
+    );
+  }
+
+  /// The failing half of [reprice].
+  ///
+  /// [rejection] is the failure the priced-with-promo attempt came back with,
+  /// and [promoCode] whatever was applied when it went out. [offerId] is the
+  /// offer that request carried, and it decides whether the two display figures
+  /// the offer card handed in are still true: a SETTLED rejection of a request
+  /// that carried an offer is the server REFUSING that offer, exactly as it is
+  /// on the handoff-apply path ([applyOffer]), and the pair stops being true the
+  /// moment it does. This is the SECOND way that refusal reaches the customer —
+  /// the offer applied cleanly on the way in, and the cap was consumed before
+  /// they came back — and leaving the figures behind here left details promising
+  /// a deal the summary then declined to honour.
+  ///
+  /// The same discipline as [applyOffer]: only a VERDICT clears them. The guard
+  /// below returns before that on an unanswered request, so a timeout or a 5xx
+  /// leaves the pair exactly where it was.
+  Future<QuoteRefresh> _repriceAfter(
+    Failure rejection, {
+    required String? promoCode,
+    required String? offerId,
+  }) async {
+    // Nothing applied means there is nothing to drop and nothing to retry
+    // differently; an unanswered request means there is nothing to drop it
+    // OVER. Either way the failure is the whole story, and `copyWith` leaves
+    // the applied code and offer exactly where they were.
+    if (promoCode == null || !_isPromoVerdict(rejection.type)) {
+      emit(
+        state.copyWith(
+          status: BookingStatus.failure,
+          errorMessage: rejection.message,
+        ),
+      );
+      return const QuoteRefresh();
+    }
+
+    // Past the guard the rejection is a VERDICT, so a request that carried an
+    // offer has had that offer refused. What the second attempt goes on to do
+    // cannot change that, so both branches below drop the figures — and the
+    // remembered offer with them, for the reason [applyOffer] gives: the
+    // summary must not keep offering back an offer the server has ended.
+    final offerRefused = offerId != null;
+
+    // Second attempt WITHOUT the code. Its own failure is the one worth
+    // surfacing — at that point nothing about the promo is left to explain.
+    final clean = await _requestQuote();
+    return clean.fold(
+      (failure) {
+        emit(
+          state.copyWith(
+            status: BookingStatus.failure,
+            errorMessage: failure.message,
+            clearOfferPrices: offerRefused,
+            clearRememberedOffer: offerRefused,
+          ),
+        );
+        return const QuoteRefresh();
+      },
+      (quote) {
+        _emitQuote(
+          quote,
+          null,
+          clearOfferPrices: offerRefused,
+          clearRememberedOffer: offerRefused,
+        );
+        return QuoteRefresh(
+          quote: quote,
+          droppedPromoReason: rejection.message,
+        );
+      },
+    );
+  }
+
+  Future<void> submitBooking() async {
     emit(state.copyWith(status: BookingStatus.loading));
     // Delegate to the strategy
     final result = await _submitStrategy.submit(
@@ -554,6 +968,9 @@ class BookingCubit extends Cubit<BookingState> {
         state.copyWith(
           status: BookingStatus.success,
           createdBooking: bookingResponse,
+          // The offer has been spent on THIS booking. Nothing downstream of a
+          // created booking may offer it back.
+          clearRememberedOffer: true,
         ),
       ),
     );
@@ -563,10 +980,6 @@ class BookingCubit extends Cubit<BookingState> {
   /// quote + soft-hold the slot, then expose the {amount, givenId, metadata}
   /// the Moyasar SDK needs.
   ///
-  /// Builds `scheduledAt` (bare ISO-8601 Saudi time) and the `vehicles` list
-  /// from the cubit state so the backend can run the same slot/lead/car checks
-  /// it runs at create time (B1 fix — PaymentInitRequest requires all three
-  /// fields: quoteId, scheduledAt, vehicles).
   Future<PaymentInitModel?> initiatePayment({int? pointsToApply}) async {
     final quoteId = state.quote?.quoteId;
     if (quoteId == null) {
@@ -580,15 +993,10 @@ class BookingCubit extends Cubit<BookingState> {
       return null;
     }
 
-    // Build scheduledAt in the exact format DayTimeModel produces (matches
-    // ServiceBookingRequestModel.toJson and the backend bare-ISO-8601 contract).
-    final scheduledAt =
-        (state.selectedDate != null && state.selectedTime != null)
-        ? DayTimeModel(
-            date: state.selectedDate!,
-            rawTime: state.selectedTime!,
-          ).toScheduledAtString()
-        : null;
+    // Same wire builder ServiceBookingRequestModel.toJson uses, so payment-init
+    // and create can never disagree about the slot.
+    final slotStart = state.selectedSlotStart;
+    final scheduledAt = slotStart != null ? toWireDateTime(slotStart) : null;
 
     if (scheduledAt == null) {
       emit(
@@ -701,8 +1109,10 @@ class BookingCubit extends Cubit<BookingState> {
     final vehicleId = state.selectedCar?.id;
     final body = <String, dynamic>{
       // scheduledAt is required by the backend record but not used for
-      // payment-init; send a sentinel to pass @NotNull validation.
-      'scheduledAt': DateTime.now().toUtc().toIso8601String(),
+      // payment-init; send a sentinel to pass @NotNull validation. Bare
+      // Asia/Riyadh local, never a `Z`-suffixed instant — the sentinel has to
+      // satisfy the same wire contract as a real value.
+      'scheduledAt': toWireDateTime(saudiNow()),
       if (vehicleId != null) 'vehicleIds': [vehicleId],
       if (addOns.isNotEmpty) 'addOns': addOns,
     };
@@ -777,7 +1187,7 @@ class BookingCubit extends Cubit<BookingState> {
     }
     final vehicleId = state.selectedCar?.id;
     final body = <String, dynamic>{
-      'scheduledAt': DateTime.now().toUtc().toIso8601String(),
+      'scheduledAt': toWireDateTime(saudiNow()),
       if (vehicleId != null) 'vehicleIds': [vehicleId],
       if (addOns.isNotEmpty) 'addOns': addOns,
     };
@@ -898,7 +1308,7 @@ class BookingCubit extends Cubit<BookingState> {
     return QuoteModel(
       quoteId: 'wash-preview',
       currency: resolvedBreakdown.currency ?? 'SAR',
-      expiresAt: DateTime.now().toUtc(),
+      expiresAt: saudiNow(),
       breakdown: resolvedBreakdown,
       lines: lines,
     );
@@ -910,8 +1320,18 @@ class BookingCubit extends Cubit<BookingState> {
   }
 
   /// Pay-before-create step 4 (spec §4.2): the SDK returned a verified `paid`
-  /// payment; create the booking with idempotency `booking-create:{id}`. On a
-  /// 409 slot-race the server auto-refunds and the UI reflects [refundPending].
+  /// payment; create the booking with idempotency `booking-create:{id}`.
+  ///
+  /// The card is ALREADY charged when this runs, so what the customer is told
+  /// about their money turns on whether the failure is evidence that it came
+  /// back. Only the rejections in `refund_evidence.dart` are — each one runs
+  /// the server's compensating refund before throwing, so [refundPending] is a
+  /// statement of fact. Everything else is [PaymentPhase.createUnconfirmed]:
+  /// a dropped connection or a timeout never reached an answer at all and the
+  /// booking may well have been created, and a 5xx rolled the transaction back
+  /// without refunding anything. Promising a refund there would be inventing
+  /// one, and telling a customer their charge is reversed when it is not is
+  /// worse than telling them we do not yet know.
   Future<void> completeBookingAfterPayment(String moyasarPaymentId) async {
     emit(
       state.copyWith(
@@ -930,7 +1350,9 @@ class BookingCubit extends Cubit<BookingState> {
       (failure) => emit(
         state.copyWith(
           status: BookingStatus.failure,
-          paymentPhase: PaymentPhase.refundPending,
+          paymentPhase: carriesRefundEvidence(failure)
+              ? PaymentPhase.refundPending
+              : PaymentPhase.createUnconfirmed,
           errorMessage: failure.message,
         ),
       ),
@@ -940,6 +1362,8 @@ class BookingCubit extends Cubit<BookingState> {
           paymentPhase: PaymentPhase.none,
           createdBooking: bookingResponse,
           clearPaymentInit: true,
+          // Spent on this booking — see [submitBooking].
+          clearRememberedOffer: true,
         ),
       ),
     );

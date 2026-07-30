@@ -1,6 +1,6 @@
 import 'package:aqua_go/core/config/local_storage/shared_prefs.dart';
 import 'package:aqua_go/core/constants.dart';
-import 'package:easy_localization/easy_localization.dart';
+import 'package:aqua_go/core/utils/date_time_formatter.dart';
 
 import '../../../../../core/enums/payment_method_enum.dart';
 import '../../../../../core/enums/payment_status_enum.dart';
@@ -9,6 +9,7 @@ import '../../enums/booking_type_enum.dart';
 import 'assigned_worker.dart';
 import 'booking_addon.dart';
 import 'booking_address.dart';
+import 'booking_promo.dart';
 import 'booking_rating.dart';
 import 'booking_vehicle.dart';
 import 'breakdown.dart';
@@ -22,6 +23,7 @@ import 'service_name.dart';
 export 'assigned_worker.dart';
 export 'booking_addon.dart';
 export 'booking_address.dart';
+export 'booking_promo.dart';
 export 'booking_rating.dart';
 export 'booking_vehicle.dart';
 export 'bookings_list_response_model.dart';
@@ -99,6 +101,10 @@ class BookingResponseModel {
   String? tipReferenceNumber;
   int? pointsEarned;
 
+  /// The promo code applied to this booking, or null when none was. Its
+  /// `discountMinor` is ALREADY netted off [totalAmountMinor].
+  BookingPromo? promo;
+
   BookingResponseModel({
     this.id,
     this.referenceNumber,
@@ -162,6 +168,7 @@ class BookingResponseModel {
     this.customerBehaviourRating,
     this.tipReferenceNumber,
     this.pointsEarned,
+    this.promo,
   });
 
   BookingResponseModel.fromJson(Map<String, dynamic> json) {
@@ -274,6 +281,9 @@ class BookingResponseModel {
     pointsEarned = json['pointsEarned'] != null
         ? int.tryParse(json['pointsEarned'].toString())
         : null;
+    promo = json['promo'] is Map<String, dynamic>
+        ? BookingPromo.fromJson(json['promo'] as Map<String, dynamic>)
+        : null;
   }
 
   // --- UI Compatibility Helpers ---
@@ -313,9 +323,7 @@ class BookingResponseModel {
     if (scheduledAt == null) return '';
     try {
       final dateTime = DateTime.parse(scheduledAt!).toLocal();
-      final timeStr = DateFormat.jm().format(dateTime);
-      final dateStr = DateFormat.yMd().format(dateTime);
-      return '$dateStr - $timeStr';
+      return formatDateAndTime(dateTime);
     } catch (_) {
       return scheduledAt!;
     }

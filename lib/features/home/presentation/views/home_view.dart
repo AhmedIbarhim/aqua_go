@@ -10,6 +10,7 @@ import 'package:aqua_go/features/subscriptions/data/models/subscription_response
 import '../controllers/services_controller/services_cubit.dart';
 import '../controllers/banners_controller/banners_cubit.dart';
 import '../controllers/packages_controller/packages_cubit.dart';
+import '../../../offers/presentation/controllers/offers_controller/offers_cubit.dart';
 import 'package:aqua_go/features/subscriptions/presentation/controllers/subscriptions_controller/subscriptions_cubit.dart';
 import 'package:aqua_go/features/rating/presentation/controllers/pending_ratings_cubit/pending_ratings_cubit.dart';
 import 'package:aqua_go/features/rating/presentation/controllers/pending_ratings_cubit/pending_ratings_state.dart';
@@ -41,6 +42,7 @@ class _HomeViewState extends State<HomeView> {
   final ServicesCubit _servicesCubit = locator<ServicesCubit>();
   final BannersCubit _bannersCubit = locator<BannersCubit>();
   final PackagesCubit _packagesCubit = locator<PackagesCubit>();
+  final OffersCubit _offersCubit = locator<OffersCubit>();
   final SubscriptionsCubit _subscriptionsCubit = locator<SubscriptionsCubit>();
   final PendingRatingsCubit _pendingRatingsCubit =
       locator<PendingRatingsCubit>();
@@ -55,6 +57,7 @@ class _HomeViewState extends State<HomeView> {
     _servicesCubit.getServices();
     _bannersCubit.getBanners();
     _packagesCubit.getPackages();
+    _offersCubit.getOffers();
     if (currentUser.value != null) {
       _subscriptionsCubit.getActiveSubscriptions();
       // Fire-and-forget: never block home rendering on the rating nudge.
@@ -92,6 +95,7 @@ class _HomeViewState extends State<HomeView> {
     _servicesCubit.close();
     _bannersCubit.close();
     _packagesCubit.close();
+    _offersCubit.close();
     _pendingRatingsCubit.close();
     // _subscriptionsCubit is a shared lazy singleton (see service_locator):
     // do NOT close it here, otherwise other surfaces lose their data source
@@ -106,6 +110,7 @@ class _HomeViewState extends State<HomeView> {
         BlocProvider.value(value: _servicesCubit),
         BlocProvider.value(value: _bannersCubit),
         BlocProvider.value(value: _packagesCubit),
+        BlocProvider.value(value: _offersCubit),
         BlocProvider.value(value: _subscriptionsCubit),
         BlocProvider.value(value: _pendingRatingsCubit),
       ],
@@ -148,6 +153,7 @@ class _HomeViewState extends State<HomeView> {
                                 _servicesCubit.getServices(),
                                 _bannersCubit.getBanners(),
                                 _packagesCubit.getPackages(),
+                                _offersCubit.getOffers(),
                                 if (isLoggedIn)
                                   _subscriptionsCubit.getActiveSubscriptions(),
                               ]);
@@ -163,6 +169,7 @@ class _HomeViewState extends State<HomeView> {
                           _servicesCubit.getServices(),
                           _bannersCubit.getBanners(),
                           _packagesCubit.getPackages(),
+                          _offersCubit.getOffers(),
                           if (isLoggedIn)
                             _subscriptionsCubit.getActiveSubscriptions(),
                         ]);

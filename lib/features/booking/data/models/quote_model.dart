@@ -1,10 +1,36 @@
+import '../../../../core/utils/saudi_wire_format.dart';
 import '../../../my_bookings/data/models/booking_response_model/breakdown.dart';
 import '../../../my_bookings/data/models/booking_response_model/quote_line.dart';
+
+/// One basis point is 1/10 000, so an unscaled 1x multiplier is 10 000 bps.
+/// The backend sends every pricing multiplier in this unit.
+const int kMultiplierBpsUnit = 10000;
 
 class QuoteModel {
   final String quoteId;
   final String currency;
+
+  /// When the quote stops being chargeable, in the Riyadh frame: UTC-flagged,
+  /// carrying Asia/Riyadh wall-clock fields, exactly like `saudiNow()`. Compare
+  /// it only against `saudiNow()` — never `DateTime.now()`, whose epoch value
+  /// slides with the device's timezone.
   final DateTime expiresAt;
+
+  /// Time-of-day pricing multiplier in basis points (10 000 = 1x), applied to
+  /// the base price before the zone and demand multipliers.
+  final int timeMultiplierBps;
+
+  /// Zone-level pricing multiplier in basis points (10 000 = 1x).
+  final int zoneMultiplierBps;
+
+  /// Real-time demand multiplier in basis points (10 000 = 1x), which rises when
+  /// zone capacity utilisation passes its configured threshold.
+  final int demandMultiplierBps;
+
+  /// Pre-VAT subtotal in halala after all three multipliers, but BEFORE the
+  /// promo discount and VAT.
+  final int surgedSubtotalMinor;
+
   final Breakdown? breakdown;
   final List<QuoteLine> lines;
   final QuoteSurgeModel? surge;
@@ -15,6 +41,10 @@ class QuoteModel {
     required this.quoteId,
     required this.currency,
     required this.expiresAt,
+    this.timeMultiplierBps = kMultiplierBpsUnit,
+    this.zoneMultiplierBps = kMultiplierBpsUnit,
+    this.demandMultiplierBps = kMultiplierBpsUnit,
+    this.surgedSubtotalMinor = 0,
     this.breakdown,
     this.lines = const [],
     this.surge,
@@ -22,24 +52,50 @@ class QuoteModel {
     this.loyalty,
   });
 
+  /// The VAT-inclusive gross of every ADDON row on this quote, in halala.
+  ///
+  /// A plain sum of backend figures — no VAT arithmetic, nothing derived. It
+  /// exists because a SERVICE offer prices the WASH only, so a screen stating
+  /// the offer's price has to add back what the add-ons on that same screen
+  /// cost; the quote's own add-on rows are the only server-blessed source for
+  /// that. 0 when nothing is selected, and 0 on a quote that carries no lines.
+  int get addOnsGrossMinor =>
+      lines.where((l) => l.isAddon).fold<int>(0, (sum, l) => sum + l.grossMinor);
+
+  /// True when any multiplier moved the price off its base — i.e. the surged
+  /// subtotal is not simply the base subtotal. The unscaled default is 10 000,
+  /// so an absent multiplier reads as "no surge" rather than as free pricing.
+  bool get isSurged =>
+      timeMultiplierBps != kMultiplierBpsUnit ||
+      zoneMultiplierBps != kMultiplierBpsUnit ||
+      demandMultiplierBps != kMultiplierBpsUnit;
+
+  // Read-reconstruction path: NEVER tighten. Every field degrades to a safe
+  // default so a partial/legacy payload yields a usable model instead of a
+  // TypeError that kills the booking screen. Money fields go through `num` so
+  // a JSON double (1500.0) parses as cleanly as an int.
   factory QuoteModel.fromJson(Map<String, dynamic> json) => QuoteModel(
     quoteId: json['quoteId'] as String? ?? '',
     currency: json['currency'] as String? ?? 'SAR',
-    expiresAt: json['expiresAt'] != null
-        ? DateTime.tryParse(json['expiresAt'] as String)?.toUtc() ??
-              DateTime.now().toUtc()
-        : DateTime.now().toUtc(),
-    breakdown: json['breakdown'] != null
+    expiresAt: tryParseWireDateTime(json['expiresAt'] as String?) ?? saudiNow(),
+    timeMultiplierBps: (json['timeMultiplierBps'] as num?)?.toInt() ??
+        (json['surge'] != null ? ((json['surge']['timeBps'] as num?)?.toInt() ?? kMultiplierBpsUnit) : kMultiplierBpsUnit),
+    zoneMultiplierBps: (json['zoneMultiplierBps'] as num?)?.toInt() ??
+        (json['surge'] != null ? ((json['surge']['zoneBps'] as num?)?.toInt() ?? kMultiplierBpsUnit) : kMultiplierBpsUnit),
+    demandMultiplierBps: (json['demandMultiplierBps'] as num?)?.toInt() ??
+        (json['surge'] != null ? ((json['surge']['demandBps'] as num?)?.toInt() ?? kMultiplierBpsUnit) : kMultiplierBpsUnit),
+    surgedSubtotalMinor: (json['surgedSubtotalMinor'] as num?)?.toInt() ?? 0,
+    breakdown: json['breakdown'] is Map<String, dynamic>
         ? Breakdown.fromJson(json['breakdown'] as Map<String, dynamic>)
         : null,
     lines: QuoteLine.listFromJson(json['lines']),
-    surge: json['surge'] != null
+    surge: json['surge'] is Map<String, dynamic>
         ? QuoteSurgeModel.fromJson(json['surge'] as Map<String, dynamic>)
         : null,
-    promo: json['promo'] != null
+    promo: json['promo'] is Map<String, dynamic>
         ? QuotePromoModel.fromJson(json['promo'] as Map<String, dynamic>)
         : null,
-    loyalty: json['loyalty'] != null
+    loyalty: json['loyalty'] is Map<String, dynamic>
         ? QuoteLoyaltyModel.fromJson(json['loyalty'] as Map<String, dynamic>)
         : null,
   );
@@ -47,7 +103,13 @@ class QuoteModel {
   Map<String, dynamic> toJson() => {
     'quoteId': quoteId,
     'currency': currency,
-    'expiresAt': expiresAt.toIso8601String(),
+    'expiresAt': toWireDateTime(expiresAt),
+    if (promoCode != null) 'promoCode': promoCode,
+    'promoDiscountMinor': promoDiscountMinor,
+    'timeMultiplierBps': timeMultiplierBps,
+    'zoneMultiplierBps': zoneMultiplierBps,
+    'demandMultiplierBps': demandMultiplierBps,
+    'surgedSubtotalMinor': surgedSubtotalMinor,
     if (breakdown != null) 'breakdown': breakdown!.toJson(),
     'lines': lines.map((e) => e.toJson()).toList(),
     if (surge != null) 'surge': surge!.toJson(),

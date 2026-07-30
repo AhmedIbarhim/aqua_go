@@ -3,7 +3,6 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/components/custom_dots_indicator.dart';
-import '../../../../core/route/routes.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../data/models/banner_model.dart';
@@ -30,9 +29,9 @@ class _HomeBannersCarosalState extends State<HomeBannersCarosal> {
       children: [
         CarouselSlider.builder(
           carouselController: widget.carouselController,
-          itemCount: getDemoBanners().length,
+          itemCount: widget.banners.length,
           itemBuilder: (context, index, realIndex) {
-            final banner = getDemoBanners()[index];
+            final banner = widget.banners[index];
             final bannerImage = banner.imageUrl;
             final isNetworkImage =
                 bannerImage.startsWith('http') ||
@@ -52,12 +51,8 @@ class _HomeBannersCarosalState extends State<HomeBannersCarosal> {
                           fit: BoxFit.fill,
                           width: double.infinity,
                           height: double.infinity,
-                          placeholder: (context, url) => Container(
-                            color: context.colors.defaultSubtle,
-                            // child: const Center(
-                            //   child: CircularProgressIndicator(),
-                            // ),
-                          ),
+                          placeholder: (context, url) =>
+                              Container(color: context.colors.defaultSubtle),
                           errorWidget: (context, url, error) => Image.asset(
                             AppAssets.demoBanner,
                             fit: BoxFit.fill,
@@ -135,7 +130,7 @@ class _HomeBannersCarosalState extends State<HomeBannersCarosal> {
       case 'DEEPLINK':
         switch (banner.ctaTarget) {
           case 'packages':
-            Navigator.pushNamed(context, Routes.packages);
+            // Navigator.pushNamed(context, Routes.packages);
             break;
           default:
             // Unknown deeplink target — safe no-op.
@@ -146,50 +141,5 @@ class _HomeBannersCarosalState extends State<HomeBannersCarosal> {
         // 'NONE' / null / unknown — no-op.
         break;
     }
-  }
-
-  List<String> demoBanners() {
-    if (context.isAr) {
-      return [
-        AppAssets.bannersOneAr,
-        AppAssets.bannersTwoAr,
-        AppAssets.bannersThreeAr,
-      ];
-    } else {
-      return [
-        AppAssets.bannersOneEn,
-        AppAssets.bannersTwoEn,
-        AppAssets.bannersThreeEn,
-      ];
-    }
-  }
-
-  List<BannerModel> getDemoBanners() {
-    return [
-      BannerModel(
-        id: '0',
-        imageUrl: demoBanners().first,
-        ctaType: 'URL',
-        ctaTarget: 'https://aquago.sa/',
-        locale: context.isAr ? 'ar' : 'en',
-        sortOrder: 0,
-      ),
-      BannerModel(
-        id: '1',
-        imageUrl: demoBanners()[1],
-        ctaType: 'URL',
-        ctaTarget: 'https://aquago.sa/',
-        locale: context.isAr ? 'ar' : 'en',
-        sortOrder: 1,
-      ),
-      BannerModel(
-        id: '2',
-        imageUrl: demoBanners()[2],
-        ctaType: 'URL',
-        ctaTarget: "https://aquago.sa/",
-        locale: context.isAr ? 'ar' : 'en',
-        sortOrder: 2,
-      ),
-    ];
   }
 }

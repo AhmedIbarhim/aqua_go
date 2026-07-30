@@ -21,6 +21,22 @@ class CustomTextField extends StatelessWidget {
   final int? maxLines;
   final int? minLines;
 
+  /// Fires on every keystroke — the caller re-renders whatever depends on the
+  /// current text (a live-validation line, a filtered suggestion list, an
+  /// enabled/disabled action).
+  final ValueChanged<String>? onChanged;
+
+  /// Fires on the keyboard's action key. Callers that also expose an explicit
+  /// button must keep the two in agreement; this is not an auto-submit.
+  final ValueChanged<String>? onSubmitted;
+
+  /// Takes focus as soon as the field is mounted — for a field that IS the
+  /// screen, such as the one control inside a dialog.
+  final bool autofocus;
+
+  /// Action key the soft keyboard shows. Defaults to the platform's choice.
+  final TextInputAction? textInputAction;
+
   const CustomTextField({
     super.key,
     required this.label,
@@ -38,6 +54,10 @@ class CustomTextField extends StatelessWidget {
     this.style,
     this.maxLines = 1,
     this.minLines,
+    this.onChanged,
+    this.onSubmitted,
+    this.autofocus = false,
+    this.textInputAction,
   });
 
   @override
@@ -71,6 +91,10 @@ class CustomTextField extends StatelessWidget {
               : height * 0.055,
           child: TextField(
             onTap: onTap,
+            autofocus: autofocus,
+            onChanged: onChanged,
+            onSubmitted: onSubmitted,
+            textInputAction: textInputAction,
             onTapOutside: (_) => FocusScope.of(context).unfocus(),
             readOnly: readOnly,
             enabled: enabled,

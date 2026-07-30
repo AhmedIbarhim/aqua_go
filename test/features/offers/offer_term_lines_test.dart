@@ -1,0 +1,513 @@
+import 'package:aqua_go/features/offers/data/models/customer_offer_model.dart';
+import 'package:aqua_go/features/offers/domain/offer_term_lines.dart';
+import 'package:aqua_go/generated/locale_keys.g.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+CustomerOfferModel _offer(String type, OfferTermsModel terms) => CustomerOfferModel(
+      id: 'x',
+      offerType: type,
+      titleAr: 'ع',
+      titleEn: 'T',
+      descriptionAr: 'و',
+      descriptionEn: 'D',
+      endsAt: DateTime.utc(2026, 9, 1),
+      terms: terms,
+    );
+
+/// The locale key a row renders from, or null when the row is a literal. The
+/// hierarchy is sealed, so this is a total function rather than a nullable-field
+/// read — and a test that asks a literal for its key gets null, not a crash.
+String? _key(OfferTermLine line) => line is OfferTermKey ? line.key : null;
+
+/// The positional args a row renders with; empty for a literal row.
+List<String> _args(OfferTermLine line) =>
+    line is OfferTermKey ? line.args : const <String>[];
+
+/// The already-localised text of a literal row, or null for a keyed one.
+String? _text(OfferTermLine line) =>
+    line is OfferTermLiteral ? line.text : null;
+
+/// Which arg of a row is a SAR figure, or null when the row states no money.
+int? _money(OfferTermLine line) =>
+    line is OfferTermKey ? line.moneyArgIndex : null;
+
+// `offerExpiryLine` formats a date per locale, which needs the `intl` symbol
+// data that GlobalMaterialLocalizations loads for the app — unavailable to a
+// bare unit test. It is covered in offers_surface_test.dart instead, where the
+// localisation delegates are real.
+void main() {
+  test('sarFromMinor renders two decimals', () {
+    expect(sarFromMinor(24900), '249.00');
+    expect(sarFromMinor(5000), '50.00');
+    expect(sarFromMinor(0), '0.00');
+  });
+
+  test('a PERCENTAGE promo yields the percent line and the min-order line', () {
+    final lines = offerTermLines(
+      _offer(
+        'PROMO_CODE',
+        const OfferTermsModel(
+          promoCode: 'WELCOME15',
+          discountType: 'PERCENTAGE',
+          configuredValue: 15,
+          minOrderMinor: 5000,
+        ),
+      ),
+      isAr: false,
+    );
+    expect(lines, hasLength(2));
+    expect(_key(lines[0]), LocaleKeys.offers_discount_percent);
+    expect(_args(lines[0]), ['15']);
+    expect(_key(lines[1]), LocaleKeys.offers_min_order);
+    expect(_args(lines[1]), ['50.00']);
+  });
+
+  test('a FIXED_AMOUNT promo renders the amount in SAR, not minor units', () {
+    final lines = offerTermLines(
+      _offer(
+        'PROMO_CODE',
+        const OfferTermsModel(
+          promoCode: 'FLAT20',
+          discountType: 'FIXED_AMOUNT',
+          configuredValue: 2000,
+        ),
+      ),
+      isAr: false,
+    );
+    expect(lines, hasLength(1));
+    expect(_key(lines[0]), LocaleKeys.offers_discount_amount);
+    expect(_args(lines[0]), ['20.00']);
+  });
+
+  test('a TARGET_PRICE promo states the price the wash BECOMES, not an amount '
+      'off', () {
+    // A PROMO_CODE offer may link a STANDALONE target-price code — nothing on
+    // the backend rejects one (requireUnmanagedPromoLink refuses only ANOTHER
+    // offer's MANAGED code) and the discount type reaches the client verbatim.
+    // Before this arm existed the whole terms block was silent about it.
+    final lines = offerTermLines(
+      _offer(
+        'PROMO_CODE',
+        const OfferTermsModel(
+          promoCode: 'FLAT35',
+          discountType: 'TARGET_PRICE',
+          configuredValue: 3500,
+        ),
+      ),
+      isAr: false,
+    );
+    expect(lines, hasLength(1));
+    expect(_key(lines[0]), LocaleKeys.offers_discount_target_price);
+    expect(_args(lines[0]), ['35.00']);
+    expect(
+      _key(lines[0]),
+      isNot(LocaleKeys.offers_discount_amount),
+      reason: 'configuredValue is the FINAL gross the wash becomes; rendering '
+          'it as "35.00 off" understates a 140.00 saving as a 35.00 one',
+    );
+  });
+
+  test('EVERY backend discount literal renders a discount row — a literal with '
+      'no arm FAILS here instead of blanking the terms block', () {
+    // The whole set com.aquago.promo.internal.application.PromoServiceImpl can
+    // put on the wire. TWO gaps shipped because an unhandled literal fell
+    // through to an empty list and every test agreed with it, so this walks the
+    // set and names the literal that emitted nothing.
+    const backendDiscountTypes = ['PERCENTAGE', 'FIXED_AMOUNT', 'TARGET_PRICE'];
+    for (final type in backendDiscountTypes) {
+      final lines = offerTermLines(
+        _offer(
+          'PROMO_CODE',
+          OfferTermsModel(
+            promoCode: 'X',
+            discountType: type,
+            configuredValue: 3500,
+          ),
+        ),
+        isAr: false,
+      );
+      expect(lines, isNotEmpty,
+          reason: '$type is a backend discount literal and offerTermLines has '
+              'no arm for it — the offer detail screen renders an "Offer '
+              'details" heading that never says what the discount is');
+    }
+  });
+
+  test('a literal that is NOT on the wire renders nothing rather than throwing',
+      () {
+    // The read path never tightens into a failure: an unrecognised value is a
+    // deployment-skew artefact, not a reason to crash the detail screen. The
+    // drift itself is caught by the test above, which walks the real set.
+    final lines = offerTermLines(
+      _offer(
+        'PROMO_CODE',
+        const OfferTermsModel(promoCode: 'X', discountType: 'PERCENT', configuredValue: 15),
+      ),
+      isAr: false,
+    );
+    expect(lines, isEmpty);
+  });
+
+  test('a PACKAGE offer yields name, washes, validity and price, localised', () {
+    const terms = OfferTermsModel(
+      packageId: 'pkg',
+      packageNameAr: 'الباقة الذهبية',
+      packageNameEn: 'Gold package',
+      packagePriceMinor: 24900,
+      packageNumWashes: 8,
+      packageValidityDays: 30,
+    );
+    final en = offerTermLines(_offer('PACKAGE', terms), isAr: false);
+    expect(en, hasLength(4));
+    expect(_text(en[0]), 'Gold package');
+    expect(_key(en[1]), LocaleKeys.offers_package_washes);
+    expect(_key(en[2]), LocaleKeys.offers_package_validity);
+    expect(_key(en[3]), LocaleKeys.offers_package_price);
+    expect(_args(en[3]), ['249.00']);
+
+    final ar = offerTermLines(_offer('PACKAGE', terms), isAr: true);
+    expect(_text(ar[0]), 'الباقة الذهبية');
+  });
+
+  group('offerMinOrderLine — BR-OFR-10 / AC-EXT-06 in the DETAIL view', () {
+    test('a promo offer carrying a minimum order states the threshold', () {
+      // AC-EXT-06: "an offer carrying a minimum order value is shown, with the
+      // SAR 100 threshold stated". Since §1.5b the card is its artwork and
+      // nothing else, so the detail view is where it is stated in text.
+      final line = offerMinOrderLine(_offer(
+        'PROMO_CODE',
+        const OfferTermsModel(promoCode: 'SAVE', discountType: 'PERCENTAGE', configuredValue: 20, minOrderMinor: 10000),
+      ));
+      expect(line, isNotNull);
+      expect(line!.key, LocaleKeys.offers_min_order);
+      expect(line.args, ['100.00']);
+    });
+
+    test('an unrestricted promo offer states nothing', () {
+      expect(
+        offerMinOrderLine(_offer(
+          'PROMO_CODE',
+          const OfferTermsModel(promoCode: 'SAVE', discountType: 'PERCENTAGE', configuredValue: 20),
+        )),
+        isNull,
+      );
+    });
+
+    test('a PACKAGE offer never carries a minimum order', () {
+      // The package half of OfferTerms leaves minOrderMinor at 0, but a future
+      // wire change must not start printing a threshold under a package offer,
+      // which has no minimum to meet.
+      expect(
+        offerMinOrderLine(_offer(
+          'PACKAGE',
+          const OfferTermsModel(packageId: 'pkg', packageNameEn: 'Gold', minOrderMinor: 10000),
+        )),
+        isNull,
+      );
+    });
+
+    test('the helper and the rendered terms block state the SAME threshold', () {
+      // The helper is reachable on its own, so it has to keep agreeing with the
+      // row `offerTermLines` actually emits — a divergence would put two
+      // different numbers behind one requirement.
+      final offer = _offer(
+        'PROMO_CODE',
+        const OfferTermsModel(promoCode: 'SAVE', discountType: 'FIXED_AMOUNT', configuredValue: 1500, minOrderMinor: 7550),
+      );
+      final helper = offerMinOrderLine(offer)!;
+      final rendered = offerTermLines(offer, isAr: false)
+          .whereType<OfferTermKey>()
+          .firstWhere((l) => l.key == LocaleKeys.offers_min_order);
+      expect(helper.args, rendered.args);
+      expect(helper.args, ['75.50']);
+    });
+  });
+
+  group('UCC23 step 6 / A5 — applicable services and zones', () {
+    const restricted = OfferTermsModel(
+      promoCode: 'CENTRAL',
+      discountType: 'PERCENTAGE',
+      configuredValue: 10,
+      applicableServiceNamesAr: ['غسيل ممتاز', 'غسيل داخلي'],
+      applicableServiceNamesEn: ['Premium Wash', 'Interior Wash'],
+      applicableZoneNamesAr: ['وسط جدة'],
+      applicableZoneNamesEn: ['Central Jeddah'],
+    );
+
+    test('a restricted code states both, after the discount and threshold', () {
+      final lines = offerTermLines(_offer('PROMO_CODE', restricted), isAr: false);
+      expect(lines, hasLength(3));
+      expect(_key(lines[0]), LocaleKeys.offers_discount_percent);
+      expect(_key(lines[1]), LocaleKeys.offers_applicable_services);
+      expect(_args(lines[1]), ['Premium Wash, Interior Wash']);
+      expect(_key(lines[2]), LocaleKeys.offers_applicable_zones);
+      expect(_args(lines[2]), ['Central Jeddah']);
+    });
+
+    test('Arabic reads the Arabic names', () {
+      final lines = offerTermLines(_offer('PROMO_CODE', restricted), isAr: true);
+      expect(_args(lines[1]), ['غسيل ممتاز، غسيل داخلي'],
+          reason: 'the list separator is the Arabic comma, not the Latin one');
+      expect(_args(lines[2]), ['وسط جدة']);
+    });
+
+    test('an EMPTY list is UNRESTRICTED — no line at all, not an empty one', () {
+      final lines = offerTermLines(
+        _offer(
+          'PROMO_CODE',
+          const OfferTermsModel(
+            promoCode: 'ANY',
+            discountType: 'PERCENTAGE',
+            configuredValue: 10,
+          ),
+        ),
+        isAr: false,
+      );
+      expect(lines.map(_key),
+          isNot(contains(LocaleKeys.offers_applicable_services)));
+      expect(lines.map(_key),
+          isNot(contains(LocaleKeys.offers_applicable_zones)));
+    });
+
+    test('the zone line is stated regardless of any saved address', () {
+      // A5 — "zone-dependent rules are skipped rather than failed; the offer is
+      // shown with its zone terms stated". These lines are pure display data
+      // computed from the offer alone, so no address state can suppress them.
+      final lines = offerTermLines(_offer('PROMO_CODE', restricted), isAr: false);
+      expect(lines.map(_key),
+          contains(LocaleKeys.offers_applicable_zones));
+    });
+
+    test('a PACKAGE offer states neither — its terms carry no scoping', () {
+      final lines = offerTermLines(
+        _offer(
+          'PACKAGE',
+          const OfferTermsModel(
+            packageId: 'pkg',
+            packageNameEn: 'Gold',
+            applicableServiceNamesEn: ['Premium Wash'],
+            applicableZoneNamesEn: ['Central Jeddah'],
+          ),
+        ),
+        isAr: false,
+      );
+      expect(lines.map(_key),
+          isNot(contains(LocaleKeys.offers_applicable_services)));
+      expect(lines.map(_key),
+          isNot(contains(LocaleKeys.offers_applicable_zones)));
+    });
+  });
+
+  group('a SERVICE offer states the wash and what the offer prices it at', () {
+    const deal = OfferTermsModel(
+      serviceId: 'svc-1',
+      serviceNameAr: 'غسيل كامل',
+      serviceNameEn: 'Full wash',
+      serviceListPriceMinor: 17500,
+      targetPriceMinor: 3500,
+    );
+
+    test('name, the list price struck through, then the offer price', () {
+      final lines = offerTermLines(_offer('SERVICE', deal), isAr: false);
+      expect(lines, hasLength(3));
+      expect(_text(lines[0]), 'Full wash');
+      expect(_key(lines[1]), LocaleKeys.offers_service_list_price);
+      expect(_args(lines[1]), ['175.00']);
+      expect((lines[1] as OfferTermKey).struckThrough, isTrue);
+      expect(_key(lines[2]), LocaleKeys.offers_service_price);
+      expect(_args(lines[2]), ['35.00']);
+      expect((lines[2] as OfferTermKey).struckThrough, isFalse);
+    });
+
+    test('Arabic reads the Arabic service name', () {
+      final lines = offerTermLines(_offer('SERVICE', deal), isAr: true);
+      expect(_text(lines[0]), 'غسيل كامل');
+    });
+
+    test('a SHORTCUT offer states the wash and NO price', () {
+      // targetPriceMinor 0 is "no deal", never "free" — a shortcut card is a
+      // deep-link into booking the wash at its list price, so pricing it here
+      // would invent a discount the offer does not carry.
+      final lines = offerTermLines(
+        _offer(
+          'SERVICE',
+          const OfferTermsModel(
+            serviceId: 'svc-1',
+            serviceNameEn: 'Full wash',
+            serviceListPriceMinor: 17500,
+          ),
+        ),
+        isAr: false,
+      );
+      expect(lines, hasLength(1));
+      expect(_text(lines[0]), 'Full wash');
+    });
+
+    test('a list price that is NOT above the target is never struck through', () {
+      // An admin who drops the wash below a published target leaves the two
+      // figures inverted. Striking through 79.00 next to 99.00 advertises a
+      // deal priced ABOVE the number it crossed out.
+      final lines = offerTermLines(
+        _offer(
+          'SERVICE',
+          const OfferTermsModel(
+            serviceId: 'svc-1',
+            serviceNameEn: 'Full wash',
+            serviceListPriceMinor: 7900,
+            targetPriceMinor: 9900,
+          ),
+        ),
+        isAr: false,
+      );
+      expect(lines.map(_key),
+          isNot(contains(LocaleKeys.offers_service_list_price)));
+      expect(_key(lines[1]), LocaleKeys.offers_service_price);
+      expect(_args(lines[1]), ['99.00']);
+    });
+
+    test('a SERVICE offer never falls through to the package rows', () {
+      final lines = offerTermLines(_offer('SERVICE', deal), isAr: false);
+      expect(lines.map(_key),
+          isNot(contains(LocaleKeys.offers_package_price)));
+      expect(lines, isNotEmpty,
+          reason: 'the terms block must never be a heading over an expiry row');
+    });
+  });
+
+  group('every SAR row DECLARES which arg is money', () {
+    // The view draws the riyal glyph immediately after the figure, and it finds
+    // the figure from this index rather than by pattern-matching a translated
+    // sentence. A money row that forgets to declare it renders the amount with
+    // no currency at all — legible, and silently wrong — so the whole set is
+    // walked here instead of one row at a time.
+    const moneyKeys = {
+      LocaleKeys.offers_min_order,
+      LocaleKeys.offers_discount_amount,
+      LocaleKeys.offers_discount_target_price,
+      LocaleKeys.offers_package_price,
+      LocaleKeys.offers_service_list_price,
+      LocaleKeys.offers_service_price,
+    };
+
+    /// Every keyed row the six offer shapes between them can emit.
+    List<OfferTermKey> allKeyedRows() => [
+          for (final terms in <(String, OfferTermsModel)>[
+            (
+              'PROMO_CODE',
+              const OfferTermsModel(
+                promoCode: 'X',
+                discountType: 'FIXED_AMOUNT',
+                configuredValue: 2000,
+                minOrderMinor: 10000,
+                applicableServiceNamesEn: ['Premium Wash'],
+                applicableZoneNamesEn: ['Central Jeddah'],
+              )
+            ),
+            (
+              'PROMO_CODE',
+              const OfferTermsModel(
+                promoCode: 'X',
+                discountType: 'TARGET_PRICE',
+                configuredValue: 3500,
+              )
+            ),
+            (
+              'PROMO_CODE',
+              const OfferTermsModel(
+                promoCode: 'X',
+                discountType: 'PERCENTAGE',
+                configuredValue: 15,
+              )
+            ),
+            (
+              'SERVICE',
+              const OfferTermsModel(
+                serviceId: 'svc-1',
+                serviceNameEn: 'Full wash',
+                serviceListPriceMinor: 17500,
+                targetPriceMinor: 3500,
+              )
+            ),
+            (
+              'PACKAGE',
+              const OfferTermsModel(
+                packageId: 'pkg',
+                packageNameEn: 'Gold',
+                packagePriceMinor: 24900,
+                packageNumWashes: 8,
+                packageValidityDays: 30,
+              )
+            ),
+          ])
+            ...offerTermLines(_offer(terms.$1, terms.$2), isAr: false)
+                .whereType<OfferTermKey>(),
+        ];
+
+    test('all six money rows point at their figure', () {
+      final seen = <String>{};
+      for (final row in allKeyedRows().where((r) => moneyKeys.contains(r.key))) {
+        seen.add(row.key);
+        expect(row.moneyArgIndex, 0,
+            reason: '${row.key} states a SAR amount and must say so, or the '
+                'detail view prints the figure with no currency');
+        expect(row.args[row.moneyArgIndex!], matches(r'^\d+\.\d{2}$'),
+            reason: 'the declared index must land on the amount itself');
+      }
+      expect(seen, moneyKeys,
+          reason: 'a money key no fixture reaches is a key nothing checks');
+    });
+
+    test('a row that states no money declares none', () {
+      // "{}% off", "{} washes", "Valid on {}" — a glyph on any of these would
+      // price a percentage, a count or a service name.
+      for (final row in allKeyedRows().where((r) => !moneyKeys.contains(r.key))) {
+        expect(_money(row), isNull, reason: '${row.key} carries no SAR figure');
+      }
+    });
+  });
+
+  test('an all-zero terms object yields no lines at all', () {
+    expect(offerTermLines(_offer('PACKAGE', const OfferTermsModel()), isAr: true), isEmpty);
+    expect(offerTermLines(_offer('PROMO_CODE', const OfferTermsModel()), isAr: true), isEmpty);
+  });
+
+  group('offerLastLiveDay — the EXCLUSIVE endsAt bound, back to a real day', () {
+    // `offerExpiryLine` itself needs the app's intl symbol data to format, so it
+    // is asserted in offers_surface_test.dart. The day arithmetic underneath it
+    // is pure, and this is where it is pinned.
+
+    test('a bound on KSA midnight names the PREVIOUS day', () {
+      // An operator running a campaign through 31 August stores 1 September's
+      // midnight. Printing the bound verbatim named a day the offer is gone on.
+      expect(
+        offerLastLiveDay(DateTime.utc(2026, 9, 1)),
+        DateTime.utc(2026, 8, 31),
+      );
+    });
+
+    test('it rolls back across a month and a year boundary', () {
+      expect(offerLastLiveDay(DateTime.utc(2026, 3, 1)), DateTime.utc(2026, 2, 28));
+      expect(offerLastLiveDay(DateTime.utc(2027, 1, 1)), DateTime.utc(2026, 12, 31));
+    });
+
+    test('a bound carrying a time of day is already inside its own last day', () {
+      // Shifting this would move a date nobody picked.
+      final withTime = DateTime.utc(2026, 12, 31, 20, 59, 59);
+      expect(offerLastLiveDay(withTime), withTime);
+      expect(
+        offerLastLiveDay(DateTime.utc(2026, 9, 1, 0, 0, 0, 0, 1)),
+        DateTime.utc(2026, 9, 1, 0, 0, 0, 0, 1),
+      );
+    });
+
+    test('it agrees with the visibility filter at the boundary', () {
+      // The card disappears at `endsAt` (offer_visibility uses isAfter), so the
+      // last day this line may print is the last day a card can still be shown.
+      final endsAt = DateTime.utc(2026, 9, 1);
+      final lastMomentLive = endsAt.subtract(const Duration(microseconds: 1));
+      expect(offerLastLiveDay(endsAt).day, lastMomentLive.day);
+      expect(offerLastLiveDay(endsAt).month, lastMomentLive.month);
+      expect(offerLastLiveDay(endsAt).year, lastMomentLive.year);
+    });
+  });
+}

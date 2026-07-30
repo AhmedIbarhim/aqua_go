@@ -7,6 +7,7 @@ import 'package:aqua_go/core/config/networking/exceptions/failure.dart';
 import 'package:aqua_go/features/auth/data/models/user_model.dart';
 import 'package:aqua_go/features/auth/data/services/auth_service.dart';
 import 'package:aqua_go/features/auth/data/services/device_token_sync.dart';
+import 'package:aqua_go/features/booking/domain/promo_code_history.dart';
 import 'package:aqua_go/core/helpers/idempotency_key_helper.dart';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
@@ -148,6 +149,10 @@ class AuthRepository {
   /// and WITHOUT touching unrelated prefs (kNotFirstUse, language, theme,
   /// install marker).
   Future<void> purgeLocalSession() async {
+    // The customer's own promo-code history is keyed to their id and STAYS —
+    // a dead refresh token is not an erasure, and they will sign back in on
+    // this handset. Only the pre-scoping shared store is cleared.
+    await PromoCodeHistory.forgetLegacyDeviceStore();
     _cachedUser = null;
     await SecureStorage.clearSecuredData();
     await CacheClient.removeString(kUserData);
@@ -222,6 +227,14 @@ class AuthRepository {
       // The install marker must persist across deliberate logouts — it only
       // becomes absent after an OS-driven reinstall (when SharedPrefs is wiped
       // externally), which is the reinstall-detection scenario it was designed for.
+      // The device-local promo-code suggestions belong to the account that
+      // earned them and are keyed by its id, so the next person to sign in on
+      // this handset can never be offered them — which is why they SURVIVE a
+      // sign-out. Erasing them here would make UCC16's autocomplete last one
+      // session and give the customer nothing back when they return. Only the
+      // pre-scoping shared store, which an older build could have left here, is
+      // cleared.
+      await PromoCodeHistory.forgetLegacyDeviceStore();
       _cachedUser = null;
       await SecureStorage.clearSecuredData();
       await CacheClient.removeString(kUserData);
@@ -242,6 +255,10 @@ class AuthRepository {
       await deregisterStoredDevice();
       // Same targeted teardown as logout() — preserve kNotFirstUse,
       // kLanguage, kThemeMode, kSessionInstallMarker.
+      // PDPL erasure reaches the handset too: the account is gone server-side,
+      // so its promo-code history must not survive on the device. Keyed by the
+      // cached user's id, so it runs BEFORE that record is removed.
+      await PromoCodeHistory.forget();
       _cachedUser = null;
       await SecureStorage.clearSecuredData();
       await CacheClient.removeString(kUserData);

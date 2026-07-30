@@ -5,14 +5,19 @@ import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
 import '../../../../../core/themes/app_text_styles.dart';
 import '../../../../../core/utils/app_assets.dart';
+import '../../../../../core/utils/date_time_formatter.dart';
 import '../../../../../generated/locale_keys.g.dart';
 import '../../../data/models/availability_response_model.dart';
 
 class BookingDateTimePicker extends StatefulWidget {
   final DateTime? initialDate;
-  final String? initialTime;
+
+  /// The already-selected slot, carried as the slot's own `start` instant.
+  final DateTime? initialSlotStart;
   final Function(DateTime) onDateChanged;
-  final Function(String) onTimeChanged;
+
+  /// Emits the picked slot's `start` instant — never a display label.
+  final Function(DateTime) onSlotSelected;
   final List<AvailabilitySlot> availabilitySlots;
   final bool isLoading;
 
@@ -20,8 +25,8 @@ class BookingDateTimePicker extends StatefulWidget {
     super.key,
     this.initialDate,
     required this.onDateChanged,
-    required this.onTimeChanged,
-    this.initialTime,
+    required this.onSlotSelected,
+    this.initialSlotStart,
     this.availabilitySlots = const [],
     this.isLoading = false,
   });
@@ -32,7 +37,7 @@ class BookingDateTimePicker extends StatefulWidget {
 
 class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
   DateTime? selectedDate;
-  String? selectedTime;
+  DateTime? selectedSlotStart;
   late List<DateTime> dates;
 
   /// Backend caps bookings to a rolling 7-day window
@@ -58,42 +63,20 @@ class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
   void initState() {
     super.initState();
     selectedDate = widget.initialDate;
-    selectedTime = widget.initialTime;
+    selectedSlotStart = widget.initialSlotStart;
     dates = _generateDates(selectedDate);
   }
 
   @override
   void didUpdateWidget(covariant BookingDateTimePicker oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.initialTime != oldWidget.initialTime) {
-      selectedTime = widget.initialTime;
+    if (widget.initialSlotStart != oldWidget.initialSlotStart) {
+      selectedSlotStart = widget.initialSlotStart;
     }
     if (widget.initialDate != oldWidget.initialDate) {
       selectedDate = widget.initialDate;
-      selectedTime = null;
+      selectedSlotStart = null;
       dates = _generateDates(selectedDate);
-    }
-  }
-
-  String _formatTimeSlot(DateTime time, BuildContext context) {
-    if (context.isAr) {
-      final hour = time.hour;
-      final minute = time.minute;
-      final minStr = minute.toString().padLeft(2, '0');
-
-      String period;
-      int displayHour = hour;
-      if (hour >= 12) {
-        period = hour == 12 ? 'ظهراً' : 'مساءً';
-        if (hour > 12) displayHour = hour - 12;
-      } else {
-        period = 'صباحاً';
-        if (hour == 0) displayHour = 12;
-      }
-
-      return '$displayHour:$minStr $period';
-    } else {
-      return DateFormat('h:mm a').format(time);
     }
   }
 
@@ -131,9 +114,7 @@ class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
           children: [
             Text(
               selectedDate != null
-                  ? (context.isAr
-                        ? DateFormat('MMMM, yyyy', 'ar').format(selectedDate!)
-                        : DateFormat('MMMM, yyyy').format(selectedDate!))
+                  ? formatMonthYear(selectedDate!)
                   : LocaleKeys.bookings_choose_day.tr(context: context),
               style: AppTextStyles.medium14.copyWith(
                 color: context.colors.textSecondary,
@@ -168,16 +149,14 @@ class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
           final date = dates[index];
           final isSelected =
               selectedDate != null && DateUtils.isSameDay(date, selectedDate!);
-          final dayName = context.isAr
-              ? DateFormat('EEEE', 'ar').format(date)
-              : DateFormat('EEEE').format(date);
-          final dayNumber = DateFormat('d').format(date);
+          final dayName = formatWeekday(date);
+          final dayNumber = formatDayOfMonth(date);
 
           return GestureDetector(
             onTap: () {
               setState(() {
                 selectedDate = date;
-                selectedTime = null;
+                selectedSlotStart = null;
               });
               widget.onDateChanged(date);
             },
@@ -272,8 +251,12 @@ class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
             spacing: width * 0.02,
             runSpacing: width * 0.02,
             children: widget.availabilitySlots.map((slot) {
-              final timeStr = _formatTimeSlot(slot.start, context);
-              final isSelected = selectedTime == timeStr;
+              final timeStr = formatClockTime(slot.start);
+              // Matched on the slot's instant, not on its label: the label is
+              // display-only and is not stable across locales.
+              final isSelected =
+                  selectedSlotStart != null &&
+                  selectedSlotStart!.isAtSameMomentAs(slot.start);
               final isDisabled = !slot.available;
 
               return GestureDetector(
@@ -281,9 +264,9 @@ class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
                     ? null
                     : () {
                         setState(() {
-                          selectedTime = timeStr;
+                          selectedSlotStart = slot.start;
                         });
-                        widget.onTimeChanged(timeStr);
+                        widget.onSlotSelected(slot.start);
                       },
                 child: Opacity(
                   opacity: isDisabled ? 0.4 : 1.0,

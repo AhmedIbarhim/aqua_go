@@ -1,6 +1,6 @@
+import '../../../../core/utils/saudi_wire_format.dart';
 import '../../../address/data/models/address_model.dart';
 import '../../../my_cars/data/models/my_car_model.dart';
-import 'day_time_model.dart';
 
 class RedeemGiftBookingRequestModel {
   final String giftCode;
@@ -8,6 +8,7 @@ class RedeemGiftBookingRequestModel {
   final MyCarModel? car;
   final DateTime? date;
   final String? time;
+  final DateTime? slotStart;
 
   RedeemGiftBookingRequestModel({
     required this.giftCode,
@@ -15,6 +16,7 @@ class RedeemGiftBookingRequestModel {
     this.car,
     this.date,
     this.time,
+    this.slotStart,
   });
 
   Map<String, dynamic> toJson() {
@@ -25,11 +27,20 @@ class RedeemGiftBookingRequestModel {
         addr?.id != 'custom_map';
 
     String scheduledAt = '';
-    if (date != null && time != null) {
-      scheduledAt = DayTimeModel(
-        date: date!,
-        rawTime: time!,
-      ).toScheduledAtString();
+    if (slotStart != null) {
+      scheduledAt = toWireDateTime(slotStart!);
+    } else if (date != null && time != null) {
+      final parts = time!.split(':');
+      if (parts.length >= 2) {
+        final dt = DateTime(
+          date!.year,
+          date!.month,
+          date!.day,
+          int.tryParse(parts[0]) ?? 0,
+          int.tryParse(parts[1]) ?? 0,
+        );
+        scheduledAt = toWireDateTime(dt);
+      }
     }
 
     return {

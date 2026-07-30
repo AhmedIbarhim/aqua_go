@@ -195,6 +195,9 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
 
   Widget _buildRatingStars() {
     final width = MediaQuery.sizeOf(context).width;
+    // Star size scales with screen width; cap it so five stars never overflow
+    // the sheet on wide screens (iPad).
+    final starSize = (width * 0.1).clamp(0.0, 44.0).toDouble();
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(5, (index) {
@@ -211,7 +214,7 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
               color: index < _rating
                   ? context.colors.warning
                   : context.colors.contentDisabled,
-              size: width * 0.1,
+              size: starSize,
             ),
           ),
         );

@@ -27,7 +27,10 @@ import '../../features/booking/presentation/views/booking_details_view.dart';
 import '../../features/booking/presentation/views/booking_location_view.dart';
 import '../../features/booking/presentation/views/booking_summary_view.dart';
 import '../../features/home/presentation/controllers/packages_controller/packages_cubit.dart';
-import '../../features/home/presentation/views/offers_view.dart';
+import '../../features/home/presentation/controllers/package_detail_controller/package_detail_cubit.dart';
+import '../../features/home/presentation/views/package_detail_view.dart';
+import '../../features/offers/presentation/controllers/offers_controller/offers_cubit.dart';
+import '../../features/offers/presentation/views/offers_view.dart';
 import '../../features/home/presentation/views/packages_view.dart';
 import '../../features/layout/presentation/views/main_layout.dart';
 import '../../features/complaints/presentation/views/complaint_view.dart';
@@ -105,9 +108,36 @@ abstract class AppRouter {
         return MaterialPageRoute(builder: (_) => MainLayout(args: args));
 
       case Routes.offers:
-        final args = settings.arguments as OffersArgs;
+        // No arguments: the screen always loads its own UCC23 feed, because
+        // eligibility is evaluated at request time and never cached
+        // (BR-OFR-11). The home rail's "View more" pushes bare.
         return MaterialPageRoute(
-          builder: (_) => OffersView(offers: args.offers),
+          builder: (_) => BlocProvider(
+            create: (_) => locator<OffersCubit>()..getOffers(),
+            child: const OffersView(),
+          ),
+        );
+
+      case Routes.packageDetail:
+        final args = settings.arguments as PackageDetailArgs;
+        return MaterialPageRoute(
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (_) =>
+                    locator<PackageDetailCubit>()..getPackage(args.packageId),
+              ),
+              // This screen renders a PackageCard, and that card owns the
+              // subscribe tap — which reads SubscriptionsCubit. A pushed route
+              // is a SIBLING of the route that provides the cubit (home, or
+              // Routes.packages), never a descendant, so without this the tap
+              // from the offer path throws ProviderNotFoundException.
+              // Shared lazy singleton — provide by value so popping this route
+              // does not close the instance the other surfaces read from.
+              BlocProvider.value(value: locator<SubscriptionsCubit>()),
+            ],
+            child: PackageDetailView(packageId: args.packageId),
+          ),
         );
 
       case Routes.packages:
@@ -186,10 +216,14 @@ abstract class AppRouter {
                   existingCar: args.existingCar,
                   existingAddress: args.existingAddress,
                   existingDate: args.existingDate,
-                  existingTime: args.existingTime,
+                  existingSlotStart: args.existingSlotStart,
                   subscriptionId: args.subscriptionId,
                   washId: args.washId,
                   giftCode: args.giftCode,
+                  offerTitleAr: args.offerTitleAr,
+                  offerTitleEn: args.offerTitleEn,
+                  offerListPriceMinor: args.offerListPriceMinor,
+                  offerTargetPriceMinor: args.offerTargetPriceMinor,
                 ),
             child: const BookingLocationView(),
           ),
@@ -385,23 +419,59 @@ class BookingFlowStartArgs {
   final MyCarModel? existingCar;
   final AddressModel? existingAddress;
   final DateTime? existingDate;
-  final String? existingTime;
+
+  /// The booking's current slot, carried as a [DateTime] so the reschedule
+  /// prefill never round-trips through a localised display label.
+  final DateTime? existingSlotStart;
   final BookingFlowConfig flowConfig;
   final BookingSubmitStrategy submitStrategy;
   final String? subscriptionId;
   final String? washId;
   final String? giftCode;
 
+  /// The offer's own title in each language, when the flow was started from a
+  /// SERVICE offer card. Carried so the summary's re-apply affordance can name
+  /// the offer it is putting back instead of calling it "your offer"; both
+  /// languages travel rather than one pre-localised string so switching
+  /// language mid-flow renames it with everything else.
+  final String? offerTitleAr;
+  final String? offerTitleEn;
+
+  /// The wash's VAT-inclusive gross LIST price in halala, when the flow was
+  /// started from a SERVICE offer card. Null otherwise.
+  final int? offerListPriceMinor;
+
+  /// The VAT-inclusive gross price that offer sells the wash at, in halala.
+  /// Null when there is no offer, or when the offer is a pure shortcut with no
+  /// deal behind it.
+  ///
+  /// Both are carried so the details screen can show the price the customer
+  /// tapped instead of the list price (owner decision D-4) — server figures,
+  /// passed through verbatim, never recomputed on device.
+  final int? offerTargetPriceMinor;
+
   BookingFlowStartArgs({
     this.service,
     this.existingCar,
     this.existingAddress,
     this.existingDate,
-    this.existingTime,
+    this.existingSlotStart,
     this.flowConfig = BookingFlowConfig.normal,
     BookingSubmitStrategy? submitStrategy,
     this.subscriptionId,
     this.washId,
     this.giftCode,
+    this.offerTitleAr,
+    this.offerTitleEn,
+    this.offerListPriceMinor,
+    this.offerTargetPriceMinor,
   }) : submitStrategy = submitStrategy ?? ServiceBookingSubmit();
+}
+
+/// Args for [Routes.packageDetail]. Pushed by the home "Best Offers" rail and by
+/// the offer detail screen's "View package" action.
+class PackageDetailArgs {
+  final String packageId;
+
+  PackageDetailArgs({required this.packageId});
 }

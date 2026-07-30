@@ -60,11 +60,13 @@ class _MyAddressesViewState extends State<MyAddressesView> {
             }
 
             if (state is AddressesActionError) {
-              context.showWarningAlert(
-                title: 'Error',
-                message: state.message,
-                primaryButtonText: 'OK',
-              );
+              if (state.message == 'address-outside-service-area') {
+                context.showErrorSnackBar(
+                  LocaleKeys.address_zone_not_available.tr(context: context),
+                );
+              } else {
+                context.showErrorSnackBar(state.message);
+              }
             }
           },
           buildWhen: (previous, current) =>

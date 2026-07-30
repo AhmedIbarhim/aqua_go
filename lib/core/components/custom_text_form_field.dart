@@ -16,6 +16,7 @@ class CustomTextFormField extends StatelessWidget {
     this.prefixIcon,
     this.maxLines,
     this.minLines,
+    this.maxLength,
     this.obscureText = false,
     this.onSaved,
     this.readOnly = false,
@@ -30,6 +31,7 @@ class CustomTextFormField extends StatelessWidget {
   final Widget? prefixIcon;
   final int? maxLines;
   final int? minLines;
+  final int? maxLength;
   final bool obscureText;
   final TextEditingController? controller;
   final void Function(String?)? onSaved;
@@ -75,10 +77,14 @@ class CustomTextFormField extends StatelessWidget {
             horizontal: 8,
             vertical: 8,
           ),
+          // Suppress the default char counter — the field is wrapped in a
+          // fixed-height SizedBox, so the counter would overflow.
+          counterText: '',
         ),
         obscureText: obscureText,
         maxLines: maxLines,
         minLines: minLines,
+        maxLength: maxLength,
       ),
     );
   }

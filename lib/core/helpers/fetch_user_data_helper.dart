@@ -77,12 +77,15 @@ class FetchUserData {
       mainButtonTextColor: context.colors.themeColor,
       onPrimaryPressed: () {
         Navigator.pop(context);
-        locator<AuthRepository>().logout().then((_) {
-          AppRouter.navigatorKey.currentState?.pushNamedAndRemoveUntil(
-            Routes.login,
-            (route) => false,
-          );
-        });
+        // This prompt fires for users who are ALREADY signed out — calling
+        // logout() here would revoke the refresh token of the previous session
+        // and, on the offers/guest path, run a full teardown on a user who was
+        // never signed in. Just route to login; the login flow owns any
+        // credential replacement.
+        AppRouter.navigatorKey.currentState?.pushNamedAndRemoveUntil(
+          Routes.login,
+          (route) => false,
+        );
       },
       secondaryButtonText: LocaleKeys.cancel.tr(context: context),
       onSecondaryPressed: () {

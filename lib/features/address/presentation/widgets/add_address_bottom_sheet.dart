@@ -22,12 +22,21 @@ class AddAddressBottomSheet extends StatefulWidget {
   final double lng;
   final AddressModel? existingAddress;
 
+  /// AQG-267: true when this sheet created (and therefore owns) its own
+  /// AddressesCubit — the ADD flow. In that case the parent MyAddressesView is
+  /// NOT listening to this cubit, so the sheet must surface action errors
+  /// itself. The EDIT flow passes the parent's cubit (ownsCubit = false) and
+  /// the parent's listener covers it — the sheet stays silent to avoid a
+  /// double toast.
+  final bool ownsCubit;
+
   const AddAddressBottomSheet({
     super.key,
     required this.address,
     required this.lat,
     required this.lng,
     this.existingAddress,
+    this.ownsCubit = false,
   });
 
   static void show({
@@ -38,6 +47,10 @@ class AddAddressBottomSheet extends StatefulWidget {
     AddressesCubit? addressesCubit,
     AddressModel? existingAddress,
   }) {
+    // AQG-267: the sheet owns its cubit only when no parent cubit is passed in
+    // (the ADD flow). The EDIT flow reuses the parent's cubit, so the parent's
+    // listener handles action errors and the sheet must not re-toast.
+    final bool ownsCubit = addressesCubit == null;
     CustomBottomSheet.show(
       context: context,
       title: existingAddress == null
@@ -51,6 +64,7 @@ class AddAddressBottomSheet extends StatefulWidget {
                 lat: lat,
                 lng: lng,
                 existingAddress: existingAddress,
+                ownsCubit: ownsCubit,
               ),
             )
           : BlocProvider(
@@ -60,6 +74,7 @@ class AddAddressBottomSheet extends StatefulWidget {
                 lat: lat,
                 lng: lng,
                 existingAddress: existingAddress,
+                ownsCubit: ownsCubit,
               ),
             ),
     );
@@ -137,8 +152,11 @@ class _AddAddressBottomSheetState extends State<AddAddressBottomSheet> {
             dismissDuration: const Duration(seconds: 2),
           );
         }
-
-        if (state is AddressesActionError) {
+        // AQG-267: surface action errors ONLY when this sheet owns its cubit
+        // (the ADD flow) — the parent MyAddressesView is not listening to it.
+        // The EDIT flow (ownsCubit = false) is covered by the parent's listener,
+        // so the sheet stays silent to avoid a duplicate toast.
+        if (widget.ownsCubit && state is AddressesActionError) {
           if (state.message == 'address-outside-service-area') {
             context.showErrorSnackBar(
               LocaleKeys.address_zone_not_available.tr(context: context),
@@ -214,6 +232,7 @@ class _AddAddressBottomSheetState extends State<AddAddressBottomSheet> {
               SizedBox(height: height * 0.01),
               CustomTextFormField(
                 controller: _addressNameController,
+                maxLength: 20,
                 label: LocaleKeys.address_address_name_label.tr(
                   context: context,
                 ),

@@ -20,12 +20,15 @@ class BookingRepository {
 
   BookingRepository({required this.bookingsRemoteDataSource});
 
+  /// [offerId] and [promoCode] are alternatives — see
+  /// [BookingsRemoteDataSource.getQuote].
   Future<Either<Failure, QuoteModel>> getQuote({
     required String packageId,
     required double lat,
     required double lng,
     List<Map<String, dynamic>>? addOns,
     String? promoCode,
+    String? offerId,
     List<String> addOnIds = const [],
     int? carCount,
     int? pointsToApply,
@@ -37,6 +40,7 @@ class BookingRepository {
         lng: lng,
         addOns: addOns,
         promoCode: promoCode,
+        offerId: offerId,
         addOnIds: addOnIds,
         carCount: carCount,
         pointsToApply: pointsToApply,
@@ -140,7 +144,7 @@ class BookingRepository {
   /// needs to open the on-device purchase.
   ///
   /// [scheduledAt] — bare ISO-8601 Saudi time (no offset) from
-  ///   [DayTimeModel.toScheduledAtString].
+  ///   `toWireDateTime` (`core/utils/saudi_wire_format.dart`).
   /// [vehicles] — 1-element list in the same shape as
   ///   [ServiceBookingRequestModel.toJson] vehicles field (savedVehicleId XOR
   ///   denormalised fields). Must be non-empty — backend @Size(min=1).
@@ -330,13 +334,16 @@ class BookingRepository {
     required PackageRescheduleRequestModel request,
   }) async {
     try {
-      final newScheduledAtIso = request.toJson()['newScheduledAt'] as String;
+      // Serialise ONCE: the idempotency key is derived from the very body that
+      // is sent, so key and payload can never describe different slots.
+      final rescheduleData = request.toJson();
+      final newScheduledAtIso = rescheduleData['newScheduledAt'] as String;
       final idempotencyKey = 'customer-reschedule:$washId:$newScheduledAtIso';
       final response = await bookingsRemoteDataSource
           .rescheduleSubscriptionWash(
             subscriptionId: subscriptionId,
             washId: washId,
-            rescheduleData: request.toJson(),
+            rescheduleData: rescheduleData,
             idempotencyKey: idempotencyKey,
           );
       return response.fold((failure) => left(failure), (data) {

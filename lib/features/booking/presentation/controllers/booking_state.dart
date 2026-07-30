@@ -31,8 +31,17 @@ enum PaymentPhase {
   /// user dismissed the SDK sheet.
   cancelled,
 
-  /// paid but create failed → server auto-refund in progress.
+  /// paid, and the server ANSWERED with one of the rejections that refunds the
+  /// charge as part of its contract (see `refund_evidence.dart`). The money is
+  /// known to be coming back and the customer is told so.
   refundPending,
+
+  /// paid, and the create did not come back with an answer this client can read
+  /// as a refund — a dropped connection, a timeout, a 5xx, or a rejection that
+  /// runs no compensation. The booking may or may not exist and the charge may
+  /// or may not have been returned yet, so nothing is asserted about either:
+  /// the customer is told not to pay again and to check My Bookings.
+  createUnconfirmed,
 }
 
 class BookingState extends Equatable {
@@ -43,7 +52,10 @@ class BookingState extends Equatable {
   final MyCarModel? selectedCar;
   final Set<int> selectedServiceIndices;
   final DateTime? selectedDate;
-  final String? selectedTime;
+  /// The availability slot the customer picked, carried as the slot's own
+  /// `start` [DateTime]. Never a display string: the wire `scheduledAt` is
+  /// built from this value, so no localised label is ever re-parsed.
+  final DateTime? selectedSlotStart;
   final Set<String> bikerNotes;
   final String specialNoteText;
   final PaymentMethod? paymentMethod;
@@ -76,6 +88,32 @@ class BookingState extends Equatable {
   /// The payment-init result driving the SDK purchase (null when not paying).
   final PaymentInitModel? paymentInit;
   final String? giftCode;
+  /// The promo code the CURRENT [quote] was priced with, as the server
+  /// normalised it (always upper case), or null when none applies. Lives here
+  /// rather than in the summary route's `State` so it survives a pop back to
+  /// the details screen and forward again — the quote it belongs to survives,
+  /// so the chip that announces it must too.
+  final String? appliedPromoCode;
+  /// The merchandising offer the applied code came from, or null when the
+  /// customer typed the code in. Sent to booking-create for redemption
+  /// attribution; two live offers may link one code, so the code alone cannot
+  /// say which offer drove the sale.
+  final String? appliedOfferId;
+
+  /// The offer this flow applied at least once, whether or not it is what
+  /// prices the order NOW.
+  final String? rememberedOfferId;
+
+  /// The offer's own title, in both languages, when the flow was started from a
+  /// SERVICE offer card.
+  final String? offerTitleAr;
+  final String? offerTitleEn;
+
+  /// The wash's VAT-INCLUSIVE gross LIST price in halala
+  final int? offerListPriceMinor;
+
+  /// The VAT-INCLUSIVE gross price the wash BECOMES through that offer
+  final int? offerTargetPriceMinor;
 
   const BookingState({
     this.status = BookingStatus.initial,
@@ -87,7 +125,7 @@ class BookingState extends Equatable {
     this.selectedCar,
     this.selectedServiceIndices = const {},
     this.selectedDate,
-    this.selectedTime,
+    this.selectedSlotStart,
     this.bikerNotes = const {},
     this.specialNoteText = '',
     this.paymentMethod,
@@ -107,6 +145,13 @@ class BookingState extends Equatable {
     this.paymentPhase = PaymentPhase.none,
     this.paymentInit,
     this.giftCode,
+    this.appliedPromoCode,
+    this.appliedOfferId,
+    this.rememberedOfferId,
+    this.offerTitleAr,
+    this.offerTitleEn,
+    this.offerListPriceMinor,
+    this.offerTargetPriceMinor,
   });
 
   BookingState copyWith({
@@ -117,7 +162,7 @@ class BookingState extends Equatable {
     MyCarModel? selectedCar,
     Set<int>? selectedServiceIndices,
     DateTime? selectedDate,
-    String? selectedTime,
+    DateTime? selectedSlotStart,
     Set<String>? bikerNotes,
     String? specialNoteText,
     PaymentMethod? paymentMethod,
@@ -137,10 +182,21 @@ class BookingState extends Equatable {
     PaymentPhase? paymentPhase,
     PaymentInitModel? paymentInit,
     String? giftCode,
+    String? appliedPromoCode,
+    String? appliedOfferId,
+    String? rememberedOfferId,
+    String? offerTitleAr,
+    String? offerTitleEn,
+    int? offerListPriceMinor,
+    int? offerTargetPriceMinor,
     bool clearSelectedDate = false,
-    bool clearSelectedTime = false,
+    bool clearSelectedSlotStart = false,
     bool clearError = false,
     bool clearPaymentInit = false,
+    bool clearPromo = false,
+    bool clearOfferId = false,
+    bool clearOfferPrices = false,
+    bool clearRememberedOffer = false,
   }) {
     return BookingState(
       status: status ?? (clearError ? BookingStatus.initial : this.status),
@@ -151,7 +207,9 @@ class BookingState extends Equatable {
       selectedServiceIndices:
           selectedServiceIndices ?? this.selectedServiceIndices,
       selectedDate: clearSelectedDate ? null : (selectedDate ?? this.selectedDate),
-      selectedTime: clearSelectedTime ? null : (selectedTime ?? this.selectedTime),
+      selectedSlotStart: clearSelectedSlotStart
+          ? null
+          : (selectedSlotStart ?? this.selectedSlotStart),
       bikerNotes: bikerNotes ?? this.bikerNotes,
       specialNoteText: specialNoteText ?? this.specialNoteText,
       paymentMethod: paymentMethod ?? this.paymentMethod,
@@ -175,6 +233,23 @@ class BookingState extends Equatable {
       paymentPhase: paymentPhase ?? this.paymentPhase,
       paymentInit: clearPaymentInit ? null : (paymentInit ?? this.paymentInit),
       giftCode: giftCode ?? this.giftCode,
+      appliedPromoCode: clearPromo
+          ? null
+          : (appliedPromoCode ?? this.appliedPromoCode),
+      appliedOfferId: (clearPromo || clearOfferId)
+          ? null
+          : (appliedOfferId ?? this.appliedOfferId),
+      rememberedOfferId: clearRememberedOffer
+          ? null
+          : (rememberedOfferId ?? this.rememberedOfferId),
+      offerTitleAr: offerTitleAr ?? this.offerTitleAr,
+      offerTitleEn: offerTitleEn ?? this.offerTitleEn,
+      offerListPriceMinor: clearOfferPrices
+          ? null
+          : (offerListPriceMinor ?? this.offerListPriceMinor),
+      offerTargetPriceMinor: clearOfferPrices
+          ? null
+          : (offerTargetPriceMinor ?? this.offerTargetPriceMinor),
     );
   }
 
@@ -187,7 +262,7 @@ class BookingState extends Equatable {
     selectedCar,
     selectedServiceIndices,
     selectedDate,
-    selectedTime,
+    selectedSlotStart,
     bikerNotes,
     specialNoteText,
     paymentMethod,
@@ -207,5 +282,12 @@ class BookingState extends Equatable {
     paymentPhase,
     paymentInit,
     giftCode,
+    appliedPromoCode,
+    appliedOfferId,
+    rememberedOfferId,
+    offerTitleAr,
+    offerTitleEn,
+    offerListPriceMinor,
+    offerTargetPriceMinor,
   ];
 }

@@ -48,7 +48,8 @@ class BannerModel {
       if (validFrom != null) 'validFrom': validFrom,
       if (validTo != null) 'validTo': validTo,
       'sortOrder': sortOrder,
-      if (currentPolicyVersion != null) 'currentPolicyVersion': currentPolicyVersion,
+      if (currentPolicyVersion != null)
+        'currentPolicyVersion': currentPolicyVersion,
     };
   }
 }

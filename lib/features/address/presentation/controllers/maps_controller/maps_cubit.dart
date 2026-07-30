@@ -28,13 +28,22 @@ class MapsCubit extends Cubit<MapsState> {
 
   String _currentSessionToken() => _sessionToken ??= _uuid.v4();
 
+  /// True once [seedLocation] has run (edit path). Prevents the location-service
+  /// stream from recentering the camera onto current GPS and clobbering the
+  /// seeded saved location (AQG-243).
+  bool _editSeeded = false;
+
   void _monitorLocationService() {
     _serviceStatusSubscription = Geolocator.getServiceStatusStream().listen((
       status,
     ) {
       if (status == ServiceStatus.enabled) {
         emit(state.copyWith(isLocationServiceEnabled: true));
-        determinePosition();
+        // In edit mode the camera is already seeded to the saved location —
+        // don't recenter to current GPS.
+        if (!_editSeeded) {
+          determinePosition();
+        }
       } else {
         emit(state.copyWith(isLocationServiceEnabled: false));
       }
@@ -163,6 +172,7 @@ class MapsCubit extends Cubit<MapsState> {
   /// Seeds the initial selected point (edit path) and recenters the camera.
   /// Reverse-geocodes once so Confirm is valid before any pan.
   void seedLocation(LatLng latLng) {
+    _editSeeded = true;
     emit(
       state.copyWith(
         selectedLatLng: latLng,
