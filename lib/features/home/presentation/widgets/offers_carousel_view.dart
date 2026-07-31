@@ -78,11 +78,11 @@ class _Rail extends StatelessWidget {
       child: CarouselView(
         itemExtent: height * 0.4,
         padding: const EdgeInsets.symmetric(horizontal: 12),
+        onTap: (index) => onTap(context, offers[index]),
         children: offers.map((offer) {
-          return GestureDetector(
+          return OfferCard(
             key: ValueKey('offer-card-${offer.id}'),
-            onTap: () => onTap(context, offer),
-            child: OfferCard(offer: offer),
+            offer: offer,
           );
         }).toList(),
       ),
