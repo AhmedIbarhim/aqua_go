@@ -1,4 +1,3 @@
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -72,22 +71,20 @@ class _Rail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CarouselSlider.builder(
-      itemCount: offers.length,
-      itemBuilder: (context, index, realIndex) => GestureDetector(
-        key: ValueKey('offer-card-${offers[index].id}'),
-        onTap: () => onTap(context, offers[index]),
-        child: OfferCard(offer: offers[index]),
-      ),
-      options: CarouselOptions(
-        height: OfferCard.heightFor(context),
-        viewportFraction: context.isTablet ? 0.6 : 0.75,
-        initialPage: 0,
-        enableInfiniteScroll: offers.length > 1,
-        enlargeCenterPage: true,
-        enlargeFactor: 0.2,
-        scrollDirection: Axis.horizontal,
-        enlargeStrategy: CenterPageEnlargeStrategy.scale,
+    final height = MediaQuery.sizeOf(context).height;
+
+    return SizedBox(
+      height: height * 0.21,
+      child: CarouselView(
+        itemExtent: height * 0.4,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        children: offers.map((offer) {
+          return GestureDetector(
+            key: ValueKey('offer-card-${offer.id}'),
+            onTap: () => onTap(context, offer),
+            child: OfferCard(offer: offer),
+          );
+        }).toList(),
       ),
     );
   }
