@@ -59,33 +59,11 @@ class OffersCarouselView extends StatelessWidget {
     );
   }
 
-  /// UCC23 step 6 — "customer taps an offer to open its detail view". Every
-  /// card, of either type, opens the offer the customer actually touched.
-  ///
-  /// It used to send a promo offer to the unfiltered offers LIST, which loses
-  /// the tap: the customer picked one card and got back the whole set, with the
-  /// one they wanted somewhere in it. A package offer jumped straight past the
-  /// detail view into the subscription catalogue, skipping the terms and the
-  /// A2 re-validation the primary action performs. Both now go through the
-  /// detail view, which owns the type-specific primary action.
   void _handleOfferTap(BuildContext context, CustomerOfferModel offer) {
     openOfferDetail(context, offer);
   }
 }
 
-/// The horizontal strip of offer cards.
-///
-/// Now that a card is its banner and nothing else, the rail is the banner
-/// carousel: the same `CarouselSlider` geometry `HomeBannersCarosal` uses —
-/// its height fractions, its viewport fraction, its centre-page enlargement —
-/// so an offer sits at the same scale, in the same rhythm, as the banner strip
-/// higher up the same screen. It used to be a `SingleChildScrollView` of
-/// 0.72-width cards sized by their text, which no longer has anything to
-/// measure.
-///
-/// Two deliberate departures from the banner strip: no autoplay and no dots.
-/// Offers are a browse list with a "view more" beside them, and a card that
-/// rotates out from under a reader's thumb takes the tap with it.
 class _Rail extends StatelessWidget {
   const _Rail({required this.offers, required this.onTap});
 
@@ -97,9 +75,6 @@ class _Rail extends StatelessWidget {
     return CarouselSlider.builder(
       itemCount: offers.length,
       itemBuilder: (context, index, realIndex) => GestureDetector(
-        // Keyed by the offer, not the slot: an infinite carousel builds the
-        // same offer on either side of the one in the middle, so a positional
-        // handle picks whichever copy the viewport happened to lay out first.
         key: ValueKey('offer-card-${offers[index].id}'),
         onTap: () => onTap(context, offers[index]),
         child: OfferCard(offer: offers[index]),
@@ -108,8 +83,6 @@ class _Rail extends StatelessWidget {
         height: OfferCard.heightFor(context),
         viewportFraction: context.isTablet ? 0.6 : 0.75,
         initialPage: 0,
-        // A single eligible offer has nothing to wrap around to, and looping it
-        // against itself only offers the customer a scroll that goes nowhere.
         enableInfiniteScroll: offers.length > 1,
         enlargeCenterPage: true,
         enlargeFactor: 0.2,
@@ -120,8 +93,6 @@ class _Rail extends StatelessWidget {
   }
 }
 
-/// UCC23 A6 — the rail's retry state. Deliberately the same shape as a card so
-/// the row does not collapse and re-expand when the retry succeeds.
 class _RailRetry extends StatelessWidget {
   const _RailRetry();
 

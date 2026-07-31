@@ -80,11 +80,9 @@ void main() {
 
     test('no promo at all sends neither key', () async {
       final api = _RecordingApiClient();
-      await BookingsRemoteDataSource(api).getQuote(
-        packageId: 'pkg-1',
-        lat: 21.4858,
-        lng: 39.1925,
-      );
+      await BookingsRemoteDataSource(
+        api,
+      ).getQuote(packageId: 'pkg-1', lat: 21.4858, lng: 39.1925);
 
       expect(api.lastBody!.containsKey('promoCode'), isFalse);
       expect(api.lastBody!.containsKey('offerId'), isFalse);
@@ -154,27 +152,31 @@ void main() {
       await CacheClient.init();
     });
 
-    test('a typed code applied over a live offer drops the attribution', () async {
-      final cubit = buildCubit(RecordingBookingRepo());
-      addTearDown(cubit.close);
+    test(
+      'a typed code applied over a live offer drops the attribution',
+      () async {
+        final cubit = buildCubit(RecordingBookingRepo());
+        addTearDown(cubit.close);
 
-      await cubit.applyOffer('offer-1');
-      expect(cubit.state.appliedOfferId, 'offer-1');
+        await cubit.applyOffer('offer-1');
+        expect(cubit.state.appliedOfferId, 'offer-1');
 
-      // The customer types a different code over the offer. The quote that
-      // comes back was priced with NO offer, so the booking must not be
-      // stamped with one — `promo_redemptions.offer_id` is the whole of the
-      // sale attribution, and this sale did not come through that offer.
-      await cubit.applyPromoCode('OTHERCODE');
+        // The customer types a different code over the offer. The quote that
+        // comes back was priced with NO offer, so the booking must not be
+        // stamped with one — `promo_redemptions.offer_id` is the whole of the
+        // sale attribution, and this sale did not come through that offer.
+        await cubit.applyPromoCode('OTHERCODE');
 
-      expect(cubit.state.appliedPromoCode, 'OTHERCODE');
-      expect(
-        cubit.state.appliedOfferId,
-        isNull,
-        reason: 'the offer the customer did not come through must not be '
-            'credited with the sale',
-      );
-    });
+        expect(cubit.state.appliedPromoCode, 'OTHERCODE');
+        expect(
+          cubit.state.appliedOfferId,
+          isNull,
+          reason:
+              'the offer the customer did not come through must not be '
+              'credited with the sale',
+        );
+      },
+    );
 
     test('an offer-driven reprice keeps the attribution', () async {
       final cubit = buildCubit(RecordingBookingRepo());
