@@ -234,7 +234,6 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
     final availableAddons = bookingState.selectedService?.addons ?? [];
 
     final lines = bookingState.quote?.lines ?? const [];
-    final quoteBreakdown = bookingState.quote?.breakdown;
 
     // SERVICE + ADDON only. The DISCOUNT row is deliberately NOT an item line:
     // it is `discountMinor`, rendered once below the subtotal. Modelling it as
@@ -246,10 +245,9 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
     if (lines.isNotEmpty) {
       final service = lines.where((l) => l.isService).firstOrNull;
       if (service != null) {
-        itemLines.add(GrossLine(
-          label: serviceName,
-          grossMinor: service.grossMinor,
-        ));
+        itemLines.add(
+          GrossLine(label: serviceName, grossMinor: service.grossMinor),
+        );
       }
       for (final line in lines.where((l) => l.isAddon)) {
         final addon = availableAddons
@@ -292,8 +290,9 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
           ? -discountLine.grossMinor
           : promoDiscountMinor,
       promoCode: bookingState.quote?.promoCode,
-      totalMinor: quoteBreakdown?.grossMinor ?? 0,
-      vatMinor: quoteBreakdown?.vatMinor ?? 0,
+      totalMinor: bookingState.quote?.totalMinor ?? 0,
+      vatMinor: bookingState.quote?.vatMinor ?? 0,
+      pointsDiscountMinor: bookingState.quote?.pointsDiscountMinor ?? 0,
     );
 
     return Container(
@@ -466,6 +465,9 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
   /// can pick it again next time (UCC16 UI/UX) — only accepted ones, so the
   /// suggestions never offer a code that has never worked.
   void _applyPromoCode(String code) async {
+    setState(() {
+      _isPointsToggled = false;
+    });
     final quote = await context.read<BookingCubit>().applyPromoCode(code);
     if (quote?.promoCode != null) {
       await PromoCodeHistory.remember(quote!.promoCode!);
@@ -495,6 +497,9 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
   /// order priced bare on purpose; re-applying silently would move a total the
   /// customer had just chosen to move the other way.
   void _reapplyOffer() {
+    setState(() {
+      _isPointsToggled = false;
+    });
     final cubit = context.read<BookingCubit>();
     final offerId = cubit.state.rememberedOfferId;
     if (offerId == null) return;

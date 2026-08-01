@@ -77,6 +77,9 @@ class GrossPriceBreakdown {
   /// on the pre-discount subtotal would be a different, larger, wrong number.
   final int vatMinor;
 
+  /// Optional wallet loyalty points discount in halala.
+  final int pointsDiscountMinor;
+
   const GrossPriceBreakdown({
     required this.lines,
     required this.subtotalMinor,
@@ -84,6 +87,7 @@ class GrossPriceBreakdown {
     required this.promoCode,
     required this.totalMinor,
     required this.vatMinor,
+    this.pointsDiscountMinor = 0,
   });
 
   /// A booking detail's breakdown.
@@ -99,6 +103,7 @@ class GrossPriceBreakdown {
     required String? promoCode,
     required int totalMinor,
     required int vatMinor,
+    int pointsDiscountMinor = 0,
   }) {
     final summed = itemLines.fold<int>(0, (s, l) => s + l.grossMinor);
     return GrossPriceBreakdown(
@@ -111,6 +116,7 @@ class GrossPriceBreakdown {
       promoCode: promoCode,
       totalMinor: totalMinor,
       vatMinor: vatMinor,
+      pointsDiscountMinor: pointsDiscountMinor,
     );
   }
 
@@ -134,10 +140,11 @@ class GrossPriceBreakdown {
   // LINE-scoped and sets the wash to a fixed price, so `charged + discount`
   // stops being a statement about the service line at all.
 
-  /// True when a discount row should render. Also gates the subtotal row: a
-  /// "before discount" figure is meaningless — and equal to the total — when
-  /// nothing was discounted.
+  /// True when a promo discount row should render.
   bool get hasDiscount => discountMinor > 0;
+
+  /// True when a wallet points discount row should render.
+  bool get hasPointsDiscount => pointsDiscountMinor > 0;
 
   /// Whether the visible line rows sum EXACTLY to the visible subtotal. The
   /// column is unreadable if they do not, so this is asserted in tests rather
@@ -152,6 +159,7 @@ class GrossPriceBreakdown {
 
   double get subtotal => subtotalMinor / 100.0;
   double get discount => discountMinor / 100.0;
+  double get pointsDiscount => pointsDiscountMinor / 100.0;
   double get total => totalMinor / 100.0;
   double get vat => vatMinor / 100.0;
 }

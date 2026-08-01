@@ -45,7 +45,7 @@ class PaymentSummaryCard extends StatelessWidget {
         // The subtotal and discount rows exist ONLY to explain a discount. With
         // no code applied a "before discount" figure would just restate the
         // total, so both rows go and the lines run straight into the total.
-        if (breakdown.hasDiscount) ...[
+        if (breakdown.hasDiscount || breakdown.hasPointsDiscount) ...[
           const SizedBox(height: 12),
           // Distinct (slightly more visible) separator between the line items
           // and the totals block — set apart from the subtle inter-item ones.
@@ -60,18 +60,24 @@ class PaymentSummaryCard extends StatelessWidget {
             label: LocaleKeys.bookings_original_total.tr(context: context),
             value: breakdown.subtotal,
           ),
-          const SizedBox(height: 12),
-          // The discount, ONCE, at its full VAT-inclusive value, immediately
-          // above the total it produces. The code is folded into the label, so
-          // there is no separate "Promo code" row. Tone matches every other
-          // non-total row: the app states a saving in muted text (the promo
-          // chip's "you saved" line), never in a positive/green colour.
-          _buildPaymentRow(
-            context,
-            label: _discountLabel(context),
-            value: breakdown.discount,
-            negative: true,
-          ),
+          if (breakdown.hasDiscount) ...[
+            const SizedBox(height: 12),
+            _buildPaymentRow(
+              context,
+              label: _discountLabel(context),
+              value: breakdown.discount,
+              negative: true,
+            ),
+          ],
+          if (breakdown.hasPointsDiscount) ...[
+            const SizedBox(height: 12),
+            _buildPaymentRow(
+              context,
+              label: LocaleKeys.bookings_pay_using_points.tr(context: context),
+              value: breakdown.pointsDiscount,
+              negative: true,
+            ),
+          ],
         ],
         const SizedBox(height: 12),
         const Divider(height: 1, thickness: 1, color: Colors.white),

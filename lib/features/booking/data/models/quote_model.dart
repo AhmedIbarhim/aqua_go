@@ -59,8 +59,9 @@ class QuoteModel {
   /// the offer's price has to add back what the add-ons on that same screen
   /// cost; the quote's own add-on rows are the only server-blessed source for
   /// that. 0 when nothing is selected, and 0 on a quote that carries no lines.
-  int get addOnsGrossMinor =>
-      lines.where((l) => l.isAddon).fold<int>(0, (sum, l) => sum + l.grossMinor);
+  int get addOnsGrossMinor => lines
+      .where((l) => l.isAddon)
+      .fold<int>(0, (sum, l) => sum + l.grossMinor);
 
   /// True when any multiplier moved the price off its base — i.e. the surged
   /// subtotal is not simply the base subtotal. The unscaled default is 10 000,
@@ -78,23 +79,55 @@ class QuoteModel {
     quoteId: json['quoteId'] as String? ?? '',
     currency: json['currency'] as String? ?? 'SAR',
     expiresAt: tryParseWireDateTime(json['expiresAt'] as String?) ?? saudiNow(),
-    timeMultiplierBps: (json['timeMultiplierBps'] as num?)?.toInt() ??
-        (json['surge'] != null ? ((json['surge']['timeBps'] as num?)?.toInt() ?? kMultiplierBpsUnit) : kMultiplierBpsUnit),
-    zoneMultiplierBps: (json['zoneMultiplierBps'] as num?)?.toInt() ??
-        (json['surge'] != null ? ((json['surge']['zoneBps'] as num?)?.toInt() ?? kMultiplierBpsUnit) : kMultiplierBpsUnit),
-    demandMultiplierBps: (json['demandMultiplierBps'] as num?)?.toInt() ??
-        (json['surge'] != null ? ((json['surge']['demandBps'] as num?)?.toInt() ?? kMultiplierBpsUnit) : kMultiplierBpsUnit),
+    timeMultiplierBps:
+        (json['timeMultiplierBps'] as num?)?.toInt() ??
+        (json['surge'] != null
+            ? ((json['surge']['timeBps'] as num?)?.toInt() ??
+                  kMultiplierBpsUnit)
+            : kMultiplierBpsUnit),
+    zoneMultiplierBps:
+        (json['zoneMultiplierBps'] as num?)?.toInt() ??
+        (json['surge'] != null
+            ? ((json['surge']['zoneBps'] as num?)?.toInt() ??
+                  kMultiplierBpsUnit)
+            : kMultiplierBpsUnit),
+    demandMultiplierBps:
+        (json['demandMultiplierBps'] as num?)?.toInt() ??
+        (json['surge'] != null
+            ? ((json['surge']['demandBps'] as num?)?.toInt() ??
+                  kMultiplierBpsUnit)
+            : kMultiplierBpsUnit),
     surgedSubtotalMinor: (json['surgedSubtotalMinor'] as num?)?.toInt() ?? 0,
     breakdown: json['breakdown'] is Map<String, dynamic>
         ? Breakdown.fromJson(json['breakdown'] as Map<String, dynamic>)
-        : null,
+        : Breakdown(
+            grossMinor:
+                (json['grossMinor'] as num?)?.toInt() ??
+                (json['totalMinor'] as num?)?.toInt(),
+            vatMinor: (json['vatMinor'] as num?)?.toInt(),
+            totalMinor:
+                (json['totalMinor'] as num?)?.toInt() ??
+                (json['grossMinor'] as num?)?.toInt(),
+            promoDiscountMinor: (json['promoDiscountMinor'] as num?)?.toInt(),
+          ),
     lines: QuoteLine.listFromJson(json['lines']),
     surge: json['surge'] is Map<String, dynamic>
         ? QuoteSurgeModel.fromJson(json['surge'] as Map<String, dynamic>)
         : null,
     promo: json['promo'] is Map<String, dynamic>
         ? QuotePromoModel.fromJson(json['promo'] as Map<String, dynamic>)
-        : null,
+        : (json['promoCode'] is String &&
+                  (json['promoCode'] as String).isNotEmpty
+              ? QuotePromoModel(
+                  code: json['promoCode'] as String,
+                  discountMinor:
+                      (json['promoDiscountMinor'] as num?)?.toInt() ?? 0,
+                  discountType: 'FIXED_AMOUNT',
+                  fixedAmountMinor:
+                      (json['promoDiscountMinor'] as num?)?.toInt() ?? 0,
+                  percent: 0,
+                )
+              : null),
     loyalty: json['loyalty'] is Map<String, dynamic>
         ? QuoteLoyaltyModel.fromJson(json['loyalty'] as Map<String, dynamic>)
         : null,
