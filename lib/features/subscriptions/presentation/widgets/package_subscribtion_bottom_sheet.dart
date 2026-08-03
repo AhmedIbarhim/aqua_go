@@ -65,7 +65,7 @@ class _PackageSubscribtionBottomSheetState
           context.showErrorSnackBar(state.message);
         } else if (state is SubscriptionPaymentCancelled) {
           // User dismissed the Moyasar sheet — stay on the payment step.
-        } else if (state is SubscriptionPaymentRefundPending) {
+        } else if (state is SubscriptionPaymentCreateFailed) {
           context.showErrorSnackBar(state.message);
         }
       },

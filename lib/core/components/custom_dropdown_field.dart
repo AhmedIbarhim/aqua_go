@@ -120,7 +120,7 @@ class CustomDropdownField extends StatelessWidget {
                     value ?? hint,
                     style: AppTextStyles.regular14.copyWith(
                       color: value == null
-                          ? context.colors.contentDisabled
+                          ? context.colors.textTertiary
                           : context.colors.textPrimary,
                     ),
                   ),

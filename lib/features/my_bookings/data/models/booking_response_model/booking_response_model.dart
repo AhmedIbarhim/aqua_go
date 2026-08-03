@@ -2,6 +2,7 @@ import 'package:aqua_go/core/config/local_storage/shared_prefs.dart';
 import 'package:aqua_go/core/constants.dart';
 import 'package:aqua_go/core/utils/date_time_formatter.dart';
 
+import '../../../../../core/enums/payment_method_enum.dart';
 import '../../../../../core/enums/payment_status_enum.dart';
 import '../../enums/booking_status_enum.dart';
 import '../../enums/booking_type_enum.dart';
@@ -16,6 +17,7 @@ import 'cancellation_policy.dart';
 import 'package_name.dart';
 import 'photos.dart';
 import 'quote_line.dart';
+import 'promo_points.dart';
 import 'reschedule_policy.dart';
 import 'service_name.dart';
 export 'assigned_worker.dart';
@@ -30,6 +32,7 @@ export 'cancellation_policy.dart';
 export 'invoice.dart';
 export 'package_name.dart';
 export 'photos.dart';
+export 'promo_points.dart';
 export 'quote_line.dart';
 export 'reschedule_policy.dart';
 export 'vehicle_localized_name.dart';
@@ -54,6 +57,7 @@ class BookingResponseModel {
   String? currency;
   PaymentStatus? paymentStatus;
   bool? isSubscription;
+  bool? isFromGift;
   String? moyasarPaymentId;
   // String? invoiceId;
   int? cancellationFeeMinor;
@@ -78,6 +82,11 @@ class BookingResponseModel {
   Breakdown? breakdown;
   BookingAddress? address;
   BookingRatingModel? rating;
+
+  /// The promo redemption applied to this booking, or null when none was.
+  /// Resolved at READ time from the promo module — never denormalised onto
+  /// the booking aggregate.
+  BookingPromo? promo;
   String? complaintId;
   String? paymentIntentId;
   String? paymentStuckDetectedAt;
@@ -89,10 +98,13 @@ class BookingResponseModel {
   String? cantFindClientReportedAt;
   String? cantFindClientNotes;
   String? addonPaymentIntentId;
-
-  /// The promo code applied to this booking, or null when none was. Its
-  /// `discountMinor` is ALREADY netted off [totalAmountMinor].
-  BookingPromo? promo;
+  bool? tipPaid;
+  int? tipAmountMinor;
+  PaymentMethod? paymentMethod;
+  PromoPoints? promoPoints;
+  double? customerBehaviourRating;
+  String? tipReferenceNumber;
+  int? pointsEarned;
 
   BookingResponseModel({
     this.id,
@@ -114,6 +126,7 @@ class BookingResponseModel {
     this.currency,
     this.paymentStatus,
     this.isSubscription,
+    this.isFromGift,
     this.moyasarPaymentId,
     // this.invoiceId,
     this.cancellationFeeMinor,
@@ -138,6 +151,7 @@ class BookingResponseModel {
     this.breakdown,
     this.address,
     this.rating,
+    this.promo,
     this.complaintId,
     this.paymentIntentId,
     this.paymentStuckDetectedAt,
@@ -149,7 +163,13 @@ class BookingResponseModel {
     this.cantFindClientReportedAt,
     this.cantFindClientNotes,
     this.addonPaymentIntentId,
-    this.promo,
+    this.tipPaid,
+    this.tipAmountMinor,
+    this.paymentMethod,
+    this.promoPoints,
+    this.customerBehaviourRating,
+    this.tipReferenceNumber,
+    this.pointsEarned,
   });
 
   BookingResponseModel.fromJson(Map<String, dynamic> json) {
@@ -176,6 +196,7 @@ class BookingResponseModel {
     currency = json['currency'];
     paymentStatus = PaymentStatus.fromString(json['paymentStatus']);
     isSubscription = json['isSubscription'];
+    isFromGift = json['isFromGift'];
     moyasarPaymentId = json['moyasarPaymentId'];
     // invoiceId = json['invoiceId'];
     cancellationFeeMinor = json['cancellationFeeMinor'];
@@ -235,6 +256,9 @@ class BookingResponseModel {
     rating = json['rating'] != null
         ? BookingRatingModel.fromJson(json['rating'])
         : null;
+    promo = json['promo'] is Map<String, dynamic>
+        ? BookingPromo.fromJson(json['promo'] as Map<String, dynamic>)
+        : null;
     complaintId = json['complaintId'];
     paymentIntentId = json['paymentIntentId'];
     paymentStuckDetectedAt = json['paymentStuckDetectedAt'];
@@ -246,8 +270,20 @@ class BookingResponseModel {
     cantFindClientReportedAt = json['cantFindClientReportedAt'];
     cantFindClientNotes = json['cantFindClientNotes'];
     addonPaymentIntentId = json['addonPaymentIntentId'];
-    promo = json['promo'] is Map<String, dynamic>
-        ? BookingPromo.fromJson(json['promo'] as Map<String, dynamic>)
+    tipPaid = json['tipPaid'];
+    tipAmountMinor = json['tipAmountMinor'];
+    paymentMethod = PaymentMethodEnumExtension.fromString(
+      json['paymentMethod'],
+    );
+    promoPoints = json['promoPoints'] != null
+        ? PromoPoints.fromJson(json['promoPoints'])
+        : null;
+    customerBehaviourRating = json['customerBehaviourRating'] != null
+        ? double.tryParse(json['customerBehaviourRating'].toString())
+        : null;
+    tipReferenceNumber = json['tipReferenceNumber'];
+    pointsEarned = json['pointsEarned'] != null
+        ? int.tryParse(json['pointsEarned'].toString())
         : null;
   }
 

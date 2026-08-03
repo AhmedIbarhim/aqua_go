@@ -94,14 +94,14 @@ class BookingDetailsRatingCard extends StatelessWidget {
                 Text(
                   LocaleKeys.bookings_rating_notes.tr(),
                   style: AppTextStyles.regular14.copyWith(
-                    color: context.colors.contentDisabled,
+                    color: context.colors.textTertiary,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   notes,
                   style: AppTextStyles.regular14.copyWith(
-                    color: context.colors.contentSecondaryLight,
+                    color: context.colors.textPrimary,
                   ),
                 ),
               ],

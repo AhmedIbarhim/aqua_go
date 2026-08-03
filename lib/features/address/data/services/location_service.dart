@@ -6,28 +6,41 @@ import '../../../../core/config/local_storage/shared_prefs.dart';
 import '../../../../core/config/networking/endpoints.dart';
 import '../../../../core/constants.dart';
 
+/// PH1-005: address lookups go through the backend `geo/places` proxy — the
+/// Google Maps key lives on the server (R-19 adapter), never in the shipped app.
+/// The shared [APIClient] attaches the customer JWT for these relative-path
+/// calls. Responses are tech-neutral DTOs (NOT raw Google JSON).
 class LocationService {
   final APIClient apiClient;
-  final String _apiKey = 'AIzaSyCBWbLd9irc4PCEchf4WEMdIY8Io-PnScc';
 
   LocationService({required this.apiClient});
 
-  Future<Either<Failure, dynamic>> getAutocomplete(String query) {
+  /// Backend language code derived from the persisted UI language.
+  String get _lang =>
+      CacheClient.getString(kLanguage, defaultValue: kArabicLang) == kArabicLang
+          ? 'ar'
+          : 'en';
+
+  /// [sessionToken] groups the autocomplete calls of one search session for
+  /// Google billing — mint one UUID per session, reuse until a result is picked.
+  Future<Either<Failure, dynamic>> getAutocomplete(
+    String query,
+    String sessionToken,
+  ) {
     return apiClient.get(
-      Endpoints.googleMapsAutocompleteUrl,
+      Endpoints.geoPlacesAutocomplete,
       queryParameters: {
-        'input': query,
-        'key': _apiKey,
-        'language': CacheClient.getString(kLanguage, defaultValue: kArabicLang) == kArabicLang ? 'ar' : 'en',
-        'components': 'country:sa',
+        'q': query,
+        'lang': _lang,
+        'sessionToken': sessionToken,
       },
     );
   }
 
   Future<Either<Failure, dynamic>> getPlaceDetails(String placeId) {
     return apiClient.get(
-      Endpoints.googleMapsPlaceDetailsUrl,
-      queryParameters: {'place_id': placeId, 'key': _apiKey, 'language': 'ar'},
+      Endpoints.geoPlaceDetail(placeId),
+      queryParameters: {'lang': _lang},
     );
   }
 
@@ -36,12 +49,8 @@ class LocationService {
     double lng,
   ) {
     return apiClient.get(
-      Endpoints.googleMapsGeocodeUrl,
-      queryParameters: {
-        'latlng': '$lat,$lng',
-        'key': _apiKey,
-        'language': 'ar',
-      },
+      Endpoints.geoPlacesReverseGeocode,
+      queryParameters: {'lat': lat, 'lng': lng, 'lang': _lang},
     );
   }
 }

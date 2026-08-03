@@ -1,127 +1,178 @@
-import '../../../../core/utils/saudi_wire_format.dart';
 import '../../../my_bookings/data/models/booking_response_model/breakdown.dart';
 import '../../../my_bookings/data/models/booking_response_model/quote_line.dart';
 
-/// One basis point is 1/10 000, so an unscaled 1x multiplier is 10 000 bps.
-/// The backend sends every pricing multiplier in this unit.
-const int kMultiplierBpsUnit = 10000;
-
 class QuoteModel {
   final String quoteId;
-  final int totalMinor;
-  final int vatMinor;
   final String currency;
-
-  /// When the quote stops being chargeable, in the Riyadh frame: UTC-flagged,
-  /// carrying Asia/Riyadh wall-clock fields, exactly like `saudiNow()`. Compare
-  /// it only against `saudiNow()` — never `DateTime.now()`, whose epoch value
-  /// slides with the device's timezone.
   final DateTime expiresAt;
-  final String? promoCode;
-  final int promoDiscountMinor;
-
-  /// Time-of-day pricing multiplier in basis points (10 000 = 1x), applied to
-  /// the base price before the zone and demand multipliers.
-  final int timeMultiplierBps;
-
-  /// Zone-level pricing multiplier in basis points (10 000 = 1x).
-  final int zoneMultiplierBps;
-
-  /// Real-time demand multiplier in basis points (10 000 = 1x), which rises when
-  /// zone capacity utilisation passes its configured threshold.
-  final int demandMultiplierBps;
-
-  /// Pre-VAT subtotal in halala after all three multipliers, but BEFORE the
-  /// promo discount and VAT.
-  final int surgedSubtotalMinor;
-
   final Breakdown? breakdown;
   final List<QuoteLine> lines;
 
-  QuoteModel({
-    required this.quoteId,
-    required this.totalMinor,
-    required this.vatMinor,
-    required this.currency,
-    required this.expiresAt,
-    this.promoCode,
-    required this.promoDiscountMinor,
-    this.timeMultiplierBps = kMultiplierBpsUnit,
-    this.zoneMultiplierBps = kMultiplierBpsUnit,
-    this.demandMultiplierBps = kMultiplierBpsUnit,
-    this.surgedSubtotalMinor = 0,
-    this.breakdown,
-    this.lines = const [],
-  });
-
-  /// The VAT-inclusive gross of every ADDON row on this quote, in halala.
+  /// Gross of the quote's ADD-ON rows only.
   ///
-  /// A plain sum of backend figures — no VAT arithmetic, nothing derived. It
-  /// exists because a SERVICE offer prices the WASH only, so a screen stating
-  /// the offer's price has to add back what the add-ons on that same screen
-  /// cost; the quote's own add-on rows are the only server-blessed source for
-  /// that. 0 when nothing is selected, and 0 on a quote that carries no lines.
+  /// A SERVICE offer prices the WASH alone, so a screen stating the offer's
+  /// price has to add back what the add-ons on that same screen cost — and the
+  /// quote's own add-on rows are the only server-blessed source for it. 0 when
+  /// nothing is selected, and 0 on a quote that carries no lines.
   int get addOnsGrossMinor =>
       lines.where((l) => l.isAddon).fold<int>(0, (sum, l) => sum + l.grossMinor);
+  final QuoteSurgeModel? surge;
+  final QuotePromoModel? promo;
+  final QuoteLoyaltyModel? loyalty;
 
-  /// True when any multiplier moved the price off its base — i.e. the surged
-  /// subtotal is not simply the base subtotal. The unscaled default is 10 000,
-  /// so an absent multiplier reads as "no surge" rather than as free pricing.
-  bool get isSurged =>
-      timeMultiplierBps != kMultiplierBpsUnit ||
-      zoneMultiplierBps != kMultiplierBpsUnit ||
-      demandMultiplierBps != kMultiplierBpsUnit;
+  QuoteModel({
+    required this.quoteId,
+    required this.currency,
+    required this.expiresAt,
+    this.breakdown,
+    this.lines = const [],
+    this.surge,
+    this.promo,
+    this.loyalty,
+  });
 
-  // Read-reconstruction path: NEVER tighten. Every field degrades to a safe
-  // default so a partial/legacy payload yields a usable model instead of a
-  // TypeError that kills the booking screen. Money fields go through `num` so
-  // a JSON double (1500.0) parses as cleanly as an int.
   factory QuoteModel.fromJson(Map<String, dynamic> json) => QuoteModel(
     quoteId: json['quoteId'] as String? ?? '',
-    totalMinor: (json['totalMinor'] as num?)?.toInt() ?? 0,
-    vatMinor: (json['vatMinor'] as num?)?.toInt() ?? 0,
     currency: json['currency'] as String? ?? 'SAR',
-    // The wire value is a BARE Riyadh wall clock. `DateTime.tryParse` alone
-    // returns a device-local instant, so the quote used to stay "valid" ~3h past
-    // expiry on a UTC device and expire ~2h early on UTC+5; a trailing `.toUtc()`
-    // is a no-op on an offset-less string and never fixed it. An absent value
-    // degrades to "expired now", which forces a re-quote rather than charging
-    // against a total nobody can vouch for.
-    expiresAt:
-        tryParseWireDateTime(json['expiresAt'] as String?) ?? saudiNow(),
-    promoCode: json['promoCode'] as String?,
-    promoDiscountMinor: (json['promoDiscountMinor'] as num?)?.toInt() ?? 0,
-    // An absent multiplier reads as UNSCALED (10 000 bps = 1x), never as 0 —
-    // which on this read-reconstruction path would describe a free wash.
-    timeMultiplierBps:
-        (json['timeMultiplierBps'] as num?)?.toInt() ?? kMultiplierBpsUnit,
-    zoneMultiplierBps:
-        (json['zoneMultiplierBps'] as num?)?.toInt() ?? kMultiplierBpsUnit,
-    demandMultiplierBps:
-        (json['demandMultiplierBps'] as num?)?.toInt() ?? kMultiplierBpsUnit,
-    surgedSubtotalMinor: (json['surgedSubtotalMinor'] as num?)?.toInt() ?? 0,
-    breakdown: json['breakdown'] is Map<String, dynamic>
+    expiresAt: json['expiresAt'] != null
+        ? DateTime.tryParse(json['expiresAt'] as String)?.toUtc() ??
+              DateTime.now().toUtc()
+        : DateTime.now().toUtc(),
+    breakdown: json['breakdown'] != null
         ? Breakdown.fromJson(json['breakdown'] as Map<String, dynamic>)
         : null,
     lines: QuoteLine.listFromJson(json['lines']),
+    surge: json['surge'] != null
+        ? QuoteSurgeModel.fromJson(json['surge'] as Map<String, dynamic>)
+        : null,
+    promo: json['promo'] != null
+        ? QuotePromoModel.fromJson(json['promo'] as Map<String, dynamic>)
+        : null,
+    loyalty: json['loyalty'] != null
+        ? QuoteLoyaltyModel.fromJson(json['loyalty'] as Map<String, dynamic>)
+        : null,
   );
 
   Map<String, dynamic> toJson() => {
     'quoteId': quoteId,
-    'totalMinor': totalMinor,
-    'vatMinor': vatMinor,
     'currency': currency,
-    // Bare Riyadh wall clock, the shape the backend emits and accepts.
-    // `toIso8601String()` would stamp a `Z` on the UTC-flagged Riyadh frame and
-    // mis-date the value by three hours on the way back out.
-    'expiresAt': toWireDateTime(expiresAt),
-    if (promoCode != null) 'promoCode': promoCode,
-    'promoDiscountMinor': promoDiscountMinor,
-    'timeMultiplierBps': timeMultiplierBps,
-    'zoneMultiplierBps': zoneMultiplierBps,
-    'demandMultiplierBps': demandMultiplierBps,
-    'surgedSubtotalMinor': surgedSubtotalMinor,
+    'expiresAt': expiresAt.toIso8601String(),
     if (breakdown != null) 'breakdown': breakdown!.toJson(),
     'lines': lines.map((e) => e.toJson()).toList(),
+    if (surge != null) 'surge': surge!.toJson(),
+    if (promo != null) 'promo': promo!.toJson(),
+    if (loyalty != null) 'loyalty': loyalty!.toJson(),
+  };
+
+  // Backwards compatibility getters
+  int get totalMinor => breakdown?.totalMinor ?? breakdown?.grossMinor ?? 0;
+  int get vatMinor => breakdown?.vatMinor ?? 0;
+  String? get promoCode => promo?.code;
+  int get promoDiscountMinor => breakdown?.promoDiscountMinor ?? 0;
+
+  int? get maxApplicablePoints => loyalty?.maxApplicablePoints;
+  int? get discountMinorAtMax => loyalty?.discountMinorAtMax;
+  int? get currentBalancePoints => loyalty?.currentBalancePoints;
+  int? get currentBalanceValueMinor => loyalty?.currentBalanceValueMinor;
+  int? get pointsApplied => loyalty?.pointsApplied;
+  int? get pointsDiscountMinor =>
+      loyalty?.pointsDiscountMinor ?? breakdown?.pointsDiscountMinor;
+  int? get amountDueMinor => breakdown?.amountDueMinor;
+}
+
+class QuoteSurgeModel {
+  final int timeBps;
+  final int zoneBps;
+  final int demandBps;
+
+  QuoteSurgeModel({
+    required this.timeBps,
+    required this.zoneBps,
+    required this.demandBps,
+  });
+
+  factory QuoteSurgeModel.fromJson(Map<String, dynamic> json) =>
+      QuoteSurgeModel(
+        timeBps: (json['timeBps'] as num?)?.toInt() ?? 0,
+        zoneBps: (json['zoneBps'] as num?)?.toInt() ?? 0,
+        demandBps: (json['demandBps'] as num?)?.toInt() ?? 0,
+      );
+
+  Map<String, dynamic> toJson() => {
+    'timeBps': timeBps,
+    'zoneBps': zoneBps,
+    'demandBps': demandBps,
+  };
+}
+
+class QuotePromoModel {
+  final String code;
+  final String discountType;
+  final int percent;
+  final int fixedAmountMinor;
+  final int discountMinor;
+
+  QuotePromoModel({
+    required this.code,
+    required this.discountType,
+    required this.percent,
+    required this.fixedAmountMinor,
+    required this.discountMinor,
+  });
+
+  factory QuotePromoModel.fromJson(Map<String, dynamic> json) =>
+      QuotePromoModel(
+        code: json['code'] as String? ?? '',
+        discountType: json['discountType'] as String? ?? '',
+        percent: (json['percent'] as num?)?.toInt() ?? 0,
+        fixedAmountMinor: (json['fixedAmountMinor'] as num?)?.toInt() ?? 0,
+        discountMinor: (json['discountMinor'] as num?)?.toInt() ?? 0,
+      );
+
+  Map<String, dynamic> toJson() => {
+    'code': code,
+    'discountType': discountType,
+    'percent': percent,
+    'fixedAmountMinor': fixedAmountMinor,
+    'discountMinor': discountMinor,
+  };
+}
+
+class QuoteLoyaltyModel {
+  final int currentBalancePoints;
+  final int currentBalanceValueMinor;
+  final int maxApplicablePoints;
+  final int discountMinorAtMax;
+  final int pointsApplied;
+  final int pointsDiscountMinor;
+
+  QuoteLoyaltyModel({
+    required this.currentBalancePoints,
+    required this.currentBalanceValueMinor,
+    required this.maxApplicablePoints,
+    required this.discountMinorAtMax,
+    required this.pointsApplied,
+    required this.pointsDiscountMinor,
+  });
+
+  factory QuoteLoyaltyModel.fromJson(
+    Map<String, dynamic> json,
+  ) => QuoteLoyaltyModel(
+    currentBalancePoints: (json['currentBalancePoints'] as num?)?.toInt() ?? 0,
+    currentBalanceValueMinor:
+        (json['currentBalanceValueMinor'] as num?)?.toInt() ?? 0,
+    maxApplicablePoints: (json['maxApplicablePoints'] as num?)?.toInt() ?? 0,
+    discountMinorAtMax: (json['discountMinorAtMax'] as num?)?.toInt() ?? 0,
+    pointsApplied: (json['pointsApplied'] as num?)?.toInt() ?? 0,
+    pointsDiscountMinor: (json['pointsDiscountMinor'] as num?)?.toInt() ?? 0,
+  );
+
+  Map<String, dynamic> toJson() => {
+    'currentBalancePoints': currentBalancePoints,
+    'currentBalanceValueMinor': currentBalanceValueMinor,
+    'maxApplicablePoints': maxApplicablePoints,
+    'discountMinorAtMax': discountMinorAtMax,
+    'pointsApplied': pointsApplied,
+    'pointsDiscountMinor': pointsDiscountMinor,
   };
 }

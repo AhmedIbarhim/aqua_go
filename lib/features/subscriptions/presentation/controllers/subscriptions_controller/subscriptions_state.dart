@@ -51,12 +51,14 @@ final class SubscriptionsError extends SubscriptionsState {
 /// the Moyasar SDK sheet without paying).
 final class SubscriptionPaymentCancelled extends SubscriptionsState {}
 
-/// Emitted after the SDK returned a verified payment and the
-/// subscription create call failed (server auto-refunds).
-final class SubscriptionPaymentRefundPending extends SubscriptionsState {
+/// Emitted after the SDK returned a verified payment and the subscription
+/// create call failed. Refunds were removed platform-wide on 2026-07-29, so the
+/// charge is NOT returned automatically — this state asserts nothing about the
+/// money, it only surfaces the server's reason.
+final class SubscriptionPaymentCreateFailed extends SubscriptionsState {
   final String message;
 
-  const SubscriptionPaymentRefundPending(this.message);
+  const SubscriptionPaymentCreateFailed(this.message);
 
   @override
   List<Object?> get props => [message];

@@ -16,8 +16,8 @@ import '../../../../core/themes/app_text_styles.dart';
 import '../../../auth/presentation/controllers/auth_cubit/auth_cubit.dart';
 import '../../../my_bookings/data/enums/booking_status_enum.dart';
 import '../../../my_bookings/data/repos/my_bookings_repository.dart';
-import 'local_texts/privacy_policy_texts_ar.dart';
-import 'local_texts/privacy_policy_texts_en.dart';
+import '../local_texts/privacy_policy_texts_ar.dart';
+import '../local_texts/privacy_policy_texts_en.dart';
 
 class PrivacyPolicyView extends StatelessWidget {
   const PrivacyPolicyView({super.key});

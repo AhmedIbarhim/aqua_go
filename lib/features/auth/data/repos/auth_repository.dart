@@ -138,6 +138,10 @@ class AuthRepository {
     _cachedUser = null;
     await SecureStorage.deleteSecuredString(kAccessToken);
     await SecureStorage.deleteSecuredString(kRefreshToken);
+    // PH1-024: also purge the persisted cached profile so no prior-user PII
+    // residue survives; combined with the token-gate in restoreCachedUser this
+    // means a stale blob can never be resurrected into a fresh/guest session.
+    await SecureStorage.deleteSecuredString(kUserData);
     currentUser.value = null;
   }
 
@@ -158,23 +162,33 @@ class AuthRepository {
   Future<void> saveUser(UserModel user) async {
     _cachedUser = user;
     currentUser.value = user;
-    await CacheClient.setString(kUserData, user.toEncodedJson());
+    // PH1-008: the cached UserModel carries PII (name/email/phone/DOB) — persist
+    // it in encrypted secure storage, never plaintext SharedPreferences.
+    await SecureStorage.saveSecuredString(kUserData, user.toEncodedJson());
   }
 
-  UserModel? getUser() {
+  /// Synchronous accessor over the in-memory cache. PH1-008: disk hydration is
+  /// no longer done here (secure storage is async) — cold-start restore runs
+  /// once via [restoreCachedUser]; all mid-session callers read this cache.
+  UserModel? getUser() => _cachedUser;
+
+  /// Cold-start rehydration of the cached user from secure storage. PH1-024:
+  /// gated on a valid access token — a stale [kUserData] blob is never
+  /// resurrected once the session's tokens are gone (prevents PII residue /
+  /// prior-user enumeration). Returns null on any decode failure.
+  Future<UserModel?> restoreCachedUser() async {
     if (_cachedUser != null) return _cachedUser;
-    final userJson = CacheClient.getString(kUserData);
-    if (userJson.isNotEmpty) {
-      try {
-        _cachedUser = UserModel.fromEncodedJson(userJson);
-        // Seed the reactive notifier on first read from disk.
-        if (currentUser.value == null) currentUser.value = _cachedUser;
-        return _cachedUser;
-      } catch (_) {
-        return null;
-      }
+    final token = await SecureStorage.getSecuredString(kAccessToken);
+    if (token == null || token.isEmpty) return null;
+    final userJson = await SecureStorage.getSecuredString(kUserData);
+    if (userJson == null || userJson.isEmpty) return null;
+    try {
+      _cachedUser = UserModel.fromEncodedJson(userJson);
+      if (currentUser.value == null) currentUser.value = _cachedUser;
+      return _cachedUser;
+    } catch (_) {
+      return null;
     }
-    return null;
   }
 
   /// Validates the persisted session by fetching `/api/customer/me`. On success

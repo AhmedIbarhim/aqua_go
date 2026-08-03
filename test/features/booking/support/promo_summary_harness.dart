@@ -352,13 +352,26 @@ QuoteModel quotePayload({
     'vatMinor': vatMinor,
     'currency': 'SAR',
     'expiresAt': toWireDateTime(expiresAt),
-    'promoCode': ?promoCode,
-    'promoDiscountMinor': promoCode == null ? 0 : promoDiscountMinor,
+    // The applied promo now travels in its OWN section, not as a top-level
+    // field: `QuoteModel.promoCode` is a getter over `promo?.code`, so a fixture
+    // that kept the flat key would read back as "no promo applied" and every
+    // offer/promo assertion downstream would quietly test the wrong branch.
+    if (promoCode != null)
+      'promo': {
+        'code': promoCode,
+        'discountType': 'FIXED_AMOUNT',
+        'percent': 0,
+        'fixedAmountMinor': promoDiscountMinor,
+        'discountMinor': promoDiscountMinor,
+      },
     'breakdown': {
       'grossMinor': grossMinor,
       'netMinor': grossMinor - vatMinor,
       'vatMinor': vatMinor,
       'currency': 'SAR',
+      'totalMinor': grossMinor,
+      'promoDiscountMinor': promoCode == null ? 0 : promoDiscountMinor,
+      'amountDueMinor': grossMinor,
     },
     // The wire's three-kind shape, mirrored EXACTLY as
     // `PriceQuoteServiceImpl.buildLines` emits it: the SERVICE row states the
@@ -446,6 +459,7 @@ class RecordingBookingRepo extends BookingRepository {
     List<Map<String, dynamic>>? addOns,
     String? promoCode,
     String? offerId,
+    int? pointsToApply,
     List<String> addOnIds = const [],
     int? carCount,
   }) async {
@@ -475,6 +489,7 @@ class RecordingBookingRepo extends BookingRepository {
     required String scheduledAt,
     required List<Map<String, dynamic>> vehicles,
     required String attemptNonce,
+    int? pointsToApply,
   }) async {
     paymentInitCalls++;
     await networkTick();

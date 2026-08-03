@@ -2,7 +2,8 @@
 ///
 /// Returned by GET /api/customer/payments/sdk-config.
 /// The publishable key is safe to read from this endpoint — it is a
-/// public key that can only originate payments, never refund/read.
+/// public key that can only originate payments; it cannot read or mutate
+/// payment records the way the secret key can.
 class PaymentSdkConfigModel {
   final String publishableApiKey;
   final String currency;

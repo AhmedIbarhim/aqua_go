@@ -6,7 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'core/components/offline_indicator.dart';
+import 'core/components/floating_control_widgets.dart';
 import 'core/themes/app_colors.dart';
+import 'package:aqua_go/core/config/di/service_locator.dart';
+import 'package:aqua_go/main/app_configs.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -62,14 +65,23 @@ class MyApp extends StatelessWidget {
               navigatorKey: AppRouter.navigatorKey,
               onGenerateRoute: AppRouter.generateRoute,
               builder: (context, child) {
+                final isDev = locator<AppConfigs>().environment.isDev;
                 return MediaQuery(
                   data: MediaQuery.of(
                     context,
                   ).copyWith(textScaler: const TextScaler.linear(1.0)),
-                  child: Column(
+                  child: Stack(
                     children: [
-                      const OfflineIndicator(),
-                      Expanded(child: child!),
+                      Column(
+                        children: [
+                          const OfflineIndicator(),
+                          Expanded(child: child!),
+                        ],
+                      ),
+                      if (isDev) ...[
+                        const FloatingThemeSwitcher(),
+                        const FloatingLanguageSwitcher(),
+                      ],
                     ],
                   ),
                 );

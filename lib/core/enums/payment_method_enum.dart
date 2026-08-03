@@ -27,6 +27,7 @@ extension PaymentMethodEnumExtension on PaymentMethod {
       case 'visa':
       case 'mastercard':
       case 'mada':
+      case 'mada_card':
         return PaymentMethod.creditCard;
       case 'applepay':
       case 'apple_pay':

@@ -87,7 +87,7 @@ class SubscriptionsCubit extends Cubit<SubscriptionsState> {
     final request = baseRequest.copyWith(moyasarPaymentId: moyasarPaymentId);
     final result = await _subscriptionsRepository.createSubscription(request);
     result.fold(
-      (failure) => emit(SubscriptionPaymentRefundPending(failure.message)),
+      (failure) => emit(SubscriptionPaymentCreateFailed(failure.message)),
       (subscription) => emit(SubscriptionCreated(subscription)),
     );
   }

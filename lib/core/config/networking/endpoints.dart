@@ -1,8 +1,8 @@
 abstract class Endpoints {
-  static const String host = 'api.aquago.sa';
+  static const String host = 'qa-api.aquago.sa';
   static const String baseUrl = 'https://$host/api/customer/';
   static const String baseUrlDev = 'https://api.aquago.sa/api/customer/';
-  static const String baseUrlQa = 'https://api.aquago.sa/api/customer/';
+  static const String baseUrlQa = 'https://qa-api.aquago.sa/api/customer/';
 
   //  Auth Endpoints
   static const String sendOtp = 'login/otp';
@@ -64,6 +64,9 @@ abstract class Endpoints {
   static String editBookingLogistics(String bookingId) =>
       'bookings/$bookingId/edit';
   static String tipBooking(String bookingId) => 'bookings/$bookingId/tip';
+  static String tipBookingPaymentInit(String bookingId) =>
+      'bookings/$bookingId/tip/payment-init';
+
 
   //  Banners Endpoints
   static const String banners = 'banners';
@@ -86,6 +89,7 @@ abstract class Endpoints {
   static const String zoneCheck = 'geo/zone-check';
   static const String geoPlacesAutocomplete = 'geo/places/autocomplete';
   static String geoPlaceDetail(String placeId) => 'geo/places/$placeId';
+  static const String geoPlacesReverseGeocode = 'geo/places/reverse-geocode';
 
   //  Packages & Subscriptions Endpoints
   static const String packages = 'subscription-packages';
@@ -171,10 +175,13 @@ abstract class Endpoints {
 
   // Gift Themes & Gifts Endpoints
   static const String giftThemes = 'gift-themes';
-  static const String gifts = 'gifts';
+  static const String giftsSent = 'gifts';
+  static const String giftsReceived = 'gifts/received';
   static String giftDetail(String giftId) => 'gifts/$giftId';
   static String cancelGift(String giftId) => 'gifts/$giftId/cancel';
   static const String redeemGift = 'gifts/redeem';
+  static const String giftQuotes = 'gifts/quote';
+  static const String giftPaymentInit = 'gifts/payment-init';
 
   // Promos Endpoints
   static const String validatePromo = 'promos/validate';
@@ -196,13 +203,8 @@ abstract class Endpoints {
   static String reportChatMessage(String messageId) =>
       'chat/messages/$messageId/report';
 
-  // External Google Maps Endpoints (Legacy Direct Calls)
-  static const String googleMapsAutocompleteUrl =
-      'https://maps.googleapis.com/maps/api/place/autocomplete/json';
-  static const String googleMapsPlaceDetailsUrl =
-      'https://maps.googleapis.com/maps/api/place/details/json';
-  static const String googleMapsGeocodeUrl =
-      'https://maps.googleapis.com/maps/api/geocode/json';
+  // PH1-005: legacy direct Google Maps endpoints removed — all place lookups now
+  // route through the backend geo/places proxy (server holds the Google key).
 
   static String nameAvatar(String? userName) =>
       'https://ui-avatars.com/api/?name=$userName&background=00D5DD&color=fff';

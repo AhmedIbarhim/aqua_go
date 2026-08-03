@@ -18,7 +18,14 @@ class EmptyAddressesWidget extends StatelessWidget {
         child: Column(
           children: [
             SizedBox(height: context.screenHeight * 0.15),
-            SvgPicture.asset(AppAssets.noAddresses),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              child: SvgPicture.asset(
+                context.isDarkTheme
+                    ? AppAssets.emptyAddressesDark
+                    : AppAssets.emptyAddressesLight,
+              ),
+            ),
             const SizedBox(height: 40),
             Text(
               LocaleKeys.address_no_addresses.tr(context: context),

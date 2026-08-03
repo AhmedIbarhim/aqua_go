@@ -17,11 +17,11 @@ import '../../../../core/components/generic_app_bar.dart';
 import '../../../../core/components/bottom_action_sheet_container.dart';
 import '../../../../core/config/di/service_locator.dart';
 import '../../../../generated/locale_keys.g.dart';
-import '../widgets/car_selection_list.dart';
-import '../widgets/package_service_selection_list.dart';
-import '../widgets/add_ons_grid.dart';
-import '../widgets/date_time_picker.dart';
-import '../widgets/package_addon_payment_bottom_sheet.dart';
+import '../widgets/booking_details_widgets/car_selection_list.dart';
+import '../widgets/booking_details_widgets/package_service_selection_list.dart';
+import '../widgets/booking_details_widgets/add_ons_grid.dart';
+import '../widgets/booking_details_widgets/date_time_picker.dart';
+import '../widgets/booking_details_widgets/package_addon_payment_bottom_sheet.dart';
 import '../controllers/booking_cubit.dart';
 import '../controllers/booking_state.dart';
 import '../../../../core/route/app_router.dart';
@@ -172,7 +172,9 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
                   : LocaleKeys.bookings_booking_details.tr(context: context),
               titleColor: Colors.white,
               hasBackground: true,
-              backgroundImage: AppAssets.bookingHeaderImage,
+              backgroundImage: (context.isDarkTheme
+              ? AppAssets.bookingHeaderImageDark
+              : AppAssets.bookingHeaderImageLight),
               centerTitle: true,
             ),
             body: Column(

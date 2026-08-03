@@ -11,6 +11,7 @@ import '../models/package_reschedule_request_model.dart';
 import '../models/quote_model.dart';
 import '../models/payment_init_model.dart';
 import '../models/availability_response_model.dart';
+import '../models/promo_validate_response_model.dart';
 import '../data_sources/bookings_remote_data_source.dart';
 
 class BookingRepository {
@@ -29,6 +30,7 @@ class BookingRepository {
     String? offerId,
     List<String> addOnIds = const [],
     int? carCount,
+    int? pointsToApply,
   }) async {
     try {
       final response = await bookingsRemoteDataSource.getQuote(
@@ -40,6 +42,7 @@ class BookingRepository {
         offerId: offerId,
         addOnIds: addOnIds,
         carCount: carCount,
+        pointsToApply: pointsToApply,
       );
       return response.fold((failure) => left(failure), (data) {
         if (data != null) {
@@ -51,6 +54,37 @@ class BookingRepository {
           }
         }
         return left(ServerFailure('Failed to load quote details'));
+      });
+    } catch (error) {
+      return left(ServerFailure(error.toString()));
+    }
+  }
+
+  Future<Either<Failure, PromoValidateResponseModel>> validatePromoCode({
+    required String code,
+    required String packageId,
+    required double lat,
+    required double lng,
+  }) async {
+    try {
+      final response = await bookingsRemoteDataSource.validatePromo(
+        code: code,
+        packageId: packageId,
+        lat: lat,
+        lng: lng,
+      );
+      return response.fold((failure) => left(failure), (data) {
+        if (data != null) {
+          try {
+            final result = PromoValidateResponseModel.fromJson(
+              data as Map<String, dynamic>,
+            );
+            return right(result);
+          } catch (e) {
+            return left(ServerFailure('Parsing error: $e'));
+          }
+        }
+        return left(ServerFailure('Failed to validate promo code'));
       });
     } catch (error) {
       return left(ServerFailure(error.toString()));
@@ -118,14 +152,16 @@ class BookingRepository {
     required String scheduledAt,
     required List<Map<String, dynamic>> vehicles,
     required String attemptNonce,
+    int? pointsToApply,
   }) async {
     try {
       final response = await bookingsRemoteDataSource.bookingPaymentInit(
         quoteId: quoteId,
         scheduledAt: scheduledAt,
         vehicles: vehicles,
-        idempotencyKey: 'booking-payment-init:$quoteId:$attemptNonce',
+        idempotencyKey: 'booking-payment-init:$quoteId:${pointsToApply ?? 0}:$attemptNonce',
         attemptNonce: attemptNonce,
+        pointsToApply: pointsToApply,
       );
       return response.fold((failure) => left(failure), (data) {
         if (data != null) {
@@ -168,6 +204,37 @@ class BookingRepository {
           }
         }
         return left(ServerFailure('Failed to load created booking details'));
+      });
+    } catch (error) {
+      return left(ServerFailure(error.toString()));
+    }
+  }
+
+  Future<Either<Failure, BookingResponseModel>> redeemGiftBooking(
+    Map<String, dynamic> data,
+  ) async {
+    try {
+      final customerId = FetchUserData.getUserId() ?? '';
+      final giftCode = data['giftCode'] as String? ?? '';
+      final idempotencyKey = 'gift-redeem-booking:$customerId:$giftCode';
+
+      final response = await bookingsRemoteDataSource.redeemGiftBooking(
+        data: data,
+        idempotencyKey: idempotencyKey,
+      );
+      return response.fold((failure) => left(failure), (resData) {
+        if (resData != null) {
+          try {
+            final map = resData as Map<String, dynamic>;
+            final bookingResponse = BookingResponseModel(
+              id: map['bookingId'] as String?,
+            );
+            return right(bookingResponse);
+          } catch (e) {
+            return left(ServerFailure('Parsing error: $e'));
+          }
+        }
+        return left(ServerFailure('Failed to redeem gift booking'));
       });
     } catch (error) {
       return left(ServerFailure(error.toString()));

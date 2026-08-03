@@ -7,8 +7,11 @@
 /// `paymentStatus` wire field under the Moyasar immediate-capture model.
 ///
 /// Collapsed set (spec §6.1): the card is charged in full at create
-/// (`PAID`), subscription-covered washes are `NOT_REQUIRED`, and reversals
-/// are refund-only (`REFUNDED` / `PARTIALLY_REFUNDED`).
+/// (`PAID`) and subscription-covered washes are `NOT_REQUIRED`. There is no
+/// reversal state — refunds were removed platform-wide on 2026-07-29, so a
+/// booking that was paid and then cancelled stays `PAID`. `fromString`
+/// returns null for any other token, including the retired `REFUNDED` /
+/// `PARTIALLY_REFUNDED`, so an old payload never throws on read.
 ///
 /// NOTE: the Moyasar SDK ships its own unrelated `PaymentStatus` enum
 /// (paid/failed/initiated) for the on-device purchase result. This enum is
@@ -16,9 +19,7 @@
 /// imports `package:moyasar/moyasar.dart` without an import prefix.
 enum PaymentStatus {
   PAID,
-  NOT_REQUIRED,
-  REFUNDED,
-  PARTIALLY_REFUNDED;
+  NOT_REQUIRED;
 
   static PaymentStatus? fromString(String? value) {
     if (value == null) return null;
@@ -27,10 +28,6 @@ enum PaymentStatus {
         return PaymentStatus.PAID;
       case 'NOT_REQUIRED':
         return PaymentStatus.NOT_REQUIRED;
-      case 'REFUNDED':
-        return PaymentStatus.REFUNDED;
-      case 'PARTIALLY_REFUNDED':
-        return PaymentStatus.PARTIALLY_REFUNDED;
       default:
         return null;
     }
@@ -42,10 +39,6 @@ enum PaymentStatus {
         return 'مدفوع';
       case PaymentStatus.NOT_REQUIRED:
         return 'مشمول بالاشتراك';
-      case PaymentStatus.REFUNDED:
-        return 'تم الاسترداد';
-      case PaymentStatus.PARTIALLY_REFUNDED:
-        return 'استرداد جزئي';
     }
   }
 
@@ -55,10 +48,6 @@ enum PaymentStatus {
         return 'Paid';
       case PaymentStatus.NOT_REQUIRED:
         return 'Covered by subscription';
-      case PaymentStatus.REFUNDED:
-        return 'Refunded';
-      case PaymentStatus.PARTIALLY_REFUNDED:
-        return 'Partially refunded';
     }
   }
 }

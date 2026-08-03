@@ -39,21 +39,21 @@ class GenderCard extends StatelessWidget {
         iconOpacity = 1.0;
       } else {
         bgColor = context.colors.background;
-        borderColor = context.colors.borderSecondary;
+        borderColor = context.colors.textTertiary;
         textColor = context.colors.contentSecondaryLight;
         iconOpacity = 1.0;
       }
     } else {
       if (isSelected) {
         bgColor = context.colors.cardBackGround;
-        borderColor = context.colors.borderSecondary;
+        borderColor = context.colors.textTertiary;
         textColor = context.colors.textSecondary;
         iconOpacity = 1.0;
       } else {
         bgColor = context.colors.background;
-        borderColor = context.colors.defaultSubtle;
-        textColor = context.colors.contentDisabled;
-        iconOpacity = 0.5;
+        borderColor = context.colors.contentDisabled;
+        textColor = context.colors.textTertiary;
+        iconOpacity = 0.7;
       }
     }
 

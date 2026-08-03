@@ -278,15 +278,15 @@ void main() {
     });
   });
 
-  group('a charge that had to be undone', () {
+  group('a charge with no booking behind it', () {
     testWidgets(
-      'says the card was refunded and how long it takes to appear',
+      'promises nothing about the money when the create is rejected',
       (tester) async {
         // The 422 the server raises when a promo cap was consumed between the
-        // quote and the charge. The card WAS charged and HAS been refunded —
-        // the server detail says nothing about either, but the SLUG does: the
-        // backend runs its compensating refund on this rejection before it
-        // throws, so the claim rests on the contract rather than a guess.
+        // quote and the charge. The card WAS charged. This rejection used to
+        // run a compensating refund and the copy said so — refunds were removed
+        // platform-wide on 2026-07-29, so it no longer does, and the client must
+        // not claim otherwise.
         const serverDetail = 'This promo code is no longer valid.';
         final cubit = buildCubit(
           RecordingBookingRepo(),
@@ -301,27 +301,23 @@ void main() {
         await cubit.completeBookingAfterPayment('pay_1');
         await settle(tester);
 
-        expect(cubit.state.paymentPhase, PaymentPhase.refundPending);
-        expect(
-          find.textContaining('bookings.payment_refunded_title'),
-          findsOneWidget,
-        );
+        expect(cubit.state.paymentPhase, PaymentPhase.createUnconfirmed);
         expect(
           find.textContaining(serverDetail),
           findsOneWidget,
           reason: 'the reason the booking failed is still stated',
         );
         expect(
-          find.textContaining('bookings.payment_refunded_notice'),
+          find.textContaining('bookings.payment_unconfirmed_notice'),
           findsOneWidget,
-          reason: 'money left the account — the customer must be told it is '
-              'coming back, and that a card refund can take up to 7 days',
+          reason: 'money left the account and is not coming back on its own — '
+              'the customer is pointed at support, not promised a reversal',
         );
       },
     );
 
     testWidgets(
-      'never promises a refund when the create never got an answer',
+      'promises nothing when the create never got an answer either',
       (tester) async {
         // The connection dropped after the card was charged. The server may
         // have created the booking and may never have refunded anything — the
@@ -341,14 +337,10 @@ void main() {
 
         expect(cubit.state.paymentPhase, PaymentPhase.createUnconfirmed);
         expect(
-          find.textContaining('bookings.payment_refunded_notice'),
-          findsNothing,
-          reason: 'the booking may in fact exist and no refund may have run — '
-              'asserting one would be inventing it',
-        );
-        expect(
           find.textContaining('bookings.payment_unconfirmed_title'),
           findsOneWidget,
+          reason: 'the booking may in fact exist and nothing was returned — '
+              'the copy asserts neither',
         );
         expect(
           find.textContaining('bookings.payment_unconfirmed_notice'),
@@ -360,7 +352,7 @@ void main() {
     );
 
     testWidgets(
-      'a 4xx that runs no compensation is unconfirmed, not refunded',
+      'a 4xx after the charge is unconfirmed too',
       (tester) async {
         // A rejection thrown AFTER verify but on a path with no compensating
         // refund (zone mismatch, saved address gone, schedule window). Same
@@ -380,10 +372,6 @@ void main() {
         await settle(tester);
 
         expect(cubit.state.paymentPhase, PaymentPhase.createUnconfirmed);
-        expect(
-          find.textContaining('bookings.payment_refunded_notice'),
-          findsNothing,
-        );
         expect(
           find.textContaining('bookings.payment_unconfirmed_notice'),
           findsOneWidget,
@@ -410,9 +398,9 @@ void main() {
 
       expect(cubit.state.paymentPhase, PaymentPhase.none);
       expect(
-        find.textContaining('bookings.payment_refunded_notice'),
+        find.textContaining('bookings.payment_unconfirmed_notice'),
         findsNothing,
-        reason: 'nothing was charged, so promising a refund would be a lie',
+        reason: 'nothing was charged, so no post-charge notice belongs here',
       );
       expect(find.textContaining('Code not recognised'), findsOneWidget);
     });

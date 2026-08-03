@@ -16,7 +16,14 @@ class EmptyNotificationsWidget extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        SvgPicture.asset(AppAssets.notificationsEmpty),
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          child: SvgPicture.asset(
+            context.isDarkTheme
+                ? AppAssets.emptyNotificationsDark
+                : AppAssets.emptyNotificationsLight,
+          ),
+        ),
         const SizedBox(height: 24),
         Text(
           LocaleKeys.notifications_no_notifications.tr(context: context),

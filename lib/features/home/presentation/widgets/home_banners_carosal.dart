@@ -1,9 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-// import '../../../../core/route/routes.dart';
+import '../../../../core/components/custom_dots_indicator.dart';
+import '../../../../core/route/routes.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../data/models/banner_model.dart';
@@ -93,32 +93,9 @@ class _HomeBannersCarosalState extends State<HomeBannersCarosal> {
         ),
         if (widget.banners.isNotEmpty) ...[
           SizedBox(height: context.screenHeight * 0.012),
-          DotsIndicator(
-            dotsCount: widget.banners.length,
-            position: _currentIndex.toDouble(),
-            decorator: DotsDecorator(
-              activeColor: context.colors.contentSecondaryLight,
-              color: context.colors.contentSecondary,
-              size: Size(
-                context.screenWidth * 0.015,
-                context.screenWidth * 0.015,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(
-                  context.screenWidth * 0.015,
-                ),
-              ),
-              spacing: EdgeInsets.all(context.screenWidth * 0.01),
-              activeSize: Size(
-                context.screenWidth * 0.015,
-                context.screenWidth * 0.015,
-              ),
-              activeShape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(
-                  context.screenWidth * 0.015,
-                ),
-              ),
-            ),
+          CustomDotsIndicator(
+            count: widget.banners.length,
+            currentIndex: _currentIndex,
           ),
         ],
       ],
@@ -154,7 +131,7 @@ class _HomeBannersCarosalState extends State<HomeBannersCarosal> {
       case 'DEEPLINK':
         switch (banner.ctaTarget) {
           case 'packages':
-            // Navigator.pushNamed(context, Routes.packages);
+            Navigator.pushNamed(context, Routes.packages);
             break;
           default:
             // Unknown deeplink target — safe no-op.

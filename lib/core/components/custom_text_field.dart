@@ -86,7 +86,9 @@ class CustomTextField extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         SizedBox(
-          height: (minLines != null || (maxLines != null && maxLines! > 1)) ? null : height * 0.055,
+          height: (minLines != null || (maxLines != null && maxLines! > 1))
+              ? null
+              : height * 0.055,
           child: TextField(
             onTap: onTap,
             autofocus: autofocus,
@@ -112,7 +114,9 @@ class CustomTextField extends StatelessWidget {
             controller: controller,
             maxLines: maxLines,
             minLines: minLines,
-            textAlignVertical: (maxLines != null && maxLines! > 1) ? TextAlignVertical.top : TextAlignVertical.center,
+            textAlignVertical: (maxLines != null && maxLines! > 1)
+                ? TextAlignVertical.top
+                : TextAlignVertical.center,
             keyboardType: keyboardType,
             style:
                 style ??
@@ -122,7 +126,7 @@ class CustomTextField extends StatelessWidget {
             decoration: InputDecoration(
               hintText: hint,
               hintStyle: AppTextStyles.regular14.copyWith(
-                color: context.colors.contentDisabled,
+                color: context.colors.textTertiary,
               ),
               filled: true,
               fillColor: fillColor ?? context.colors.background,

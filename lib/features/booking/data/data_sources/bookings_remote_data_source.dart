@@ -23,6 +23,7 @@ class BookingsRemoteDataSource {
     String? offerId,
     List<String> addOnIds = const [],
     int? carCount,
+    int? pointsToApply,
   }) {
     final hasOffer = offerId != null && offerId.isNotEmpty;
     return _apiClient.post(
@@ -31,6 +32,9 @@ class BookingsRemoteDataSource {
         'packageId': packageId,
         'lat': lat,
         'lng': lng,
+        // offerId and promoCode are alternatives — sending both is a 400
+        // (promo-and-offer-mutually-exclusive), so the offer wins when present and
+        // the server resolves its linked code.
         if (hasOffer) 'offerId': offerId,
         if (!hasOffer && promoCode != null && promoCode.isNotEmpty)
           'promoCode': promoCode,
@@ -38,7 +42,20 @@ class BookingsRemoteDataSource {
           'addOns': addOnIds.map((id) => {'addonId': id}).toList(),
           'carCount': carCount ?? 1,
         },
+        if (pointsToApply != null) 'pointsToApply': pointsToApply,
       },
+    );
+  }
+
+  Future<Either<Failure, dynamic>> validatePromo({
+    required String code,
+    required String packageId,
+    required double lat,
+    required double lng,
+  }) {
+    return _apiClient.post(
+      Endpoints.validatePromo,
+      data: {'code': code, 'packageId': packageId, 'lat': lat, 'lng': lng},
     );
   }
 
@@ -74,6 +91,7 @@ class BookingsRemoteDataSource {
     required List<Map<String, dynamic>> vehicles,
     required String idempotencyKey,
     required String attemptNonce,
+    int? pointsToApply,
   }) {
     return _apiClient.post(
       Endpoints.bookingsPaymentInit,
@@ -82,6 +100,7 @@ class BookingsRemoteDataSource {
         'scheduledAt': scheduledAt,
         'vehicles': vehicles,
         'attemptNonce': attemptNonce,
+        if (pointsToApply != null) 'pointsToApply': pointsToApply,
       },
       options: Options(headers: {'Idempotency-Key': idempotencyKey}),
     );
@@ -143,6 +162,17 @@ class BookingsRemoteDataSource {
     return _apiClient.post(
       Endpoints.rescheduleSubscriptionWash(subscriptionId, washId),
       data: rescheduleData,
+      options: Options(headers: {'Idempotency-Key': idempotencyKey}),
+    );
+  }
+
+  Future<Either<Failure, dynamic>> redeemGiftBooking({
+    required Map<String, dynamic> data,
+    required String idempotencyKey,
+  }) {
+    return _apiClient.post(
+      Endpoints.redeemGift,
+      data: data,
       options: Options(headers: {'Idempotency-Key': idempotencyKey}),
     );
   }

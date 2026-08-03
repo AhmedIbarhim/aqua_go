@@ -1,5 +1,6 @@
 import 'package:aqua_go/core/config/di/service_locator.dart';
 import 'package:aqua_go/core/extentions/context_extentions.dart';
+import 'package:aqua_go/core/security/screen_protection.dart';
 import 'package:aqua_go/features/auth/presentation/controllers/auth_cubit/auth_cubit.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +26,11 @@ class PhoneOtpView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // PH1-022: OTP screen — block screenshots/snapshots while it is shown.
+    return ScreenProtectionScope(child: _buildProtected(context));
+  }
+
+  Widget _buildProtected(BuildContext context) {
     return BlocProvider(
       create: (context) => locator<AuthCubit>(),
       child: BlocListener<AuthCubit, AuthState>(

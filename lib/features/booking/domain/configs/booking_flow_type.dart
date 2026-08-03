@@ -1,1 +1,1 @@
-enum BookingFlowType { service, reschedule, package }
+enum BookingFlowType { service, reschedule, package, giftRedeem }

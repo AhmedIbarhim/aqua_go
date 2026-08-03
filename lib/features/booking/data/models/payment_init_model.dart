@@ -19,8 +19,8 @@ class PaymentInitModel {
 
   factory PaymentInitModel.fromJson(Map<String, dynamic> json) {
     return PaymentInitModel(
-      amountMinor: json['amountMinor'] as int,
-      givenId: json['givenId'] as String,
+      amountMinor: (json['amountMinor'] as num?)?.toInt() ?? 0,
+      givenId: json['givenId'] as String? ?? '',
       currency: (json['currency'] as String?) ?? 'SAR',
       metadata: json['metadata'] != null
           ? Map<String, dynamic>.from(json['metadata'] as Map)

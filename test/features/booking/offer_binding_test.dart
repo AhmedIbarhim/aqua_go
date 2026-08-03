@@ -15,6 +15,7 @@ import 'package:aqua_go/features/my_bookings/data/models/booking_response_model/
 import 'package:aqua_go/features/my_cars/data/models/my_car_model.dart';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
+import 'package:aqua_go/features/my_bookings/data/models/booking_response_model/breakdown.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -190,12 +191,26 @@ void main() {
 
 final _quote = QuoteModel(
   quoteId: 'quote-1',
-  totalMinor: 9500,
-  vatMinor: 1239,
   currency: 'SAR',
   expiresAt: saudiNow().add(const Duration(minutes: 15)),
-  promoCode: 'WELCOME20',
-  promoDiscountMinor: 2000,
+  // Nested shape: the money lives on the breakdown and the code on the promo
+  // section — the quote root carries neither.
+  breakdown: Breakdown(
+    grossMinor: 9500,
+    netMinor: 9500 - 1239,
+    vatMinor: 1239,
+    currency: 'SAR',
+    totalMinor: 9500,
+    promoDiscountMinor: 2000,
+    amountDueMinor: 9500,
+  ),
+  promo: QuotePromoModel(
+    code: 'WELCOME20',
+    discountType: 'FIXED_AMOUNT',
+    percent: 0,
+    fixedAmountMinor: 2000,
+    discountMinor: 2000,
+  ),
 );
 
 /// Captures the body each call would put on the wire, and answers with an

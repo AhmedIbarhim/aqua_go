@@ -3,9 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:svg_flutter/svg.dart';
 import 'package:easy_localization/easy_localization.dart';
-// import 'package:url_launcher/url_launcher.dart';
-// import 'package:aqua_go/core/config/networking/endpoints.dart';
-// import 'package:aqua_go/core/enums/payment_status_enum.dart';
 import 'package:aqua_go/core/components/custom_button.dart';
 import 'package:aqua_go/core/components/generic_app_bar.dart';
 import 'package:aqua_go/core/themes/app_colors.dart';
@@ -185,10 +182,8 @@ class MyBookingDetailsView extends StatelessWidget {
                                       rating: activeBooking.rating!,
                                     ),
                                   ],
-                                  // if (_showsReceipt(activeBooking)) ...[
-                                  //   const SizedBox(height: 16),
-                                  //   _buildReceiptLink(context, activeBooking),
-                                  // ],
+                                  const SizedBox(height: 16),
+                                  _buildReceiptLink(context, activeBooking),
                                   const SizedBox(height: 32),
                                 ],
                               ),
@@ -280,52 +275,43 @@ class MyBookingDetailsView extends StatelessWidget {
   /// bugs). Shown only for completed bookings whose money actually moved.
   // bool _showsReceipt(BookingResponseModel booking) {
   //   return booking.status == BookingStatus.COMPLETED &&
-  //       (booking.paymentStatus == PaymentStatus.PAID ||
-  //           booking.paymentStatus == PaymentStatus.PARTIALLY_REFUNDED);
+  //       booking.paymentStatus == PaymentStatus.PAID;
   // }
 
-  // Widget _buildReceiptLink(BuildContext context, BookingResponseModel booking) {
-  //   if (!_showsReceipt(booking) || booking.id == null) {
-  //     return const SizedBox.shrink();
-  //   }
-  //   return InkWell(
-  //     onTap: () async {
-  //       final uri = Uri.parse(
-  //         Endpoints.baseUrl + Endpoints.bookingReceiptPdf(booking.id!),
-  //       );
-  //       final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
-  //       if (!ok && context.mounted) {
-  //         context.showWarningSnackBar(
-  //           context.isAr ? 'تعذّر فتح الإيصال.' : 'Could not open the receipt.',
-  //         );
-  //       }
-  //     },
-  //     borderRadius: BorderRadius.circular(12),
-  //     child: Container(
-  //       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-  //       decoration: BoxDecoration(
-  //         color: context.colors.themeColor,
-  //         borderRadius: BorderRadius.circular(12),
-  //       ),
-  //       child: Row(
-  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //         children: [
-  //           Text(
-  //             LocaleKeys.bookings_view_receipt.tr(context: context),
-  //             style: AppTextStyles.medium14.copyWith(
-  //               color: context.colors.primary,
-  //             ),
-  //           ),
-  //           Icon(
-  //             Icons.arrow_forward_ios,
-  //             color: context.colors.primary,
-  //             size: 16,
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
+  Widget _buildReceiptLink(BuildContext context, BookingResponseModel booking) {
+    if (booking.id == null) {
+      return const SizedBox.shrink();
+    }
+    return InkWell(
+      onTap: () {
+        context.pushNamed(Routes.receiptSummary, arguments: booking);
+      },
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: context.colors.themeColor,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              LocaleKeys.bookings_view_receipt.tr(context: context),
+              style: AppTextStyles.medium14.copyWith(
+                color: context.colors.primary,
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios,
+              color: context.colors.primary,
+              size: 16,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   /// Mirrors the backend reschedule policy (AQG-119:
   /// reschedulePolicy.minHoursBeforeStart = 12h). Editing launches the
@@ -431,7 +417,7 @@ class MyBookingDetailsView extends StatelessWidget {
         height: MediaQuery.sizeOf(context).height * 0.055,
         padding: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
-          color: context.colors.brandSubtle,
+          color: context.colors.contentDisabled,
           border: Border.all(color: context.colors.borderSecondary, width: 0.5),
           borderRadius: BorderRadius.circular(12),
         ),
@@ -442,7 +428,7 @@ class MyBookingDetailsView extends StatelessWidget {
             Icon(
               Icons.lock_clock_outlined,
               size: 18,
-              color: context.colors.contentDisabled,
+              color: context.colors.textSecondary,
             ),
             Flexible(
               child: FittedBox(
@@ -451,7 +437,7 @@ class MyBookingDetailsView extends StatelessWidget {
                   LocaleKeys.bookings_edit_closed_12h.tr(context: context),
                   textAlign: TextAlign.center,
                   style: AppTextStyles.regular14.copyWith(
-                    color: context.colors.contentDisabled,
+                    color: context.colors.textSecondary,
                   ),
                 ),
               ),

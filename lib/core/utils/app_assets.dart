@@ -1,5 +1,8 @@
 abstract class AppAssets {
   // General Icons
+  static const String chat = 'assets/svg/chat.svg';
+  static const String emptyOffers = 'assets/svg/empty_folder.svg';
+  static const String promotion = 'assets/svg/promotion.svg';
   static const String edit = 'assets/svg/edit.svg';
   static const String remove = 'assets/svg/remove.svg';
   static const String language = 'assets/svg/lang.svg';
@@ -11,7 +14,10 @@ abstract class AppAssets {
   // Notifications
   static const String notification = 'assets/svg/notification.svg';
   static const String notificationActive = 'assets/svg/notification_active.svg';
-  static const String notificationsEmpty = 'assets/svg/notifications_empty.svg';
+  static const String emptyNotificationsDark =
+      'assets/svg/empty_notifications_dark.svg';
+  static const String emptyNotificationsLight =
+      'assets/svg/empty_notifications_light.svg';
   // Home
   static const String homeLightHeader = 'assets/images/home_light_header.png';
   static const String baseServiceDark =
@@ -24,13 +30,12 @@ abstract class AppAssets {
       'assets/images/base_service_light_en.png';
 
   // Empty Screens
-  static const String emptyCars = 'assets/svg/empty_folder.svg';
-  static const String emptyBookings = 'assets/svg/empty_bookings.svg';
+  static const String emptyCarsDark = 'assets/svg/empty_cars_dark.svg';
+  static const String emptyCarsLight = 'assets/svg/empty_cars_light.svg';
+  static const String emptyBookingsDark = 'assets/svg/empty_bookings_dark.svg';
+  static const String emptyBookingsLight =
+      'assets/svg/empty_bookings_light.svg';
   static const String emptyComplaints = 'assets/svg/no_complaints.svg';
-  // The same generic "nothing here" illustration `emptyCars` uses — the app has
-  // no offers-specific one, and inventing a second style for one screen is the
-  // opposite of what an empty state should do.
-  static const String emptyOffers = 'assets/svg/empty_folder.svg';
 
   // Auth
   static const String logo = 'assets/images/app_logo.png';
@@ -104,6 +109,7 @@ abstract class AppAssets {
   static const String shadows_3 = 'assets/images/shadows_3.png';
 
   static const String successIcon = 'assets/svg/success_icon.svg';
+  static const String cautionIcon = 'assets/svg/caution_icon.svg';
   static const String warningIcon = 'assets/svg/warning_icon.svg';
 
   // My Vehicles
@@ -115,8 +121,10 @@ abstract class AppAssets {
 
   // Booking
   static const String packageDefault = 'assets/svg/package_default.svg';
-  static const String bookingHeaderImage =
-      'assets/images/booking_header_image.png';
+  static const String bookingHeaderImageDark =
+      'assets/images/booking_header_image_dark.png';
+  static const String bookingHeaderImageLight =
+      'assets/images/booking_header_image_light.png';
   static const String addCarIcon = 'assets/svg/add_car.svg';
   static const String date = 'assets/svg/date.svg';
   static const String document = 'assets/svg/document.svg';
@@ -130,6 +138,7 @@ abstract class AppAssets {
   static const String adding = 'assets/svg/add.svg';
   static const String applePay = 'assets/images/apple_pay.png';
   static const String mastercardPay = 'assets/images/mastercard_pay.png';
+  static const String giftCoupon = 'assets/svg/gift_coupon.svg';
 
   static const String male = 'assets/svg/male.svg';
   static const String female = 'assets/svg/female.svg';
@@ -151,6 +160,7 @@ abstract class AppAssets {
   static const String packages = 'assets/svg/packages.svg';
   static const String whatsppOutlined = 'assets/svg/whatsapp_outlined.svg';
   static const String sms = 'assets/svg/sms.svg';
+  static const String messages = 'assets/svg/messages.svg';
   static const String whatsapp = 'assets/svg/whatsapp.svg';
   static const String question = 'assets/svg/question.svg';
   static const String documentCopy = 'assets/svg/document_copy.svg';
@@ -163,11 +173,33 @@ abstract class AppAssets {
   static const String mapOutlined = 'assets/svg/map.svg';
   static const String location = 'assets/svg/location.svg';
   static const String gps = 'assets/svg/gps.svg';
+  static const String emptyAddressesDark =
+      'assets/svg/empty_addresses_dark.svg';
+  static const String emptyAddressesLight =
+      'assets/svg/empty_addresses_light.svg';
+
+  // gifts
+  static const String emptyGiftsDark = 'assets/svg/empty_gifts_dark.svg';
+  static const String emptyGiftsLight = 'assets/svg/empty_gifts_light.svg';
+  static const String giftSendNow = 'assets/svg/gift_send_now.svg';
+  static const String giftSendLater = 'assets/svg/gift_send_later.svg';
+
+  // wallet
+  static const String points = 'assets/svg/points.svg';
+
+  // not used yet
+
+  static const String techIssueDark = 'assets/svg/tech_issue_dark.svg';
+  static const String techIssueLight = 'assets/svg/tech_issue_light.svg';
+
+  static const String accountBlockedDark =
+      'assets/svg/account_blocked_dark.svg';
+  static const String accountBlockedLight =
+      'assets/svg/account_blocked_light.svg';
   static const String noAddresses = 'assets/svg/no_addresses.svg';
 
-  //Promotions
-  static const String promotion = 'assets/svg/promotion.svg';
-  static const String promoCode = 'assets/svg/promo_code.svg';
+  // defaults
+  static const String defatltPackageIcon = 'assets/images/gift_demo.png';
 
   //Demos
   static const String demoBanner = 'assets/demos/banner_demo.webp';

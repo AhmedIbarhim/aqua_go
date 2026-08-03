@@ -26,6 +26,7 @@ abstract class Routes {
   static const String bookingLocation = '/booking_location_view';
   static const String myBookingDetails = '/my_booking_details_view';
   static const String bookingSummary = '/booking_summary_view';
+  static const String receiptSummary = '/receipt_summary_view';
 
   static const String gallery = '/gallery_view';
   static const String newAddressMap = '/new_address_map_view';
@@ -33,4 +34,9 @@ abstract class Routes {
   static const String myAddresses = '/my_addresses_view';
   static const String complaintDetails = '/complaint_details_view';
   static const String faqs = '/faqs_view';
+  static const String chatInbox = '/chat_inbox_view';
+  static const String chatThread = '/chat_thread_view';
+  static const String gifts = '/gifts_view';
+  static const String sendGift = '/send_gift_view';
+  static const String myWallet = '/my_wallet_view';
 }

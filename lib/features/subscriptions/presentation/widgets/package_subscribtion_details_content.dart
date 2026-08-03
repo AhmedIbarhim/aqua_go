@@ -27,9 +27,11 @@ class PackageSubscribtionDetailsContent extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         // Image
-        SizedBox(
+        Container(
           height: height * 0.25,
           width: width * 0.75,
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(16)),
           child: packageModel.imageUrl.isNotEmpty
               ? CustomNetworkImage(packageModel.imageUrl, fit: BoxFit.cover)
               : SvgPicture.asset(AppAssets.packageDefault, fit: BoxFit.fill),

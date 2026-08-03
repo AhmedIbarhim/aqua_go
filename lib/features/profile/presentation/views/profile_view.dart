@@ -4,6 +4,7 @@ import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:aqua_go/core/security/screen_protection.dart';
 import 'package:aqua_go/core/config/di/service_locator.dart';
 import 'package:aqua_go/features/auth/presentation/controllers/auth_cubit/auth_cubit.dart';
 import 'package:svg_flutter/svg_flutter.dart';
@@ -30,6 +31,11 @@ class ProfileView extends StatefulWidget {
 class _ProfileViewState extends State<ProfileView> {
   @override
   Widget build(BuildContext context) {
+    // PH1-022: profile screen shows PII — block screenshots/snapshots.
+    return ScreenProtectionScope(child: _buildProtected(context));
+  }
+
+  Widget _buildProtected(BuildContext context) {
     double sw(double width) => context.sw(width);
     double sh(double height) => context.sh(height);
 

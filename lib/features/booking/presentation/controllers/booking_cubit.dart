@@ -7,7 +7,6 @@ import '../../../address/data/models/address_model.dart';
 import '../../../my_cars/data/models/my_car_model.dart';
 import '../../../home/data/models/service_model.dart';
 import '../../domain/configs/booking_flow_config.dart';
-import '../../domain/refund_evidence.dart';
 import '../../data/models/quote_model.dart';
 import '../../../my_bookings/data/models/booking_response_model/breakdown.dart';
 import '../../../my_bookings/data/models/booking_response_model/quote_line.dart';
@@ -577,8 +576,16 @@ class BookingCubit extends Cubit<BookingState> {
   /// [applyOffer], [removePromoCode] are the callers that express intent), so
   /// the applied-code chip and the create call read one authoritative value
   /// instead of a screen-local mirror that dies with the route.
-  Future<QuoteModel?> fetchQuote({String? promoCode, String? offerId}) async {
-    final result = await _priceAndPublish(promoCode: promoCode, offerId: offerId);
+  Future<QuoteModel?> fetchQuote({
+    String? promoCode,
+    String? offerId,
+    int? pointsToApply,
+  }) async {
+    final result = await _priceAndPublish(
+      promoCode: promoCode,
+      offerId: offerId,
+      pointsToApply: pointsToApply,
+    );
     return result?.fold((_) => null, (quote) => quote);
   }
 
@@ -592,6 +599,7 @@ class BookingCubit extends Cubit<BookingState> {
   Future<Either<Failure, QuoteModel>?> _priceAndPublish({
     String? promoCode,
     String? offerId,
+    int? pointsToApply,
   }) async {
     if (state.selectedService == null || state.selectedAddress == null) {
       return null;
@@ -599,7 +607,11 @@ class BookingCubit extends Cubit<BookingState> {
 
     emit(state.copyWith(status: BookingStatus.loading));
 
-    final result = await _requestQuote(promoCode: promoCode, offerId: offerId);
+    final result = await _requestQuote(
+      promoCode: promoCode,
+      offerId: offerId,
+      pointsToApply: pointsToApply,
+    );
 
     result.fold(
       (failure) => emit(
@@ -630,6 +642,7 @@ class BookingCubit extends Cubit<BookingState> {
   Future<Either<Failure, QuoteModel>> _requestQuote({
     String? promoCode,
     String? offerId,
+    int? pointsToApply,
   }) {
     final availableAddons = state.selectedService?.addons ?? [];
     final List<String> addOnIds = [];
@@ -650,6 +663,9 @@ class BookingCubit extends Cubit<BookingState> {
       offerId: offerId,
       addOnIds: addOnIds,
       carCount: carCount,
+      // P2R-2 — points are applied authoritatively by the server; the client
+      // renders the returned amountDueMinor and never recomputes it.
+      pointsToApply: pointsToApply,
     );
   }
 
@@ -850,7 +866,9 @@ class BookingCubit extends Cubit<BookingState> {
   /// (`OfferUncheckable`). On an unanswered request the applied code and offer
   /// stay exactly where they were and the failure is raised as itself, so the
   /// customer can retry with their code intact.
-  Future<QuoteRefresh> reprice() async {
+  /// [pointsToApply] is threaded so a re-price preserves the customer's loyalty
+  /// selection; omitting it re-prices with no redemption.
+  Future<QuoteRefresh> reprice({int? pointsToApply}) async {
     if (state.selectedService == null || state.selectedAddress == null) {
       return const QuoteRefresh();
     }
@@ -858,7 +876,11 @@ class BookingCubit extends Cubit<BookingState> {
     final offerId = state.appliedOfferId;
 
     emit(state.copyWith(status: BookingStatus.loading));
-    final result = await _requestQuote(promoCode: promoCode, offerId: offerId);
+    final result = await _requestQuote(
+      promoCode: promoCode,
+      offerId: offerId,
+      pointsToApply: pointsToApply,
+    );
 
     return result.fold(
       (rejection) =>
@@ -978,7 +1000,7 @@ class BookingCubit extends Cubit<BookingState> {
   /// can run the same slot/lead/car checks it runs at create time (B1 fix —
   /// PaymentInitRequest requires all three fields: quoteId, scheduledAt,
   /// vehicles).
-  Future<PaymentInitModel?> initiatePayment() async {
+  Future<PaymentInitModel?> initiatePayment({int? pointsToApply}) async {
     final quoteId = state.quote?.quoteId;
     if (quoteId == null) {
       emit(
@@ -1048,6 +1070,9 @@ class BookingCubit extends Cubit<BookingState> {
       scheduledAt: scheduledAt,
       vehicles: vehicles,
       attemptNonce: attemptNonce,
+      // P2R-2 — the points the customer chose to redeem. The hold is taken
+      // server-side at payment-init and the card is charged the remainder.
+      pointsToApply: pointsToApply,
     );
 
     return result.fold(
@@ -1291,13 +1316,11 @@ class BookingCubit extends Cubit<BookingState> {
 
     return QuoteModel(
       quoteId: 'wash-preview',
-      totalMinor: breakdown?.grossMinor ?? chargeTotalMinor,
-      vatMinor: breakdown?.vatMinor ?? 0,
       currency: breakdown?.currency ?? 'SAR',
       // Riyadh frame, like every parsed `expiresAt` — the summary screen's
       // price-lock check compares it against `saudiNow()`.
       expiresAt: saudiNow(),
-      promoDiscountMinor: 0,
+      // Nested shape: totals/VAT live on the breakdown, not on the quote root.
       breakdown: breakdown,
       lines: lines,
     );
@@ -1311,16 +1334,14 @@ class BookingCubit extends Cubit<BookingState> {
   /// Pay-before-create step 4 (spec §4.2): the SDK returned a verified `paid`
   /// payment; create the booking with idempotency `booking-create:{id}`.
   ///
-  /// The card is ALREADY charged when this runs, so what the customer is told
-  /// about their money turns on whether the failure is evidence that it came
-  /// back. Only the rejections in `refund_evidence.dart` are — each one runs
-  /// the server's compensating refund before throwing, so [refundPending] is a
-  /// statement of fact. Everything else is [PaymentPhase.createUnconfirmed]:
-  /// a dropped connection or a timeout never reached an answer at all and the
-  /// booking may well have been created, and a 5xx rolled the transaction back
-  /// without refunding anything. Promising a refund there would be inventing
-  /// one, and telling a customer their charge is reversed when it is not is
-  /// worse than telling them we do not yet know.
+  /// The card is ALREADY charged when this runs. Refunds were removed
+  /// platform-wide on 2026-07-29, so NO failure here returns the money
+  /// automatically — the compensating refund that used to back a "your charge
+  /// has been reversed" message is gone. Every failure is therefore
+  /// [PaymentPhase.createUnconfirmed], whose copy makes no promise about the
+  /// money: do not pay again, check My Bookings, contact support if a charge
+  /// left with no booking behind it. Telling a customer their charge is
+  /// reversed when it is not is worse than telling them we do not yet know.
   Future<void> completeBookingAfterPayment(String moyasarPaymentId) async {
     emit(
       state.copyWith(
@@ -1339,9 +1360,7 @@ class BookingCubit extends Cubit<BookingState> {
       (failure) => emit(
         state.copyWith(
           status: BookingStatus.failure,
-          paymentPhase: carriesRefundEvidence(failure)
-              ? PaymentPhase.refundPending
-              : PaymentPhase.createUnconfirmed,
+          paymentPhase: PaymentPhase.createUnconfirmed,
           errorMessage: failure.message,
         ),
       ),

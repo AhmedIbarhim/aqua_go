@@ -59,9 +59,9 @@ class VehicleMakeLogo extends StatelessWidget {
         colors: [
           Colors.grey.shade300,
 
-          Colors.grey.shade600,
-          Colors.grey.shade100,
-          Colors.grey.shade600,
+          Colors.grey.shade700,
+          Colors.grey.shade300,
+          Colors.grey.shade700,
 
           Colors.grey.shade800,
         ],

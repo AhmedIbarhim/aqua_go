@@ -6,6 +6,7 @@ import 'package:aqua_go/features/subscriptions/data/models/subscription_response
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../core/components/custom_network_image.dart';
 import '../../../../generated/locale_keys.g.dart';
 
 class CurrentPackageCard extends StatelessWidget {
@@ -74,15 +75,13 @@ class CurrentPackageCard extends StatelessWidget {
                           color: context.colors.primary,
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: package.image.startsWith('http')
-                            ? Image.network(
-                                package.image,
-                                color: context.colors.textTheme,
-                                errorBuilder: (context, error, stackTrace) =>
-                                    Image.asset(
-                                      'assets/images/gift_demo.png',
-                                      color: context.colors.textTheme,
-                                    ),
+                        child: package.packageInfo.iconUrl != null
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: CustomNetworkImage(
+                                  package.packageInfo.iconUrl!,
+                                  fit: BoxFit.contain,
+                                ),
                               )
                             : Image.asset(
                                 package.image,

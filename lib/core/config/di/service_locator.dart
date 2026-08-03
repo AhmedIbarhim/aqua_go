@@ -40,17 +40,30 @@ import 'package:aqua_go/features/my_bookings/data/data_sources/my_bookings_remot
 import 'package:aqua_go/features/my_bookings/data/repos/my_bookings_repository.dart';
 import 'package:aqua_go/features/my_bookings/presentation/controllers/my_bookings_cubit.dart';
 import 'package:aqua_go/features/my_bookings/presentation/controllers/my_booking_details_cubit.dart';
+import 'package:aqua_go/features/gifts/data/data_sources/gifts_remote_data_source.dart';
+import 'package:aqua_go/features/gifts/data/repos/gifts_repository.dart';
+import 'package:aqua_go/features/gifts/presentation/controllers/gifts_cubit.dart';
+import 'package:aqua_go/features/gifts/presentation/controllers/send_gift_cubit.dart';
 import 'package:aqua_go/features/complaints/data/data_sources/complaints_remote_data_source.dart';
 import 'package:aqua_go/features/complaints/data/repos/complaints_repository.dart';
 import 'package:aqua_go/features/complaints/presentation/controllers/complaints_cubit/complaints_cubit.dart';
 import 'package:aqua_go/features/complaints/presentation/controllers/complaint_details_cubit/complaint_details_cubit.dart';
 import 'package:aqua_go/features/rating/data/data_sources/rating_remote_data_source.dart';
+import 'package:aqua_go/features/rating/data/data_sources/tips_remote_data_source.dart';
 import 'package:aqua_go/features/rating/data/repos/rating_repository.dart';
+import 'package:aqua_go/features/rating/data/repos/tips_repository.dart';
 import 'package:aqua_go/features/rating/presentation/controllers/rating_cubit/rating_cubit.dart';
 import 'package:aqua_go/features/rating/presentation/controllers/pending_ratings_cubit/pending_ratings_cubit.dart';
+import 'package:aqua_go/features/rating/presentation/controllers/paying_tips_cubit/paying_tips_cubit.dart';
 import 'package:aqua_go/features/support/data/data_sources/faqs_remote_data_source.dart';
 import 'package:aqua_go/features/support/data/repos/faqs_repository.dart';
 import 'package:aqua_go/features/support/presentation/controllers/faqs_cubit.dart';
+import 'package:aqua_go/features/wallet/data/data_sources/wallet_remote_data_source.dart';
+import 'package:aqua_go/features/wallet/data/repos/wallet_repository.dart';
+import 'package:aqua_go/features/wallet/presentation/controllers/wallet_cubit.dart';
+import 'package:aqua_go/features/chat/data/data_sources/chat_remote_data_source.dart';
+import 'package:aqua_go/features/chat/data/repos/chat_repository.dart';
+import 'package:aqua_go/features/chat/presentation/controllers/chat_threads_cubit/chat_threads_cubit.dart';
 import 'package:get_it/get_it.dart';
 
 import '../../../features/address/data/services/location_service.dart';
@@ -61,6 +74,7 @@ import 'package:aqua_go/main/app_configs.dart';
 final GetIt locator = GetIt.instance;
 
 Future<void> initServiceLocator(AppConfigs configs) async {
+  locator.registerSingleton<AppConfigs>(configs);
   locator.registerLazySingleton<APIClient>(
     () => APIClient(DioFactory.create(baseUrl: configs.baseUrl)),
   );
@@ -103,6 +117,9 @@ Future<void> initServiceLocator(AppConfigs configs) async {
   locator.registerLazySingleton<MyBookingsRemoteDataSource>(
     () => MyBookingsRemoteDataSource(locator()),
   );
+  locator.registerLazySingleton<GiftsRemoteDataSource>(
+    () => GiftsRemoteDataSource(locator()),
+  );
   locator.registerLazySingleton<BookingsRemoteDataSource>(
     () => BookingsRemoteDataSource(locator()),
   );
@@ -112,8 +129,17 @@ Future<void> initServiceLocator(AppConfigs configs) async {
   locator.registerLazySingleton<RatingRemoteDataSource>(
     () => RatingRemoteDataSource(locator()),
   );
+  locator.registerLazySingleton<TipsRemoteDataSource>(
+    () => TipsRemoteDataSource(locator()),
+  );
   locator.registerLazySingleton<FaqsRemoteDataSource>(
     () => FaqsRemoteDataSource(locator()),
+  );
+  locator.registerLazySingleton<WalletRemoteDataSource>(
+    () => WalletRemoteDataSource(locator()),
+  );
+  locator.registerLazySingleton<ChatRemoteDataSource>(
+    () => ChatRemoteDataSource(locator()),
   );
 
   // Repositories
@@ -165,6 +191,9 @@ Future<void> initServiceLocator(AppConfigs configs) async {
   locator.registerLazySingleton<MyBookingsRepository>(
     () => MyBookingsRepository(locator()),
   );
+  locator.registerLazySingleton<GiftsRepository>(
+    () => GiftsRepository(locator()),
+  );
 
   locator.registerLazySingleton<BookingRepository>(
     () => BookingRepository(bookingsRemoteDataSource: locator()),
@@ -175,8 +204,17 @@ Future<void> initServiceLocator(AppConfigs configs) async {
   locator.registerLazySingleton<RatingRepository>(
     () => RatingRepository(locator()),
   );
+  locator.registerLazySingleton<TipsRepository>(
+    () => TipsRepository(locator()),
+  );
   locator.registerLazySingleton<FaqsRepository>(
     () => FaqsRepository(locator()),
+  );
+  locator.registerLazySingleton<WalletRepository>(
+    () => WalletRepository(locator()),
+  );
+  locator.registerLazySingleton<ChatRepository>(
+    () => ChatRepository(locator()),
   );
 
   // Cubits
@@ -233,6 +271,13 @@ Future<void> initServiceLocator(AppConfigs configs) async {
   );
 
   locator.registerFactory<MyBookingsCubit>(() => MyBookingsCubit(locator()));
+  locator.registerFactory<GiftsCubit>(() => GiftsCubit(locator()));
+  locator.registerFactory<SendGiftCubit>(
+    () => SendGiftCubit(
+      giftsRepository: locator(),
+      servicesRepository: locator(),
+    ),
+  );
   locator.registerFactory<MyBookingDetailsCubit>(
     () => MyBookingDetailsCubit(locator()),
   );
@@ -244,6 +289,14 @@ Future<void> initServiceLocator(AppConfigs configs) async {
   locator.registerFactory<PendingRatingsCubit>(
     () => PendingRatingsCubit(locator()),
   );
+  locator.registerFactory<PayingTipsCubit>(() => PayingTipsCubit(locator()));
   locator.registerFactory<FaqsCubit>(() => FaqsCubit(locator()));
   locator.registerFactory<SupportCubit>(() => SupportCubit(locator()));
+  locator.registerFactory<WalletCubit>(() => WalletCubit(locator()));
+  // ChatThreadsCubit drives the support inbox. ChatThreadCubit (a single open
+  // thread) is NOT registered here — it needs threadId + currentUserId +
+  // initialThread ctor args, so the router constructs it with locator<ChatRepository>().
+  locator.registerFactory<ChatThreadsCubit>(
+    () => ChatThreadsCubit(locator()),
+  );
 }

@@ -31,16 +31,13 @@ enum PaymentPhase {
   /// user dismissed the SDK sheet.
   cancelled,
 
-  /// paid, and the server ANSWERED with one of the rejections that refunds the
-  /// charge as part of its contract (see `refund_evidence.dart`). The money is
-  /// known to be coming back and the customer is told so.
-  refundPending,
-
-  /// paid, and the create did not come back with an answer this client can read
-  /// as a refund — a dropped connection, a timeout, a 5xx, or a rejection that
-  /// runs no compensation. The booking may or may not exist and the charge may
-  /// or may not have been returned yet, so nothing is asserted about either:
-  /// the customer is told not to pay again and to check My Bookings.
+  /// paid, and the create did not produce a booking. Refunds were removed
+  /// platform-wide on 2026-07-29, so NO failure on this path returns the money
+  /// automatically any more — the former `refundPending` phase was folded in
+  /// here rather than kept promising a refund that no longer happens. The
+  /// booking may or may not exist and the charge may still be sitting there, so
+  /// nothing is asserted about either: the customer is told not to pay again,
+  /// to check My Bookings, and to reach support if money left with no booking.
   createUnconfirmed,
 }
 
@@ -64,6 +61,9 @@ class BookingState extends Equatable {
   final List<AvailabilitySlot> availabilitySlots;
   final bool isAvailabilityLoading;
   final BookingResponseModel? createdBooking;
+  /// Gift-redeem flow: the voucher code the booking is being redeemed against.
+  final String? giftCode;
+
   final String? subscriptionId;
   final String? washId;
   /// The package's included (bundled) services resolved to full [ServiceModel]s
@@ -164,6 +164,7 @@ class BookingState extends Equatable {
     this.availabilitySlots = const [],
     this.isAvailabilityLoading = false,
     this.createdBooking,
+    this.giftCode,
     this.subscriptionId,
     this.washId,
     this.packageServices = const [],
@@ -200,6 +201,7 @@ class BookingState extends Equatable {
     List<AvailabilitySlot>? availabilitySlots,
     bool? isAvailabilityLoading,
     BookingResponseModel? createdBooking,
+    String? giftCode,
     String? subscriptionId,
     String? washId,
     List<ServiceModel>? packageServices,
@@ -247,6 +249,7 @@ class BookingState extends Equatable {
       isAvailabilityLoading:
           isAvailabilityLoading ?? this.isAvailabilityLoading,
       createdBooking: createdBooking ?? this.createdBooking,
+      giftCode: giftCode ?? this.giftCode,
       subscriptionId: subscriptionId ?? this.subscriptionId,
       washId: washId ?? this.washId,
       packageServices: packageServices ?? this.packageServices,
@@ -327,6 +330,7 @@ class BookingState extends Equatable {
     availabilitySlots,
     isAvailabilityLoading,
     createdBooking,
+    giftCode,
     subscriptionId,
     washId,
     packageServices,

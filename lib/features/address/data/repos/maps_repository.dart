@@ -4,6 +4,10 @@ import 'package:aqua_go/features/address/data/models/place_prediction_model.dart
 import 'package:dartz/dartz.dart';
 import '../services/location_service.dart';
 
+/// PH1-005: parses the backend `geo/places` proxy DTOs. The proxy already maps
+/// Google errors onto the standard problem+json contract, so non-200 responses
+/// (incl. 404 no-result on reverse-geocode) arrive here as a [Failure] from the
+/// shared APIClient — no `status`/`error_message` field to inspect.
 class MapsRepository {
   final LocationService locationService;
 
@@ -11,34 +15,25 @@ class MapsRepository {
 
   Future<Either<Failure, List<PlacePredictionModel>>> getAutocomplete(
     String query,
+    String sessionToken,
   ) async {
-    final result = await locationService.getAutocomplete(query);
+    final result = await locationService.getAutocomplete(query, sessionToken);
     return result.fold((failure) => Left(failure), (data) {
-      if (data != null && data['status'] == 'OK') {
-        final predictions = (data['predictions'] as List)
-            .map((e) => PlacePredictionModel.fromJson(e))
-            .toList();
-        return Right(predictions);
-      } else {
-        return Left(
-          ServerFailure(data?['error_message'] ?? 'Failed to get predictions'),
-        );
-      }
+      final suggestions = (data?['suggestions'] as List?) ?? const [];
+      final predictions = suggestions
+          .map((e) => PlacePredictionModel.fromJson(e as Map<String, dynamic>))
+          .toList();
+      return Right(predictions);
     });
   }
 
   Future<Either<Failure, LocationModel>> getPlaceDetails(String placeId) async {
     final result = await locationService.getPlaceDetails(placeId);
     return result.fold((failure) => Left(failure), (data) {
-      if (data != null && data['status'] == 'OK') {
-        return Right(LocationModel.fromPlaceDetailsJson(data));
-      } else {
-        return Left(
-          ServerFailure(
-            data?['error_message'] ?? 'Failed to get place details',
-          ),
-        );
+      if (data == null) {
+        return const Left(ServerFailure('Failed to get place details'));
       }
+      return Right(LocationModel.fromJson(data as Map<String, dynamic>));
     });
   }
 
@@ -48,15 +43,10 @@ class MapsRepository {
   ) async {
     final result = await locationService.getAddressFromLatLng(lat, lng);
     return result.fold((failure) => Left(failure), (data) {
-      if (data != null &&
-          data['status'] == 'OK' &&
-          data['results'].isNotEmpty) {
-        return Right(LocationModel.fromGeocodeJson(data['results'][0]));
-      } else {
-        return Left(
-          ServerFailure(data?['error_message'] ?? 'Failed to get address'),
-        );
+      if (data == null) {
+        return const Left(ServerFailure('Failed to get address'));
       }
+      return Right(LocationModel.fromJson(data as Map<String, dynamic>));
     });
   }
 }

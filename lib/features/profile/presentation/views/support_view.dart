@@ -37,10 +37,15 @@ class SupportView extends StatelessWidget {
           if (state is SupportFailure) {
             context.showErrorSnackBar(state.message);
           } else if (state is SupportWhatsAppLoaded) {
-            final whatsappUrl = Uri.parse('https://wa.me/${state.whatsappNumber}');
+            final whatsappUrl = Uri.parse(
+              'https://wa.me/${state.whatsappNumber}',
+            );
             try {
               if (await canLaunchUrl(whatsappUrl)) {
-                await launchUrl(whatsappUrl, mode: LaunchMode.externalApplication);
+                await launchUrl(
+                  whatsappUrl,
+                  mode: LaunchMode.externalApplication,
+                );
               } else {
                 context.showErrorSnackBar('Could not launch WhatsApp');
               }
@@ -80,6 +85,14 @@ class SupportView extends StatelessWidget {
                       icon: AppAssets.documentCopy,
                       onTap: () {
                         context.pushNamed(Routes.complainsRecord);
+                      },
+                    ),
+                    SizedBox(height: sh(12)),
+                    ProfileTile(
+                      title: LocaleKeys.support_contact_us.tr(context: context),
+                      icon: AppAssets.messages,
+                      onTap: () {
+                        context.pushNamed(Routes.chatInbox);
                       },
                     ),
                     SizedBox(height: sh(12)),

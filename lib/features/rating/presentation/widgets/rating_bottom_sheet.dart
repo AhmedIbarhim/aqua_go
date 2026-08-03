@@ -1,4 +1,3 @@
-import 'package:aqua_go/features/rating/presentation/widgets/rating_widget.dart';
 import 'package:aqua_go/core/components/custom_bottom_sheet.dart';
 import 'package:aqua_go/core/components/custom_button.dart';
 import 'package:aqua_go/core/extentions/context_extentions.dart';
@@ -11,8 +10,8 @@ import '../../../my_bookings/data/models/booking_response_model/booking_response
 import '../../../../core/config/di/service_locator.dart';
 import '../controllers/rating_cubit/rating_cubit.dart';
 import '../controllers/rating_cubit/rating_state.dart';
-import '../../../../core/components/custom_network_image.dart';
 import 'package:aqua_go/core/components/custom_text_field.dart';
+import 'pay_tips_bottom_sheet.dart';
 import 'rating_success_alert_box.dart';
 import 'package:aqua_go/core/route/app_router.dart';
 import 'package:aqua_go/core/route/routes.dart';
@@ -141,13 +140,14 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
             ),
           ),
           SizedBox(height: height * 0.03),
-          _buildBikerInfo(),
+          // _buildBikerInfo(),
+          if (widget.booking.tipPaid == false) _buildPayTipButton(),
 
           if (_rating < 5) ...[
             SizedBox(height: height * 0.03),
             _buildRatingReasons(),
           ],
-          SizedBox(height: height * 0.04),
+          SizedBox(height: height * 0.05),
           Row(
             children: [
               Expanded(
@@ -238,78 +238,70 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
     return context.isEn ? "Poor Rating" : "تقييم ضعيف";
   }
 
-  Widget _buildBikerInfo() {
-    final width = MediaQuery.sizeOf(context).width;
-    final worker = widget.booking.assignedWorker;
-    if (worker == null) {
-      return const SizedBox.shrink();
-    }
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          LocaleKeys.bookings_your_biker.tr(context: context),
-          style: AppTextStyles.regular14.copyWith(
-            color: context.colors.textPrimary,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          padding: EdgeInsets.all(width * 0.04),
-          decoration: BoxDecoration(
-            color: context.colors.cardBackGround,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Row(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(width * 0.05),
-                child: Container(
-                  width: width * 0.1,
-                  height: width * 0.1,
-                  color: context.colors.borderSecondary,
-                  child: CustomNetworkImage(
-                    worker.avatarUrl ?? "",
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-              SizedBox(width: width * 0.03),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    worker.displayName ??
-                        (context.isEn ? "Service Provider" : "مقدم الخدمة"),
-                    style: AppTextStyles.medium14.copyWith(
-                      color: context.colors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      RatingWidget(
-                        rating: worker.ratingAggregate?.toDouble() ?? 0.0,
-                        starSize: 16,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        "(${worker.ratingAggregate?.toDouble() ?? 0.0})",
-                        style: AppTextStyles.regular12.copyWith(
-                          color: context.colors.contentDisabled,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
+  // Widget _buildBikerInfo() {
+  //   final width = MediaQuery.sizeOf(context).width;
+  //   final worker = widget.booking.assignedWorker;
+  //   if (worker == null) {
+  //     return const SizedBox.shrink();
+  //   }
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       Text(
+  //         LocaleKeys.bookings_your_biker.tr(context: context),
+  //         style: AppTextStyles.regular14.copyWith(
+  //           color: context.colors.textPrimary,
+  //         ),
+  //       ),
+  //       const SizedBox(height: 8),
+  //       Container(
+  //         padding: EdgeInsets.all(width * 0.04),
+  //         decoration: BoxDecoration(
+  //           color: context.colors.cardBackGround,
+  //           borderRadius: BorderRadius.circular(12),
+  //         ),
+  //         child: Row(
+  //           children: [
+  //             ClipRRect(
+  //               borderRadius: BorderRadius.circular(width * 0.05),
+  //               child: Container(
+  //                 width: width * 0.1,
+  //                 height: width * 0.1,
+  //                 color: context.colors.borderSecondary,
+  //                 child: CustomNetworkImage(
+  //                   worker.avatarUrl ?? "",
+  //                   fit: BoxFit.cover,
+  //                 ),
+  //               ),
+  //             ),
+  //             SizedBox(width: width * 0.03),
+  //             Column(
+  //               crossAxisAlignment: CrossAxisAlignment.start,
+  //               children: [
+  //                 Text(
+  //                   worker.displayName ??
+  //                       (context.isEn ? "Service Provider" : "مقدم الخدمة"),
+  //                   style: AppTextStyles.medium14.copyWith(
+  //                     color: context.colors.textPrimary,
+  //                   ),
+  //                 ),
+  //                 const SizedBox(height: 4),
+  //                 RatingWidget(
+  //                   rating: worker.ratingAggregate?.toDouble() ?? 0.0,
+  //                   starSize: 16,
+  //                   showRatingValue: true,
+  //                   ratingTextStyle: AppTextStyles.regular12.copyWith(
+  //                     color: context.colors.contentDisabled,
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           ],
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget _buildRatingReasons() {
     final width = MediaQuery.sizeOf(context).width;
@@ -382,6 +374,41 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
           ),
         ],
       ],
+    );
+  }
+
+  Widget _buildPayTipButton() {
+    final width = MediaQuery.sizeOf(context).width;
+    return InkWell(
+      onTap: () {
+        Navigator.pop(context);
+        PayTipsBottomSheet.show(context, widget.booking);
+      },
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(width * 0.03),
+        decoration: BoxDecoration(
+          border: Border.all(color: context.colors.warning, width: 0.5),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.add_circle_outline_outlined,
+              color: context.colors.warning,
+            ),
+            SizedBox(width: width * 0.02),
+
+            Text(
+              context.isEn ? "Pay Tip For the Biker" : "دفع إكرامية للبايكر",
+              style: AppTextStyles.regular16.copyWith(
+                color: context.colors.warning,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

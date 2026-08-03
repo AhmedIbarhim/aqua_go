@@ -54,7 +54,7 @@ class BookingDetailsBikerCard extends StatelessWidget {
                 height: context.sw(40),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(context.sw(20)),
-                  border: Border.all(color: context.colors.borderSecondary),
+                  border: Border.all(color: context.colors.contentTertiary),
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(context.sw(20)),
@@ -77,21 +77,10 @@ class BookingDetailsBikerCard extends StatelessWidget {
                     ),
                     if (worker != null) ...[
                       SizedBox(height: context.sh(4)),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          RatingWidget(
-                            rating: rating,
-                            starSize: context.sw(16),
-                          ),
-                          SizedBox(width: context.sw(4)),
-                          Text(
-                            '($rating)',
-                            style: AppTextStyles.regular12.copyWith(
-                              color: context.colors.contentDisabled,
-                            ),
-                          ),
-                        ],
+                      RatingWidget(
+                        rating: rating,
+                        starSize: context.sw(16),
+                        showRatingValue: true,
                       ),
                     ],
                   ],

@@ -5,6 +5,17 @@ import '../../features/booking/domain/configs/booking_flow_config.dart';
 import '../../features/booking/domain/strategies/booking_submit_strategy.dart';
 import '../../features/booking/domain/strategies/service_booking_submit.dart';
 import '../../../../core/config/di/service_locator.dart';
+import '../../features/gifts/presentation/views/gifts_view.dart';
+import '../../features/gifts/presentation/views/send_gift_view.dart';
+import '../../features/gifts/presentation/controllers/send_gift_cubit.dart';
+import '../../features/my_bookings/data/models/booking_response_model/booking_response_model.dart';
+import '../../features/chat/data/models/thread_model.dart';
+import '../../features/chat/data/repos/chat_repository.dart';
+import '../../features/chat/presentation/controllers/chat_thread_cubit/chat_thread_cubit.dart';
+import '../../features/chat/presentation/controllers/chat_threads_cubit/chat_threads_cubit.dart';
+import '../../features/chat/presentation/views/chat_inbox_view.dart';
+import '../../features/chat/presentation/views/chat_thread_view.dart';
+import '../helpers/fetch_user_data_helper.dart';
 import '../../features/subscriptions/data/repos/subscriptions_repository.dart';
 import '../../features/address/presentation/views/my_addresses_view.dart';
 import '../../features/address/presentation/views/new_address_map_view.dart';
@@ -29,6 +40,7 @@ import '../../features/complaints/presentation/controllers/complaints_cubit/comp
 import '../../features/complaints/presentation/controllers/complaint_details_cubit/complaint_details_cubit.dart';
 import '../../features/my_bookings/presentation/views/gallery_view.dart';
 import '../../features/my_bookings/presentation/views/my_booking_details_view.dart';
+import '../../features/my_bookings/presentation/views/receipt_summary_view.dart';
 import '../../features/my_cars/data/models/my_car_model.dart';
 import '../../features/home/data/models/service_model.dart';
 import '../../features/home/data/repos/services_repository.dart';
@@ -52,6 +64,8 @@ import '../../features/support/presentation/controllers/faqs_cubit.dart';
 import '../../features/my_bookings/presentation/controllers/my_booking_details_cubit.dart';
 import '../../features/subscriptions/presentation/controllers/subscriptions_controller/subscriptions_cubit.dart';
 import '../../features/profile/presentation/views/my_subscribed_packages_view.dart';
+import '../../features/wallet/presentation/views/my_wallet_view.dart';
+import '../../features/wallet/presentation/controllers/wallet_cubit.dart';
 
 import 'routes.dart';
 
@@ -262,6 +276,12 @@ abstract class AppRouter {
           ),
         );
 
+      case Routes.receiptSummary:
+        final booking = settings.arguments as BookingResponseModel;
+        return MaterialPageRoute(
+          builder: (_) => ReceiptSummaryView(booking: booking),
+        );
+
       case Routes.gallery:
         final args = settings.arguments as GalleryArgs;
         return MaterialPageRoute(
@@ -320,10 +340,70 @@ abstract class AppRouter {
           ),
         );
 
+      case Routes.gifts:
+        return MaterialPageRoute(builder: (_) => const GiftsView());
+
+      case Routes.sendGift:
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => locator<SendGiftCubit>()..fetchInitialData(),
+            child: const SendGiftView(),
+          ),
+        );
+
+      case Routes.myWallet:
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => locator<WalletCubit>()..fetchWallet(),
+            child: const MyWalletView(),
+          ),
+        );
+
+      case Routes.chatInbox:
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => locator<ChatThreadsCubit>()..loadThreads(),
+            child: const ChatInboxView(),
+          ),
+        );
+
+      case Routes.chatThread:
+        // Accepts a full ChatThreadArgs (from the inbox) or a bare threadId
+        // String (from an FCM deep-link) when only the id is known.
+        final args = settings.arguments;
+        final String threadId = args is ChatThreadArgs
+            ? args.threadId
+            : (args is String ? args : '');
+        final ThreadModel? initialThread = args is ChatThreadArgs
+            ? args.initialThread
+            : null;
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) =>
+                ChatThreadCubit(
+                  repository: locator<ChatRepository>(),
+                  threadId: threadId,
+                  currentUserId: FetchUserData.getUserId() ?? '',
+                  initialThread: initialThread,
+                )..open(),
+            child: const ChatThreadView(),
+          ),
+        );
+
       default:
         return MaterialPageRoute(builder: (_) => const Placeholder());
     }
   }
+}
+
+/// Args for opening a single chat thread. [initialThread] pre-populates the
+/// header + status when navigating from the inbox; an FCM deep-link may pass
+/// only a threadId (as a bare String or via this class with initialThread null).
+class ChatThreadArgs {
+  final String threadId;
+  final ThreadModel? initialThread;
+
+  const ChatThreadArgs({required this.threadId, this.initialThread});
 }
 
 /// Args for passing an already-created BookingCubit between views in the flow.
@@ -346,6 +426,7 @@ class BookingFlowStartArgs {
   final BookingSubmitStrategy submitStrategy;
   final String? subscriptionId;
   final String? washId;
+  final String? giftCode;
 
   /// The offer's own title in each language, when the flow was started from a
   /// SERVICE offer card. Carried so the summary's re-apply affordance can name
@@ -369,6 +450,7 @@ class BookingFlowStartArgs {
   final int? offerTargetPriceMinor;
 
   BookingFlowStartArgs({
+    this.giftCode,
     this.service,
     this.existingCar,
     this.existingAddress,
