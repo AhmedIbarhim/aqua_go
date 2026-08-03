@@ -65,8 +65,7 @@ class MyApp extends StatelessWidget {
               navigatorKey: AppRouter.navigatorKey,
               onGenerateRoute: AppRouter.generateRoute,
               builder: (context, child) {
-                final isDev = locator.isRegistered<AppConfigs>() &&
-                    locator<AppConfigs>().environment.isDev;
+                final isDev = locator<AppConfigs>().environment.isDev;
                 return MediaQuery(
                   data: MediaQuery.of(
                     context,

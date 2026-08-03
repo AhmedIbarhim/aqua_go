@@ -6,6 +6,7 @@ import 'package:easy_localization/easy_localization.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
+import '../../../../core/utils/date_time_formatter.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../controllers/send_gift_cubit.dart';
 import '../controllers/send_gift_state.dart';
@@ -132,9 +133,9 @@ class ReviewAndPayStep extends StatelessWidget {
                     label: context.isAr ? "التسليم" : "Delivery",
                     value: state.deliveryType == 'IMMEDIATE'
                         ? (context.isAr ? "فوري" : "Immediate")
-                        : (context.isAr
-                              ? "مجدول: ${state.scheduledTime} . ${DateFormat('yyyy/M/d').format(state.scheduledDate!)}"
-                              : "Scheduled: ${state.scheduledTime} . ${DateFormat('M/d/yyyy').format(state.scheduledDate!)}"),
+                        : "${context.isAr ? "مجدول" : "Scheduled"}:"
+                              " ${formatPickedTime(state.scheduledTime!)}"
+                              " . ${formatShortDate(state.scheduledDate!)}",
                   ),
                   SizedBox(height: context.sh(12)),
                   _buildDetailRow(

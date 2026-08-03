@@ -82,6 +82,11 @@ class BookingResponseModel {
   Breakdown? breakdown;
   BookingAddress? address;
   BookingRatingModel? rating;
+
+  /// The promo redemption applied to this booking, or null when none was.
+  /// Resolved at READ time from the promo module — never denormalised onto
+  /// the booking aggregate.
+  BookingPromo? promo;
   String? complaintId;
   String? paymentIntentId;
   String? paymentStuckDetectedAt;
@@ -100,10 +105,6 @@ class BookingResponseModel {
   double? customerBehaviourRating;
   String? tipReferenceNumber;
   int? pointsEarned;
-
-  /// The promo code applied to this booking, or null when none was. Its
-  /// `discountMinor` is ALREADY netted off [totalAmountMinor].
-  BookingPromo? promo;
 
   BookingResponseModel({
     this.id,
@@ -150,6 +151,7 @@ class BookingResponseModel {
     this.breakdown,
     this.address,
     this.rating,
+    this.promo,
     this.complaintId,
     this.paymentIntentId,
     this.paymentStuckDetectedAt,
@@ -168,7 +170,6 @@ class BookingResponseModel {
     this.customerBehaviourRating,
     this.tipReferenceNumber,
     this.pointsEarned,
-    this.promo,
   });
 
   BookingResponseModel.fromJson(Map<String, dynamic> json) {
@@ -255,6 +256,9 @@ class BookingResponseModel {
     rating = json['rating'] != null
         ? BookingRatingModel.fromJson(json['rating'])
         : null;
+    promo = json['promo'] is Map<String, dynamic>
+        ? BookingPromo.fromJson(json['promo'] as Map<String, dynamic>)
+        : null;
     complaintId = json['complaintId'];
     paymentIntentId = json['paymentIntentId'];
     paymentStuckDetectedAt = json['paymentStuckDetectedAt'];
@@ -280,9 +284,6 @@ class BookingResponseModel {
     tipReferenceNumber = json['tipReferenceNumber'];
     pointsEarned = json['pointsEarned'] != null
         ? int.tryParse(json['pointsEarned'].toString())
-        : null;
-    promo = json['promo'] is Map<String, dynamic>
-        ? BookingPromo.fromJson(json['promo'] as Map<String, dynamic>)
         : null;
   }
 

@@ -20,8 +20,6 @@ class SubscriptionResponseModel {
   final String purchasedAt;
   final String? cancelledAt;
   final String? cancelReason;
-  final int? refundedMinor;
-  final String? refundStatus;
   final PackageInfo packageInfo;
   final String? referenceNumber;
   final SubscriptionBreakdown? breakdown;
@@ -43,8 +41,6 @@ class SubscriptionResponseModel {
     required this.purchasedAt,
     this.cancelledAt,
     this.cancelReason,
-    this.refundedMinor,
-    this.refundStatus,
     required this.packageInfo,
     this.referenceNumber,
     this.breakdown,
@@ -100,8 +96,6 @@ class SubscriptionResponseModel {
       purchasedAt: json['purchasedAt'] as String? ?? '',
       cancelledAt: json['cancelledAt'] as String?,
       cancelReason: json['cancelReason'] as String?,
-      refundedMinor: (json['refundedMinor'] as num?)?.toInt(),
-      refundStatus: json['refundStatus'] as String?,
       packageInfo: PackageInfo.fromJson(
         (json['packageInfo'] ?? json['packageSnapshot'] ?? {})
             as Map<String, dynamic>,
@@ -145,8 +139,6 @@ class SubscriptionResponseModel {
       'purchasedAt': purchasedAt,
       'cancelledAt': cancelledAt,
       'cancelReason': cancelReason,
-      'refundedMinor': refundedMinor,
-      'refundStatus': refundStatus,
       'packageInfo': packageInfo.toJson(),
       if (referenceNumber != null) 'referenceNumber': referenceNumber,
       if (breakdown != null) 'breakdown': breakdown!.toJson(),

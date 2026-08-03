@@ -1,5 +1,7 @@
+import 'package:flutter/material.dart' show TimeOfDay;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
+import '../../../../core/utils/saudi_wire_format.dart';
 import '../../../home/data/repos/services_repository.dart';
 import '../../data/repos/gifts_repository.dart';
 import 'send_gift_state.dart';
@@ -120,7 +122,7 @@ class SendGiftCubit extends Cubit<SendGiftState> {
     required String message,
     required String deliveryType,
     DateTime? date,
-    String? time,
+    TimeOfDay? time,
     GiftThemeModel? theme,
   }) {
     emit(
@@ -247,33 +249,16 @@ class SendGiftCubit extends Cubit<SendGiftState> {
 
     final giftId = const Uuid().v4();
 
-    // Calculate scheduled ISO string if scheduled delivery is selected
-    String? scheduledDeliveryAt;
-    if (state.deliveryType == 'SCHEDULED' &&
-        state.scheduledDate != null &&
-        state.scheduledTime != null) {
-      // parse scheduledTime (e.g. "09:00 PM")
-      final parts = state.scheduledTime!.split(' ');
-      if (parts.length == 2) {
-        final timeParts = parts[0].split(':');
-        int hour = int.parse(timeParts[0]);
-        final minute = int.parse(timeParts[1]);
-        final isPm = parts[1].toUpperCase() == 'PM';
-        if (isPm && hour < 12) {
-          hour += 12;
-        } else if (!isPm && hour == 12) {
-          hour = 0;
-        }
-        final deliveryDateTime = DateTime(
-          state.scheduledDate!.year,
-          state.scheduledDate!.month,
-          state.scheduledDate!.day,
-          hour,
-          minute,
-        );
-        scheduledDeliveryAt = deliveryDateTime.toUtc().toIso8601String();
-      }
-    }
+    // The picked wall clock reaches the wire verbatim, in the backend's bare
+    // Asia/Riyadh shape. Nothing here reads a formatted string: the delivery
+    // time used to be recovered by parsing the picker's LABEL, which booked
+    // every Arabic PM delivery 12 hours early.
+    final delivery = state.deliveryType == 'SCHEDULED'
+        ? state.scheduledDeliveryAt
+        : null;
+    final String? scheduledDeliveryAt = delivery == null
+        ? null
+        : toWireDateTime(delivery);
 
     final request = PurchaseGiftRequestModel(
       packageId: state.selectedService!.id!,

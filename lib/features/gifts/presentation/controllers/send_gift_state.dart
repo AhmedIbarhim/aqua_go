@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart' show TimeOfDay;
 import '../../../home/data/models/service_model.dart';
 import '../../data/models/gift_model.dart';
 import '../../data/models/gift_theme_model.dart';
@@ -31,7 +32,14 @@ class SendGiftState extends Equatable {
   final String messageText;
   final String deliveryType; // 'IMMEDIATE' or 'SCHEDULED'
   final DateTime? scheduledDate;
-  final String? scheduledTime; // e.g. "09:00 PM"
+
+  /// The picked delivery time, carried structurally from `showTimePicker`.
+  ///
+  /// This was a display label (`"09:00 PM"`) that the purchase path split on a
+  /// space and matched against `'PM'`. In Arabic the picker emits `م`, so the
+  /// match failed and every PM delivery was sent 12 hours early; a locale with
+  /// its own digits made the hour parse throw outright.
+  final TimeOfDay? scheduledTime;
   final GiftThemeModel? selectedTheme;
   final PaymentMethod? paymentMethod;
 
@@ -83,7 +91,7 @@ class SendGiftState extends Equatable {
     String? messageText,
     String? deliveryType,
     DateTime? scheduledDate,
-    String? scheduledTime,
+    TimeOfDay? scheduledTime,
     GiftThemeModel? selectedTheme,
     PaymentMethod? paymentMethod,
     String? savedCardTokenId,
@@ -123,6 +131,17 @@ class SendGiftState extends Equatable {
       purchasedGift: purchasedGift ?? this.purchasedGift,
       quote: clearQuote ? null : (quote ?? this.quote),
     );
+  }
+
+  /// The scheduled delivery as a single wall clock, or null until BOTH pickers
+  /// have been used. Feeds `scheduledDeliveryAt`; the picked fields are carried
+  /// through verbatim, so nothing between the picker and the wire re-reads a
+  /// formatted string.
+  DateTime? get scheduledDeliveryAt {
+    final date = scheduledDate;
+    final time = scheduledTime;
+    if (date == null || time == null) return null;
+    return DateTime(date.year, date.month, date.day, time.hour, time.minute);
   }
 
   @override

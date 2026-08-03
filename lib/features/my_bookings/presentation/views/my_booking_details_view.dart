@@ -275,8 +275,7 @@ class MyBookingDetailsView extends StatelessWidget {
   /// bugs). Shown only for completed bookings whose money actually moved.
   // bool _showsReceipt(BookingResponseModel booking) {
   //   return booking.status == BookingStatus.COMPLETED &&
-  //       (booking.paymentStatus == PaymentStatus.PAID ||
-  //           booking.paymentStatus == PaymentStatus.PARTIALLY_REFUNDED);
+  //       booking.paymentStatus == PaymentStatus.PAID;
   // }
 
   Widget _buildReceiptLink(BuildContext context, BookingResponseModel booking) {

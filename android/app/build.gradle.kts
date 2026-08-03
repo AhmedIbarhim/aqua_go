@@ -47,13 +47,13 @@ android {
         create("dev") {
             dimension = "environment"
             // applicationIdSuffix = ".dev"
-            resValue("string", "app_name", "Aqua Go")
+            resValue("string", "app_name", "Aqua Go (Dev)")
             buildConfigField("String", "FLAVOR", "\"dev\"")
         }
         create("qa") {
             dimension = "environment"
             // applicationIdSuffix = ".qa"
-            resValue("string", "app_name", "Aqua Go")
+            resValue("string", "app_name", "Aqua Go (QA)")
             buildConfigField("String", "FLAVOR", "\"qa\"")
         }
         create("prod") {

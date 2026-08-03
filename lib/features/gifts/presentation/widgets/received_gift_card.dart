@@ -1,5 +1,6 @@
 import 'package:aqua_go/core/components/custom_button.dart';
 import 'package:aqua_go/core/utils/app_assets.dart';
+import 'package:aqua_go/core/utils/date_time_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:svg_flutter/svg.dart';
@@ -43,9 +44,9 @@ class ReceivedGiftCard extends StatelessWidget {
     final String title = context.isAr
         ? gift.serviceName.ar
         : gift.serviceName.en;
-    final String formattedExpiryDate = DateFormat(
-      'yyyy/MM/dd',
-    ).format(gift.validityEndsAt);
+    // Same shape as `GiftModel.formattedExpiryDate` — the two gift surfaces
+    // showed the same expiry in two different field orders.
+    final String formattedExpiryDate = formatNumericDate(gift.validityEndsAt);
 
     final cardBgColor = _parseHexColor(
       gift.themeColor,

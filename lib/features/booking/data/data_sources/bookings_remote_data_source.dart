@@ -32,6 +32,9 @@ class BookingsRemoteDataSource {
         'packageId': packageId,
         'lat': lat,
         'lng': lng,
+        // offerId and promoCode are alternatives — sending both is a 400
+        // (promo-and-offer-mutually-exclusive), so the offer wins when present and
+        // the server resolves its linked code.
         if (hasOffer) 'offerId': offerId,
         if (!hasOffer && promoCode != null && promoCode.isNotEmpty)
           'promoCode': promoCode,
@@ -39,7 +42,7 @@ class BookingsRemoteDataSource {
           'addOns': addOnIds.map((id) => {'addonId': id}).toList(),
           'carCount': carCount ?? 1,
         },
-        if (pointsToApply != null && pointsToApply > 0) 'pointsToApply': pointsToApply,
+        if (pointsToApply != null) 'pointsToApply': pointsToApply,
       },
     );
   }
