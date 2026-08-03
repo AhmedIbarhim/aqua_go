@@ -33,6 +33,13 @@ class MapsCubit extends Cubit<MapsState> {
   /// seeded saved location (AQG-243).
   bool _editSeeded = false;
 
+  /// Bounds the platform location fix in [determinePosition]. Without this,
+  /// a device that never gets a fix (indoors, GPS off, airplane mode, or the
+  /// iOS Simulator's "Location > None") leaves `getCurrentPosition` awaiting
+  /// forever, so `isLoading` never clears and the screen is stuck on a
+  /// spinner with no escape.
+  static const Duration _positionTimeLimit = Duration(seconds: 15);
+
   void _monitorLocationService() {
     _serviceStatusSubscription = Geolocator.getServiceStatusStream().listen((
       status,
@@ -88,7 +95,11 @@ class MapsCubit extends Cubit<MapsState> {
     }
 
     try {
-      Position position = await Geolocator.getCurrentPosition();
+      Position position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          timeLimit: _positionTimeLimit,
+        ),
+      );
       final latLng = LatLng(position.latitude, position.longitude);
 
       emit(
@@ -102,6 +113,14 @@ class MapsCubit extends Cubit<MapsState> {
       );
 
       getAddressFromLatLng(latLng);
+    } on TimeoutException {
+      emit(
+        state.copyWith(
+          isLoading: false,
+          errorMessage:
+              'Could not get your location. Please try again or pick it on the map.',
+        ),
+      );
     } catch (e) {
       emit(state.copyWith(isLoading: false, errorMessage: e.toString()));
     }

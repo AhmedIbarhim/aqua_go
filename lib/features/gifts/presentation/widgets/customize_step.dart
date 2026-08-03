@@ -5,6 +5,7 @@ import '../../../../core/components/custom_text_form_field.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
+import '../../../../core/utils/date_time_formatter.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../controllers/send_gift_cubit.dart';
 import '../controllers/send_gift_state.dart';
@@ -90,7 +91,7 @@ class _CustomizeStepState extends State<CustomizeStep> {
   Future<void> _selectTime(BuildContext context, SendGiftState state) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
-      initialTime: const TimeOfDay(hour: 12, minute: 0),
+      initialTime: state.scheduledTime ?? const TimeOfDay(hour: 12, minute: 0),
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
@@ -121,12 +122,13 @@ class _CustomizeStepState extends State<CustomizeStep> {
       },
     );
     if (picked != null && mounted) {
-      final formattedTime = picked.format(context); // e.g. "09:00 PM"
+      // The pick goes into state as it came out of the picker. Its label is
+      // built for display only, at the button below.
       context.read<SendGiftCubit>().updateCustomization(
         message: _messageController.text,
         deliveryType: state.deliveryType,
         date: state.scheduledDate,
-        time: formattedTime,
+        time: picked,
         theme: state.selectedTheme,
       );
     }
@@ -209,9 +211,7 @@ class _CustomizeStepState extends State<CustomizeStep> {
                   Expanded(
                     child: GiftPickerButton(
                       label: state.scheduledDate != null
-                          ? DateFormat(
-                              'yyyy-MM-dd',
-                            ).format(state.scheduledDate!)
+                          ? formatShortDate(state.scheduledDate!)
                           : (context.isAr ? "اختر تاريخ" : "Choose Date"),
                       icon: AppAssets.calender,
                       onTap: () => _selectDate(context, state),
@@ -221,9 +221,9 @@ class _CustomizeStepState extends State<CustomizeStep> {
 
                   Expanded(
                     child: GiftPickerButton(
-                      label:
-                          state.scheduledTime ??
-                          (context.isAr ? "اختر وقت" : "Choose Time"),
+                      label: state.scheduledTime != null
+                          ? formatPickedTime(state.scheduledTime!)
+                          : (context.isAr ? "اختر وقت" : "Choose Time"),
                       icon: AppAssets.time,
                       onTap: () => _selectTime(context, state),
                     ),

@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart' show TimeOfDay;
 
 /// The app's single date/time DISPLAY formatter.
 ///
@@ -22,6 +23,15 @@ String get _locale => Intl.defaultLocale ?? 'ar';
 /// Clock time, e.g. `2:00 PM` / `٢:٠٠ م` — locale's own 12/24-hour convention
 /// and meridiem markers.
 String formatClockTime(DateTime time) => DateFormat.jm(_locale).format(time);
+
+/// Clock time for a time-only pick, e.g. `9:00 PM` / `٩:٠٠ م`.
+///
+/// A picker button is the one place a time exists before a date does. The date
+/// passed through is inert — [formatClockTime] reads the time fields only —
+/// and `MaterialLocalizations.formatTimeOfDay` is deliberately not used: its
+/// output is a LABEL, and the gift flow once parsed one back into a wire value.
+String formatPickedTime(TimeOfDay time) =>
+    formatClockTime(DateTime(2000, 1, 1, time.hour, time.minute));
 
 /// Numeric date in the locale's own field order, e.g. `7/23/2026` / `٢٣‏/٧‏/٢٠٢٦`.
 String formatShortDate(DateTime date) => DateFormat.yMd(_locale).format(date);

@@ -269,8 +269,6 @@ abstract class  LocaleKeys {
   static const bookings_promo_discount_named = 'bookings.promo_discount_named';
   static const bookings_vat_inclusive = 'bookings.vat_inclusive';
   static const bookings_promo_released = 'bookings.promo_released';
-  static const bookings_payment_refunded_title = 'bookings.payment_refunded_title';
-  static const bookings_payment_refunded_notice = 'bookings.payment_refunded_notice';
   static const bookings_payment_unconfirmed_title = 'bookings.payment_unconfirmed_title';
   static const bookings_payment_unconfirmed_notice = 'bookings.payment_unconfirmed_notice';
   static const bookings_reapply_offer = 'bookings.reapply_offer';

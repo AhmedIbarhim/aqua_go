@@ -32,6 +32,9 @@ import 'package:aqua_go/core/config/controllers/language_controller/language_cub
 import 'package:aqua_go/core/config/controllers/theme_controller/theme_cubit.dart';
 import 'package:aqua_go/features/subscriptions/data/data_sources/subscriptions_remote_data_source.dart';
 import 'package:aqua_go/features/subscriptions/data/repos/subscriptions_repository.dart';
+import 'package:aqua_go/features/wallet/data/data_sources/wallet_remote_data_source.dart';
+import 'package:aqua_go/features/wallet/data/models/loyalty_balance_model.dart';
+import 'package:aqua_go/features/wallet/data/repos/wallet_repository.dart';
 // dartz exports a `State` monad that collides with Flutter's widget `State`,
 // which this file's docs refer to. Nothing here uses the monad.
 import 'package:dartz/dartz.dart' hide State;
@@ -96,6 +99,7 @@ Future<void> pumpSummary(WidgetTester tester, BookingCubit cubit) async {
   tester.view.devicePixelRatio = 1.0;
   addTearDown(tester.view.reset);
 
+  _ensureWalletRepositoryRegistered();
   await tester.pumpWidget(_summaryApp(cubit));
   await settle(tester);
 }
@@ -103,10 +107,29 @@ Future<void> pumpSummary(WidgetTester tester, BookingCubit cubit) async {
 /// Tears the summary out of the tree, destroying its [State] exactly as popping
 /// the route does, then mounts it again on the SAME cubit.
 Future<void> remountSummary(WidgetTester tester, BookingCubit cubit) async {
+  _ensureWalletRepositoryRegistered();
   await tester.pumpWidget(const MaterialApp(home: SizedBox.shrink()));
   await tester.pump();
   await tester.pumpWidget(_summaryApp(cubit));
   await settle(tester);
+}
+
+/// [BookingSummaryView] reads its loyalty balance from the service locator on
+/// a service-flow booking (`_fetchLoyaltyBalance`). Registers a fake that
+/// answers with an empty balance instead of reaching the network, guarded the
+/// same way [pumpDetails] guards `MyCarsCubit` — a test that mounts the
+/// summary more than once (remount, details → summary) must not double-teardown
+/// a type an earlier call already unregistered.
+void _ensureWalletRepositoryRegistered() {
+  if (locator.isRegistered<WalletRepository>()) {
+    return;
+  }
+  locator.registerLazySingleton<WalletRepository>(() => _NoWalletRepository());
+  addTearDown(() async {
+    if (locator.isRegistered<WalletRepository>()) {
+      await locator.unregister<WalletRepository>();
+    }
+  });
 }
 
 /// Pumps [BookingDetailsView] — the screen the customer pops BACK to from the
@@ -148,6 +171,25 @@ class _NoCarsRepository extends CarsRepository {
 
   @override
   Future<Either<Failure, List<MyCarModel>>> fetchCars() async => right(const []);
+}
+
+/// Answers the loyalty balance with a zeroed-out fake, so the summary screen's
+/// post-frame `_fetchLoyaltyBalance` settles instead of reaching the network.
+class _NoWalletRepository extends WalletRepository {
+  _NoWalletRepository() : super(WalletRemoteDataSource(APIClient(Dio())));
+
+  @override
+  Future<Either<Failure, LoyaltyBalanceModel>> getWalletBalance() async =>
+      right(
+        LoyaltyBalanceModel(
+          points: 0,
+          estimatedValueMinor: 0,
+          redemptionRateMinorPerPoint: 1,
+          earnMinorPerPoint: 0,
+          maxCoveragePct: 100,
+          recentEntries: const [],
+        ),
+      );
 }
 
 Widget _summaryApp(BookingCubit cubit) =>
@@ -352,13 +394,26 @@ QuoteModel quotePayload({
     'vatMinor': vatMinor,
     'currency': 'SAR',
     'expiresAt': toWireDateTime(expiresAt),
-    'promoCode': ?promoCode,
-    'promoDiscountMinor': promoCode == null ? 0 : promoDiscountMinor,
+    // The applied promo now travels in its OWN section, not as a top-level
+    // field: `QuoteModel.promoCode` is a getter over `promo?.code`, so a fixture
+    // that kept the flat key would read back as "no promo applied" and every
+    // offer/promo assertion downstream would quietly test the wrong branch.
+    if (promoCode != null)
+      'promo': {
+        'code': promoCode,
+        'discountType': 'FIXED_AMOUNT',
+        'percent': 0,
+        'fixedAmountMinor': promoDiscountMinor,
+        'discountMinor': promoDiscountMinor,
+      },
     'breakdown': {
       'grossMinor': grossMinor,
       'netMinor': grossMinor - vatMinor,
       'vatMinor': vatMinor,
       'currency': 'SAR',
+      'totalMinor': grossMinor,
+      'promoDiscountMinor': promoCode == null ? 0 : promoDiscountMinor,
+      'amountDueMinor': grossMinor,
     },
     // The wire's three-kind shape, mirrored EXACTLY as
     // `PriceQuoteServiceImpl.buildLines` emits it: the SERVICE row states the

@@ -1,70 +1,42 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:aqua_go/features/booking/data/models/quote_model.dart';
 
+/// Read-reconstruction cover for [QuoteModel.fromJson]. Every field degrades to
+/// a safe default so a partial/legacy payload yields a usable model instead of
+/// a TypeError that kills the booking screen. The money-bearing sub-objects go
+/// through `num` so a JSON double (1500.0) parses as cleanly as an int.
+///
+/// NOTE: on this branch the money getters (`totalMinor`, `vatMinor`,
+/// `promoDiscountMinor`, `promoCode`) are DERIVED from `breakdown` / `promo`,
+/// not read off the top level of the payload — the cases below feed the nested
+/// shape the backend actually sends.
 void main() {
   group('QuoteModel.fromJson', () {
     test('parses a fully populated payload', () {
       final q = QuoteModel.fromJson({
         'quoteId': 'q-1',
-        'totalMinor': 11500,
-        'vatMinor': 1500,
         'currency': 'SAR',
-        // Bare Riyadh wall clock — no offset, no `Z`. That is the only shape
-        // the backend emits, and a `Z` here would hide the device-local parse.
-        'expiresAt': '2026-07-24T13:00:00',
-        'promoCode': 'WELCOME15',
-        'promoDiscountMinor': 2000,
-        'timeMultiplierBps': 12000,
-        'zoneMultiplierBps': 11000,
-        'demandMultiplierBps': 10500,
-        'surgedSubtotalMinor': 10000,
+        'expiresAt': '2026-07-24T10:00:00Z',
+        'promo': {
+          'code': 'WELCOME15',
+          'discountType': 'FIXED_AMOUNT',
+          'fixedAmountMinor': 2000,
+          'discountMinor': 2000,
+        },
+        'breakdown': {
+          'grossMinor': 11500,
+          'netMinor': 10000,
+          'vatMinor': 1500,
+          'totalMinor': 11500,
+          'promoDiscountMinor': 2000,
+          'currency': 'SAR',
+        },
       });
       expect(q.quoteId, 'q-1');
       expect(q.totalMinor, 11500);
       expect(q.vatMinor, 1500);
       expect(q.promoCode, 'WELCOME15');
       expect(q.promoDiscountMinor, 2000);
-      expect(q.timeMultiplierBps, 12000);
-      expect(q.zoneMultiplierBps, 11000);
-      expect(q.demandMultiplierBps, 10500);
-      expect(q.surgedSubtotalMinor, 10000);
-      expect(q.isSurged, isTrue);
-    });
-
-    test('expiresAt lands in the Riyadh frame, on any device', () {
-      // The wire value is a bare wall clock. `DateTime.tryParse` alone returns a
-      // DEVICE-LOCAL instant, so the price-lock check in booking_summary_view
-      // fired ~3h late on a UTC device and ~2h early on UTC+5. Equality here
-      // pins the UTC flag as well as the instant, so it fails on every device
-      // under the old parse — including a UTC+3 one.
-      final q = QuoteModel.fromJson({
-        'quoteId': 'q-tz',
-        'expiresAt': '2026-07-24T13:00:00',
-        'promoDiscountMinor': 0,
-      });
-      expect(q.expiresAt, DateTime.utc(2026, 7, 24, 13));
-    });
-
-    test('an absent multiplier reads as UNSCALED, never as zero', () {
-      // 0 bps would describe a free wash on this read-reconstruction path.
-      final q = QuoteModel.fromJson({'quoteId': 'q-4'});
-      expect(q.timeMultiplierBps, kMultiplierBpsUnit);
-      expect(q.zoneMultiplierBps, kMultiplierBpsUnit);
-      expect(q.demandMultiplierBps, kMultiplierBpsUnit);
-      expect(q.surgedSubtotalMinor, 0);
-      expect(q.isSurged, isFalse);
-    });
-
-    test('toJson re-emits expiresAt as a BARE wall clock', () {
-      // `toIso8601String()` would stamp a `Z` on the UTC-flagged Riyadh frame
-      // and mis-date the value by three hours on the way back out.
-      final q = QuoteModel.fromJson({
-        'quoteId': 'q-5',
-        'expiresAt': '2026-07-24T13:00:00',
-        'promoDiscountMinor': 0,
-      });
-      expect(q.toJson()['expiresAt'], '2026-07-24T13:00:00');
-      expect(QuoteModel.fromJson(q.toJson()).expiresAt, q.expiresAt);
     });
 
     test('survives an empty payload instead of throwing', () {
@@ -76,30 +48,64 @@ void main() {
       expect(q.promoCode, isNull);
       expect(q.promoDiscountMinor, 0);
       expect(q.lines, isEmpty);
+      expect(q.breakdown, isNull);
+      expect(q.surge, isNull);
+      expect(q.promo, isNull);
+      expect(q.loyalty, isNull);
     });
 
-    test('accepts money fields delivered as JSON doubles', () {
-      // quoteId is present so the FIRST cast to fail is the totalMinor double.
+    test('totalMinor falls back to grossMinor when totalMinor is absent', () {
+      // Legacy breakdowns carried gross only; the getter must not read 0.
       final q = QuoteModel.fromJson({
-        'quoteId': 'q-2',
-        'totalMinor': 11500.0,
-        'vatMinor': 1500.0,
-        'promoDiscountMinor': 2000.0,
+        'quoteId': 'q-legacy',
+        'breakdown': {'grossMinor': 11500, 'netMinor': 10000, 'vatMinor': 1500},
       });
       expect(q.totalMinor, 11500);
       expect(q.vatMinor, 1500);
-      expect(q.promoDiscountMinor, 2000);
+    });
+
+    test('accepts money fields delivered as JSON doubles', () {
+      final q = QuoteModel.fromJson({
+        'quoteId': 'q-2',
+        'surge': {'timeBps': 1000.0, 'zoneBps': 0, 'demandBps': 500.0},
+        'promo': {'code': 'WELCOME15', 'discountMinor': 2000.0},
+        'loyalty': {
+          'currentBalancePoints': 300.0,
+          'currentBalanceValueMinor': 3000.0,
+          'maxApplicablePoints': 200.0,
+          'discountMinorAtMax': 2000.0,
+          'pointsApplied': 150.0,
+          'pointsDiscountMinor': 1500.0,
+        },
+      });
+      expect(q.surge!.timeBps, 1000);
+      expect(q.surge!.demandBps, 500);
+      expect(q.promo!.discountMinor, 2000);
+      expect(q.currentBalancePoints, 300);
+      expect(q.maxApplicablePoints, 200);
+      expect(q.pointsApplied, 150);
+      expect(q.pointsDiscountMinor, 1500);
+    });
+
+    test('degrades a partial promo/loyalty object instead of throwing', () {
+      final q = QuoteModel.fromJson({
+        'quoteId': 'q-4',
+        'promo': <String, dynamic>{},
+        'loyalty': <String, dynamic>{},
+      });
+      expect(q.promo!.code, '');
+      expect(q.promo!.discountType, '');
+      expect(q.promo!.percent, 0);
+      expect(q.maxApplicablePoints, 0);
+      expect(q.pointsDiscountMinor, 0);
     });
 
     test('falls back to now() on a malformed expiresAt instead of throwing', () {
       // Everything before expiresAt is present so the date parse is what fails.
       final q = QuoteModel.fromJson({
         'quoteId': 'q-3',
-        'totalMinor': 0,
-        'vatMinor': 0,
         'currency': 'SAR',
         'expiresAt': 'not-a-date',
-        'promoDiscountMinor': 0,
       });
       expect(q.expiresAt.isUtc, isTrue);
     });

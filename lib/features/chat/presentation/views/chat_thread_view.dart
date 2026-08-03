@@ -31,9 +31,7 @@ class ChatThreadView extends StatelessWidget {
     // Pre-resolve the role labels here (with context) so resolveUser — a bare
     // callback — can hand back localised display names.
     final meLabel = LocaleKeys.chat_role_you.tr(context: context);
-    final supportLabel = LocaleKeys.chat_role_support_agent.tr(
-      context: context,
-    );
+    final supportLabel = LocaleKeys.chat_role_support_agent.tr(context: context);
     final workerLabel = LocaleKeys.chat_role_worker.tr(context: context);
     final systemLabel = LocaleKeys.chat_role_system.tr(context: context);
 
@@ -79,11 +77,20 @@ class ChatThreadView extends StatelessWidget {
               if (state is ChatThreadLoaded)
                 IconButton(
                   onPressed: cubit.refresh,
-                  icon: Icon(Icons.refresh, color: context.colors.textPrimary),
+                  icon: Icon(
+                    Icons.refresh,
+                    color: context.colors.textPrimary,
+                  ),
                 ),
             ],
           ),
-          body: _buildBody(context, state, cubit, currentUserId, resolveUser),
+          body: _buildBody(
+            context,
+            state,
+            cubit,
+            currentUserId,
+            resolveUser,
+          ),
         );
       },
     );
@@ -100,7 +107,10 @@ class ChatThreadView extends StatelessWidget {
       return const Center(child: CustomLoadingIndicator(size: 100));
     }
     if (state is ChatThreadError) {
-      return ErrorRetryWidget(errorMessage: state.message, onRetry: cubit.open);
+      return ErrorRetryWidget(
+        errorMessage: state.message,
+        onRetry: cubit.open,
+      );
     }
     if (state is! ChatThreadLoaded) return const SizedBox.shrink();
 
@@ -116,63 +126,21 @@ class ChatThreadView extends StatelessWidget {
             theme: buildChatTheme(context),
             onMessageSend: (text) => cubit.sendText(text),
             onAttachmentTap: () => _pickAttachment(context, cubit),
-            onMessageLongPress:
-                (ctx, message, {required index, required details}) {
-                  _confirmReport(context, cubit, message, currentUserId);
-                },
+            onMessageLongPress: (ctx, message, {required index, required details}) {
+              _confirmReport(context, cubit, message, currentUserId);
+            },
             builders: Builders(
-              chatMessageBuilder:
-                  (
-                    context,
-                    message,
-                    index,
-                    animation,
-                    child, {
-                    isRemoved,
-                    required isSentByMe,
-                    groupStatus,
-                  }) => ChatMessage(
-                    message: message,
-                    index: index,
-                    animation: animation,
-                    isRemoved: isRemoved,
-                    groupStatus: groupStatus,
-                    sentMessageAlignment: AlignmentDirectional.centerStart,
-                    receivedMessageAlignment: AlignmentDirectional.centerEnd,
-                    sentMessageColumnAlignment: CrossAxisAlignment.start,
-                    receivedMessageColumnAlignment: CrossAxisAlignment.end,
-                    sentMessageScaleAnimationAlignment: Alignment.centerLeft,
-                    receivedMessageScaleAnimationAlignment:
-                        Alignment.centerRight,
-                    child: child,
-                  ),
-              composerBuilder: (context) => Composer(
-                backgroundColor: context.colors.screenBG,
-                sendIconColor: context.colors.primary,
-                emptyFieldSendIconColor: context.colors.primary,
-              ),
               // Wire older-message pagination (scroll-to-top -> load older page).
-              chatAnimatedListBuilder: (context, itemBuilder) => Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 8.0,
-                  horizontal: 16.0,
-                ),
-                child: ChatAnimatedList(
-                  itemBuilder: itemBuilder,
-                  onEndReached: () => cubit.loadOlder(),
-                ),
-              ),
+              chatAnimatedListBuilder: (context, itemBuilder) =>
+                  ChatAnimatedList(
+                    itemBuilder: itemBuilder,
+                    onEndReached: () => cubit.loadOlder(),
+                  ),
               // Default text bubble, plus an obvious "tap to resend" affordance
               // under any message that failed to send. RTL is automatic (the
               // affordance aligns to the trailing/sender side).
               textMessageBuilder:
-                  (
-                    context,
-                    message,
-                    index, {
-                    required isSentByMe,
-                    groupStatus,
-                  }) {
+                  (context, message, index, {required isSentByMe, groupStatus}) {
                     final bubble = SimpleTextMessage(
                       message: message,
                       index: index,
@@ -192,13 +160,8 @@ class ChatThreadView extends StatelessWidget {
                     );
                   },
               systemMessageBuilder:
-                  (
-                    context,
-                    message,
-                    index, {
-                    required isSentByMe,
-                    groupStatus,
-                  }) => _SystemBubble(text: message.text),
+                  (context, message, index, {required isSentByMe, groupStatus}) =>
+                      _SystemBubble(text: message.text),
             ),
           ),
         ),

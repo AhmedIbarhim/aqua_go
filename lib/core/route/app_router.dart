@@ -219,7 +219,6 @@ abstract class AppRouter {
                   existingSlotStart: args.existingSlotStart,
                   subscriptionId: args.subscriptionId,
                   washId: args.washId,
-                  giftCode: args.giftCode,
                   offerTitleAr: args.offerTitleAr,
                   offerTitleEn: args.offerTitleEn,
                   offerListPriceMinor: args.offerListPriceMinor,
@@ -451,6 +450,7 @@ class BookingFlowStartArgs {
   final int? offerTargetPriceMinor;
 
   BookingFlowStartArgs({
+    this.giftCode,
     this.service,
     this.existingCar,
     this.existingAddress,
@@ -460,7 +460,6 @@ class BookingFlowStartArgs {
     BookingSubmitStrategy? submitStrategy,
     this.subscriptionId,
     this.washId,
-    this.giftCode,
     this.offerTitleAr,
     this.offerTitleEn,
     this.offerListPriceMinor,

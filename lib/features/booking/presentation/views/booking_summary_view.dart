@@ -140,32 +140,15 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
               });
         } else if (state.status == BookingStatus.failure) {
           switch (state.paymentPhase) {
-            // The card was ALREADY charged (pay-before-create) and the server
-            // refunded it before answering — a promo cap consumed between the
-            // quote and the charge, a lost slot, a mismatched amount. The
-            // server's reason says none of that, and a customer who has just
-            // seen money leave their account has to be told it is coming back,
-            // and when. Root CLAUDE.md §10: up to 7 days on a card refund.
-            case PaymentPhase.refundPending:
-              context.showWarningAlert(
-                title: LocaleKeys.bookings_payment_refunded_title.tr(
-                  context: context,
-                ),
-                message:
-                    '${state.errorMessage ?? ''}\n\n'
-                    '${LocaleKeys.bookings_payment_refunded_notice.tr(context: context)}',
-                primaryButtonText: LocaleKeys.ok.tr(context: context),
-              );
-            // The card was charged and the create did NOT come back with an
-            // answer this client can read as a refund — a dropped connection, a
-            // timeout, a 5xx, or one of the create-path rejections that throws
-            // after the verify without compensating. The booking may exist; the
-            // charge may still be sitting there, and NO job reclaims it (see
-            // `refund_evidence.dart`). So nothing is asserted about either: the
+            // The card was ALREADY charged (pay-before-create) and the create
+            // did not come back with an answer this client can assert
+            // anything about — a dropped connection, a timeout, a 5xx, or a
+            // server rejection. Refunds were removed platform-wide (Root
+            // CLAUDE.md §10): nothing on this platform returns money to a
+            // customer, so nothing here claims the charge is coming back. The
+            // booking may exist; the charge may still be sitting there. The
             // customer is told not to pay again, to check My Bookings, and to
-            // reach support if money left with no booking behind it. The copy
-            // used to promise the amount came back automatically, which on this
-            // branch was not true.
+            // reach support if money left with no booking behind it.
             case PaymentPhase.createUnconfirmed:
               context.showWarningAlert(
                 title: LocaleKeys.bookings_payment_unconfirmed_title.tr(

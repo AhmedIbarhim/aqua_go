@@ -51,6 +51,7 @@ class BookingDetailsBottomActionSheet extends StatelessWidget {
         bookingState.selectedPackageService != null;
     final isComplete =
         bookingState.selectedCar != null &&
+        bookingState.selectedDate != null &&
         bookingState.selectedSlotStart != null &&
         servicePicked;
 

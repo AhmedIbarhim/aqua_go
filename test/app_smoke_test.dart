@@ -2,6 +2,7 @@ import 'package:aqua_go/app.dart';
 import 'package:aqua_go/core/config/controllers/connectivity_controller/connectivity_cubit.dart';
 import 'package:aqua_go/core/config/controllers/language_controller/language_cubit.dart';
 import 'package:aqua_go/core/config/controllers/theme_controller/theme_cubit.dart';
+import 'package:aqua_go/core/components/floating_control_widgets.dart';
 import 'package:aqua_go/core/components/offline_indicator.dart';
 import 'package:aqua_go/core/config/di/service_locator.dart';
 import 'package:aqua_go/core/config/local_storage/shared_prefs.dart';
@@ -13,6 +14,7 @@ import 'package:aqua_go/features/auth/data/services/auth_service.dart';
 import 'package:aqua_go/features/startup/views/onboarding_view.dart';
 import 'package:aqua_go/features/startup/views/splash_view.dart';
 import 'package:aqua_go/generated/codegen_loader.g.dart';
+import 'package:aqua_go/main/app_configs.dart';
 import 'package:dio/dio.dart';
 // `intl` (re-exported by easy_localization) ships its own TextDirection, which
 // would shadow the dart:ui one the Directionality assertion needs.
@@ -42,6 +44,12 @@ void main() {
     FlutterSecureStorage.setMockInitialValues({});
     await CacheClient.init();
     await EasyLocalization.ensureInitialized();
+    // MyApp's builder gates the floating dev switchers on the environment,
+    // so the shell cannot mount without AppConfigs. Pin it to prod — that is
+    // the shell shape that ships.
+    locator.registerSingleton<AppConfigs>(
+      AppConfigs.forEnvironment(AppEnvironment.prod),
+    );
     // SplashView resolves AuthRepository off the locator once the splash
     // delay lapses. The purge path it takes here never reaches the network,
     // so a bare Dio is enough to satisfy the graph.
@@ -119,6 +127,11 @@ void main() {
     // The offline banner is mounted above the router, not inside a route,
     // so it survives every navigation.
     expect(find.byType(OfflineIndicator), findsOneWidget);
+
+    // The floating theme/language switchers are a dev affordance only — they
+    // must never reach a prod build.
+    expect(find.byType(FloatingThemeSwitcher), findsNothing);
+    expect(find.byType(FloatingLanguageSwitcher), findsNothing);
 
     await settleSplash(tester);
   });

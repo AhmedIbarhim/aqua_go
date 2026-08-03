@@ -1,3 +1,5 @@
+import 'package:aqua_go/core/config/local_storage/shared_prefs.dart';
+import 'package:aqua_go/core/themes/app_colors.dart';
 import 'package:aqua_go/core/utils/date_time_formatter.dart';
 import 'package:aqua_go/core/utils/saudi_wire_format.dart';
 import 'package:aqua_go/features/booking/data/models/availability_response_model.dart';
@@ -5,6 +7,9 @@ import 'package:aqua_go/features/booking/data/models/package_booking_request_mod
 import 'package:aqua_go/features/booking/data/models/package_reschedule_request_model.dart';
 import 'package:aqua_go/features/booking/data/models/service_booking_request_model.dart';
 import 'package:aqua_go/features/booking/data/models/service_reschedule_request_model.dart';
+import 'package:aqua_go/features/gifts/data/models/gift_model.dart';
+import 'package:aqua_go/features/my_bookings/data/models/booking_response_model/booking_response_model.dart';
+import 'package:aqua_go/features/my_bookings/presentation/widgets/receipt_booking_details_card.dart';
 import 'package:aqua_go/generated/codegen_loader.g.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +34,9 @@ void main() {
   setUp(() async {
     TestWidgetsFlutterBinding.ensureInitialized();
     SharedPreferences.setMockInitialValues({});
+    // The receipt card resolves `booking.title` through `CacheClient`, which
+    // throws a LateInitializationError until the store is opened.
+    await CacheClient.init();
     await EasyLocalization.ensureInitialized();
   });
 
@@ -109,6 +117,126 @@ void main() {
       // formatter must read Arabic — not the Bengali handset.
       expect(formatClockTime(slot), contains('م'));
       expect(formatClockTime(slot), startsWith('11:00'));
+    });
+  });
+
+  group('the gift and receipt surfaces follow the app locale too', () {
+    /// These three shipped after the AQG-393 sweep and still built bare
+    /// `DateFormat`s, so they read the handset. They have no p1 counterpart —
+    /// gifts is Phase 2 only.
+    final expiry = DateTime(2026, 7, 23, 23, 0);
+
+    GiftModel giftExpiring(DateTime at) =>
+        GiftModel(validityEndsAt: at.toIso8601String());
+
+    /// Mounts the receipt card inside the same localization scaffolding
+    /// `launchApp` builds, plus the [AppColors] extension `context.colors`
+    /// resolves against.
+    Future<void> pumpReceiptCard(
+      WidgetTester tester, {
+      required String locale,
+      required DateTime scheduledAt,
+    }) async {
+      await tester.pumpWidget(
+        EasyLocalization(
+          supportedLocales: const [Locale('ar'), Locale('en')],
+          path: 'assets/translations',
+          fallbackLocale: const Locale('ar'),
+          startLocale: Locale(locale),
+          assetLoader: const CodegenLoader(),
+          child: Builder(
+            builder: (context) => MaterialApp(
+              localizationsDelegates: context.localizationDelegates,
+              supportedLocales: context.supportedLocales,
+              locale: context.locale,
+              theme: ThemeData(
+                extensions: const <ThemeExtension<dynamic>>[darkAppColors],
+              ),
+              home: Scaffold(
+                body: ReceiptBookingDetailsCard(
+                  booking: BookingResponseModel(
+                    scheduledAt: toWireDateTime(scheduledAt),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    /// The rendered booking date/time, read back off the card.
+    String renderedDateTime(WidgetTester tester) => tester
+        .widgetList<Text>(find.byType(Text))
+        .map((t) => t.data ?? '')
+        .firstWhere((s) => s.contains(' . '));
+
+    testWidgets('gift expiry is day-first under either app language', (
+      tester,
+    ) async {
+      await loadProductionDateSymbols(tester);
+
+      // The device is Bengali throughout: the app's pin must win every time.
+      Intl.systemLocale = 'bn';
+
+      // `ar` declares no ZERODIGIT in Flutter's table — Saudi Arabic renders
+      // Western digits — so both app languages agree on this fixed-order shape.
+      Intl.defaultLocale = 'en';
+      expect(giftExpiring(expiry).formattedExpiryDate, '23 - 07 - 2026');
+
+      Intl.defaultLocale = 'ar';
+      expect(giftExpiring(expiry).formattedExpiryDate, '23 - 07 - 2026');
+
+      // Control: the getter really does read a locale, so the two assertions
+      // above cannot pass vacuously against a hardcoded ASCII format.
+      Intl.defaultLocale = 'bn';
+      expect(giftExpiring(expiry).formattedExpiryDate, isNot('23 - 07 - 2026'));
+    });
+
+    testWidgets('the two gift surfaces no longer disagree on the same value', (
+      tester,
+    ) async {
+      await loadProductionDateSymbols(tester);
+
+      for (final locale in const ['ar', 'en']) {
+        Intl.defaultLocale = locale;
+        // The model getter feeds the sent-gift screens; the received-gift card
+        // formats its own `validityEndsAt`. One shape, one call.
+        expect(
+          giftExpiring(expiry).formattedExpiryDate,
+          formatNumericDate(expiry),
+          reason: locale,
+        );
+      }
+    });
+
+    testWidgets('the receipt card reads the app locale, not the handset', (
+      tester,
+    ) async {
+      Intl.systemLocale = 'ar_SA';
+      Intl.defaultLocale = 'en';
+      await pumpReceiptCard(tester, locale: 'en', scheduledAt: expiry);
+      // `DateFormat.jm` separates the meridiem with a narrow no-break space
+      // (U+202F), which is invisible in a failure diff — normalise it away.
+      expect(
+        renderedDateTime(tester).replaceAll('\u202f', ' '),
+        '11:00 PM . 7/23/2026',
+      );
+
+      Intl.systemLocale = 'en_US';
+      Intl.defaultLocale = 'ar';
+      await pumpReceiptCard(tester, locale: 'ar', scheduledAt: expiry);
+      final arabic = renderedDateTime(tester);
+      expect(arabic, startsWith('11:00'));
+      expect(arabic, contains('م'));
+      expect(arabic, isNot(contains('PM')));
+      // The hand-built meridiem the card used to emit; `DateFormat.jm` gives
+      // the locale's own marker instead.
+      expect(arabic, isNot(contains('مساءً')));
+      // Arabic is day-first where English rendered `7/23`. The date carries
+      // RLM marks, so this asserts the leading field rather than the literal.
+      expect(arabic.split(' . ').last, startsWith('23'));
     });
   });
 

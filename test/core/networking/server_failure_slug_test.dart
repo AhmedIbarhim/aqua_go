@@ -1,5 +1,4 @@
 import 'package:aqua_go/core/config/networking/exceptions/failure.dart';
-import 'package:aqua_go/features/booking/domain/refund_evidence.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// The RFC 9457 `type` slug is the only machine-readable statement of WHICH
@@ -48,51 +47,6 @@ void main() {
       final failure = ServerFailure.fromResponse(422, _problem('promo-code-no-longer-valid'));
       expect(failure.message, 'A localized sentence for the customer.');
       expect(failure.type, FailureType.validation);
-    });
-  });
-
-  group('refund evidence', () {
-    test('the rejections that run the compensating refund carry it', () {
-      for (final slug in refundEvidenceSlugs) {
-        expect(
-          carriesRefundEvidence(ServerFailure.fromResponse(422, _problem(slug))),
-          isTrue,
-          reason: '$slug refunds the charge before it throws',
-        );
-      }
-    });
-
-    test('a 4xx on a path with no compensation does NOT', () {
-      // Same 422 shape, thrown after the payment was verified, with no refund
-      // run — and NOTHING behind the client runs one either. There is no
-      // sweeper to defer to: MoyasarReconciliationJob's orphan-refund arm ships
-      // disabled, only logs when enabled, and sweeps PENDING_PAYMENT rather
-      // than these. So the charge really does stay where it is, and the client
-      // must not claim otherwise.
-      for (final slug in ['zone-mismatch', 'address-outside-service-area',
-          'saved-address-not-found', 'invalid-booking-creation-request']) {
-        expect(
-          carriesRefundEvidence(ServerFailure.fromResponse(422, _problem(slug))),
-          isFalse,
-          reason: '$slug leaves the charge where it is',
-        );
-      }
-    });
-
-    test('a transport failure never does — no answer, no evidence', () {
-      expect(
-        carriesRefundEvidence(
-          const ServerFailure('No internet connection', type: FailureType.network),
-        ),
-        isFalse,
-      );
-      expect(
-        carriesRefundEvidence(
-          const ServerFailure('Connection timed out', type: FailureType.timeout),
-        ),
-        isFalse,
-      );
-      expect(carriesRefundEvidence(ServerFailure.fromResponse(502, null)), isFalse);
     });
   });
 }
