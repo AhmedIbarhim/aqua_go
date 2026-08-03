@@ -7,7 +7,6 @@ import '../../../address/data/models/address_model.dart';
 import '../../../my_cars/data/models/my_car_model.dart';
 import '../../../home/data/models/service_model.dart';
 import '../../domain/configs/booking_flow_config.dart';
-import '../../domain/refund_evidence.dart';
 import '../../data/models/quote_model.dart';
 import '../../../my_bookings/data/models/booking_response_model/breakdown.dart';
 import '../../../my_bookings/data/models/booking_response_model/quote_line.dart';
@@ -1322,16 +1321,15 @@ class BookingCubit extends Cubit<BookingState> {
   /// Pay-before-create step 4 (spec §4.2): the SDK returned a verified `paid`
   /// payment; create the booking with idempotency `booking-create:{id}`.
   ///
-  /// The card is ALREADY charged when this runs, so what the customer is told
-  /// about their money turns on whether the failure is evidence that it came
-  /// back. Only the rejections in `refund_evidence.dart` are — each one runs
-  /// the server's compensating refund before throwing, so [refundPending] is a
-  /// statement of fact. Everything else is [PaymentPhase.createUnconfirmed]:
-  /// a dropped connection or a timeout never reached an answer at all and the
-  /// booking may well have been created, and a 5xx rolled the transaction back
-  /// without refunding anything. Promising a refund there would be inventing
-  /// one, and telling a customer their charge is reversed when it is not is
-  /// worse than telling them we do not yet know.
+  /// The card is ALREADY charged when this runs, and refunds were removed
+  /// platform-wide (Root CLAUDE.md §10): nothing on this platform returns
+  /// money to a customer, so a failed create is ALWAYS
+  /// [PaymentPhase.createUnconfirmed] — never a promise that the charge is
+  /// coming back. A dropped connection or a timeout never reached an answer
+  /// at all and the booking may well have been created; a 5xx rolled the
+  /// transaction back; and a server rejection never compensates. Support is
+  /// the only path back to that money, and the client must say so, not
+  /// invent a refund.
   Future<void> completeBookingAfterPayment(String moyasarPaymentId) async {
     emit(
       state.copyWith(
@@ -1350,9 +1348,7 @@ class BookingCubit extends Cubit<BookingState> {
       (failure) => emit(
         state.copyWith(
           status: BookingStatus.failure,
-          paymentPhase: carriesRefundEvidence(failure)
-              ? PaymentPhase.refundPending
-              : PaymentPhase.createUnconfirmed,
+          paymentPhase: PaymentPhase.createUnconfirmed,
           errorMessage: failure.message,
         ),
       ),

@@ -31,16 +31,15 @@ enum PaymentPhase {
   /// user dismissed the SDK sheet.
   cancelled,
 
-  /// paid, and the server ANSWERED with one of the rejections that refunds the
-  /// charge as part of its contract (see `refund_evidence.dart`). The money is
-  /// known to be coming back and the customer is told so.
-  refundPending,
-
-  /// paid, and the create did not come back with an answer this client can read
-  /// as a refund — a dropped connection, a timeout, a 5xx, or a rejection that
-  /// runs no compensation. The booking may or may not exist and the charge may
-  /// or may not have been returned yet, so nothing is asserted about either:
-  /// the customer is told not to pay again and to check My Bookings.
+  /// paid, and the create did not come back with an answer this client can
+  /// assert anything about — a dropped connection, a timeout, a 5xx, or a
+  /// server rejection. Refunds were removed platform-wide (Root CLAUDE.md
+  /// §10): nothing on this platform returns money to a customer, so the
+  /// client must never claim a charge is coming back. The booking may or may
+  /// not exist and the charge may or may not have been returned by support
+  /// yet, so nothing is asserted about either: the customer is told not to
+  /// pay again, to check My Bookings, and to reach support if money left with
+  /// no booking behind it.
   createUnconfirmed,
 }
 

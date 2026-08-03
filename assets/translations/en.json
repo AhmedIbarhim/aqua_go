@@ -277,8 +277,6 @@
     "promo_discount_named": "{} discount",
     "vat_inclusive": "Includes VAT",
     "promo_released": "Code returned after cancellation",
-    "payment_refunded_title": "Booking not completed",
-    "payment_refunded_notice": "Your card was charged and the full amount has been refunded. It can take up to 7 days to appear on your statement, depending on your bank.",
     "payment_unconfirmed_title": "We could not confirm your booking",
     "payment_unconfirmed_notice": "Please do not pay again. Open My Bookings to check whether the booking went through. If your card was charged and no booking appears there, contact support with the payment details and we will resolve it for you.",
     "reapply_offer": "Re-apply {}",
