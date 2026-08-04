@@ -19,7 +19,7 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "com.example.aqua_go"
-    compileSdk = 36
+    compileSdk = 37
 
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
@@ -35,7 +35,7 @@ android {
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 37
         versionCode = flutter.versionCode
         versionName = flutter.versionName
         multiDexEnabled = true

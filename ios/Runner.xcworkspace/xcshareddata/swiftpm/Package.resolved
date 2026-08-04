@@ -136,6 +136,24 @@
       }
     },
     {
+      "identity" : "recaptcha-enterprise-mobile-sdk",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/GoogleCloudPlatform/recaptcha-enterprise-mobile-sdk.git",
+      "state" : {
+        "revision" : "85588690041e63784be7bcb4b631c32565127ba2",
+        "version" : "18.9.1"
+      }
+    },
+    {
+      "identity" : "screenprotectorkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/prongbang/ScreenProtectorKit.git",
+      "state" : {
+        "revision" : "1d00d802ed3b919988e273072052388e32a92920",
+        "version" : "1.5.1"
+      }
+    },
+    {
       "identity" : "tocropviewcontroller",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/TimOliver/TOCropViewController.git",

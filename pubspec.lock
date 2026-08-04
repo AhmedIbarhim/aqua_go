@@ -1073,10 +1073,10 @@ packages:
     dependency: "direct main"
     description:
       name: moyasar
-      sha256: f5e3838f55715bb53b072a37a3211a4930816c5f108883b36009e0ace8b8584e
+      sha256: f05320fbcc7a7a0a3d7cd7c283b057961d6d0f5c953e8eb7e2eea65cd1bd1a84
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.3"
+    version: "3.0.4"
   native_toolchain_c:
     dependency: transitive
     description:
