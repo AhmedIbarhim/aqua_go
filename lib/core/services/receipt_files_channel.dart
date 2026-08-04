@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/services.dart';
 
 /// The outcome of the native "reveal" step — writing a second, user-visible
@@ -68,6 +70,27 @@ class ReceiptFilesChannel {
       return const ReceiptRevealFailed();
     } on MissingPluginException {
       return const ReceiptRevealFailed();
+    }
+  }
+
+  /// Opens [path] in the OS viewer.
+  ///
+  /// iOS ONLY — returns false on every other platform so the caller falls back
+  /// to open_file. open_file's iOS side picks its presenting controller by
+  /// scanning for the current key window, which can leave the app on a black
+  /// screen once the preview is dismissed; the native side here presents
+  /// QuickLook from our own root view controller instead. Android keeps
+  /// open_file, whose implementation is an ACTION_VIEW intent and shares none
+  /// of that machinery.
+  static Future<bool> openFile(String path) async {
+    if (!Platform.isIOS) return false;
+    try {
+      final ok = await _channel.invokeMethod<bool>('openFile', {'path': path});
+      return ok ?? false;
+    } on PlatformException {
+      return false;
+    } on MissingPluginException {
+      return false;
     }
   }
 }

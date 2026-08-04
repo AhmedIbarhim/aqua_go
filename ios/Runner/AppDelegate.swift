@@ -1,9 +1,15 @@
 import Flutter
 import UIKit
 import GoogleMaps
+import QuickLook
 
 @main
 @objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
+
+  /// Retained for the lifetime of the preview — QLPreviewController's data
+  /// source is unowned, so a local would be gone before the first callback.
+  private var previewItem: URL?
+
   override func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
@@ -31,12 +37,52 @@ import GoogleMaps
       name: "aquago/receipts",
       binaryMessenger: engineBridge.applicationRegistrar.messenger()
     )
-    channel.setMethodCallHandler { call, result in
-      guard call.method == "saveAndReveal" else {
+    channel.setMethodCallHandler { [weak self] call, result in
+      switch call.method {
+      case "saveAndReveal":
+        AppDelegate.saveAndReveal(call: call, result: result)
+      case "openFile":
+        self?.openFile(call: call, result: result)
+      default:
         result(FlutterMethodNotImplemented)
-        return
       }
-      AppDelegate.saveAndReveal(call: call, result: result)
+    }
+  }
+
+  /// Presents the file in QuickLook from the app's OWN root view controller.
+  ///
+  /// Deliberately not open_file: its iOS implementation resolves the presenting
+  /// controller by scanning `connectedScenes` for whatever window happens to be
+  /// `isKeyWindow` at that moment, so the preview can be pushed onto a
+  /// controller that is not the Flutter one it was invoked from. Dismissing it
+  /// then leaves the app on a black screen that only a relaunch clears. Here the
+  /// presenting controller is the window's root, captured once and dismissed
+  /// explicitly, so the preview can only ever return to the view it covered.
+  private func openFile(call: FlutterMethodCall, result: @escaping FlutterResult) {
+    guard let args = call.arguments as? [String: Any],
+      let path = args["path"] as? String
+    else {
+      result(FlutterError(code: "bad_args", message: "path missing", details: nil))
+      return
+    }
+    let url = URL(fileURLWithPath: path)
+    guard FileManager.default.fileExists(atPath: url.path) else {
+      result(FlutterError(code: "not_found", message: "no file at \(path)", details: nil))
+      return
+    }
+    guard let presenter = window?.rootViewController else {
+      result(FlutterError(code: "no_presenter", message: "no root view controller", details: nil))
+      return
+    }
+
+    previewItem = url
+    let preview = QLPreviewController()
+    preview.dataSource = self
+    preview.delegate = self
+    // Present on whatever is already on top, so this composes with a Flutter
+    // route that is itself presented modally instead of fighting it.
+    (presenter.presentedViewController ?? presenter).present(preview, animated: true) {
+      result(true)
     }
   }
 
@@ -69,3 +115,20 @@ import GoogleMaps
   }
 }
 
+// QuickLook needs a data source and gives us the dismissal callback that lets
+// the preview item go; without releasing it the URL outlives every preview.
+extension AppDelegate: QLPreviewControllerDataSource, QLPreviewControllerDelegate {
+  func numberOfPreviewItems(in controller: QLPreviewController) -> Int {
+    previewItem == nil ? 0 : 1
+  }
+
+  func previewController(_ controller: QLPreviewController, previewItemAt index: Int)
+    -> QLPreviewItem
+  {
+    previewItem! as QLPreviewItem
+  }
+
+  func previewControllerDidDismiss(_ controller: QLPreviewController) {
+    previewItem = nil
+  }
+}

@@ -207,6 +207,13 @@ class _DownloadReceiptButtonState extends State<_DownloadReceiptButton> {
       // still exists and stays openable even when the best-effort visible
       // copy could not be written.
 
+      // iOS goes through our own channel (QuickLook presented from the root view
+      // controller); it returns false on Android, which falls through to
+      // open_file's ACTION_VIEW intent.
+      final openedNatively = await ReceiptFilesChannel.openFile(privateFile.path);
+      if (!mounted) return;
+      if (openedNatively) return;
+
       final openResult = await OpenFile.open(
         privateFile.path,
         type: 'application/pdf',
