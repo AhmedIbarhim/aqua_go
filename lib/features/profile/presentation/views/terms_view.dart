@@ -1,87 +1,76 @@
+import 'package:aqua_go/generated/locale_keys.g.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/components/custom_loading_indicator.dart';
+import '../../../../core/components/error_retry_widget.dart';
 import '../../../../core/components/generic_app_bar.dart';
+import '../../../../core/config/di/service_locator.dart';
 import '../../../../core/extentions/context_extentions.dart';
-import '../../../../core/themes/app_text_styles.dart';
-import '../local_texts/terms_texts_ar.dart';
-import '../local_texts/terms_texts_en.dart';
+import '../../data/models/policy_model.dart';
+import '../controllers/policy_cubit/policy_cubit.dart';
+import '../controllers/policy_cubit/policy_state.dart';
+import '../widgets/policy_markdown_body.dart';
 
 class TermsView extends StatelessWidget {
   const TermsView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final texts = context.isAr ? termsTextsAr : termsTextsEn;
-
+    // See PrivacyPolicyView: the locale must be read here, not inside `create:`.
+    final localeCode = context.locale.languageCode;
     return Scaffold(
       backgroundColor: context.colors.screenBG,
-      appBar: GenericAppBar(title: texts.appBarTitle, centerTitle: true),
-      body: Column(
-        children: [
-          const SizedBox(height: 16),
-          Expanded(
-            child: Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: context.colors.background,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(24),
-                  topRight: Radius.circular(24),
+      appBar: GenericAppBar(
+        title: LocaleKeys.settings_terms_and_conditions.tr(context: context),
+        centerTitle: true,
+      ),
+      body: BlocProvider(
+        key: ValueKey(localeCode),
+        create: (_) => locator<PolicyCubit>()
+          ..fetchPolicy(type: PolicyType.tos, locale: localeCode),
+        child: Column(
+          children: [
+            const SizedBox(height: 16),
+            Expanded(
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: context.colors.background,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(24),
+                    topRight: Radius.circular(24),
+                  ),
                 ),
-              ),
-              padding: const EdgeInsets.all(24),
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      texts.title,
-                      style: AppTextStyles.bold18.copyWith(
-                        color: context.colors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    Text(
-                      texts.contentP1,
-                      style: AppTextStyles.regular16.copyWith(
-                        color: context.colors.textSecondary,
-                        height: 1.6,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Text(
-                      texts.contentP2,
-                      style: AppTextStyles.regular16.copyWith(
-                        color: context.colors.textSecondary,
-                        height: 1.6,
-                      ),
-                    ),
-                    const SizedBox(height: 48),
-                    SizedBox(
-                      width: double.infinity,
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: Alignment.center,
-                        child: Text(
-                          textAlign: TextAlign.center,
-                          texts.footer,
-                          style: AppTextStyles.medium16.copyWith(
-                            color: context.colors.primary,
-                            height: 1.5,
+                padding: const EdgeInsets.all(24),
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: BlocBuilder<PolicyCubit, PolicyState>(
+                    builder: (context, state) {
+                      if (state is PolicyLoading || state is PolicyInitial) {
+                        return const Center(
+                          child: CustomLoadingIndicator(size: 100),
+                        );
+                      } else if (state is PolicyFailure) {
+                        return ErrorRetryWidget(
+                          errorMessage: state.message,
+                          onRetry: () => context.read<PolicyCubit>().fetchPolicy(
+                            type: PolicyType.tos,
+                            locale: localeCode,
                           ),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 48),
-                  ],
+                        );
+                      } else if (state is PolicySuccess) {
+                        return PolicyMarkdownBody(policy: state.policy);
+                      }
+                      return const SizedBox.shrink();
+                    },
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -1,4 +1,6 @@
 import 'dart:io';
+
+import '../../../../core/enums/payment_status_enum.dart';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -94,8 +96,11 @@ class ReceiptSummaryView extends StatelessWidget {
               ),
             ),
           ),
-          // Download Action Button
-          _DownloadReceiptButton(booking: booking),
+          // Only PAID bookings have a receipt: the endpoint 422s on anything
+          // else, and NOT_REQUIRED (gift redemption, subscription-covered wash)
+          // took no payment on this booking to receipt at all.
+          if (booking.paymentStatus == PaymentStatus.PAID)
+            _DownloadReceiptButton(booking: booking),
         ],
       ),
     );
