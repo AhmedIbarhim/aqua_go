@@ -30,7 +30,10 @@ import 'package:aqua_go/features/home/presentation/controllers/package_detail_co
 import 'package:aqua_go/features/home/presentation/controllers/packages_controller/packages_cubit.dart';
 import 'package:aqua_go/features/subscriptions/presentation/controllers/subscriptions_controller/subscriptions_cubit.dart';
 import 'package:aqua_go/features/profile/data/data_sources/profile_remote_data_source.dart';
+import 'package:aqua_go/features/profile/data/data_sources/policies_remote_data_source.dart';
 import 'package:aqua_go/features/profile/data/repos/profile_repository.dart';
+import 'package:aqua_go/features/profile/data/repos/policies_repository.dart';
+import 'package:aqua_go/features/profile/presentation/controllers/policy_cubit/policy_cubit.dart';
 import 'package:aqua_go/features/profile/presentation/controllers/notification_preferences_cubit/notification_preferences_cubit.dart';
 import 'package:aqua_go/features/profile/presentation/controllers/support_cubit/support_cubit.dart';
 import 'package:aqua_go/features/notifications/data/data_sources/notifications_remote_data_source.dart';
@@ -111,6 +114,9 @@ Future<void> initServiceLocator(AppConfigs configs) async {
   locator.registerLazySingleton<ProfileRemoteDataSource>(
     () => ProfileRemoteDataSource(locator()),
   );
+  locator.registerLazySingleton<PoliciesRemoteDataSource>(
+    () => PoliciesRemoteDataSource(locator()),
+  );
   locator.registerLazySingleton<NotificationsRemoteDataSource>(
     () => NotificationsRemoteDataSource(locator()),
   );
@@ -184,6 +190,9 @@ Future<void> initServiceLocator(AppConfigs configs) async {
   );
   locator.registerLazySingleton<ProfileRepository>(
     () => ProfileRepository(locator()),
+  );
+  locator.registerLazySingleton<PoliciesRepository>(
+    () => PoliciesRepository(locator()),
   );
   locator.registerLazySingleton<NotificationsRepository>(
     () => NotificationsRepository(locator()),
@@ -291,6 +300,12 @@ Future<void> initServiceLocator(AppConfigs configs) async {
   );
   locator.registerFactory<PayingTipsCubit>(() => PayingTipsCubit(locator()));
   locator.registerFactory<FaqsCubit>(() => FaqsCubit(locator()));
+  // Factory (not lazy singleton): the same PolicyCubit type backs both the
+  // Privacy Policy and Terms screens, which fetch different `type`s and can
+  // be open at once (e.g. one pushed from the other's About Us / consent
+  // flow) — a shared instance would clobber one screen's state with the
+  // other's.
+  locator.registerFactory<PolicyCubit>(() => PolicyCubit(locator()));
   locator.registerFactory<SupportCubit>(() => SupportCubit(locator()));
   locator.registerFactory<WalletCubit>(() => WalletCubit(locator()));
   // ChatThreadsCubit drives the support inbox. ChatThreadCubit (a single open
