@@ -484,6 +484,8 @@
     "conversion_rule": "كل {} نقطة = {} ريال خصم",
     "conversion_subtext": "يمكنك استخدام نقاطك أثناء تأكيد الحجز",
     "booking_number": "رقم الحجز {}",
+    "gift_number": "نقاط هدية {}",
+    "admin_credit": "رصيد إداري",
     "today": "اليوم",
     "yesterday": "امس"
   },

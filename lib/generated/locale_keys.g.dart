@@ -459,6 +459,8 @@ abstract class  LocaleKeys {
   static const wallet_conversion_rule = 'wallet.conversion_rule';
   static const wallet_conversion_subtext = 'wallet.conversion_subtext';
   static const wallet_booking_number = 'wallet.booking_number';
+  static const wallet_gift_number = 'wallet.gift_number';
+  static const wallet_admin_credit = 'wallet.admin_credit';
   static const wallet_today = 'wallet.today';
   static const wallet_yesterday = 'wallet.yesterday';
   static const wallet = 'wallet';

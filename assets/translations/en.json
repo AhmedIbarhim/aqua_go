@@ -484,6 +484,8 @@
     "conversion_rule": "Every {} points = {} SAR discount",
     "conversion_subtext": "You can use your points during booking confirmation",
     "booking_number": "Booking No. {}",
+    "gift_number": "Gift Points. {}",
+    "admin_credit": "Admin Credit",
     "today": "Today",
     "yesterday": "Yesterday"
   },
