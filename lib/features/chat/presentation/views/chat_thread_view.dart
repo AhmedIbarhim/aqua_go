@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -74,28 +75,10 @@ class ChatThreadView extends StatelessWidget {
 
         return Scaffold(
           backgroundColor: context.colors.background,
-          appBar: GenericAppBar(
-            title: title,
-            centerTitle: false,
-            actions: [
-              if (state is ChatThreadLoaded)
-                IconButton(
-                  onPressed: cubit.refresh,
-                  icon: SvgPicture.asset(
-                    AppAssets.chatRefresh,
-                    width: 24,
-                    height: 24,
-                    // The vuesax source ships a hardcoded near-black stroke
-                    // (#292D32) which is invisible on this app's dark surface,
-                    // so every one of these icons must be tinted, not drawn raw.
-                    colorFilter: ColorFilter.mode(
-                      context.colors.textPrimary,
-                      BlendMode.srcIn,
-                    ),
-                  ),
-                ),
-            ],
-          ),
+          // No manual refresh action: the thread already refreshes itself (the
+          // poll while the screen is open, plus the optimistic append on send),
+          // so the button only ever repeated work the screen does on its own.
+          appBar: GenericAppBar(title: title, centerTitle: false),
           body: _buildBody(context, state, cubit, currentUserId, resolveUser),
         );
       },
@@ -175,9 +158,16 @@ class ChatThreadView extends StatelessWidget {
               ),
               emptyChatListBuilder: (context) =>
                   EmptyChatList(text: LocaleKeys.chat_no_messages_yet.tr()),
-              // Wire older-message pagination (scroll-to-top -> load older page).
+              // Anchor the list to the bottom (like every other messaging app):
+              // ChatAnimatedListReversed lays the CustomScrollView out with
+              // `reverse: true`, so a short thread sits at the bottom of the
+              // viewport instead of the top, and the view opens already
+              // scrolled to the newest message with no extra scroll call
+              // needed. `onEndReached` semantics are unchanged by `reversed`
+              // — it still fires on reaching the TOP (oldest), so pagination
+              // keeps loading older pages exactly as before.
               chatAnimatedListBuilder: (context, itemBuilder) =>
-                  ChatAnimatedList(
+                  ChatAnimatedListReversed(
                     itemBuilder: itemBuilder,
                     onEndReached: () => cubit.loadOlder(),
                   ),
@@ -210,6 +200,47 @@ class ChatThreadView extends StatelessWidget {
                       ],
                     );
                   },
+              // REQUIRED, not optional polish. flutter_chat_ui has no default
+              // widget for image or file messages — `_buildMessage` asserts on
+              // the zero-size SizedBox it falls back to, so a single attachment
+              // in the thread throws on every frame and the list never renders.
+              // MessageMapper emits Message.image / Message.file whenever the
+              // wire carries an attachmentDownloadUrl, so both must be provided.
+              imageMessageBuilder:
+                  (
+                    context,
+                    message,
+                    index, {
+                    required isSentByMe,
+                    groupStatus,
+                  }) => _AttachmentBubble(
+                    isSentByMe: isSentByMe,
+                    caption: message.text,
+                    onResend: message.resolvedStatus == MessageStatus.error
+                        ? () => cubit.resendMessage(message)
+                        : null,
+                    child: _RemoteImage(
+                      url: message.source,
+                      cacheKey: message.id,
+                    ),
+                  ),
+              fileMessageBuilder:
+                  (
+                    context,
+                    message,
+                    index, {
+                    required isSentByMe,
+                    groupStatus,
+                  }) => _AttachmentBubble(
+                    isSentByMe: isSentByMe,
+                    onResend: message.resolvedStatus == MessageStatus.error
+                        ? () => cubit.resendMessage(message)
+                        : null,
+                    child: _FileRow(
+                      name: message.name,
+                      sizeBytes: message.size,
+                    ),
+                  ),
               systemMessageBuilder:
                   (
                     context,
@@ -364,6 +395,215 @@ class _ResendAffordance extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Shared shell for an attachment message — the sender-side alignment, the
+/// bubble tint, the rounded clip and the optional caption/resend row. Keeps the
+/// image and file bubbles from drifting apart, and keeps both aligned with the
+/// text bubble the package draws for us.
+class _AttachmentBubble extends StatelessWidget {
+  final bool isSentByMe;
+  final Widget child;
+  final String? caption;
+  final VoidCallback? onResend;
+
+  const _AttachmentBubble({
+    required this.isSentByMe,
+    required this.child,
+    this.caption,
+    this.onResend,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final hasCaption = caption != null && caption!.trim().isNotEmpty;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      // Start/end, never left/right — the sender side flips with the locale.
+      crossAxisAlignment: isSentByMe
+          ? CrossAxisAlignment.end
+          : CrossAxisAlignment.start,
+      children: [
+        Container(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.sizeOf(context).width * 0.72,
+          ),
+          margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          decoration: BoxDecoration(
+            color: isSentByMe
+                ? context.colors.chatPrimary
+                : context.colors.chatSecondary,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              child,
+              if (hasCaption)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 8, 12, 10),
+                  child: Text(
+                    caption!,
+                    style: AppTextStyles.regular14.copyWith(
+                      color: context.colors.textPrimary,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+        if (onResend != null) _ResendAffordance(onTap: onResend!),
+      ],
+    );
+  }
+}
+
+/// A chat image, cached by MESSAGE ID rather than by URL.
+///
+/// The URL is a Garage presigned link: the signature rotates on every read, so
+/// the default cache key (the URL itself) would miss on every poll and re-download
+/// the whole photo. [cacheKey] pins the entry to the thing that is actually
+/// stable — the message id — because a message's attachment bytes are written
+/// once and never change. First view downloads; every view after that, in this
+/// session or a later one, is served from disk regardless of how many times the
+/// signature has been reissued.
+///
+/// Tapping opens the full-size viewer, which reuses the same cache entry.
+class _RemoteImage extends StatelessWidget {
+  final String url;
+  final String cacheKey;
+  const _RemoteImage({required this.url, required this.cacheKey});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          fullscreenDialog: true,
+          builder: (_) => _ImageViewer(url: url, cacheKey: cacheKey),
+        ),
+      ),
+      child: Hero(
+        tag: cacheKey,
+        child: CachedNetworkImage(
+          imageUrl: url,
+          cacheKey: cacheKey,
+          fit: BoxFit.cover,
+          placeholder: (context, _) => const SizedBox(
+            height: 180,
+            width: double.infinity,
+            child: Center(child: CustomLoadingIndicator()),
+          ),
+          errorWidget: (context, _, _) => SizedBox(
+            height: 180,
+            width: double.infinity,
+            child: Center(
+              child: Icon(
+                Icons.broken_image_outlined,
+                color: context.colors.textSecondary,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Full-screen attachment viewer: pinch/pan over the SAME cached entry the
+/// bubble used, so opening it costs no second download.
+class _ImageViewer extends StatelessWidget {
+  final String url;
+  final String cacheKey;
+  const _ImageViewer({required this.url, required this.cacheKey});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      extendBodyBehindAppBar: true,
+      body: Center(
+        child: Hero(
+          tag: cacheKey,
+          child: InteractiveViewer(
+            minScale: 1,
+            maxScale: 4,
+            child: CachedNetworkImage(
+              imageUrl: url,
+              cacheKey: cacheKey,
+              fit: BoxFit.contain,
+              placeholder: (context, _) =>
+                  const Center(child: CustomLoadingIndicator()),
+              errorWidget: (context, _, _) => const Center(
+                child: Icon(Icons.broken_image_outlined, color: Colors.white),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A non-image attachment — shown as a labelled row rather than a preview.
+class _FileRow extends StatelessWidget {
+  final String name;
+  final int? sizeBytes;
+  const _FileRow({required this.name, this.sizeBytes});
+
+  static String _humanSize(int bytes) {
+    if (bytes < 1024) return '$bytes B';
+    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(0)} KB';
+    return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.insert_drive_file_outlined,
+            size: 20,
+            color: context.colors.textSecondary,
+          ),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyles.regular14.copyWith(
+                    color: context.colors.textPrimary,
+                  ),
+                ),
+                if (sizeBytes != null)
+                  Text(
+                    _humanSize(sizeBytes!),
+                    style: AppTextStyles.regular12.copyWith(
+                      color: context.colors.textSecondary,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

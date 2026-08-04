@@ -267,13 +267,18 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
     // for a quote whose lines the backend omitted — the same figure, stated in
     // a different place.
     final discountLine = lines.where((l) => l.isDiscount).firstOrNull;
+    // `totalMinor` is the backend's own authoritative "what is actually
+    // charged" figure (CustomerQuoteController: the client renders it
+    // verbatim and never re-derives it). Points are a discount on the taxable
+    // base, exactly like the promo, so this is already points-net.
+    final quoteTotalMinor = bookingState.quote?.totalMinor ?? 0;
     final summary = GrossPriceBreakdown.fromBookingLines(
       itemLines: itemLines,
       discountMinor: discountLine != null
           ? -discountLine.grossMinor
           : promoDiscountMinor,
       promoCode: bookingState.quote?.promoCode,
-      totalMinor: bookingState.quote?.totalMinor ?? 0,
+      totalMinor: quoteTotalMinor,
       vatMinor: bookingState.quote?.vatMinor ?? 0,
       pointsDiscountMinor: bookingState.quote?.pointsDiscountMinor ?? 0,
     );

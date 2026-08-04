@@ -4,6 +4,13 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <!-- aquago/receipts channel, API 24-28 only: pre-scoped-storage runtime
+         permission needed to write into the public Downloads directory.
+         No-op from API 29 (Q) on, where MediaStore.Downloads needs no
+         permission — capped with maxSdkVersion so it doesn't apply there. -->
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
     <application
         android:label="@string/app_name"
         android:name="${applicationName}"

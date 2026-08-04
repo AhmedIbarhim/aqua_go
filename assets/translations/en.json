@@ -192,6 +192,7 @@
     "available_points_format": "Available: {} points ≈ {} SAR",
     "insufficient_points": "Current balance is not enough",
     "card_charged": "Card Charged",
+    "tip_paid_separately": "Tip (paid separately)",
     "apply_code_hint": "Enter promo code",
     "apply": "Apply",
     "cancel": "Cancel",
@@ -475,6 +476,7 @@
     "total_amount": "Total Amount",
     "download": "Download",
     "error_download": "Could not open or download the receipt.",
+    "storage_permission_denied": "Storage permission is required to save the receipt. You can enable it in Settings.",
     "subscription_package": "Subscription Package",
     "credit_card": "Credit Card"
   },

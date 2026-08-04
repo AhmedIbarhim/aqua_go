@@ -208,6 +208,7 @@ class CodegenLoader extends AssetLoader{
     "available_points_format": "Available: {} points ≈ {} SAR",
     "insufficient_points": "Current balance is not enough",
     "card_charged": "Card Charged",
+    "tip_paid_separately": "Tip (paid separately)",
     "apply_code_hint": "Enter promo code",
     "apply": "Apply",
     "cancel": "Cancel",
@@ -491,6 +492,7 @@ class CodegenLoader extends AssetLoader{
     "total_amount": "Total Amount",
     "download": "Download",
     "error_download": "Could not open or download the receipt.",
+    "storage_permission_denied": "Storage permission is required to save the receipt. You can enable it in Settings.",
     "subscription_package": "Subscription Package",
     "credit_card": "Credit Card"
   },
@@ -774,6 +776,7 @@ static const Map<String,dynamic> _ar = {
     "available_points_format": "المتاح: {} نقطة ≈ {} ريال",
     "insufficient_points": "رصيد الحالي لا يكفي",
     "card_charged": "المبلغ المدفوع بالبطاقة",
+    "tip_paid_separately": "الإكرامية (تدفع بشكل منفصل)",
     "apply_code_hint": "أدخل كود الخصم",
     "apply": "تطبيق",
     "cancel": "إلغاء",
@@ -1057,6 +1060,7 @@ static const Map<String,dynamic> _ar = {
     "total_amount": "المجموع الكلي",
     "download": "تحميل",
     "error_download": "تعذّر فتح أو تحميل الإيصال.",
+    "storage_permission_denied": "يلزم إذن التخزين لحفظ الإيصال. يمكنك تفعيله من الإعدادات.",
     "subscription_package": "باقة الاشتراك",
     "credit_card": "البطاقة الائتمانية"
   },

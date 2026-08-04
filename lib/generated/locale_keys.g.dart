@@ -187,6 +187,7 @@ abstract class  LocaleKeys {
   static const bookings_available_points_format = 'bookings.available_points_format';
   static const bookings_insufficient_points = 'bookings.insufficient_points';
   static const bookings_card_charged = 'bookings.card_charged';
+  static const bookings_tip_paid_separately = 'bookings.tip_paid_separately';
   static const bookings_apply_code_hint = 'bookings.apply_code_hint';
   static const bookings_apply = 'bookings.apply';
   static const bookings_cancel = 'bookings.cancel';
@@ -450,6 +451,7 @@ abstract class  LocaleKeys {
   static const receipt_total_amount = 'receipt.total_amount';
   static const receipt_download = 'receipt.download';
   static const receipt_error_download = 'receipt.error_download';
+  static const receipt_storage_permission_denied = 'receipt.storage_permission_denied';
   static const receipt_subscription_package = 'receipt.subscription_package';
   static const receipt_credit_card = 'receipt.credit_card';
   static const receipt = 'receipt';

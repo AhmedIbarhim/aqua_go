@@ -12,18 +12,24 @@
 ///     ─────────────────────────────
 ///     Total before discount  175.00     <- [subtotalMinor]; == Σ lines
 ///     Discount NEWCUST50     −50.00     <- [discountMinor], full gross value
+///     Pay using points       −24.00     <- [pointsDiscountMinor]
 ///     ─────────────────────────────
-///     Total                  125.00     <- [totalMinor], emphasised
-///     Includes VAT            16.30     <- [vatMinor], muted, NOT an addend
+///     Total                  101.00     <- [totalMinor], ALWAYS the emphasised
+///                                          payable figure
+///     Includes VAT            13.20     <- [vatMinor], muted, NOT an addend
 ///
 /// With no discount the subtotal and discount rows BOTH disappear, leaving
 /// lines → total → VAT footnote. There is never a `−0.00` row, and never a
 /// "before discount" figure equal to the total.
 ///
-/// **No net figures, ever.** There is deliberately no VAT-exclusive subtotal and
-/// no pre-VAT discount on this type. Showing the same discount in two bases
-/// (−50.00 gross and −43.48 net) and two competing subtotals (175.00 gross and
-/// 108.70 net) in one column is the defect this replaces.
+/// **Points are a discount on the taxable base, exactly like a promo code —
+/// NOT a separate tender.** The backend re-extracts VAT from the gross AFTER
+/// both the promo discount and the loyalty-points discount, so [totalMinor] is
+/// already points-net and IS what the customer pays. There is deliberately no
+/// second "amount due" / "card charged" figure any more: it would always equal
+/// [totalMinor] and would just be the same number stated twice. The points row
+/// stays — it is one of the two discount rows that walk the subtotal down to
+/// the total, the same as the promo row.
 ///
 /// **No client-side tax maths.** Nothing here multiplies or divides by a VAT
 /// rate. Every field is a backend figure, or an exact sum/difference of backend
@@ -69,15 +75,20 @@ class GrossPriceBreakdown {
   /// label so no separate "Promo code" row is needed.
   final String? promoCode;
 
-  /// The amount actually charged, VAT-inclusive.
+  /// The amount actually charged, VAT-inclusive — the backend's own
+  /// authoritative payable figure, AFTER both the promo discount and the
+  /// loyalty-points discount. Rendered verbatim as the Total row; never
+  /// re-derived here.
   final int totalMinor;
 
   /// The VAT contained WITHIN [totalMinor] — the tax actually charged, which
-  /// the backend computed on the DISCOUNTED gross. Never recomputed here: VAT
-  /// on the pre-discount subtotal would be a different, larger, wrong number.
+  /// the backend computed on the gross AFTER both the promo discount and the
+  /// loyalty-points discount. Never recomputed here.
   final int vatMinor;
 
-  /// Optional wallet loyalty points discount in halala.
+  /// Optional wallet loyalty points discount in halala, already folded into
+  /// [totalMinor] / [vatMinor] by the backend. Surfaced here only so its own
+  /// row can render — it is not subtracted from anything on this type.
   final int pointsDiscountMinor;
 
   const GrossPriceBreakdown({
@@ -140,6 +151,16 @@ class GrossPriceBreakdown {
   // LINE-scoped and sets the wash to a fixed price, so `charged + discount`
   // stops being a statement about the service line at all.
 
+  // There is also deliberately no `amountDueMinor` / "card charged" figure any
+  // more. It used to diverge from [totalMinor] when points were a TENDER that
+  // reduced only the card charge, leaving the taxable total untouched. Points
+  // are now a discount on the taxable base — exactly like the promo — so the
+  // backend's `totalMinor` is already points-net and the wire's own
+  // `amountDueMinor` field is defined to equal it exactly (kept server-side
+  // only for back-compat). Carrying a second client-side field for a number
+  // that always equals [totalMinor] would just be a duplicate payable row
+  // waiting to happen again.
+
   /// True when a promo discount row should render.
   bool get hasDiscount => discountMinor > 0;
 
@@ -153,9 +174,11 @@ class GrossPriceBreakdown {
       lines.isEmpty ||
       lines.fold<int>(0, (s, l) => s + l.grossMinor) == subtotalMinor;
 
-  /// Whether `subtotal − discount == total`, the one arithmetic statement this
-  /// layout makes.
-  bool get totalReconciles => subtotalMinor - discountMinor == totalMinor;
+  /// Whether `subtotal − discount − points == total`, the one arithmetic
+  /// statement this layout makes now that both discounts land on the same
+  /// taxable-base ladder. Asserted in tests rather than trusted silently.
+  bool get totalReconciles =>
+      subtotalMinor - discountMinor - pointsDiscountMinor == totalMinor;
 
   double get subtotal => subtotalMinor / 100.0;
   double get discount => discountMinor / 100.0;
