@@ -59,24 +59,23 @@ class _OnboardingViewState extends State<OnboardingView> {
       backgroundColor: darkAppColors.themeOpositeColor,
       body: Stack(
         children: [
-          SizedBox(
-            width: double.infinity,
-            height: size.height * 0.7,
-            child: Image.asset(AppAssets.onboardingMainBg, fit: BoxFit.cover),
-          ),
-
-          // Positioned(
-          //   top: 0,
-          //   left: 0,
-          //   right: 0,
-          //   child: SizedBox(
-          //     width: double.infinity,
-          //     child: Image.asset(
-          //       AppAssets.onboardingShadowTop,
-          //       fit: BoxFit.fill,
-          //     ),
-          //   ),
+          // SizedBox(
+          //   width: double.infinity,
+          //   height: size.height * 0.7,
+          //   child: Image.asset(AppAssets.onboardingMainBg, fit: BoxFit.cover),
           // ),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: SizedBox(
+              width: double.infinity,
+              child: Image.asset(
+                AppAssets.onboardingShadowTop,
+                fit: BoxFit.fill,
+              ),
+            ),
+          ),
           Column(
             children: [
               SizedBox(height: MediaQuery.sizeOf(context).height * 0.2),
