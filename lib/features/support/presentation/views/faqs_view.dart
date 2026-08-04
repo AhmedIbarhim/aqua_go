@@ -8,7 +8,6 @@ import '../../../../core/components/error_retry_widget.dart';
 import '../../../../core/components/generic_app_bar.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/themes/app_text_styles.dart';
-import '../../data/enums/faqs_categories_enum.dart';
 import '../../data/models/Faq_model.dart';
 import '../controllers/faqs_cubit.dart';
 import '../controllers/faqs_state.dart';
@@ -66,22 +65,21 @@ class _FaqsViewState extends State<FaqsView> {
                       return const SizedBox.shrink();
                     }
 
-                    // Group FAQs by category
-                    final Map<FaqsCategoriesEnum, List<FaqModel>> groupedFaqs =
-                        {};
+                    // Grouped by the backend's category slug, and headed by the
+                    // backend's own localised categoryName. The category SET is
+                    // admin-managed, so a closed client enum could not represent
+                    // it: anything it did not know fell through to Service and
+                    // was silently misfiled, and a renamed category never
+                    // reached the app at all.
+                    //
+                    // LinkedHashMap keeps insertion order, so the sections
+                    // follow the order the API returned (displayOrder) instead
+                    // of a hardcoded list.
+                    final Map<String, List<FaqModel>> groupedFaqs = {};
                     for (final faq in faqs) {
-                      groupedFaqs
-                          .putIfAbsent(faq.faqCategory, () => [])
-                          .add(faq);
+                      groupedFaqs.putIfAbsent(faq.category, () => []).add(faq);
                     }
-
-                    final activeCategories = FaqsCategoriesEnum.values
-                        .where(
-                          (cat) =>
-                              groupedFaqs.containsKey(cat) &&
-                              groupedFaqs[cat]!.isNotEmpty,
-                        )
-                        .toList();
+                    final activeCategories = groupedFaqs.keys.toList();
 
                     return ListView.separated(
                       physics: const BouncingScrollPhysics(),
@@ -91,6 +89,7 @@ class _FaqsViewState extends State<FaqsView> {
                       itemBuilder: (context, index) {
                         final category = activeCategories[index];
                         final categoryFaqs = groupedFaqs[category]!;
+                        final categoryName = categoryFaqs.first.categoryName;
 
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -98,7 +97,7 @@ class _FaqsViewState extends State<FaqsView> {
                             Padding(
                               padding: EdgeInsets.only(bottom: sh(12)),
                               child: Text(
-                                category.localizedName,
+                                categoryName,
                                 style: AppTextStyles.semiBold18.copyWith(
                                   color: context.colors.primary,
                                 ),
