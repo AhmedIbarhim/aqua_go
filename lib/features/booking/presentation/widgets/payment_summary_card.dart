@@ -73,7 +73,11 @@ class PaymentSummaryCard extends StatelessWidget {
             const SizedBox(height: 12),
             _buildPaymentRow(
               context,
-              label: LocaleKeys.bookings_pay_using_points.tr(context: context),
+              // "Points discount", not "Pay using points" — that phrasing is the
+              // TOGGLE's, an action the customer takes. In a column of amounts
+              // being subtracted, the row has to name what the figure IS, and
+              // sit parallel to the promo row above it.
+              label: LocaleKeys.bookings_points_discount.tr(context: context),
               value: breakdown.pointsDiscount,
               negative: true,
             ),

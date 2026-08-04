@@ -190,6 +190,8 @@
     "wallet_points_title": "Wallet Points",
     "pay_using_points": "Pay using points",
     "available_points_format": "Available: {} points ≈ {} SAR",
+    "points_discount": "Points discount",
+    "max_applicable_points_format": "Max for this order: {} points ≈ {} SAR",
     "insufficient_points": "Current balance is not enough",
     "card_charged": "Card Charged",
     "tip_paid_separately": "Tip (paid separately)",

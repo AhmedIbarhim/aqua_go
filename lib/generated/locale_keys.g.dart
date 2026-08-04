@@ -185,6 +185,8 @@ abstract class  LocaleKeys {
   static const bookings_wallet_points_title = 'bookings.wallet_points_title';
   static const bookings_pay_using_points = 'bookings.pay_using_points';
   static const bookings_available_points_format = 'bookings.available_points_format';
+  static const bookings_points_discount = 'bookings.points_discount';
+  static const bookings_max_applicable_points_format = 'bookings.max_applicable_points_format';
   static const bookings_insufficient_points = 'bookings.insufficient_points';
   static const bookings_card_charged = 'bookings.card_charged';
   static const bookings_tip_paid_separately = 'bookings.tip_paid_separately';

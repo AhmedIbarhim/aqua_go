@@ -33,6 +33,11 @@ class WalletPointsSection extends StatelessWidget {
         quote?.currentBalancePoints ?? loyaltyBalance?.points ?? 0;
     final double pointsValue = balanceValueMinor / 100.0;
 
+    // Quote-scoped, so only available once a quote exists — 0 means "no cap to
+    // explain yet" and the second line simply does not render.
+    final int maxPoints = quote?.maxApplicablePoints ?? 0;
+    final int maxDiscountMinor = quote?.discountMinorAtMax ?? 0;
+
     final borderBorder = Border.all(
       color: isPointsToggled
           ? (isInsufficient ? context.colors.error : context.colors.primary)
@@ -81,6 +86,28 @@ class WalletPointsSection extends StatelessWidget {
                       color: context.colors.textTertiary,
                     ),
                   ),
+                  // The balance is almost never what actually comes off THIS
+                  // order — the backend caps a redemption at a share of the
+                  // order, so a 2,000-point (200.00 SAR) balance still only
+                  // takes 64.80 off an 81.00 wash. Showing the balance alone
+                  // reads as a broken discount. State the cap next to it, and
+                  // only when it genuinely bites (a cap at or above the balance
+                  // is not a limit worth explaining).
+                  if (maxPoints > 0 && maxPoints < points) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      LocaleKeys.bookings_max_applicable_points_format.tr(
+                        context: context,
+                        args: [
+                          NumberFormat('#,###').format(maxPoints),
+                          (maxDiscountMinor / 100.0).toStringAsFixed(2),
+                        ],
+                      ),
+                      style: AppTextStyles.regular12.copyWith(
+                        color: context.colors.textTertiary,
+                      ),
+                    ),
+                  ],
                 ],
               ),
               const Spacer(),

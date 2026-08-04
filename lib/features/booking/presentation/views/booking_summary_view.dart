@@ -262,11 +262,17 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
     // payment summary; 0 when no code is applied, which is what suppresses
     // both rows.
     final int promoDiscountMinor = bookingState.quote?.promoDiscountMinor ?? 0;
-    // The quote's own DISCOUNT row, when it has one. Its gross is NEGATIVE, so
-    // the display value is its magnitude. `promoDiscountMinor` is the fallback
-    // for a quote whose lines the backend omitted — the same figure, stated in
-    // a different place.
-    final discountLine = lines.where((l) => l.isDiscount).firstOrNull;
+    // Read the promo discount from `promoDiscountMinor` ONLY — never from the
+    // quote's DISCOUNT line.
+    //
+    // That line is the COMBINED discount (promo + loyalty points), not the
+    // promo's share of it. Reading it as the promo produced a phantom "code
+    // discount" row on any points-only order: a 81.00 order paying 648 points
+    // came back with promo:null, promoDiscountMinor:0 and a DISCOUNT line of
+    // -6480, and the card then showed the same 64.80 twice — once as a code
+    // discount, once as points — under a total that had only subtracted it
+    // once. `promoDiscountMinor` is the backend's explicit per-cause figure and
+    // is 0 exactly when no code was applied.
     // `totalMinor` is the backend's own authoritative "what is actually
     // charged" figure (CustomerQuoteController: the client renders it
     // verbatim and never re-derives it). Points are a discount on the taxable
@@ -274,9 +280,7 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
     final quoteTotalMinor = bookingState.quote?.totalMinor ?? 0;
     final summary = GrossPriceBreakdown.fromBookingLines(
       itemLines: itemLines,
-      discountMinor: discountLine != null
-          ? -discountLine.grossMinor
-          : promoDiscountMinor,
+      discountMinor: promoDiscountMinor,
       promoCode: bookingState.quote?.promoCode,
       totalMinor: quoteTotalMinor,
       vatMinor: bookingState.quote?.vatMinor ?? 0,
