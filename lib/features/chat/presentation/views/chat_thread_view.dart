@@ -219,7 +219,10 @@ class ChatThreadView extends StatelessWidget {
                     onResend: message.resolvedStatus == MessageStatus.error
                         ? () => cubit.resendMessage(message)
                         : null,
-                    child: _RemoteImage(url: message.source),
+                    child: _RemoteImage(
+                      url: message.source,
+                      cacheKey: message.id,
+                    ),
                   ),
               fileMessageBuilder:
                   (
@@ -460,30 +463,91 @@ class _AttachmentBubble extends StatelessWidget {
   }
 }
 
-/// A chat image. The URL is a Garage presigned link with a 1-hour expiry, so a
-/// thread left open past that renders the error state rather than a broken box
-/// — reopening the screen re-fetches the message with a fresh signature.
+/// A chat image, cached by MESSAGE ID rather than by URL.
+///
+/// The URL is a Garage presigned link: the signature rotates on every read, so
+/// the default cache key (the URL itself) would miss on every poll and re-download
+/// the whole photo. [cacheKey] pins the entry to the thing that is actually
+/// stable — the message id — because a message's attachment bytes are written
+/// once and never change. First view downloads; every view after that, in this
+/// session or a later one, is served from disk regardless of how many times the
+/// signature has been reissued.
+///
+/// Tapping opens the full-size viewer, which reuses the same cache entry.
 class _RemoteImage extends StatelessWidget {
   final String url;
-  const _RemoteImage({required this.url});
+  final String cacheKey;
+  const _RemoteImage({required this.url, required this.cacheKey});
 
   @override
   Widget build(BuildContext context) {
-    return CachedNetworkImage(
-      imageUrl: url,
-      fit: BoxFit.cover,
-      placeholder: (context, _) => const SizedBox(
-        height: 180,
-        width: double.infinity,
-        child: Center(child: CustomLoadingIndicator()),
+    return GestureDetector(
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          fullscreenDialog: true,
+          builder: (_) => _ImageViewer(url: url, cacheKey: cacheKey),
+        ),
       ),
-      errorWidget: (context, _, _) => SizedBox(
-        height: 180,
-        width: double.infinity,
-        child: Center(
-          child: Icon(
-            Icons.broken_image_outlined,
-            color: context.colors.textSecondary,
+      child: Hero(
+        tag: cacheKey,
+        child: CachedNetworkImage(
+          imageUrl: url,
+          cacheKey: cacheKey,
+          fit: BoxFit.cover,
+          placeholder: (context, _) => const SizedBox(
+            height: 180,
+            width: double.infinity,
+            child: Center(child: CustomLoadingIndicator()),
+          ),
+          errorWidget: (context, _, _) => SizedBox(
+            height: 180,
+            width: double.infinity,
+            child: Center(
+              child: Icon(
+                Icons.broken_image_outlined,
+                color: context.colors.textSecondary,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Full-screen attachment viewer: pinch/pan over the SAME cached entry the
+/// bubble used, so opening it costs no second download.
+class _ImageViewer extends StatelessWidget {
+  final String url;
+  final String cacheKey;
+  const _ImageViewer({required this.url, required this.cacheKey});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      extendBodyBehindAppBar: true,
+      body: Center(
+        child: Hero(
+          tag: cacheKey,
+          child: InteractiveViewer(
+            minScale: 1,
+            maxScale: 4,
+            child: CachedNetworkImage(
+              imageUrl: url,
+              cacheKey: cacheKey,
+              fit: BoxFit.contain,
+              placeholder: (context, _) =>
+                  const Center(child: CustomLoadingIndicator()),
+              errorWidget: (context, _, _) => const Center(
+                child: Icon(Icons.broken_image_outlined, color: Colors.white),
+              ),
+            ),
           ),
         ),
       ),

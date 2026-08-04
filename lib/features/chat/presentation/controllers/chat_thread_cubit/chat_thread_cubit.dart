@@ -169,6 +169,27 @@ class ChatThreadCubit extends Cubit<ChatThreadState> {
   /// refresh still makes sense on this screen.
   Future<void> refresh() => _poll();
 
+  /// True when [existing] and [mapped] are the same message differing ONLY by
+  /// the attachment's presigned URL.
+  ///
+  /// Garage links are signed with a 1-hour expiry and the server mints a FRESH
+  /// signature every time it reads the message, so an unchanged attachment comes
+  /// back with a different `source` on EVERY poll. Treated as a real change,
+  /// that re-issued a `updateMessage` each tick; the bubble rebuilt with a new
+  /// URL, cached_network_image saw an unfamiliar key, and the download restarted
+  /// from zero — a large photo could never finish before the next tick killed
+  /// it, so it spun forever. The bytes behind the URL are immutable (a message's
+  /// attachment is written once), so a signature-only difference is not a change.
+  static bool _differsOnlyBySignedUrl(Message existing, Message mapped) {
+    if (existing is ImageMessage && mapped is ImageMessage) {
+      return mapped.copyWith(source: existing.source) == existing;
+    }
+    if (existing is FileMessage && mapped is FileMessage) {
+      return mapped.copyWith(source: existing.source) == existing;
+    }
+    return false;
+  }
+
   /// Merges a freshly fetched newest-first page into the controller: appends
   /// unseen messages in chronological order and updates changed ones (e.g. a
   /// sent message becoming "seen").
@@ -180,7 +201,9 @@ class ChatThreadCubit extends Cubit<ChatThreadState> {
       if (_knownIds.contains(model.id)) {
         // Update in place if something changed (status/read/content).
         final existing = _findById(model.id);
-        if (existing != null && existing != mapped) {
+        if (existing != null &&
+            existing != mapped &&
+            !_differsOnlyBySignedUrl(existing, mapped)) {
           await chatController.updateMessage(existing, mapped);
         }
         continue;
