@@ -82,10 +82,11 @@ class PaymentSummaryCard extends StatelessWidget {
         const SizedBox(height: 12),
         const Divider(height: 1, thickness: 1, color: Colors.white),
         const SizedBox(height: 12),
-        // Invoice Total = Subtotal + VAT. When points were redeemed it is NOT the
-        // final emphasised figure (the card charge is) — the emphasis moves to
-        // the "Card charged" row below so the reconciling ledger reads
-        // Total → − Points → Card charged.
+        // Total = Subtotal − promo − points. Points are a discount on the
+        // taxable base, exactly like the promo above, so this figure is
+        // already points-net and is unconditionally the emphasised payable
+        // row — there is no separate "Card charged" row any more, since it
+        // would always equal this and just restate the same number twice.
         _buildPaymentRow(
           context,
           label: LocaleKeys.bookings_total_amount.tr(context: context),

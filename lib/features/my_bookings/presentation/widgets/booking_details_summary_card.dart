@@ -22,8 +22,24 @@ class BookingDetailsSummaryCard extends StatelessWidget {
     final bool showItems = !isCoveredZero && summary.lines.isNotEmpty;
     final bool showDiscount = !isCoveredZero && summary.hasDiscount;
     final bool showVat = !isCoveredZero && summary.vatMinor > 0;
+    // A gift-redeemed / covered-wash booking carries no points concept
+    // (0 pricing throughout, see `title` row's copy branches below), so the
+    // points row is suppressed the same way the promo/VAT rows already are.
+    final bool showPointsDiscount = !isCoveredZero && summary.hasPointsDiscount;
+    // The "before discount" subtotal exists to explain whichever of the two
+    // discount rows below it render — a promo, points, or both. With neither,
+    // it would just restate the total and is suppressed the same way.
+    final bool showSubtotal = showDiscount || showPointsDiscount;
     final promo = booking.promo;
     final bool showPromo = promo != null && !promo.isEmpty;
+    // The tip is its own payment, charged after the wash — never part of
+    // `totalAmountMinor` and never folded into the card above. Gated on the
+    // backend's own confirmation (`tipPaid`), so an unpaid/no-tip booking
+    // renders nothing here.
+    final bool showTip =
+        booking.tipPaid == true &&
+        booking.tipAmountMinor != null &&
+        booking.tipAmountMinor! > 0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,7 +82,7 @@ class BookingDetailsSummaryCard extends StatelessWidget {
                     icon: AppAssets.document,
                   ),
                 ),
-              if (showDiscount) ...[
+              if (showSubtotal) ...[
                 if (showItems) _buildThinDivider(context),
                 _buildSummaryRow(
                   context,
@@ -76,14 +92,33 @@ class BookingDetailsSummaryCard extends StatelessWidget {
                   value: '${summary.subtotal.toStringAsFixed(2)} $currency',
                   icon: AppAssets.document,
                 ),
-                _buildSummaryRow(
-                  context,
-                  title: _discountLabel(context),
-                  value: '-${summary.discount.toStringAsFixed(2)} $currency',
-                  icon: AppAssets.promotion,
-                ),
+                if (showDiscount)
+                  _buildSummaryRow(
+                    context,
+                    title: _discountLabel(context),
+                    value:
+                        '-${summary.discount.toStringAsFixed(2)} $currency',
+                    icon: AppAssets.promotion,
+                  ),
+                // Points are a discount on the taxable base, exactly like the
+                // promo row above — not a separate tender — so this row walks
+                // the subtotal down to Total below it the same way the promo
+                // row does. `totalAmountMinor` already has this saving folded
+                // in; there is no separate "Card charged" row any more, since
+                // it would always equal Total and just restate the same
+                // number twice.
+                if (showPointsDiscount)
+                  _buildSummaryRow(
+                    context,
+                    title: LocaleKeys.bookings_pay_using_points.tr(
+                      context: context,
+                    ),
+                    value:
+                        '-${summary.pointsDiscount.toStringAsFixed(2)} $currency',
+                    icon: AppAssets.points,
+                  ),
               ],
-              if (showItems || showDiscount) _buildTotalDivider(context),
+              if (showItems || showSubtotal) _buildTotalDivider(context),
               _buildSummaryRow(
                 context,
                 title: LocaleKeys.bookings_total_amount.tr(context: context),
@@ -117,7 +152,34 @@ class BookingDetailsSummaryCard extends StatelessWidget {
             ],
           ),
         ),
+        // The tip: a SEPARATE payment from the wash total above, so it gets
+        // its own card rather than a row inside the summary — folding it in
+        // would misstate what the total above was charged for.
+        if (showTip) ...[
+          const SizedBox(height: 12),
+          _buildTipSection(context, currency),
+        ],
       ],
+    );
+  }
+
+  /// The tip, in its own card below the payment summary. Kept visually and
+  /// structurally separate from `totalAmountMinor` above: this money moved on
+  /// its own payment intent, after the wash was already charged and paid for.
+  Widget _buildTipSection(BuildContext context, String currency) {
+    final tipAmount = (booking.tipAmountMinor ?? 0) / 100.0;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: context.colors.cardBackGround,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: _buildSummaryRow(
+        context,
+        title: LocaleKeys.bookings_tip_paid_separately.tr(context: context),
+        value: '${tipAmount.toStringAsFixed(2)} $currency',
+        icon: AppAssets.currency,
+      ),
     );
   }
 
@@ -154,6 +216,7 @@ class BookingDetailsSummaryCard extends StatelessWidget {
       );
     }
 
+    final totalAmountMinor = booking.totalAmountMinor ?? 0;
     return GrossPriceBreakdown.fromBookingLines(
       itemLines: itemLines,
       // The DISCOUNT line's gross is NEGATIVE; the display value is its
@@ -163,8 +226,9 @@ class BookingDetailsSummaryCard extends StatelessWidget {
           ? -discountLine.grossMinor
           : (booking.promo?.discountMinor ?? 0),
       promoCode: booking.promo?.code,
-      totalMinor: booking.totalAmountMinor ?? 0,
+      totalMinor: totalAmountMinor,
       vatMinor: booking.breakdown?.vatMinor ?? 0,
+      pointsDiscountMinor: booking.promoPoints?.pointsDiscountMinor ?? 0,
     );
   }
 

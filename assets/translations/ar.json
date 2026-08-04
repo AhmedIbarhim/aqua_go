@@ -192,6 +192,7 @@
     "available_points_format": "المتاح: {} نقطة ≈ {} ريال",
     "insufficient_points": "رصيد الحالي لا يكفي",
     "card_charged": "المبلغ المدفوع بالبطاقة",
+    "tip_paid_separately": "الإكرامية (تدفع بشكل منفصل)",
     "apply_code_hint": "أدخل كود الخصم",
     "apply": "تطبيق",
     "cancel": "إلغاء",
@@ -475,6 +476,7 @@
     "total_amount": "المجموع الكلي",
     "download": "تحميل",
     "error_download": "تعذّر فتح أو تحميل الإيصال.",
+    "storage_permission_denied": "يلزم إذن التخزين لحفظ الإيصال. يمكنك تفعيله من الإعدادات.",
     "subscription_package": "باقة الاشتراك",
     "credit_card": "البطاقة الائتمانية"
   },

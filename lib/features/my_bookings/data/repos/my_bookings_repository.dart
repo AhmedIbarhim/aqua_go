@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:aqua_go/core/config/networking/exceptions/failure.dart';
 import 'package:aqua_go/features/my_bookings/data/data_sources/my_bookings_remote_data_source.dart';
 import 'package:aqua_go/features/my_bookings/data/models/booking_response_model/booking_response_model.dart';
@@ -74,5 +76,9 @@ class MyBookingsRepository {
         return const Left(ServerFailure('Failed to load booking details'));
       },
     );
+  }
+
+  Future<Either<Failure, Uint8List>> downloadReceiptPdf(String bookingId) {
+    return _remoteDataSource.downloadReceiptPdf(bookingId);
   }
 }

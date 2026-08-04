@@ -16,6 +16,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 Map<String, dynamic> _bookingJson({
   Map<String, dynamic>? promo,
   int totalAmountMinor = 9500,
+  bool? tipPaid,
+  int? tipAmountMinor,
 }) => {
   'id': 'booking-1',
   'referenceNumber': 'BK-000123',
@@ -26,6 +28,8 @@ Map<String, dynamic> _bookingJson({
   'currency': 'SAR',
   'isSubscription': false,
   'promo': ?promo,
+  'tipPaid': ?tipPaid,
+  'tipAmountMinor': ?tipAmountMinor,
 };
 
 /// The per-line breakdown of a discounted booking, exactly as the server now
@@ -433,6 +437,153 @@ void main() {
       expect(find.text('Promo Code'), findsNothing);
       expect(find.text('Original Total'), findsNothing);
       expect(find.text('95.00 SAR'), findsOneWidget);
+    });
+  });
+
+  group(
+    'BookingDetailsSummaryCard — points on the taxable base, one payable row',
+    () {
+      setUp(() async {
+        TestWidgetsFlutterBinding.ensureInitialized();
+        SharedPreferences.setMockInitialValues({});
+        await CacheClient.init();
+        await EasyLocalization.ensureInitialized();
+      });
+
+      /// Pins the exact scenario reported: subtotal 175.00, promo 50.00 off,
+      /// points worth 24.00 redeemed, total 101.00. Points are a discount on
+      /// the taxable base now, exactly like the promo, so `totalAmountMinor`
+      /// (10100) is ALREADY net of both — there is no second "Card Charged"
+      /// row stating 101.00 again, and no row anywhere states 125.00 (the old
+      /// subtotal-minus-promo-only figure) or 77.00 (the old
+      /// total-minus-points tender figure).
+      testWidgets(
+        'renders subtotal, promo, points, and exactly ONE payable Total row',
+        (tester) async {
+          final json = _bookingJson(
+            promo: {'code': 'NEWCUST50', 'discountMinor': 5000},
+            totalAmountMinor: 10100,
+          )
+            ..['promoPoints'] = {
+              'promoCode': 'NEWCUST50',
+              'promoDiscountMinor': 5000,
+              'pointsApplied': 2400,
+              'pointsDiscountMinor': 2400,
+              // Equals totalAmountMinor exactly — wire back-compat only, and
+              // the card must not render this as a second figure.
+              'cardChargeMinor': 10100,
+              'currency': 'SAR',
+            }
+            ..['lines'] = const [
+              {
+                'kind': 'SERVICE',
+                'refId': 'pkg-1',
+                'grossMinor': 17500,
+                'netMinor': 15217,
+                'vatMinor': 2283,
+              },
+              {
+                'kind': 'DISCOUNT',
+                'refId': null,
+                'grossMinor': -5000,
+                'netMinor': -4348,
+                'vatMinor': -652,
+              },
+            ]
+            ..['breakdown'] = {
+              'grossMinor': 10100,
+              'netMinor': 8783,
+              'vatMinor': 1317,
+              'currency': 'SAR',
+            };
+          await _pumpCard(tester, BookingResponseModel.fromJson(json));
+
+          // Renders twice: once as the single SERVICE item row (there is
+          // only one line, so it equals the subtotal) and once as the
+          // "before discount" subtotal row itself.
+          expect(find.text('175.00 SAR'), findsNWidgets(2), reason: 'the service line and the subtotal it equals');
+          expect(find.text('-50.00 SAR'), findsOneWidget, reason: 'the promo discount');
+          expect(find.text('-24.00 SAR'), findsOneWidget, reason: 'the points discount');
+          expect(find.text('101.00 SAR'), findsOneWidget, reason: 'the ONE payable Total row');
+          expect(find.text('13.17 SAR'), findsOneWidget, reason: 'VAT, disclosed under the total');
+
+          // No duplicate payable row, and no stale intermediate figure.
+          expect(find.text('Card Charged'), findsNothing);
+          expect(find.text('125.00 SAR'), findsNothing, reason: 'subtotal - promo only, no longer a figure on screen');
+          expect(find.text('77.00 SAR'), findsNothing, reason: 'the old total-minus-points tender figure');
+          expect(tester.takeException(), isNull);
+        },
+      );
+    },
+  );
+
+  group('BookingDetailsSummaryCard — tip row', () {
+    setUp(() async {
+      TestWidgetsFlutterBinding.ensureInitialized();
+      SharedPreferences.setMockInitialValues({});
+      await CacheClient.init();
+      await EasyLocalization.ensureInitialized();
+    });
+
+    testWidgets('a paid tip renders its own row, in a separate card', (
+      tester,
+    ) async {
+      await _pumpCard(
+        tester,
+        BookingResponseModel.fromJson(
+          _bookingJson(tipPaid: true, tipAmountMinor: 5000),
+        ),
+      );
+      // The wash total (95.00) and the tip (50.00) are two distinct figures —
+      // neither is folded into the other.
+      expect(find.text('95.00 SAR'), findsOneWidget);
+      expect(find.text('Tip (paid separately)'), findsOneWidget);
+      expect(find.text('50.00 SAR'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('the tip row renders in Arabic too', (tester) async {
+      await _pumpCard(
+        tester,
+        BookingResponseModel.fromJson(
+          _bookingJson(tipPaid: true, tipAmountMinor: 5000),
+        ),
+        locale: const Locale('ar'),
+      );
+      expect(find.text('الإكرامية (تدفع بشكل منفصل)'), findsOneWidget);
+      expect(find.text('50.00 SAR'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('no tip row when tipPaid is false', (tester) async {
+      await _pumpCard(
+        tester,
+        BookingResponseModel.fromJson(
+          _bookingJson(tipPaid: false, tipAmountMinor: 5000),
+        ),
+      );
+      expect(find.text('Tip (paid separately)'), findsNothing);
+      expect(find.text('50.00 SAR'), findsNothing);
+    });
+
+    testWidgets('no tip row when tipPaid and tipAmountMinor are both absent', (
+      tester,
+    ) async {
+      await _pumpCard(tester, BookingResponseModel.fromJson(_bookingJson()));
+      expect(find.text('Tip (paid separately)'), findsNothing);
+    });
+
+    testWidgets('no tip row for a zero tip amount, even if tipPaid is true', (
+      tester,
+    ) async {
+      // Defensive: a 0-value tip should never render an empty row.
+      await _pumpCard(
+        tester,
+        BookingResponseModel.fromJson(
+          _bookingJson(tipPaid: true, tipAmountMinor: 0),
+        ),
+      );
+      expect(find.text('Tip (paid separately)'), findsNothing);
     });
   });
 }
