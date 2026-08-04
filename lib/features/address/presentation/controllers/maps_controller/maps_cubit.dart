@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:equatable/equatable.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
+import '../../../../../generated/locale_keys.g.dart';
 import '../../../data/repos/maps_repository.dart';
 import '../../../data/models/place_prediction_model.dart';
 
@@ -77,7 +79,7 @@ class MapsCubit extends Cubit<MapsState> {
         emit(
           state.copyWith(
             isLoading: false,
-            errorMessage: 'Location permissions are denied.',
+            errorMessage: LocaleKeys.address_location_permission_denied.tr(),
           ),
         );
         return;
@@ -88,7 +90,8 @@ class MapsCubit extends Cubit<MapsState> {
       emit(
         state.copyWith(
           isLoading: false,
-          errorMessage: 'Location permissions are permanently denied.',
+          errorMessage: LocaleKeys.address_location_permission_denied_forever
+              .tr(),
         ),
       );
       return;
@@ -96,9 +99,7 @@ class MapsCubit extends Cubit<MapsState> {
 
     try {
       Position position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          timeLimit: _positionTimeLimit,
-        ),
+        locationSettings: const LocationSettings(timeLimit: _positionTimeLimit),
       );
       final latLng = LatLng(position.latitude, position.longitude);
 
@@ -114,11 +115,31 @@ class MapsCubit extends Cubit<MapsState> {
 
       getAddressFromLatLng(latLng);
     } on TimeoutException {
+      // A cold GPS fix routinely takes longer than _positionTimeLimit, so a
+      // timeout is NOT the same as "we have no idea where you are" — the OS
+      // usually still holds a recent fix from another app. Fall back to it and
+      // carry on silently; only tell the customer we failed when there is
+      // genuinely nothing to show. Reporting an error while the map then
+      // centres on their actual location reads as a bug, because it is one.
+      final lastKnown = await Geolocator.getLastKnownPosition();
+      if (lastKnown != null) {
+        final latLng = LatLng(lastKnown.latitude, lastKnown.longitude);
+        emit(
+          state.copyWith(
+            currentPosition: lastKnown,
+            isLoading: false,
+            selectedLatLng: latLng,
+            cameraMoveTarget: latLng,
+            cameraMoveToken: state.cameraMoveToken + 1,
+          ),
+        );
+        getAddressFromLatLng(latLng);
+        return;
+      }
       emit(
         state.copyWith(
           isLoading: false,
-          errorMessage:
-              'Could not get your location. Please try again or pick it on the map.',
+          errorMessage: LocaleKeys.address_location_unavailable.tr(),
         ),
       );
     } catch (e) {

@@ -304,7 +304,10 @@
     "zone_not_available": "Sorry, this location is currently outside our service area",
     "address_name_example": "Home, Work, ... etc.",
     "added_success": "Address added successfully",
-    "updated_success": "Address updated successfully"
+    "updated_success": "Address updated successfully",
+    "location_permission_denied": "Location permission was denied.",
+    "location_permission_denied_forever": "Location permission is permanently denied. You can enable it in Settings.",
+    "location_unavailable": "Couldn't determine your location. Try again, or pick it on the map."
   },
   "profile": {
     "male": "Male",

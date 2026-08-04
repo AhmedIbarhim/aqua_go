@@ -304,7 +304,10 @@
     "zone_not_available": "نأسف، هذا الموقع خارج منطقة التغطية حالياً",
     "address_name_example": "البيت، العمل، ... الخ",
     "added_success": "تمت إضافة العنوان بنجاح",
-    "updated_success": "تم تحديث العنوان بنجاح"
+    "updated_success": "تم تحديث العنوان بنجاح",
+    "location_permission_denied": "تم رفض إذن الوصول إلى الموقع.",
+    "location_permission_denied_forever": "تم رفض إذن الموقع نهائيا. يمكنك تفعيله من الإعدادات.",
+    "location_unavailable": "تعذر تحديد موقعك. حاول مرة أخرى أو حدده على الخريطة."
   },
   "profile": {
     "male": "ذكر",

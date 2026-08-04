@@ -320,7 +320,10 @@ class CodegenLoader extends AssetLoader{
     "zone_not_available": "Sorry, this location is currently outside our service area",
     "address_name_example": "Home, Work, ... etc.",
     "added_success": "Address added successfully",
-    "updated_success": "Address updated successfully"
+    "updated_success": "Address updated successfully",
+    "location_permission_denied": "Location permission was denied.",
+    "location_permission_denied_forever": "Location permission is permanently denied. You can enable it in Settings.",
+    "location_unavailable": "Couldn't determine your location. Try again, or pick it on the map."
   },
   "profile": {
     "male": "Male",
@@ -881,7 +884,10 @@ static const Map<String,dynamic> _ar = {
     "zone_not_available": "نأسف، هذا الموقع خارج منطقة التغطية حالياً",
     "address_name_example": "البيت، العمل، ... الخ",
     "added_success": "تمت إضافة العنوان بنجاح",
-    "updated_success": "تم تحديث العنوان بنجاح"
+    "updated_success": "تم تحديث العنوان بنجاح",
+    "location_permission_denied": "تم رفض إذن الوصول إلى الموقع.",
+    "location_permission_denied_forever": "تم رفض إذن الموقع نهائيا. يمكنك تفعيله من الإعدادات.",
+    "location_unavailable": "تعذر تحديد موقعك. حاول مرة أخرى أو حدده على الخريطة."
   },
   "profile": {
     "male": "ذكر",
