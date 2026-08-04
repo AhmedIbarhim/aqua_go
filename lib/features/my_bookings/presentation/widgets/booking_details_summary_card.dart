@@ -96,8 +96,7 @@ class BookingDetailsSummaryCard extends StatelessWidget {
                   _buildSummaryRow(
                     context,
                     title: _discountLabel(context),
-                    value:
-                        '-${summary.discount.toStringAsFixed(2)} $currency',
+                    value: '-${summary.discount.toStringAsFixed(2)} $currency',
                     icon: AppAssets.promotion,
                   ),
                 // Points are a discount on the taxable base, exactly like the
@@ -146,7 +145,7 @@ class BookingDetailsSummaryCard extends StatelessWidget {
                 Text(
                   LocaleKeys.bookings_promo_released.tr(context: context),
                   style: AppTextStyles.regular12.copyWith(
-                    color: context.colors.contentDisabled,
+                    color: context.colors.textTertiary,
                   ),
                 ),
             ],
@@ -254,7 +253,10 @@ class BookingDetailsSummaryCard extends StatelessWidget {
     String currency,
   ) {
     final style = AppTextStyles.regular12.copyWith(
-      color: context.colors.contentDisabled,
+      // textTertiary, not contentDisabled: still clearly subordinate to the
+      // total above it, but legible on the light card (see the note on the
+      // summary-row label).
+      color: context.colors.textTertiary,
     );
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -327,7 +329,9 @@ class BookingDetailsSummaryCard extends StatelessWidget {
                 width: 24,
                 height: 24,
                 colorFilter: ColorFilter.mode(
-                  context.colors.contentDisabled,
+                  // Same reasoning as the label below — the icon shares the
+                  // label's weight, so it shares its colour.
+                  context.colors.textSecondary,
                   BlendMode.srcIn,
                 ),
               ),
@@ -338,7 +342,12 @@ class BookingDetailsSummaryCard extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: AppTextStyles.regular14.copyWith(
-                    color: context.colors.contentDisabled,
+                    // NOT contentDisabled. In the LIGHT palette that token is #CCD0D7, which sits
+                    // at ~1.1:1 against this card's #E6E7E9 — the label column rendered as a
+                    // ghost. It only looked fine in dark, where the same token is #737373.
+                    // These labels are muted, not DISABLED; textSecondary is the token the
+                    // equivalent row in PaymentSummaryCard already uses.
+                    color: context.colors.textSecondary,
                   ),
                 ),
               ),

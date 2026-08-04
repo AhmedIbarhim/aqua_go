@@ -27,7 +27,6 @@ class PaymentSummaryCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-
         // Line items — VAT-inclusive, pre-discount. These sum to the subtotal
         // below, which is what makes the column followable by eye.
         for (final (i, line) in breakdown.lines.indexed) ...[
@@ -125,7 +124,9 @@ class PaymentSummaryCard extends StatelessWidget {
 
   Widget _buildVatFootnote(BuildContext context) {
     final style = AppTextStyles.regular12.copyWith(
-      color: context.colors.contentDisabled,
+      // See BookingDetailsSummaryCard: contentDisabled is ~1.1:1 on the light
+      // card. This footnote must stay subordinate, not vanish.
+      color: context.colors.textTertiary,
     );
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -158,7 +159,7 @@ class PaymentSummaryCard extends StatelessWidget {
                 width: 16,
                 height: 16,
                 colorFilter: ColorFilter.mode(
-                  context.colors.contentDisabled,
+                  context.colors.textTertiary,
                   BlendMode.srcIn,
                 ),
               ),
