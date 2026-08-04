@@ -163,7 +163,10 @@ class ChatThreadCubit extends Cubit<ChatThreadState> {
     result.fold((_) {}, (page) => _reconcile(page.items));
   }
 
-  /// Manual refresh (app-bar action / pull gesture): re-poll newest immediately.
+  /// Manual refresh: re-poll newest immediately. No caller today — the app-bar
+  /// action was removed once the background poll made it redundant — kept as
+  /// the entry point for a pull-to-refresh gesture, the only place a manual
+  /// refresh still makes sense on this screen.
   Future<void> refresh() => _poll();
 
   /// Merges a freshly fetched newest-first page into the controller: appends
