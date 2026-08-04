@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
+import 'package:svg_flutter/svg.dart';
 
 import '../../../../core/components/custom_loading_indicator.dart';
 import '../../../../core/components/error_retry_widget.dart';
@@ -12,6 +13,7 @@ import '../../../../core/components/generic_app_bar.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/helpers/fetch_user_data_helper.dart';
 import '../../../../core/themes/app_text_styles.dart';
+import '../../../../core/utils/app_assets.dart';
 import '../../../../core/utils/image_picker_helper.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../controllers/chat_thread_cubit/chat_thread_cubit.dart';
@@ -31,7 +33,9 @@ class ChatThreadView extends StatelessWidget {
     // Pre-resolve the role labels here (with context) so resolveUser — a bare
     // callback — can hand back localised display names.
     final meLabel = LocaleKeys.chat_role_you.tr(context: context);
-    final supportLabel = LocaleKeys.chat_role_support_agent.tr(context: context);
+    final supportLabel = LocaleKeys.chat_role_support_agent.tr(
+      context: context,
+    );
     final workerLabel = LocaleKeys.chat_role_worker.tr(context: context);
     final systemLabel = LocaleKeys.chat_role_system.tr(context: context);
 
@@ -77,20 +81,22 @@ class ChatThreadView extends StatelessWidget {
               if (state is ChatThreadLoaded)
                 IconButton(
                   onPressed: cubit.refresh,
-                  icon: Icon(
-                    Icons.refresh,
-                    color: context.colors.textPrimary,
+                  icon: SvgPicture.asset(
+                    AppAssets.chatRefresh,
+                    width: 24,
+                    height: 24,
+                    // The vuesax source ships a hardcoded near-black stroke
+                    // (#292D32) which is invisible on this app's dark surface,
+                    // so every one of these icons must be tinted, not drawn raw.
+                    colorFilter: ColorFilter.mode(
+                      context.colors.textPrimary,
+                      BlendMode.srcIn,
+                    ),
                   ),
                 ),
             ],
           ),
-          body: _buildBody(
-            context,
-            state,
-            cubit,
-            currentUserId,
-            resolveUser,
-          ),
+          body: _buildBody(context, state, cubit, currentUserId, resolveUser),
         );
       },
     );
@@ -107,10 +113,7 @@ class ChatThreadView extends StatelessWidget {
       return const Center(child: CustomLoadingIndicator(size: 100));
     }
     if (state is ChatThreadError) {
-      return ErrorRetryWidget(
-        errorMessage: state.message,
-        onRetry: cubit.open,
-      );
+      return ErrorRetryWidget(errorMessage: state.message, onRetry: cubit.open);
     }
     if (state is! ChatThreadLoaded) return const SizedBox.shrink();
 
@@ -126,10 +129,52 @@ class ChatThreadView extends StatelessWidget {
             theme: buildChatTheme(context),
             onMessageSend: (text) => cubit.sendText(text),
             onAttachmentTap: () => _pickAttachment(context, cubit),
-            onMessageLongPress: (ctx, message, {required index, required details}) {
-              _confirmReport(context, cubit, message, currentUserId);
-            },
+            onMessageLongPress:
+                (ctx, message, {required index, required details}) {
+                  _confirmReport(context, cubit, message, currentUserId);
+                },
             builders: Builders(
+              // flutter_chat_ui ships its OWN English defaults for the composer
+              // hint and the empty state ('Type a message' / 'No messages yet'),
+              // which easy_localization never sees — that is why this screen read
+              // as untranslated while the rest of the feature was fine. Both are
+              // overridden here; the package exposes no l10n hook, only builders.
+              composerBuilder: (context) => Composer(
+                hintText: LocaleKeys.chat_type_a_message.tr(),
+                // The send glyph is directional — it points the way the message
+                // travels, i.e. along the reading direction. The asset points
+                // RIGHT, which is correct in LTR and backwards in Arabic, so it
+                // is mirrored for RTL. Only the ARROW flips; the composer's own
+                // layout is handled by Directionality and must not be touched.
+                sendIcon: Transform(
+                  alignment: Alignment.center,
+                  transform: Matrix4.diagonal3Values(
+                    context.locale.languageCode == 'ar' ? -1.0 : 1.0,
+                    1.0,
+                    1.0,
+                  ),
+                  child: SvgPicture.asset(
+                    AppAssets.chatSend,
+                    width: 24,
+                    height: 24,
+                    colorFilter: ColorFilter.mode(
+                      context.colors.primary,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                ),
+                attachmentIcon: SvgPicture.asset(
+                  AppAssets.chatAttach,
+                  width: 24,
+                  height: 24,
+                  colorFilter: ColorFilter.mode(
+                    context.colors.textSecondary,
+                    BlendMode.srcIn,
+                  ),
+                ),
+              ),
+              emptyChatListBuilder: (context) =>
+                  EmptyChatList(text: LocaleKeys.chat_no_messages_yet.tr()),
               // Wire older-message pagination (scroll-to-top -> load older page).
               chatAnimatedListBuilder: (context, itemBuilder) =>
                   ChatAnimatedList(
@@ -140,7 +185,13 @@ class ChatThreadView extends StatelessWidget {
               // under any message that failed to send. RTL is automatic (the
               // affordance aligns to the trailing/sender side).
               textMessageBuilder:
-                  (context, message, index, {required isSentByMe, groupStatus}) {
+                  (
+                    context,
+                    message,
+                    index, {
+                    required isSentByMe,
+                    groupStatus,
+                  }) {
                     final bubble = SimpleTextMessage(
                       message: message,
                       index: index,
@@ -160,8 +211,13 @@ class ChatThreadView extends StatelessWidget {
                     );
                   },
               systemMessageBuilder:
-                  (context, message, index, {required isSentByMe, groupStatus}) =>
-                      _SystemBubble(text: message.text),
+                  (
+                    context,
+                    message,
+                    index, {
+                    required isSentByMe,
+                    groupStatus,
+                  }) => _SystemBubble(text: message.text),
             ),
           ),
         ),

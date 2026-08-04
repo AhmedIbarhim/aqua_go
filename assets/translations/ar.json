@@ -533,7 +533,9 @@
       "support_agent": "الدعم",
       "worker": "العامل",
       "system": "النظام"
-    }
+    },
+    "no_messages_yet": "لا توجد رسائل بعد",
+    "type_a_message": "اكتب رسالة"
   },
   "offers": {
     "title": "العروض",

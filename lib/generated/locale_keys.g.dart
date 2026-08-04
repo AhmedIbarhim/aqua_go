@@ -504,6 +504,8 @@ abstract class  LocaleKeys {
   static const chat_role_worker = 'chat.role.worker';
   static const chat_role_system = 'chat.role.system';
   static const chat_role = 'chat.role';
+  static const chat_no_messages_yet = 'chat.no_messages_yet';
+  static const chat_type_a_message = 'chat.type_a_message';
   static const chat = 'chat';
   static const offers_title = 'offers.title';
   static const offers_empty = 'offers.empty';

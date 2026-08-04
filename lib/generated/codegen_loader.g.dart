@@ -549,7 +549,9 @@ class CodegenLoader extends AssetLoader{
       "support_agent": "Support",
       "worker": "Worker",
       "system": "System"
-    }
+    },
+    "no_messages_yet": "No messages yet",
+    "type_a_message": "Type a message"
   },
   "offers": {
     "title": "Offers",
@@ -1113,7 +1115,9 @@ static const Map<String,dynamic> _ar = {
       "support_agent": "الدعم",
       "worker": "العامل",
       "system": "النظام"
-    }
+    },
+    "no_messages_yet": "لا توجد رسائل بعد",
+    "type_a_message": "اكتب رسالة"
   },
   "offers": {
     "title": "العروض",

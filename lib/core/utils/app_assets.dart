@@ -204,4 +204,9 @@ abstract class AppAssets {
 
   //Demos
   static const String demoBanner = 'assets/demos/banner_demo.webp';
+
+  //Chat (vuesax linear)
+  static const String chatSend = 'assets/svg/chat_send.svg';
+  static const String chatRefresh = 'assets/svg/chat_refresh.svg';
+  static const String chatAttach = 'assets/svg/chat_attach.svg';
 }
