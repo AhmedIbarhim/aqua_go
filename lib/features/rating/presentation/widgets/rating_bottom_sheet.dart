@@ -141,7 +141,13 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
           ),
           SizedBox(height: height * 0.03),
           // _buildBikerInfo(),
-          if (widget.booking.tipPaid == false) _buildPayTipButton(),
+          // UC-C19 — the tip window closes some days after the wash completed, and
+          // its length is an admin dial. `canTip` is the server's own answer; gating
+          // on tipPaid alone offered the button on months-old bookings and only
+          // failed once the customer had chosen an amount. Hidden (not disabled)
+          // here: this sheet is the post-wash review prompt, and a dead row in it
+          // reads as something the customer failed to do.
+          if (widget.booking.canTip) _buildPayTipButton(),
 
           if (_rating < 5) ...[
             SizedBox(height: height * 0.03),

@@ -106,6 +106,17 @@ class BookingResponseModel {
   String? tipReferenceNumber;
   int? pointsEarned;
 
+  /// UC-C19 — whether the customer can still pay a tip on this booking, decided
+  /// entirely server-side (COMPLETED + not already tipped + inside the
+  /// admin-configurable tip window measured from `completedAt`).
+  ///
+  /// Defaults to FALSE when the server omits the field: an older backend that
+  /// does not send it must HIDE the tip action rather than offer one the tip
+  /// endpoint will reject after the customer has already picked an amount. Never
+  /// re-derive this from `completedAt` — the window length is an admin dial and
+  /// is deliberately not on the customer wire.
+  bool canTip = false;
+
   BookingResponseModel({
     this.id,
     this.referenceNumber,
@@ -170,6 +181,7 @@ class BookingResponseModel {
     this.customerBehaviourRating,
     this.tipReferenceNumber,
     this.pointsEarned,
+    this.canTip = false,
   });
 
   BookingResponseModel.fromJson(Map<String, dynamic> json) {
@@ -285,6 +297,9 @@ class BookingResponseModel {
     pointsEarned = json['pointsEarned'] != null
         ? int.tryParse(json['pointsEarned'].toString())
         : null;
+    // Absent (older server) → false: hide the action rather than offer a tip
+    // the server will refuse.
+    canTip = json['canTip'] == true;
   }
 
   // --- UI Compatibility Helpers ---
