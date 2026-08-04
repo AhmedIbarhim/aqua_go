@@ -1,8 +1,9 @@
-import '../enums/faqs_categories_enum.dart';
-
 class FaqModel {
   final String id;
   final String category;
+  /// Admin-authored, already localised for the requested locale. The set of
+  /// categories is backend-owned, so it is never mapped to a client enum.
+  final String categoryName;
   final String locale;
   final String slug;
   final String title;
@@ -14,6 +15,7 @@ class FaqModel {
   const FaqModel({
     required this.id,
     required this.category,
+    required this.categoryName,
     required this.locale,
     required this.slug,
     required this.title,
@@ -27,6 +29,12 @@ class FaqModel {
     return FaqModel(
       id: json['id'] as String? ?? '',
       category: json['category'] as String? ?? '',
+      // Falls back to the slug so an unnamed category still groups and labels
+      // itself rather than collapsing into a blank heading.
+      categoryName:
+          (json['categoryName'] as String?)?.trim().isNotEmpty == true
+          ? json['categoryName'] as String
+          : (json['category'] as String? ?? ''),
       locale: json['locale'] as String? ?? '',
       slug: json['slug'] as String? ?? '',
       title: json['title'] as String? ?? '',
@@ -39,8 +47,6 @@ class FaqModel {
 
   // Compatibility getter for widget title rendering
   String get question => title;
-
-  FaqsCategoriesEnum get faqCategory => FaqsCategoriesEnum.fromString(category);
 
   // Compatibility getter parsing bodyMarkdown into a list of bullet points
   List<String> get answerBullets {

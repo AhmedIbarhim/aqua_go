@@ -377,14 +377,7 @@ class CodegenLoader extends AssetLoader{
     "faq": "FAQ",
     "complaint_log": "Complaint Log",
     "whatsapp_contact": "Contact via WhatsApp",
-    "contact_us": "Contact Us",
-    "faq_categories": {
-      "booking": "Booking & Scheduling",
-      "payment": "Payments",
-      "quality": "Quality Assurance",
-      "service": "Our Services",
-      "coverage": "Coverage Areas"
-    }
+    "contact_us": "Contact Us"
   },
   "complaint": {
     "status_open": "Open",
@@ -947,14 +940,7 @@ static const Map<String,dynamic> _ar = {
     "faq": "الأسئلة الشائعة",
     "complaint_log": "سجل الشكاوي",
     "whatsapp_contact": "التواصل عن طريق الواتس اب",
-    "contact_us": "تواصل معنا",
-    "faq_categories": {
-      "booking": "الحجوزات والمواعيد",
-      "payment": "المدفوعات",
-      "quality": "جودة الخدمة",
-      "service": "الخدمات",
-      "coverage": "مناطق التغطية"
-    }
+    "contact_us": "تواصل معنا"
   },
   "complaint": {
     "status_open": "مفتوحة",

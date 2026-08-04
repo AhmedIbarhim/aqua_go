@@ -219,6 +219,9 @@ abstract class AppRouter {
                   existingSlotStart: args.existingSlotStart,
                   subscriptionId: args.subscriptionId,
                   washId: args.washId,
+                  // Without this the gift-redeem flow POSTs giftCode:"" and the
+                  // server 400s on a required field the customer never sees.
+                  giftCode: args.giftCode,
                   offerTitleAr: args.offerTitleAr,
                   offerTitleEn: args.offerTitleEn,
                   offerListPriceMinor: args.offerListPriceMinor,
