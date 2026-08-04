@@ -7,7 +7,7 @@ import '../../../../core/themes/app_text_styles.dart';
 import '../../data/models/policy_model.dart';
 
 /// Renders an admin-authored policy document (`bodyMarkdown` — headings,
-/// paragraphs, lists) below its API-supplied [PolicyModel.title].
+/// paragraphs, lists). The document names itself via its own leading heading.
 ///
 /// Unlike `FaqModel.answerBullets`, the body is NOT line-split — a full legal
 /// document's structure (nested headings, lists) would flatten to noise.
@@ -26,11 +26,9 @@ class PolicyMarkdownBody extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          policy.title,
-          style: AppTextStyles.bold18.copyWith(color: colors.textPrimary),
-        ),
-        const SizedBox(height: 16),
+        // No separate title row. The app bar already names the document, and
+        // bodyMarkdown opens with its own `## <title>` heading, so rendering
+        // policy.title here printed it a third time.
         MarkdownBody(
           data: policy.bodyMarkdown,
           shrinkWrap: true,
