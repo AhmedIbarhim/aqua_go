@@ -1,4 +1,4 @@
-package com.example.aqua_go
+package sa.aquago.customerapp
 
 import io.flutter.embedding.android.FlutterActivity
 

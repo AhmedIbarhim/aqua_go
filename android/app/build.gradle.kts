@@ -18,7 +18,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.example.aqua_go"
+    namespace = "sa.aquago.customerapp"
     compileSdk = 37
 
     compileOptions {
