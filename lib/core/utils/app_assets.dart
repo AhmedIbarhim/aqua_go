@@ -187,6 +187,7 @@ abstract class AppAssets {
 
   // wallet
   static const String points = 'assets/svg/points.svg';
+  static const String loyalty = 'assets/svg/loyalty.svg';
 
   // not used yet
 

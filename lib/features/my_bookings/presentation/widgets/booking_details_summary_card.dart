@@ -114,7 +114,7 @@ class BookingDetailsSummaryCard extends StatelessWidget {
                     ),
                     value:
                         '-${summary.pointsDiscount.toStringAsFixed(2)} $currency',
-                    icon: AppAssets.points,
+                    icon: AppAssets.loyalty,
                   ),
               ],
               if (showItems || showSubtotal) _buildTotalDivider(context),
