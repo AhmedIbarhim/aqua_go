@@ -18,6 +18,8 @@ class TermsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // See PrivacyPolicyView: the locale must be read here, not inside `create:`.
+    final localeCode = context.locale.languageCode;
     return Scaffold(
       backgroundColor: context.colors.screenBG,
       appBar: GenericAppBar(
@@ -25,11 +27,9 @@ class TermsView extends StatelessWidget {
         centerTitle: true,
       ),
       body: BlocProvider(
-        create: (context) => locator<PolicyCubit>()
-          ..fetchPolicy(
-            type: PolicyType.tos,
-            locale: context.locale.languageCode,
-          ),
+        key: ValueKey(localeCode),
+        create: (_) => locator<PolicyCubit>()
+          ..fetchPolicy(type: PolicyType.tos, locale: localeCode),
         child: Column(
           children: [
             const SizedBox(height: 16),
@@ -57,7 +57,7 @@ class TermsView extends StatelessWidget {
                           errorMessage: state.message,
                           onRetry: () => context.read<PolicyCubit>().fetchPolicy(
                             type: PolicyType.tos,
-                            locale: context.locale.languageCode,
+                            locale: localeCode,
                           ),
                         );
                       } else if (state is PolicySuccess) {

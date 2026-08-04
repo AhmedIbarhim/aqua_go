@@ -26,6 +26,12 @@ class PrivacyPolicyView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Read the locale HERE, in build, where depending on an InheritedWidget is
+    // legal. Reading it inside a provider's `create:` throws — that callback
+    // runs once and can never rebuild, so it must not establish a dependency.
+    // The ValueKey is what makes a locale switch re-run `create` and refetch in
+    // the new language; without it the cubit would keep serving the old one.
+    final localeCode = context.locale.languageCode;
     return Scaffold(
       backgroundColor: context.colors.screenBG,
       appBar: GenericAppBar(
@@ -36,11 +42,9 @@ class PrivacyPolicyView extends StatelessWidget {
         providers: [
           BlocProvider(create: (context) => locator<AuthCubit>()),
           BlocProvider(
-            create: (context) => locator<PolicyCubit>()
-              ..fetchPolicy(
-                type: PolicyType.privacy,
-                locale: context.locale.languageCode,
-              ),
+            key: ValueKey(localeCode),
+            create: (_) => locator<PolicyCubit>()
+              ..fetchPolicy(type: PolicyType.privacy, locale: localeCode),
           ),
         ],
         child: Column(
@@ -78,7 +82,7 @@ class PrivacyPolicyView extends StatelessWidget {
                               onRetry: () =>
                                   context.read<PolicyCubit>().fetchPolicy(
                                     type: PolicyType.privacy,
-                                    locale: context.locale.languageCode,
+                                    locale: localeCode,
                                   ),
                             );
                           } else if (state is PolicySuccess) {
