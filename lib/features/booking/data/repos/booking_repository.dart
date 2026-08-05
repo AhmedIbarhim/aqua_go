@@ -14,6 +14,48 @@ import '../models/availability_response_model.dart';
 import '../models/promo_validate_response_model.dart';
 import '../data_sources/bookings_remote_data_source.dart';
 
+/// The deterministic `Idempotency-Key` for `POST /api/customer/bookings`.
+///
+/// Two shapes, one per lane:
+///
+///   * **Paid** — `booking-create:{moyasarPaymentId}`. Unchanged, and
+///     canonical: a retried create against the same verified Moyasar payment
+///     must replay the same booking (spec §9.5).
+///
+///   * **Card-less** (zero total, or fully points-covered) —
+///     `booking-create:quote:{quoteId}`. This USED to be the same expression
+///     as the paid lane, which interpolated a null payment id into the LITERAL
+///     string `booking-create:null` — one constant key shared by every free
+///     booking from every customer. `booking.idempotency_keys.key` is a bare
+///     PRIMARY KEY and the server's filter resolves it without consulting the
+///     principal, so within the 7-day retention window the second free booking
+///     on the platform either 422'd on a request-hash mismatch or replayed the
+///     first customer's cached 201.
+///
+/// The quote id is a real basis for the card-less lane, not a nonce: a quote
+/// belongs to exactly one customer (the server re-checks `quote.customerId` at
+/// create) and to exactly one intended booking, so the key is unique across
+/// customers AND stable across retries of the same create — which is the whole
+/// point of an idempotency key. A random nonce would satisfy uniqueness and
+/// destroy retry safety.
+///
+/// Throws [StateError] when neither basis is available, rather than emitting a
+/// key with no meaning. There is no legitimate create with neither a verified
+/// payment nor a quote.
+String bookingCreateIdempotencyKey(ServiceBookingRequestModel booking) {
+  final paymentId = booking.moyasarPaymentId;
+  if (paymentId != null && paymentId.isNotEmpty) {
+    return 'booking-create:$paymentId';
+  }
+  final quoteId = booking.quote?.quoteId;
+  if (quoteId != null && quoteId.isNotEmpty) {
+    return 'booking-create:quote:$quoteId';
+  }
+  throw StateError(
+    'cannot build a booking-create idempotency key: no payment id and no quote',
+  );
+}
+
 class BookingRepository {
   final BookingsRemoteDataSource bookingsRemoteDataSource;
 
@@ -184,9 +226,7 @@ class BookingRepository {
     ServiceBookingRequestModel booking,
   ) async {
     try {
-      // Deterministic pay-before-create key: a retried create against the
-      // same verified Moyasar payment replays the same booking (spec §9.5).
-      final idempotencyKey = 'booking-create:${booking.moyasarPaymentId}';
+      final idempotencyKey = bookingCreateIdempotencyKey(booking);
 
       final response = await bookingsRemoteDataSource.createBooking(
         bookingData: booking.toJson(),
