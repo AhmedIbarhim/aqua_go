@@ -333,23 +333,45 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
           // AQG-424/425 — a fully-discounted booking has nothing to pay with.
           // Showing a card picker on a SAR 0.00 order invites the customer to
           // pick a payment method that is then never used.
+          //
+          // But the quote this decision reads is THREE-state, not two: it can
+          // be unresolved, resolved-and-payable, or resolved-and-free. The
+          // initial quote is fired from a post-frame callback in `initState`,
+          // and `payableTotalMajor(null)` answers 0.0 BY DESIGN
+          // (booking_payable_total.dart), so an if/else over
+          // `needsPaymentMethod` ALONE cannot tell "no quote yet" apart from
+          // "nothing to pay". It read the first frame of an ordinary PAID
+          // booking as free and told the customer "No payment required — this
+          // booking is fully covered", then swapped in a card picker when the
+          // quote landed a moment later.
+          //
+          // So the payment section waits for the quote, and while it is out
+          // NEITHER is rendered. Nothing can be submitted in that window: the
+          // confirm button is gated on this same predicate
+          // (`priceLocked`, booking_summary_bottom_action_sheet.dart).
+          //
+          // `!config.requiresQuote` short-circuits the wait rather than hiding
+          // the picker forever on a flow that never quotes. Today no such flow
+          // exists — `showPaymentMethod` and `requiresQuote` are both
+          // `flowType == service` — and payment_method_pending_quote_test.dart
+          // pins that implication so this stays a safe gate if one is added.
           if (config.showPaymentMethod &&
-              needsPaymentMethod(
-                payableTotal: payableTotalMajor(bookingState.quote?.breakdown),
-                hasPayableAddon: false,
-              )) ...[
-            PaymentMethodSelection(
-              initialMethod: bookingState.paymentMethod,
-              onPaymentMethodChanged: (method) {
-                context.read<BookingCubit>().updatePaymentMethod(method);
-              },
-            ),
-            const SizedBox(height: 24),
-          ] else if (config.showPaymentMethod) ...[
-            Text(
-              LocaleKeys.bookings_no_payment_required.tr(context: context),
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
+              (!config.requiresQuote || bookingState.quote != null)) ...[
+            if (needsPaymentMethod(
+              payableTotal: payableTotalMajor(bookingState.quote?.breakdown),
+              hasPayableAddon: false,
+            ))
+              PaymentMethodSelection(
+                initialMethod: bookingState.paymentMethod,
+                onPaymentMethodChanged: (method) {
+                  context.read<BookingCubit>().updatePaymentMethod(method);
+                },
+              )
+            else
+              Text(
+                LocaleKeys.bookings_no_payment_required.tr(context: context),
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
             const SizedBox(height: 24),
           ],
           if (config.isGiftRedeem) ...[

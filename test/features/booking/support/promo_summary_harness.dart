@@ -104,6 +104,28 @@ Future<void> pumpSummary(WidgetTester tester, BookingCubit cubit) async {
   await settle(tester);
 }
 
+/// Pumps [BookingSummaryView] and STOPS inside the window where the initial
+/// quote is still in flight — the state the screen used to misreport.
+///
+/// The initial quote is fired from a post-frame callback, so one frame is
+/// needed to start it; the fake repo's round trip is [networkTick] (20ms), so
+/// advancing a single millisecond leaves `state.quote` null with the request
+/// genuinely outstanding. Callers must go on to [settle] before the test ends,
+/// otherwise the in-flight timer outlives the test.
+Future<void> pumpSummaryPendingQuote(
+  WidgetTester tester,
+  BookingCubit cubit,
+) async {
+  tester.view.physicalSize = const Size(1400, 3000);
+  tester.view.devicePixelRatio = 1.0;
+  addTearDown(tester.view.reset);
+
+  _ensureWalletRepositoryRegistered();
+  await tester.pumpWidget(_summaryApp(cubit));
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 1));
+}
+
 /// Tears the summary out of the tree, destroying its [State] exactly as popping
 /// the route does, then mounts it again on the SAME cubit.
 Future<void> remountSummary(WidgetTester tester, BookingCubit cubit) async {

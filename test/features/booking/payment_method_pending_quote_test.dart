@@ -1,0 +1,198 @@
+import 'package:aqua_go/core/config/local_storage/shared_prefs.dart';
+import 'package:aqua_go/core/config/networking/exceptions/failure.dart';
+import 'package:aqua_go/core/utils/saudi_wire_format.dart';
+import 'package:aqua_go/features/booking/data/models/quote_model.dart';
+import 'package:aqua_go/features/booking/domain/configs/booking_flow_config.dart';
+import 'package:aqua_go/features/booking/presentation/widgets/booking_summary_widgets/payment_method_selection.dart';
+import 'package:aqua_go/generated/locale_keys.g.dart';
+import 'package:dartz/dartz.dart' hide State;
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'support/promo_summary_harness.dart';
+
+/// The booking summary's payment section reads a THREE-state quote through a
+/// two-state if/else.
+///
+/// The states are: (a) the quote has not come back yet, (b) it came back and
+/// something is payable, (c) it came back and nothing is. `payableTotalMajor`
+/// answers 0.0 for a null breakdown BY DESIGN, so (a) is indistinguishable from
+/// (c) to `needsPaymentMethod` alone — and the else-branch told the customer
+/// "No payment required — this booking is fully covered" on the FIRST FRAME of
+/// an ordinary paid booking, swapping to a card picker a moment later when the
+/// quote landed.
+///
+/// These tests pin all three states apart on the real screen.
+void main() {
+  setUpAll(() async {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    SharedPreferences.setMockInitialValues({});
+    await EasyLocalization.ensureInitialized();
+    await loadTranslations();
+  });
+
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
+    await CacheClient.init();
+  });
+
+  /// The message is asserted by localization KEY, not by wording: under this
+  /// harness `tr(context: context)` resolves to the key, and the assertion is
+  /// about WHICH message the screen decided to show.
+  const noPaymentCopy = LocaleKeys.bookings_no_payment_required;
+
+  group('payment section while the quote is unresolved', () {
+    testWidgets(
+      'a payable booking never claims "no payment required" before its quote lands',
+      (tester) async {
+        final repo = RecordingBookingRepo();
+        final cubit = buildCubit(repo);
+        addTearDown(cubit.close);
+
+        await pumpSummaryPendingQuote(tester, cubit);
+
+        expect(
+          cubit.state.quote,
+          isNull,
+          reason: 'the initial quote must still be in flight for this to test '
+              'anything',
+        );
+        expect(
+          find.text(noPaymentCopy),
+          findsNothing,
+          reason: 'an unresolved quote is not a free booking — this copy is a '
+              'claim the screen cannot make yet',
+        );
+
+        await settle(tester);
+      },
+    );
+
+    testWidgets('neither the picker nor the copy renders in that window', (
+      tester,
+    ) async {
+      final repo = RecordingBookingRepo();
+      final cubit = buildCubit(repo);
+      addTearDown(cubit.close);
+
+      await pumpSummaryPendingQuote(tester, cubit);
+
+      expect(find.text(noPaymentCopy), findsNothing);
+      expect(find.byType(PaymentMethodSelection), findsNothing);
+
+      await settle(tester);
+    });
+  });
+
+  group('payment section once the quote resolves', () {
+    testWidgets('a normal paid booking gets the payment picker', (
+      tester,
+    ) async {
+      final repo = RecordingBookingRepo();
+      final cubit = buildCubit(repo);
+      addTearDown(cubit.close);
+
+      await pumpSummary(tester, cubit);
+
+      expect(cubit.state.quote, isNotNull);
+      expect(
+        find.byType(PaymentMethodSelection),
+        findsOneWidget,
+        reason: 'the picker must still render for every booking that has '
+            'something to pay',
+      );
+      expect(find.text(noPaymentCopy), findsNothing);
+    });
+
+    testWidgets('a genuinely zero-total quote gets the "no payment" copy', (
+      tester,
+    ) async {
+      final cubit = buildCubit(_ZeroTotalBookingRepo());
+      addTearDown(cubit.close);
+
+      await pumpSummary(tester, cubit);
+
+      expect(cubit.state.quote, isNotNull);
+      expect(
+        find.text(noPaymentCopy),
+        findsOneWidget,
+        reason: 'a fully covered booking is exactly what this copy is for',
+      );
+      expect(find.byType(PaymentMethodSelection), findsNothing);
+    });
+  });
+
+  group('the invariant the gate rests on', () {
+    test('every flow that shows the payment picker also requires a quote', () {
+      // The gate waits for a quote only where `requiresQuote` says one is
+      // coming. If a flow ever shows the picker WITHOUT quoting, waiting would
+      // hide the picker forever — worse than the flash being fixed. Today no
+      // such flow exists, and this pins it: break the implication and this
+      // fails rather than the picker silently vanishing in production.
+      for (final flowType in BookingFlowType.values) {
+        final config = BookingFlowConfig(flowType: flowType);
+        if (config.showPaymentMethod) {
+          expect(
+            config.requiresQuote,
+            isTrue,
+            reason:
+                '$flowType shows the payment picker but never resolves a quote '
+                '— booking_summary_view.dart gates the picker on the quote '
+                'being resolved, so this flow would lose it entirely',
+          );
+        }
+      }
+    });
+
+    test('a flow that shows the picker without quoting counts as resolved', () {
+      // The gate's own shape, asserted directly: `!requiresQuote` short-
+      // circuits it, so such a flow (were one added) renders its payment
+      // section on the first frame exactly as it does today.
+      bool quoteResolved(bool requiresQuote, QuoteModel? quote) =>
+          !requiresQuote || quote != null;
+
+      expect(quoteResolved(false, null), isTrue);
+      expect(quoteResolved(true, null), isFalse);
+    });
+  });
+}
+
+/// Answers every quote with a booking that is FULLY covered: a real gross, a
+/// zero total and a zero amount due — the shape a 100% promo or a full points
+/// redemption produces.
+class _ZeroTotalBookingRepo extends RecordingBookingRepo {
+  @override
+  Future<Either<Failure, QuoteModel>> getQuote({
+    required String packageId,
+    required double lat,
+    required double lng,
+    List<Map<String, dynamic>>? addOns,
+    String? promoCode,
+    String? offerId,
+    int? pointsToApply,
+    List<String> addOnIds = const [],
+    int? carCount,
+  }) async {
+    await networkTick();
+    return right(
+      QuoteModel.fromJson({
+        'quoteId': 'quote-free',
+        'currency': 'SAR',
+        'expiresAt': toWireDateTime(
+          saudiNow().add(const Duration(minutes: 15)),
+        ),
+        'breakdown': {
+          'grossMinor': grossWithoutPromoMinor,
+          'netMinor': 0,
+          'vatMinor': 0,
+          'currency': 'SAR',
+          'totalMinor': 0,
+          'promoDiscountMinor': grossWithoutPromoMinor,
+          'amountDueMinor': 0,
+        },
+        'lines': const [],
+      }),
+    );
+  }
+}
