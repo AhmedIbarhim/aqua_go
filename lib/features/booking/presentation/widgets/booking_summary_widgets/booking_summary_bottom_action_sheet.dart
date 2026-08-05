@@ -11,6 +11,7 @@ import '../../../data/models/payment_init_model.dart';
 import '../../controllers/booking_cubit.dart';
 import '../../controllers/booking_state.dart';
 import '../../views/moyasar_payment_view.dart';
+import 'booking_payable_total.dart';
 
 class BookingSummaryBottomActionSheet extends StatelessWidget {
   final BookingState bookingState;
@@ -46,13 +47,8 @@ class BookingSummaryBottomActionSheet extends StatelessWidget {
     return false;
   }
 
-  double _calculateTotal(BookingState state) {
-    final quoteBreakdown = state.quote?.breakdown;
-    if (quoteBreakdown != null) {
-      return quoteBreakdown.gross;
-    }
-    return 0.0;
-  }
+  double _calculateTotal(BookingState state) =>
+      payableTotalMajor(state.quote?.breakdown);
 
   @override
   Widget build(BuildContext context) {
