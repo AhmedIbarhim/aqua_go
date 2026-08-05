@@ -17,6 +17,7 @@ import '../widgets/booking_summary_widgets/gift_coupon_payment_widget.dart';
 import '../widgets/promo_code_section.dart';
 import '../widgets/booking_summary_widgets/wallet_points_section.dart';
 import '../widgets/booking_summary_widgets/booking_summary_bottom_action_sheet.dart';
+import '../widgets/booking_summary_widgets/booking_payable_total.dart';
 import '../controllers/booking_cubit.dart';
 import '../controllers/booking_state.dart';
 import 'package:aqua_go/core/route/routes.dart';
@@ -329,12 +330,25 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
             ),
             const SizedBox(height: 24),
           ],
-          if (config.showPaymentMethod) ...[
+          // AQG-424/425 — a fully-discounted booking has nothing to pay with.
+          // Showing a card picker on a SAR 0.00 order invites the customer to
+          // pick a payment method that is then never used.
+          if (config.showPaymentMethod &&
+              needsPaymentMethod(
+                payableTotal: payableTotalMajor(bookingState.quote?.breakdown),
+                hasPayableAddon: false,
+              )) ...[
             PaymentMethodSelection(
               initialMethod: bookingState.paymentMethod,
               onPaymentMethodChanged: (method) {
                 context.read<BookingCubit>().updatePaymentMethod(method);
               },
+            ),
+            const SizedBox(height: 24),
+          ] else if (config.showPaymentMethod) ...[
+            Text(
+              LocaleKeys.bookings_no_payment_required.tr(context: context),
+              style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 24),
           ],

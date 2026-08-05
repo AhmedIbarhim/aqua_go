@@ -168,6 +168,7 @@ abstract class  LocaleKeys {
   static const bookings_covered_by_package = 'bookings.covered_by_package';
   static const bookings_no_available_times = 'bookings.no_available_times';
   static const bookings_confirm_booking = 'bookings.confirm_booking';
+  static const bookings_no_payment_required = 'bookings.no_payment_required';
   static const bookings_confirm_payment = 'bookings.confirm_payment';
   static const bookings_package_name = 'bookings.package_name';
   static const bookings_dont_call = 'bookings.dont_call';

@@ -173,6 +173,7 @@
     "covered_by_package": "Covered by package",
     "no_available_times": "No available times for this day in this zone",
     "confirm_booking": "Confirm Booking",
+    "no_payment_required": "No payment required — this booking is fully covered.",
     "confirm_payment": "Confirm Payment",
     "package_name": "Package Name",
     "dont_call": "Don't call",

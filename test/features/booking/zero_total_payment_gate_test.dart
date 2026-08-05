@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:aqua_go/features/booking/data/models/payment_init_model.dart';
 import 'package:aqua_go/features/booking/presentation/widgets/booking_summary_widgets/booking_payable_total.dart';
 import 'package:aqua_go/features/my_bookings/data/models/booking_response_model/breakdown.dart';
 
@@ -95,6 +96,55 @@ void main() {
 
     test('a null breakdown is payable-zero', () {
       expect(payableTotalMajor(null), 0.0);
+    });
+  });
+
+  group('needsPaymentMethod (affordance)', () {
+    test('a zero payable total needs no payment method', () {
+      expect(
+        needsPaymentMethod(payableTotal: 0.0, hasPayableAddon: false),
+        isFalse,
+      );
+    });
+
+    test('a positive payable total needs a payment method', () {
+      expect(
+        needsPaymentMethod(payableTotal: 45.0, hasPayableAddon: false),
+        isTrue,
+      );
+    });
+
+    test('a zero total with a payable add-on still needs a payment method', () {
+      // The package flow charges add-ons separately from the wash.
+      expect(
+        needsPaymentMethod(payableTotal: 0.0, hasPayableAddon: true),
+        isTrue,
+      );
+    });
+  });
+
+  group('shouldOpenPaymentSdk (authoritative)', () {
+    PaymentInitModel init(int amountMinor) => PaymentInitModel(
+      amountMinor: amountMinor,
+      givenId: 'g',
+      currency: 'SAR',
+      metadata: const {},
+      holdToken: 'h',
+    );
+
+    test('a server amount of zero never opens the SDK', () {
+      expect(shouldOpenPaymentSdk(init(0)), isFalse);
+    });
+
+    test('a positive server amount opens the SDK', () {
+      expect(shouldOpenPaymentSdk(init(4500)), isTrue);
+    });
+
+    test('the SDK decision ignores client-side totals entirely', () {
+      // R1 — the client must never decide whether a card is charged. The
+      // server re-prices at payment-init; if it says zero, it is zero, and
+      // if it says 45.00 after the client thought zero, the card is charged.
+      expect(shouldOpenPaymentSdk(init(4500)), isTrue);
     });
   });
 }

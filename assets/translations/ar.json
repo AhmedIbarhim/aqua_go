@@ -173,6 +173,7 @@
     "covered_by_package": "مشمول بالباقة",
     "no_available_times": "لا توجد أوقات متاحة لهذا اليوم في هذه المنطقة",
     "confirm_booking": "تأكيد الحجز",
+    "no_payment_required": "لا حاجة للدفع — هذا الحجز مغطى بالكامل.",
     "confirm_payment": "تأكيد الدفع",
     "package_name": "اسم الباقة",
     "dont_call": "لا تتصل بالهاتف",
