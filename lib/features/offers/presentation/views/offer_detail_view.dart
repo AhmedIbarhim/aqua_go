@@ -96,7 +96,7 @@ class _Summary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isAr = context.isAr;
-    final endsIn = offerEndsInDays(offer.endsAt, saudiNow());
+    final countdown = offerCountdown(offer.endsAt, saudiNow());
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -117,20 +117,40 @@ class _Summary extends StatelessWidget {
         // enumerates it ("terms … and expiry"). What stays here is the urgency
         // chip, which is a UI/UX note rather than a term — so the date is
         // stated once, in the place the requirement puts it.
-        if (endsIn != null) ...[
+        if (countdown != null) ...[
           const SizedBox(height: 12),
           Text(
-            endsIn == 1
-                ? LocaleKeys.offers_ends_in_one_day.tr(context: context)
-                : LocaleKeys.offers_ends_in_days.tr(
-                    context: context,
-                    args: ['$endsIn'],
-                  ),
+            _countdownText(context, countdown),
             style: AppTextStyles.medium12.copyWith(color: context.colors.error),
           ),
         ],
       ],
     );
+  }
+}
+
+/// The urgency chip's sentence for [c], in the reader's language.
+///
+/// One dedicated key per unit for the singular case, because "1 day" /
+/// "ساعة واحدة" is not a substitution of the plural sentence in either
+/// language — Arabic changes the noun, English changes the suffix.
+String _countdownText(BuildContext context, OfferCountdown c) {
+  switch (c.unit) {
+    case OfferCountdownUnit.days:
+      return c.value == 1
+          ? LocaleKeys.offers_ends_in_one_day.tr(context: context)
+          : LocaleKeys.offers_ends_in_days
+              .tr(context: context, args: ['${c.value}']);
+    case OfferCountdownUnit.hours:
+      return c.value == 1
+          ? LocaleKeys.offers_ends_in_one_hour.tr(context: context)
+          : LocaleKeys.offers_ends_in_hours
+              .tr(context: context, args: ['${c.value}']);
+    case OfferCountdownUnit.minutes:
+      return c.value == 1
+          ? LocaleKeys.offers_ends_in_one_minute.tr(context: context)
+          : LocaleKeys.offers_ends_in_minutes
+              .tr(context: context, args: ['${c.value}']);
   }
 }
 

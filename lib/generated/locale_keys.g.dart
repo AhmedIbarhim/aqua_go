@@ -513,6 +513,10 @@ abstract class  LocaleKeys {
   static const offers_error = 'offers.error';
   static const offers_ends_in_days = 'offers.ends_in_days';
   static const offers_ends_in_one_day = 'offers.ends_in_one_day';
+  static const offers_ends_in_hours = 'offers.ends_in_hours';
+  static const offers_ends_in_one_hour = 'offers.ends_in_one_hour';
+  static const offers_ends_in_minutes = 'offers.ends_in_minutes';
+  static const offers_ends_in_one_minute = 'offers.ends_in_one_minute';
   static const offers_terms_title = 'offers.terms_title';
   static const offers_use_code = 'offers.use_code';
   static const offers_view_package = 'offers.view_package';
