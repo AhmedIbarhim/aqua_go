@@ -146,6 +146,13 @@ void main() {
   }
 
   group('OfferDetailView — the SERVICE offer', () {
+    // AQG-439. The SERVICE action is gated behind sign-in — the booking flow
+    // it deep-links into is authenticated end to end. `bootOffersTestEnvironment`
+    // leaves `currentUser` null, i.e. a GUEST, so every case in this group that
+    // asserts on what happens AFTER the tap has to say who is tapping. The
+    // guest's own path is covered by `offer_guest_gate_test.dart`.
+    setUp(signIn);
+
     testWidgets('labels its primary action "Book now"', (tester) async {
       await pumpDetail(tester, serviceOffer());
       expect(find.text(LocaleKeys.offers_book_now.tr()), findsOneWidget);

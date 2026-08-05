@@ -95,4 +95,42 @@ void main() {
     expect(find.byType(CustomLoadingIndicator), findsNothing);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('resetLoadingOverlay clears a counter leaked by a torn-down screen',
+      (tester) async {
+    // AQG-439. Two listeners raise the overlay, then the route stack is
+    // wiped by a session teardown before either "else -> hide" leg runs.
+    // The counter is process-global, so without a reset it never returns to
+    // zero and the entry — which lives in the ROOT overlay and survives the
+    // route removal — sits on the login page forever.
+    late BuildContext captured;
+    await tester.pumpWidget(harness((context) => captured = context));
+
+    await tester.tap(find.text('go'));
+    await tester.pump();
+
+    captured.showLoadingOverlay();
+    captured.showLoadingOverlay();
+    await tester.pump();
+    await tester.pump();
+    expect(find.byType(CustomLoadingIndicator), findsOneWidget);
+
+    resetLoadingOverlay();
+    await tester.pump();
+    await tester.pump();
+    expect(find.byType(CustomLoadingIndicator), findsNothing);
+
+    // And the next screen's overlay still works — the reset must not leave
+    // the counter negative or the entry double-removed.
+    captured.showLoadingOverlay();
+    await tester.pump();
+    await tester.pump();
+    expect(find.byType(CustomLoadingIndicator), findsOneWidget);
+
+    captured.hideLoadingOverlay();
+    await tester.pump();
+    await tester.pump();
+    expect(find.byType(CustomLoadingIndicator), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
 }

@@ -7,6 +7,7 @@ import '../../../../core/components/custom_button.dart';
 import '../../../../core/components/generic_app_bar.dart';
 import '../../../../core/config/di/service_locator.dart';
 import '../../../../core/extentions/context_extentions.dart';
+import '../../../../core/helpers/fetch_user_data_helper.dart';
 import '../../../../core/route/app_router.dart';
 import '../../../../core/route/routes.dart';
 import '../../../../core/themes/app_text_styles.dart';
@@ -348,6 +349,17 @@ class _PrimaryActionState extends State<_PrimaryAction> {
     // a SERVICE offer with a deal also carries a code, but that code is the
     // server's to resolve, not the client's to apply.
     if (offer.isService) {
+      // UCC23 A4 — a guest may BROWSE the feed, but the booking flow it
+      // deep-links into is authenticated end to end: `bookingLocation`
+      // opens on the saved-address read, whose 401 tears the tokenless
+      // session down mid-request and leaves the process-global loading
+      // overlay stranded over the login page (AQG-439). The home surface
+      // has always gated this exact push (`service_card.dart`); the offers
+      // surface is the one entry point that did not.
+      if (FetchUserData.isGuest()) {
+        FetchUserData.promptGuestToLogin(context);
+        return;
+      }
       final serviceId = offer.terms.serviceId;
       if (serviceId == null || serviceId.isEmpty) {
         _leaveUnavailable();

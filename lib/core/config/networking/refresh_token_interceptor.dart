@@ -7,6 +7,7 @@ import 'package:aqua_go/core/route/routes.dart';
 import 'package:aqua_go/core/config/networking/endpoints.dart';
 import 'package:aqua_go/features/auth/data/repos/auth_repository.dart';
 import 'package:aqua_go/core/config/networking/anonymous_session_policy.dart';
+import 'package:aqua_go/core/extentions/context_extentions/loading_extension.dart';
 
 class RefreshTokenInterceptor extends Interceptor {
   final Dio dio;
@@ -191,6 +192,13 @@ class RefreshTokenInterceptor extends Interceptor {
   Future<void> _clearSessionAndRedirect() async {
     // purgeLocalSession clears _cachedUser + currentUser notifier + tokens.
     await locator<AuthRepository>().purgeLocalSession();
+
+    // AQG-439 — the redirect below wipes the route stack, so any screen
+    // currently holding the blocking overlay up never runs its matching hide.
+    // The counter is process-global and the entry lives in the root overlay,
+    // so without this the login page renders under a spinner that never
+    // clears.
+    resetLoadingOverlay();
 
     if (_isRedirecting) return;
     _isRedirecting = true;

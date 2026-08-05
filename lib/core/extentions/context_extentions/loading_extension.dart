@@ -44,3 +44,29 @@ extension LoadingExtension on BuildContext {
     }
   }
 }
+
+/// Force-clears the blocking loading overlay and its reference count.
+///
+/// [_loadingCount] is process-global and only ever decremented by the matching
+/// [LoadingExtension.hideLoadingOverlay]. A screen torn down mid-request never
+/// runs its matching hide — the session-teardown redirect wipes the route stack
+/// with `(route) => false`, disposing every BlocListener before its "else" leg
+/// fires — so the counter stays above zero forever. The entry itself lives in
+/// the ROOT navigator overlay and survives the route removal, so the next
+/// screen renders under a permanent blurred spinner (AQG-439). Call this at
+/// every point that discards the route stack out from under an in-flight
+/// request.
+///
+/// Removal is deferred to a post-frame callback and guarded on
+/// [OverlayEntry.mounted] for the same reason the paired hide is: the insert is
+/// itself post-frame, so an entry created and reset inside one frame gap was
+/// never inserted and `remove()` would assert on it.
+void resetLoadingOverlay() {
+  _loadingCount = 0;
+  final entry = _loadingOverlayEntry;
+  _loadingOverlayEntry = null;
+  if (entry == null) return;
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    if (entry.mounted) entry.remove();
+  });
+}
