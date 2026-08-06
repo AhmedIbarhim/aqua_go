@@ -204,11 +204,13 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
   ) {
     final config = bookingState.flowConfig;
 
-    // Has the backend quote landed? Every priced element on this screen waits
+    // Has the backend price landed? Every priced element on this screen waits
     // on this one answer — the payment affordance below, the breakdown card at
     // the bottom, and the confirm button in the action sheet, which calls the
     // same helper. See isPriceLocked (booking_payable_total.dart) for why they
-    // cannot each decide for themselves.
+    // cannot each decide for themselves — and for why the answer is NOT
+    // `requiresQuote`: the package flow prices from the wash-charge preview
+    // fetched in initState above, which lands on this same `state.quote`.
     final priceLocked = isPriceLocked(config: config, quote: bookingState.quote);
 
     // Backend-rendered per-line breakdown (quote.lines) is the source of truth
@@ -359,10 +361,11 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
           // confirm button is gated on this same predicate
           // (`priceLocked`, booking_summary_bottom_action_sheet.dart).
           //
-          // `!config.requiresQuote` short-circuits the wait rather than hiding
-          // the picker forever on a flow that never quotes. Today no such flow
-          // exists — `showPaymentMethod` and `requiresQuote` are both
-          // `flowType == service` — and payment_method_pending_quote_test.dart
+          // `!config.awaitsBackendPrice` short-circuits the wait rather than
+          // hiding the picker forever on a flow that never asks the server for
+          // a price. Today no such flow shows the picker —
+          // `showPaymentMethod` is `flowType == service`, which is inside
+          // `awaitsBackendPrice` — and payment_method_pending_quote_test.dart
           // pins that implication so this stays a safe gate if one is added.
           if (config.showPaymentMethod && priceLocked) ...[
             if (needsPaymentMethod(

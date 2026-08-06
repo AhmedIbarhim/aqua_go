@@ -11,6 +11,7 @@ import 'package:aqua_go/features/booking/data/models/availability_response_model
 import 'package:aqua_go/features/booking/data/models/payment_init_model.dart';
 import 'package:aqua_go/features/booking/data/models/quote_model.dart';
 import 'package:aqua_go/features/booking/data/repos/booking_repository.dart';
+import 'package:aqua_go/features/booking/domain/configs/booking_flow_config.dart';
 import 'package:aqua_go/features/booking/domain/strategies/booking_submit_strategy.dart';
 import 'package:aqua_go/features/booking/presentation/controllers/booking_cubit.dart';
 import 'package:aqua_go/features/booking/presentation/controllers/booking_state.dart';
@@ -31,6 +32,7 @@ import 'package:aqua_go/features/my_cars/data/models/vehicle_model_model.dart';
 import 'package:aqua_go/core/config/controllers/language_controller/language_cubit.dart';
 import 'package:aqua_go/core/config/controllers/theme_controller/theme_cubit.dart';
 import 'package:aqua_go/features/subscriptions/data/data_sources/subscriptions_remote_data_source.dart';
+import 'package:aqua_go/features/subscriptions/data/models/subscription_response_model/subscription_response_model.dart';
 import 'package:aqua_go/features/subscriptions/data/repos/subscriptions_repository.dart';
 import 'package:aqua_go/features/wallet/data/data_sources/wallet_remote_data_source.dart';
 import 'package:aqua_go/features/wallet/data/models/loyalty_balance_model.dart';
@@ -332,6 +334,57 @@ BookingCubit buildCubit(
   cubit.updateDateTime(date, slotStart);
   cubit.updatePaymentMethod(PaymentMethod.creditCard);
   return cubit;
+}
+
+/// Builds the cubit in the SUBSCRIPTION-WASH flow ([BookingFlowType.package]).
+///
+/// That flow takes no quote. It prices from the read-only wash-charge preview
+/// (`fetchWashChargePreview`), which the summary fires from its own post-frame
+/// callback, so the state this exercises is the same "the price has not arrived
+/// yet" window the service flow has — reached down a different road.
+///
+/// `subscriptionId` + `washId` have to be on the state for the preview to be
+/// requested at all (the cubit returns early without them), and they arrive
+/// through `initBooking`, which also kicks off the subscription-detail fetch.
+/// That fetch is stubbed out rather than faked in full: everything it would
+/// populate (the package pseudo-service, the add-on classification, the
+/// bundled-service picker) is beside the point here, and [service] is already
+/// on the state from `initBooking` itself.
+BookingCubit buildPackageCubit(BookingRepository repo) {
+  final apiClient = APIClient(Dio());
+  final cubit = BookingCubit(
+    bookingRepo: repo,
+    subscriptionsRepo: _NoSubscriptionsRepository(),
+    servicesRepo: ServicesRepository(ServicesRemoteDataSource(apiClient)),
+    submitStrategy: UnusedSubmitStrategy(),
+    flowConfig: const BookingFlowConfig(flowType: BookingFlowType.package),
+  );
+
+  cubit.initBooking(
+    service,
+    existingCar: car,
+    existingAddress: address,
+    subscriptionId: 'sub-1',
+    washId: 'wash-1',
+  );
+  final date = DateTime.now().add(const Duration(days: 2));
+  final slotStart = DateTime(date.year, date.month, date.day, 10, 0);
+  cubit.updateDateTime(date, null);
+  cubit.updateDateTime(date, slotStart);
+  return cubit;
+}
+
+/// Answers the subscription detail with a failure, so the package cubit settles
+/// without reaching the network. See [buildPackageCubit] for why the real
+/// payload is not needed.
+class _NoSubscriptionsRepository extends SubscriptionsRepository {
+  _NoSubscriptionsRepository()
+    : super(SubscriptionsRemoteDataSource(APIClient(Dio())));
+
+  @override
+  Future<Either<Failure, SubscriptionResponseModel>> fetchSubscriptionDetail({
+    required String subscriptionId,
+  }) async => left(ServerFailure('subscription detail not exercised here'));
 }
 
 final service = ServiceModel(

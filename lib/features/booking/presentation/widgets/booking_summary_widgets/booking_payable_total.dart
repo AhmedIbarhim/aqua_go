@@ -3,24 +3,40 @@ import '../../../data/models/payment_init_model.dart';
 import '../../../data/models/quote_model.dart';
 import '../../../domain/configs/booking_flow_config.dart';
 
-/// Whether the backend quote this screen prices everything from has landed.
+/// Whether the backend figure this screen prices everything from has landed.
 ///
-/// The quote is fired from a post-frame callback, so the first frame of an
-/// ordinary paid booking has none. Every figure on the summary — the payment
-/// affordance, the breakdown card, the confirm button — has to wait for it
-/// together, because each of them reads `quote?.<field> ?? 0` and a missing
-/// quote is therefore indistinguishable from a genuinely free order. One
-/// predicate, one moment: while it is false the screen shows a placeholder and
-/// nothing can be submitted; when it flips, every number appears at once and
-/// they all come from the same locked quote.
+/// It is fired from a post-frame callback, so the first frames of a priced
+/// booking have none. Every figure on the summary — the payment affordance, the
+/// breakdown card, the confirm button — has to wait for it together, because
+/// each of them reads `quote?.<field> ?? 0` and a missing price is therefore
+/// indistinguishable from a genuinely free order. One predicate, one moment:
+/// while it is false the screen shows a placeholder and nothing can be
+/// submitted; when it flips, every number appears at once and they all come
+/// from the same locked figure.
 ///
-/// `!requiresQuote` short-circuits the wait rather than blocking forever on a
-/// flow that never quotes (gift redemption, package washes). Today
-/// `requiresQuote` is `flowType == service`.
+/// **[quote] is not always a quote.** Two flows price from the server and only
+/// one of them quotes:
+///   * service — the `/quote` round trip (`config.requiresQuote`);
+///   * package (subscription wash) — the read-only wash-charge preview,
+///     which `BookingCubit.fetchWashChargePreview` maps into a SYNTHETIC
+///     `QuoteModel` and publishes on the same `state.quote` field.
+/// So the arrival that releases the gate is the same field either way, but the
+/// question "is this flow waiting for one?" is NOT `requiresQuote` — that
+/// answers "does it call /quote?". Gating on it left the package flow's gate
+/// permanently open (`!requiresQuote` short-circuits), and the package summary
+/// went on stating a fabricated SAR 0.00 subtotal, VAT and total for a wash
+/// that costs money. [BookingFlowConfig.awaitsBackendPrice] is the readiness
+/// question; `requiresQuote` stays the routing one.
+///
+/// `!awaitsBackendPrice` short-circuits the wait rather than blocking forever
+/// on a flow that never asks the server for a price at all (reschedule, gift
+/// redemption) — neither renders the payment summary, so neither has anything
+/// to withhold, and gating them would disable a Confirm button waiting on a
+/// figure that is never coming.
 bool isPriceLocked({
   required BookingFlowConfig config,
   required QuoteModel? quote,
-}) => !config.requiresQuote || quote != null;
+}) => !config.awaitsBackendPrice || quote != null;
 
 /// The amount the customer will actually be charged, in major units (SAR).
 ///

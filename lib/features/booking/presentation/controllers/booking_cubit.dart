@@ -1199,12 +1199,26 @@ class BookingCubit extends Cubit<BookingState> {
 
     return result.fold(
       (failure) {
-        // Soft failure: keep the summary usable. The Confirm gate's
-        // hasPayableAddon safety net (booking_summary_view) still routes a
-        // paid wash through addon-payment-init even without a preview.
+        // Reported, exactly as a failed /quote is on the service flow
+        // (`_priceAndPublish`), because the summary now WAITS on this preview:
+        // it is the package flow's price, and `isPriceLocked` holds the card
+        // and the Confirm button until it lands
+        // (booking_payable_total.dart).
+        //
+        // This used to be a soft failure emitting `initial`, on the reasoning
+        // that the summary stayed usable because the Confirm gate's
+        // hasPayableAddon safety net still routed a paid wash through
+        // addon-payment-init. That reasoning is gone with the fabricated price
+        // it depended on: without a preview the card had no figures and
+        // rendered SAR 0.00 for a payable wash, so "usable" meant submittable
+        // against a price the customer was shown wrongly. With the gate in
+        // place a silent `initial` would instead leave a placeholder and a
+        // dead Confirm button with nothing on screen saying why — so the
+        // failure is surfaced, and the customer can leave and re-enter to
+        // retry, which is what the service flow does with the same failure.
         emit(
           state.copyWith(
-            status: BookingStatus.initial,
+            status: BookingStatus.failure,
             errorMessage: failure.message,
           ),
         );

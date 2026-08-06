@@ -191,40 +191,47 @@ void main() {
   });
 
   group('the invariant the gate rests on', () {
-    test('every flow that shows the payment picker also requires a quote', () {
-      // The gate waits for a quote only where `requiresQuote` says one is
-      // coming. If a flow ever shows the picker WITHOUT quoting, waiting would
-      // hide the picker forever — worse than the flash being fixed. Today no
-      // such flow exists, and this pins it: break the implication and this
-      // fails rather than the picker silently vanishing in production.
+    test('every flow that shows the payment picker also waits for a price', () {
+      // The gate waits only where `awaitsBackendPrice` says a price is coming.
+      // If a flow ever shows the picker WITHOUT one coming, waiting would hide
+      // the picker forever — worse than the flash being fixed. Today no such
+      // flow exists, and this pins it: break the implication and this fails
+      // rather than the picker silently vanishing in production.
       for (final flowType in BookingFlowType.values) {
         final config = BookingFlowConfig(flowType: flowType);
         if (config.showPaymentMethod) {
           expect(
-            config.requiresQuote,
+            config.awaitsBackendPrice,
             isTrue,
             reason:
-                '$flowType shows the payment picker but never resolves a quote '
-                '— booking_summary_view.dart gates the picker on the quote '
+                '$flowType shows the payment picker but never resolves a price '
+                '— booking_summary_view.dart gates the picker on the price '
                 'being resolved, so this flow would lose it entirely',
           );
         }
       }
     });
 
-    test('a flow that shows the picker without quoting counts as resolved', () {
+    test('a flow that shows the picker without a price counts as resolved', () {
       // The gate's own shape, asserted on the SHIPPED predicate rather than a
       // copy of it — `isPriceLocked` is the single helper the payment section,
       // the breakdown card and the confirm button all call, and a local
       // re-declaration here would keep passing after the real one changed.
-      // `!requiresQuote` short-circuits it, so such a flow (were one added)
-      // renders its payment section on the first frame exactly as it does
-      // today.
+      // `!awaitsBackendPrice` short-circuits it, so such a flow (were one
+      // added) renders its payment section on the first frame exactly as it
+      // does today.
+      //
+      // The short-circuit is keyed on `awaitsBackendPrice`, NOT `requiresQuote`
+      // — gift redemption answers false to both, but the package flow answers
+      // false to `requiresQuote` while still waiting on a price (its
+      // wash-charge preview), and gating it on the routing predicate is what
+      // let it state SAR 0.00. See package_summary_pending_price_test.dart.
       final quoting = BookingFlowConfig(flowType: BookingFlowType.service);
-      final notQuoting = BookingFlowConfig(flowType: BookingFlowType.giftRedeem);
-      expect(notQuoting.requiresQuote, isFalse);
+      final unpriced = BookingFlowConfig(flowType: BookingFlowType.giftRedeem);
+      expect(unpriced.requiresQuote, isFalse);
+      expect(unpriced.awaitsBackendPrice, isFalse);
 
-      expect(isPriceLocked(config: notQuoting, quote: null), isTrue);
+      expect(isPriceLocked(config: unpriced, quote: null), isTrue);
       expect(isPriceLocked(config: quoting, quote: null), isFalse);
     });
   });
