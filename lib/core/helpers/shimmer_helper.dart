@@ -77,6 +77,10 @@ class ShimmerHelper extends StatelessWidget {
   // Unified list in all packages page
   static Widget packagesList({int itemCount = 3}) =>
       PackagesListShimmer(itemCount: itemCount);
+
+  // 9. Shimmer stand-in for the booking summary's price breakdown, shown while
+  //    the backend quote is still out.
+  static Widget paymentSummary() => const PaymentSummaryShimmer();
 }
 
 // ==========================================
@@ -523,6 +527,62 @@ class BookingAddressesShimmer extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Stand-in for `PaymentSummaryCard` while the quote it renders is still out.
+///
+/// It mirrors that card's shape — a couple of label/amount rows, the total
+/// rule, and the VAT footnote — so the section keeps its height and the real
+/// figures land in place instead of pushing the page around. It shows no
+/// number at all, which is the point: a fabricated SAR 0.00 is a price the
+/// customer can read and believe.
+class PaymentSummaryShimmer extends StatelessWidget {
+  const PaymentSummaryShimmer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ShimmerHelper(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _row(labelWidth: 140, amountWidth: 70, height: 16),
+          const SizedBox(height: 12),
+          _row(labelWidth: 110, amountWidth: 70, height: 16),
+          const SizedBox(height: 12),
+          const Divider(height: 1, thickness: 1, color: Colors.white),
+          const SizedBox(height: 12),
+          _row(labelWidth: 90, amountWidth: 90, height: 18),
+          const SizedBox(height: 8),
+          _row(labelWidth: 160, amountWidth: 50, height: 12),
+        ],
+      ),
+    );
+  }
+
+  // Direction-agnostic: a spaceBetween Row lays itself out RTL in Arabic with
+  // no branching, exactly as PaymentSummaryCard._buildPaymentRow does.
+  Widget _row({
+    required double labelWidth,
+    required double amountWidth,
+    required double height,
+  }) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        _bar(width: labelWidth, height: height),
+        _bar(width: amountWidth, height: height),
+      ],
+    );
+  }
+
+  Widget _bar({required double width, required double height}) => Container(
+    width: width,
+    height: height,
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(4),
+    ),
+  );
 }
 
 class PackagesListShimmer extends StatelessWidget {

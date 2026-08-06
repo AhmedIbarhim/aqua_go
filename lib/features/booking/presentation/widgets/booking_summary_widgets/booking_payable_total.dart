@@ -1,5 +1,26 @@
 import '../../../../my_bookings/data/models/booking_response_model/breakdown.dart';
 import '../../../data/models/payment_init_model.dart';
+import '../../../data/models/quote_model.dart';
+import '../../../domain/configs/booking_flow_config.dart';
+
+/// Whether the backend quote this screen prices everything from has landed.
+///
+/// The quote is fired from a post-frame callback, so the first frame of an
+/// ordinary paid booking has none. Every figure on the summary — the payment
+/// affordance, the breakdown card, the confirm button — has to wait for it
+/// together, because each of them reads `quote?.<field> ?? 0` and a missing
+/// quote is therefore indistinguishable from a genuinely free order. One
+/// predicate, one moment: while it is false the screen shows a placeholder and
+/// nothing can be submitted; when it flips, every number appears at once and
+/// they all come from the same locked quote.
+///
+/// `!requiresQuote` short-circuits the wait rather than blocking forever on a
+/// flow that never quotes (gift redemption, package washes). Today
+/// `requiresQuote` is `flowType == service`.
+bool isPriceLocked({
+  required BookingFlowConfig config,
+  required QuoteModel? quote,
+}) => !config.requiresQuote || quote != null;
 
 /// The amount the customer will actually be charged, in major units (SAR).
 ///

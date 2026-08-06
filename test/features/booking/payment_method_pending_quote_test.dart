@@ -1,9 +1,12 @@
 import 'package:aqua_go/core/config/local_storage/shared_prefs.dart';
 import 'package:aqua_go/core/config/networking/exceptions/failure.dart';
+import 'package:aqua_go/core/helpers/shimmer_helper.dart';
 import 'package:aqua_go/core/utils/saudi_wire_format.dart';
 import 'package:aqua_go/features/booking/data/models/quote_model.dart';
 import 'package:aqua_go/features/booking/domain/configs/booking_flow_config.dart';
+import 'package:aqua_go/features/booking/presentation/widgets/booking_summary_widgets/booking_payable_total.dart';
 import 'package:aqua_go/features/booking/presentation/widgets/booking_summary_widgets/payment_method_selection.dart';
+import 'package:aqua_go/features/booking/presentation/widgets/payment_summary_card.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:dartz/dartz.dart' hide State;
 import 'package:easy_localization/easy_localization.dart';
@@ -123,6 +126,70 @@ void main() {
     });
   });
 
+  group('price breakdown while the quote is unresolved', () {
+    testWidgets('the summary card never states a fabricated SAR 0.00', (
+      tester,
+    ) async {
+      final repo = RecordingBookingRepo();
+      final cubit = buildCubit(repo);
+      addTearDown(cubit.close);
+
+      await pumpSummaryPendingQuote(tester, cubit);
+
+      expect(
+        cubit.state.quote,
+        isNull,
+        reason: 'the initial quote must still be in flight for this to test '
+            'anything',
+      );
+      expect(
+        find.byType(PaymentSummaryCard),
+        findsNothing,
+        reason: 'every figure on the card is `quote?.<field> ?? 0`, so with no '
+            'quote it prices a payable order at zero',
+      );
+      expect(
+        find.byType(PaymentSummaryShimmer),
+        findsOneWidget,
+        reason: 'the section keeps its place with a placeholder — the absence '
+            'of a price, not a price of nothing',
+      );
+
+      await settle(tester);
+    });
+
+    testWidgets('the real card takes over once the quote lands', (
+      tester,
+    ) async {
+      final repo = RecordingBookingRepo();
+      final cubit = buildCubit(repo);
+      addTearDown(cubit.close);
+
+      await pumpSummary(tester, cubit);
+
+      expect(cubit.state.quote, isNotNull);
+      expect(find.byType(PaymentSummaryCard), findsOneWidget);
+      expect(find.byType(PaymentSummaryShimmer), findsNothing);
+    });
+
+    testWidgets('a genuinely zero-total quote still gets the real card', (
+      tester,
+    ) async {
+      final cubit = buildCubit(_ZeroTotalBookingRepo());
+      addTearDown(cubit.close);
+
+      await pumpSummary(tester, cubit);
+
+      expect(
+        find.byType(PaymentSummaryCard),
+        findsOneWidget,
+        reason: 'a resolved free order HAS a price — zero — and is entitled to '
+            'see it stated; only the unresolved case is withheld',
+      );
+      expect(find.byType(PaymentSummaryShimmer), findsNothing);
+    });
+  });
+
   group('the invariant the gate rests on', () {
     test('every flow that shows the payment picker also requires a quote', () {
       // The gate waits for a quote only where `requiresQuote` says one is
@@ -146,14 +213,19 @@ void main() {
     });
 
     test('a flow that shows the picker without quoting counts as resolved', () {
-      // The gate's own shape, asserted directly: `!requiresQuote` short-
-      // circuits it, so such a flow (were one added) renders its payment
-      // section on the first frame exactly as it does today.
-      bool quoteResolved(bool requiresQuote, QuoteModel? quote) =>
-          !requiresQuote || quote != null;
+      // The gate's own shape, asserted on the SHIPPED predicate rather than a
+      // copy of it — `isPriceLocked` is the single helper the payment section,
+      // the breakdown card and the confirm button all call, and a local
+      // re-declaration here would keep passing after the real one changed.
+      // `!requiresQuote` short-circuits it, so such a flow (were one added)
+      // renders its payment section on the first frame exactly as it does
+      // today.
+      final quoting = BookingFlowConfig(flowType: BookingFlowType.service);
+      final notQuoting = BookingFlowConfig(flowType: BookingFlowType.giftRedeem);
+      expect(notQuoting.requiresQuote, isFalse);
 
-      expect(quoteResolved(false, null), isTrue);
-      expect(quoteResolved(true, null), isFalse);
+      expect(isPriceLocked(config: notQuoting, quote: null), isTrue);
+      expect(isPriceLocked(config: quoting, quote: null), isFalse);
     });
   });
 }

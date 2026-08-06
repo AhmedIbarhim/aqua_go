@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/extentions/context_extentions.dart';
+import '../../../../core/helpers/shimmer_helper.dart';
 import '../../../../core/pricing/gross_price_breakdown.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
@@ -203,6 +204,13 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
   ) {
     final config = bookingState.flowConfig;
 
+    // Has the backend quote landed? Every priced element on this screen waits
+    // on this one answer — the payment affordance below, the breakdown card at
+    // the bottom, and the confirm button in the action sheet, which calls the
+    // same helper. See isPriceLocked (booking_payable_total.dart) for why they
+    // cannot each decide for themselves.
+    final priceLocked = isPriceLocked(config: config, quote: bookingState.quote);
+
     // Backend-rendered per-line breakdown (quote.lines) is the source of truth
     // for displayed amounts — no client-side VAT math. Each line's GROSS
     // (VAT-inclusive) grossMinor is what the customer sees, so the rows carry
@@ -245,17 +253,18 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
         itemLines.add(GrossLine(label: title, grossMinor: line.grossMinor));
       }
     }
-    // When lines are absent (still loading / fetch failed / expired, or the
-    // covered-wash zero-total path) we deliberately render NO line rows and no
-    // live catalog price — the totals below come out as 0.00 and the Confirm
-    // gate blocks.
+    // When lines are absent (fetch failed / expired, or the covered-wash
+    // zero-total path) we deliberately render NO line rows and no live catalog
+    // price, and the Confirm gate blocks. The still-loading case never reaches
+    // the card at all — `priceLocked` shows a placeholder instead.
 
     // PRICE LOCK: every figure comes STRAIGHT from the backend quote frozen at
-    // booking initiation — never from the live catalog. When the quote is
-    // absent we render zeros and the Confirm gate below blocks, rather than
-    // silently falling back to live selectedService prices (which would
-    // mismatch the eventual charge and break the locked-at-initiation
-    // guarantee).
+    // booking initiation — never from the live catalog, and never from a
+    // `?? 0` default standing in for a quote that has not arrived. Falling back
+    // to live selectedService prices would mismatch the eventual charge; so
+    // would a fabricated 0.00, which reads as a real, and free, price. Both
+    // break the locked-at-initiation guarantee, so while the quote is out the
+    // summary renders a placeholder and the Confirm gate blocks.
     //
     // `promoDiscountMinor` is what the applied code took off THIS order — the
     // same figure the server subtracted from the VAT-inclusive gross. It drives
@@ -355,8 +364,7 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
           // exists — `showPaymentMethod` and `requiresQuote` are both
           // `flowType == service` — and payment_method_pending_quote_test.dart
           // pins that implication so this stays a safe gate if one is added.
-          if (config.showPaymentMethod &&
-              (!config.requiresQuote || bookingState.quote != null)) ...[
+          if (config.showPaymentMethod && priceLocked) ...[
             if (needsPaymentMethod(
               payableTotal: payableTotalMajor(bookingState.quote?.breakdown),
               hasPayableAddon: false,
@@ -440,7 +448,17 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
               LocaleKeys.bookings_payment_summary.tr(context: context),
             ),
             const SizedBox(height: 16),
-            PaymentSummaryCard(breakdown: summary),
+            // Same wait as the payment section above. Without it this card read
+            // `quote?.<field> ?? 0` on the first frame and stated a subtotal, a
+            // VAT and a total of SAR 0.00 for an order that costs money —
+            // a fabricated price, not a missing one, and the customer has no
+            // way to tell. The price-lock rule the block above states is
+            // "never show a figure that did not come from the locked quote";
+            // a placeholder honours it, a zero does not.
+            if (priceLocked)
+              PaymentSummaryCard(breakdown: summary)
+            else
+              ShimmerHelper.paymentSummary(),
           ],
           const SizedBox(height: 30),
         ],

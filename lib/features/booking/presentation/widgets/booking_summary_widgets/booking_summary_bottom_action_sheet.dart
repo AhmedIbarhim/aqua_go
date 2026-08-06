@@ -59,7 +59,10 @@ class BookingSummaryBottomActionSheet extends StatelessWidget {
       payableTotal: total,
       hasPayableAddon: hasPayableAddon,
     );
-    final priceLocked = !config.requiresQuote || bookingState.quote != null;
+    final priceLocked = isPriceLocked(
+      config: config,
+      quote: bookingState.quote,
+    );
     final servicePicked = _servicePicked(bookingState);
     final isEnabled =
         priceLocked &&
