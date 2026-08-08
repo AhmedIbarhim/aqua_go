@@ -104,12 +104,14 @@ class CustomPhoneTextField extends StatefulWidget {
     this.onSaved,
     this.textColor,
     this.fillColor,
+    this.borderColor,
   });
 
   final TextEditingController? controller;
   final void Function(String?)? onSaved;
   final Color? textColor;
   final Color? fillColor;
+  final Color? borderColor;
 
   @override
   State<CustomPhoneTextField> createState() => _CustomPhoneTextFieldState();
@@ -123,7 +125,9 @@ class _CustomPhoneTextFieldState extends State<CustomPhoneTextField> {
       height: height * 0.055,
       decoration: BoxDecoration(
         color: widget.fillColor ?? context.colors.background,
-        border: Border.all(color: context.colors.borderSecondary),
+        border: Border.all(
+          color: widget.borderColor ?? context.colors.borderSecondary,
+        ),
         borderRadius: BorderRadius.circular(8),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -149,7 +153,12 @@ class _CustomPhoneTextFieldState extends State<CustomPhoneTextField> {
                     ),
                   ),
                   const SizedBox(width: 4),
-                  Text("+966", style: AppTextStyles.regular16),
+                  Text(
+                    "+966",
+                    style: AppTextStyles.regular16.copyWith(
+                      color: widget.textColor ?? context.colors.textPrimary,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -169,7 +178,7 @@ class _CustomPhoneTextFieldState extends State<CustomPhoneTextField> {
                 // },
                 onSaved: widget.onSaved,
                 style: AppTextStyles.regular16.copyWith(
-                  color: context.colors.contentSecondaryLight,
+                  color: widget.textColor ?? context.colors.contentSecondaryLight,
                 ),
                 onTapOutside: (_) {
                   FocusScope.of(context).unfocus();

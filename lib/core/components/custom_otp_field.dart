@@ -10,6 +10,13 @@ class CustomOtpFields extends StatefulWidget {
   final List<FocusNode> focusNodes;
   final Function(String)? onChanged;
   final bool hasError;
+  final Color? textColor;
+  final Color? fillColor;
+  final Color? borderColor;
+  final Color? focusedBorderColor;
+  final Color? focusedFillColor;
+  final Color? disabledColor;
+  final Color? errorColor;
 
   const CustomOtpFields({
     super.key,
@@ -17,6 +24,13 @@ class CustomOtpFields extends StatefulWidget {
     required this.focusNodes,
     this.onChanged,
     this.hasError = false,
+    this.textColor,
+    this.fillColor,
+    this.borderColor,
+    this.focusedBorderColor,
+    this.focusedFillColor,
+    this.disabledColor,
+    this.errorColor,
   });
 
   @override
@@ -116,28 +130,37 @@ class _CustomOtpFieldsState extends State<CustomOtpFields> {
       width: screenHeight * 0.07,
       height: screenHeight * 0.07,
       textStyle: AppTextStyles.semiBold32.copyWith(
-        color: context.colors.textPrimary,
+        color: widget.textColor ?? context.colors.textPrimary,
       ),
       decoration: BoxDecoration(
-        color: Colors.transparent,
+        color: widget.fillColor ?? Colors.transparent,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: context.colors.borderSecondary, width: 1),
+        border: Border.all(
+          color: widget.borderColor ?? context.colors.borderSecondary,
+          width: 1,
+        ),
       ),
     );
 
     // Focused theme: primary border, brandHover background
     final focusedPinTheme = defaultPinTheme.copyWith(
       decoration: defaultPinTheme.decoration!.copyWith(
-        color: context.colors.brandHover,
-        border: Border.all(color: context.colors.primary, width: 1.5),
+        color: widget.focusedFillColor ?? context.colors.brandHover,
+        border: Border.all(
+          color: widget.focusedBorderColor ?? context.colors.primary,
+          width: 1.5,
+        ),
       ),
     );
 
     // Submitted theme matches focused theme in background color, but uses primary border or borderSecondary
     final submittedPinTheme = defaultPinTheme.copyWith(
       decoration: defaultPinTheme.decoration!.copyWith(
-        color: context.colors.brandHover,
-        border: Border.all(color: context.colors.primary, width: 1.5),
+        color: widget.focusedFillColor ?? context.colors.brandHover,
+        border: Border.all(
+          color: widget.focusedBorderColor ?? context.colors.primary,
+          width: 1.5,
+        ),
       ),
     );
 
@@ -145,10 +168,12 @@ class _CustomOtpFieldsState extends State<CustomOtpFields> {
     final errorPinTheme = defaultPinTheme.copyWith(
       decoration: defaultPinTheme.decoration!.copyWith(
         color: _pinputFocusNode.hasFocus || _pinputController.text.isNotEmpty
-            ? context.colors.brandHover
-            : Colors.transparent,
+            ? (widget.focusedFillColor ?? context.colors.brandHover)
+            : (widget.fillColor ?? Colors.transparent),
         border: Border.all(
-          color: context.colors.error.withValues(alpha: 0.2),
+          color: (widget.errorColor ?? context.colors.error).withValues(
+            alpha: 0.2,
+          ),
           width: 1.5,
         ),
       ),
@@ -171,7 +196,7 @@ class _CustomOtpFieldsState extends State<CustomOtpFields> {
           preFilledWidget: Text(
             '_',
             style: AppTextStyles.regular32.copyWith(
-              color: context.colors.contentDisabled,
+              color: widget.disabledColor ?? context.colors.contentDisabled,
             ),
           ),
           showCursor: false,

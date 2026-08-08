@@ -176,6 +176,12 @@ class _EmailOtpContentState extends State<EmailOtpContent> {
                   controllers: _controllers,
                   focusNodes: _focusNodes,
                   hasError: state is LoginError,
+                  textColor: darkAppColors.textPrimary,
+                  borderColor: darkAppColors.borderSecondary,
+                  focusedBorderColor: darkAppColors.primary,
+                  focusedFillColor: darkAppColors.brandHover,
+                  disabledColor: darkAppColors.contentDisabled,
+                  errorColor: darkAppColors.error,
                   onChanged: (value) {
                     setState(() {
                       // _errorMessage = null;
@@ -208,6 +214,12 @@ class _EmailOtpContentState extends State<EmailOtpContent> {
                         }
                       : null,
                   enabled: _isOtpComplete && _currentOtpSessionId != null,
+                  color: darkAppColors.primary,
+                  disabledColor: darkAppColors.contentDisabled,
+                  textColor: Colors.black,
+                  disabledTextColor: darkAppColors.textSecondary,
+                  borderColor: darkAppColors.primary,
+                  disabledBorderColor: darkAppColors.contentDisabled,
                 ),
                 SizedBox(height: height * 0.025),
                 Center(
@@ -228,7 +240,7 @@ class _EmailOtpContentState extends State<EmailOtpContent> {
                               context: context,
                             ),
                             style: AppTextStyles.regular16.copyWith(
-                              color: context.colors.primary,
+                              color: darkAppColors.primary,
                             ),
                           ),
                         )
@@ -245,7 +257,7 @@ class _EmailOtpContentState extends State<EmailOtpContent> {
                             Text(
                               _timerText,
                               style: AppTextStyles.regular16.copyWith(
-                                color: context.colors.primary,
+                                color: darkAppColors.primary,
                               ),
                             ),
                           ],

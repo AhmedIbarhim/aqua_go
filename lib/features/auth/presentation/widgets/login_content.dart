@@ -109,7 +109,12 @@ class _LoginContentState extends State<LoginContent> {
                     ),
                   ),
                   SizedBox(height: height * 0.01),
-                  CustomPhoneTextField(controller: _phoneController),
+                  CustomPhoneTextField(
+                    controller: _phoneController,
+                    fillColor: darkAppColors.background,
+                    borderColor: darkAppColors.borderSecondary,
+                    textColor: darkAppColors.textPrimary,
+                  ),
                   SizedBox(height: height * 0.02),
                   CustomButton(
                     onPressed: _isPhoneValid
@@ -129,6 +134,12 @@ class _LoginContentState extends State<LoginContent> {
                         : null,
                     text: LocaleKeys.auth_login.tr(context: context),
                     enabled: _isPhoneValid,
+                    color: darkAppColors.primary,
+                    disabledColor: darkAppColors.contentDisabled,
+                    textColor: Colors.black,
+                    disabledTextColor: darkAppColors.textSecondary,
+                    borderColor: darkAppColors.primary,
+                    disabledBorderColor: darkAppColors.contentDisabled,
                   ),
                   SizedBox(height: height * 0.01),
                   CustomButton(
@@ -136,7 +147,8 @@ class _LoginContentState extends State<LoginContent> {
                       context: context,
                     ),
                     color: darkAppColors.themeColor,
-                    textColor: context.colors.primary,
+                    textColor: darkAppColors.primary,
+                    borderColor: darkAppColors.primary,
                     onPressed: () {
                       if (!ConnectivityHelper().isConnected) {
                         context.showErrorSnackBar(

@@ -84,8 +84,7 @@ class _EmailContentState extends State<EmailContent> {
                 left: 24,
                 right: 24,
                 top: height * 0.02,
-                bottom:
-                    height * 0.02 + MediaQuery.viewInsetsOf(context).bottom,
+                bottom: height * 0.02 + MediaQuery.viewInsetsOf(context).bottom,
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -95,7 +94,9 @@ class _EmailContentState extends State<EmailContent> {
                     FetchUserData.getEmail() == null
                         ? LocaleKeys.auth_add_email.tr(context: context)
                         : LocaleKeys.auth_change_email.tr(context: context),
-                    style: AppTextStyles.semiBold24,
+                    style: AppTextStyles.semiBold24.copyWith(
+                      color: darkAppColors.textPrimary,
+                    ),
                   ),
                   SizedBox(height: height * 0.01),
                   Text(
@@ -110,9 +111,21 @@ class _EmailContentState extends State<EmailContent> {
                     label: LocaleKeys.auth_email_address.tr(context: context),
                     hint: LocaleKeys.auth_enter_email.tr(context: context),
                     keyboardType: TextInputType.emailAddress,
+                    fillColor: darkAppColors.background,
+                    labelColor: darkAppColors.textPrimary,
+                    textColor: darkAppColors.textPrimary,
+                    hintColor: darkAppColors.textTertiary,
+                    borderColor: darkAppColors.borderSecondary,
+                    focusedBorderColor: darkAppColors.primary,
                     prefixIcon: Padding(
                       padding: const EdgeInsets.all(12.0),
-                      child: SvgPicture.asset(AppAssets.mail),
+                      child: SvgPicture.asset(
+                        AppAssets.mail,
+                        colorFilter: ColorFilter.mode(
+                          darkAppColors.textSecondary,
+                          BlendMode.srcIn,
+                        ),
+                      ),
                     ),
                   ),
                   SizedBox(height: height * 0.02),
@@ -126,6 +139,12 @@ class _EmailContentState extends State<EmailContent> {
                         : null,
                     text: LocaleKeys.proceed.tr(context: context),
                     enabled: _isEmailValid,
+                    color: darkAppColors.primary,
+                    disabledColor: darkAppColors.contentDisabled,
+                    textColor: Colors.black,
+                    disabledTextColor: darkAppColors.textSecondary,
+                    borderColor: darkAppColors.primary,
+                    disabledBorderColor: darkAppColors.contentDisabled,
                   ),
                   SizedBox(height: height * 0.01),
                   CustomButton(
@@ -133,8 +152,9 @@ class _EmailContentState extends State<EmailContent> {
                       context.pop();
                     },
                     text: LocaleKeys.auth_back_to_profile.tr(context: context),
-                    textColor: context.colors.primary,
+                    textColor: darkAppColors.primary,
                     color: darkAppColors.themeColor,
+                    borderColor: darkAppColors.primary,
                     enabled: true,
                   ),
                   SizedBox(height: height * 0.02),

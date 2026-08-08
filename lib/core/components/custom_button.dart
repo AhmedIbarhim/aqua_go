@@ -10,8 +10,11 @@ class CustomButton extends StatelessWidget {
     required this.text,
     this.enabled = true,
     this.color,
+    this.disabledColor,
     this.textColor = Colors.black,
+    this.disabledTextColor,
     this.borderColor,
+    this.disabledBorderColor,
     this.preWidget,
     this.postWidget,
   });
@@ -19,8 +22,11 @@ class CustomButton extends StatelessWidget {
   final String text;
   final bool enabled;
   final Color? color;
+  final Color? disabledColor;
   final Color textColor;
+  final Color? disabledTextColor;
   final Color? borderColor;
+  final Color? disabledBorderColor;
   final Widget? preWidget;
   final Widget? postWidget;
 
@@ -29,17 +35,19 @@ class CustomButton extends StatelessWidget {
     return MaterialButton(
       onPressed: enabled ? onPressed : null,
       color: color ?? context.colors.primary,
-      disabledColor: context.colors.contentDisabled,
+      disabledColor: disabledColor ?? context.colors.contentDisabled,
       shape: RoundedRectangleBorder(
         side: BorderSide(
           color: enabled
-              ? (borderColor ?? context.colors.primary)
-              : context.colors.contentTertiary,
+              ? (borderColor ?? color ?? context.colors.primary)
+              : (disabledBorderColor ?? context.colors.contentTertiary),
           width: 1.0,
         ),
         borderRadius: BorderRadius.circular(12),
       ),
-      textColor: enabled ? textColor : context.colors.textSecondary,
+      textColor: enabled
+          ? textColor
+          : (disabledTextColor ?? context.colors.textSecondary),
       elevation: 0,
       minWidth: double.infinity,
       height: MediaQuery.sizeOf(context).height * 0.055,

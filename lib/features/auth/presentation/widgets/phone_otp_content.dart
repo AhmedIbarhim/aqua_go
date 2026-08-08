@@ -201,6 +201,12 @@ class _PhoneOtpContentState extends State<PhoneOtpContent> {
                   controllers: _controllers,
                   focusNodes: _focusNodes,
                   hasError: state is LoginError,
+                  textColor: darkAppColors.textPrimary,
+                  borderColor: darkAppColors.borderSecondary,
+                  focusedBorderColor: darkAppColors.primary,
+                  focusedFillColor: darkAppColors.brandHover,
+                  disabledColor: darkAppColors.contentDisabled,
+                  errorColor: darkAppColors.error,
                   onChanged: (value) {
                     if (state is LoginError) {
                       setState(() {});
@@ -237,6 +243,12 @@ class _PhoneOtpContentState extends State<PhoneOtpContent> {
                         }
                       : null,
                   enabled: _isOtpComplete && _otpSessionId != null,
+                  color: darkAppColors.primary,
+                  disabledColor: darkAppColors.contentDisabled,
+                  textColor: Colors.black,
+                  disabledTextColor: darkAppColors.textSecondary,
+                  borderColor: darkAppColors.primary,
+                  disabledBorderColor: darkAppColors.contentDisabled,
                 ),
                 SizedBox(height: height * 0.025),
                 Center(
@@ -254,7 +266,7 @@ class _PhoneOtpContentState extends State<PhoneOtpContent> {
                               context: context,
                             ),
                             style: AppTextStyles.regular16.copyWith(
-                              color: context.colors.primary,
+                              color: darkAppColors.primary,
                             ),
                           ),
                         )
@@ -271,7 +283,7 @@ class _PhoneOtpContentState extends State<PhoneOtpContent> {
                             Text(
                               _timerText,
                               style: AppTextStyles.regular16.copyWith(
-                                color: context.colors.primary,
+                                color: darkAppColors.primary,
                               ),
                             ),
                           ],

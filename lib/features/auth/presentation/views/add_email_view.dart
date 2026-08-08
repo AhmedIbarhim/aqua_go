@@ -12,7 +12,10 @@ class AddEmailView extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => locator<AuthCubit>(),
-      child: const AuthScaffold(content: EmailContent()),
+      child: const AuthScaffold(
+        showBackButton: true,
+        content: EmailContent(),
+      ),
     );
   }
 }

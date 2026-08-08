@@ -15,6 +15,11 @@ class CustomTextField extends StatelessWidget {
   final bool readOnly;
   final VoidCallback? onTap;
   final Color? fillColor;
+  final Color? labelColor;
+  final Color? textColor;
+  final Color? hintColor;
+  final Color? borderColor;
+  final Color? focusedBorderColor;
   final Widget? prefixIcon;
   final Widget? suffixIcon;
   final TextStyle? style;
@@ -49,6 +54,11 @@ class CustomTextField extends StatelessWidget {
     this.readOnly = false,
     this.onTap,
     this.fillColor,
+    this.labelColor,
+    this.textColor,
+    this.hintColor,
+    this.borderColor,
+    this.focusedBorderColor,
     this.prefixIcon,
     this.suffixIcon,
     this.style,
@@ -79,7 +89,7 @@ class CustomTextField extends StatelessWidget {
             Text(
               label,
               style: AppTextStyles.medium14.copyWith(
-                color: context.colors.textPrimary,
+                color: labelColor ?? context.colors.textPrimary,
               ),
             ),
           ],
@@ -118,15 +128,13 @@ class CustomTextField extends StatelessWidget {
                 ? TextAlignVertical.top
                 : TextAlignVertical.center,
             keyboardType: keyboardType,
-            style:
-                style ??
-                AppTextStyles.regular14.copyWith(
-                  color: context.colors.textPrimary,
-                ),
+            style: (style ?? AppTextStyles.regular14).copyWith(
+              color: textColor ?? style?.color ?? context.colors.textPrimary,
+            ),
             decoration: InputDecoration(
               hintText: hint,
               hintStyle: AppTextStyles.regular14.copyWith(
-                color: context.colors.textTertiary,
+                color: hintColor ?? context.colors.textTertiary,
               ),
               filled: true,
               fillColor: fillColor ?? context.colors.background,
@@ -139,19 +147,27 @@ class CustomTextField extends StatelessWidget {
 
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: context.colors.borderSecondary),
+                borderSide: BorderSide(
+                  color: borderColor ?? context.colors.borderSecondary,
+                ),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: context.colors.borderSecondary),
+                borderSide: BorderSide(
+                  color: borderColor ?? context.colors.borderSecondary,
+                ),
               ),
               disabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: context.colors.borderSecondary),
+                borderSide: BorderSide(
+                  color: borderColor ?? context.colors.borderSecondary,
+                ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: context.colors.primary),
+                borderSide: BorderSide(
+                  color: focusedBorderColor ?? context.colors.primary,
+                ),
               ),
             ),
           ),
