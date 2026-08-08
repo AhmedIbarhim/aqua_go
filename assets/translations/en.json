@@ -152,6 +152,7 @@
     "choose_car": "Choose Car",
     "choose_service": "Choose Service",
     "services_load_failed": "Couldn't load the services included in your package. Please try again.",
+    "price_unavailable": "We couldn't load the price for this booking. Check your connection and try again.",
     "service_selection_required": "Please choose a service from your package before confirming.",
     "additional_services": "Additional Services",
     "total": "Total",

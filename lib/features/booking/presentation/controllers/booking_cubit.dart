@@ -597,7 +597,15 @@ class BookingCubit extends Cubit<BookingState> {
       return null;
     }
 
-    emit(state.copyWith(status: BookingStatus.loading));
+    // The request is going out, so whatever an earlier attempt left behind is
+    // no longer true: a retry in flight must show the shimmer, not the error it
+    // is busy clearing.
+    emit(
+      state.copyWith(
+        status: BookingStatus.loading,
+        priceLoadFailed: false,
+      ),
+    );
 
     final result = await _requestQuote(
       promoCode: promoCode,
@@ -610,6 +618,10 @@ class BookingCubit extends Cubit<BookingState> {
         state.copyWith(
           status: BookingStatus.failure,
           errorMessage: failure.message,
+          // A price failure specifically — the summary reads this to tell "no
+          // price is coming" from "no price yet" and offer a retry rather than
+          // shimmer forever (booking_state.dart, `priceLoadFailed`).
+          priceLoadFailed: true,
         ),
       ),
       (quote) => _emitQuote(quote, offerId),
@@ -694,6 +706,9 @@ class BookingCubit extends Cubit<BookingState> {
       state.copyWith(
         status: BookingStatus.initial,
         quote: quote,
+        // A price landed. This is the one place every successful quote path
+        // funnels through, so clearing it here covers them all.
+        priceLoadFailed: false,
         appliedPromoCode: applied,
         appliedOfferId: applied == null ? null : offerId,
         // Only an offer that actually PRICED something is worth offering back;
@@ -739,7 +754,16 @@ class BookingCubit extends Cubit<BookingState> {
       return const OfferApplication();
     }
 
-    emit(state.copyWith(status: BookingStatus.loading));
+    // The THIRD way into a price call, alongside `_priceAndPublish` and
+    // `reprice`, and it clears the failed-price state for the same reason they
+    // do: a retry re-takes a held offer and comes through HERE, so leaving the
+    // flag set would keep offering a Retry for a request already in flight.
+    emit(
+      state.copyWith(
+        status: BookingStatus.loading,
+        priceLoadFailed: false,
+      ),
+    );
 
     var result = await _requestQuote(offerId: offerId);
     final unanswered = result.fold(
@@ -863,7 +887,14 @@ class BookingCubit extends Cubit<BookingState> {
     final promoCode = state.appliedPromoCode;
     final offerId = state.appliedOfferId;
 
-    emit(state.copyWith(status: BookingStatus.loading));
+    // Same reason as `_priceAndPublish`: the attempt is live again, so the
+    // failed-price state it may be recovering from is cleared on the way out.
+    emit(
+      state.copyWith(
+        status: BookingStatus.loading,
+        priceLoadFailed: false,
+      ),
+    );
     final result = await _requestQuote(promoCode: promoCode, offerId: offerId);
 
     return result.fold(
@@ -906,6 +937,10 @@ class BookingCubit extends Cubit<BookingState> {
         state.copyWith(
           status: BookingStatus.failure,
           errorMessage: rejection.message,
+          // No quote came back, so a flow with none yet has nothing to show.
+          // Harmless where one is already on the state: `resolvePriceDisplay`
+          // lets an existing quote win, because it is still a real figure.
+          priceLoadFailed: true,
         ),
       );
       return const QuoteRefresh();
@@ -927,6 +962,8 @@ class BookingCubit extends Cubit<BookingState> {
           state.copyWith(
             status: BookingStatus.failure,
             errorMessage: failure.message,
+            // Both attempts are spent and neither produced a price.
+            priceLoadFailed: true,
             clearOfferPrices: offerRefused,
             clearRememberedOffer: offerRefused,
           ),
@@ -1171,7 +1208,14 @@ class BookingCubit extends Cubit<BookingState> {
     final washId = state.washId;
     if (subscriptionId == null || washId == null) return null;
 
-    emit(state.copyWith(status: BookingStatus.loading));
+    // The preview is going out — clear any earlier failure so a retry in flight
+    // reads as pending, exactly as the service flow's quote does.
+    emit(
+      state.copyWith(
+        status: BookingStatus.loading,
+        priceLoadFailed: false,
+      ),
+    );
 
     // Same body shape as initiateWashAddonPayment / the schedule endpoint
     // (scheduledAt is required by the record but ignored for the read-only
@@ -1214,19 +1258,29 @@ class BookingCubit extends Cubit<BookingState> {
         // against a price the customer was shown wrongly. With the gate in
         // place a silent `initial` would instead leave a placeholder and a
         // dead Confirm button with nothing on screen saying why — so the
-        // failure is surfaced, and the customer can leave and re-enter to
-        // retry, which is what the service flow does with the same failure.
+        // failure is surfaced — and, since it is the same dead end the service
+        // flow reaches when `/quote` fails, by the same means: `priceLoadFailed`
+        // turns the summary's endless shimmer into an inline message with a
+        // Retry that re-fires THIS call. Leaving and re-entering the flow used
+        // to be the only way out of it.
         emit(
           state.copyWith(
             status: BookingStatus.failure,
             errorMessage: failure.message,
+            priceLoadFailed: true,
           ),
         );
         return null;
       },
       (data) {
         final quote = _quoteFromWashPreview(data);
-        emit(state.copyWith(status: BookingStatus.initial, quote: quote));
+        emit(
+          state.copyWith(
+            status: BookingStatus.initial,
+            quote: quote,
+            priceLoadFailed: false,
+          ),
+        );
         return quote;
       },
     );

@@ -38,6 +38,58 @@ bool isPriceLocked({
   required QuoteModel? quote,
 }) => !config.awaitsBackendPrice || quote != null;
 
+/// What the payment summary should render — THREE states, not two.
+///
+/// [isPriceLocked] answers "may this screen state a figure?", which is the
+/// question the Confirm gate asks and the only one it needs. It is not enough
+/// for the section itself, because the two ways of NOT having a price are
+/// different situations for the customer:
+///   * [pending] — the call is out and an answer is coming. A shimmer is an
+///     honest promise.
+///   * [unavailable] — the call came back a failure. Nothing re-fires it: both
+///     price calls are fired once, from `booking_summary_view`'s `initState`
+///     post-frame callback, and the snackbar that announced the failure is
+///     transient. Shimmering here promises a price that is never arriving, and
+///     leaves a customer who looked away on a permanently loading screen with a
+///     dead Confirm button and no way forward but to leave the flow.
+///   * [ready] — a real server figure is on the state, and the card states it.
+///
+/// The distinction is why `priceLoadFailed` exists on the state at all: on a
+/// flow that fires its price call from a post-frame callback, `quote == null`
+/// covers both of the first two.
+enum PriceDisplay {
+  /// The price call is out; nothing has failed.
+  pending,
+
+  /// The price call FAILED and left no price behind. Offer a way to re-fire it.
+  unavailable,
+
+  /// A price is on the state and may be stated.
+  ready,
+}
+
+/// Resolves the three states, for BOTH priced flows, from the one predicate the
+/// Confirm gate already uses.
+///
+/// Deliberately delegating to [isPriceLocked] rather than restating its rule:
+/// "may a figure be stated?" must have exactly one answer on this screen, and a
+/// second copy of `!awaitsBackendPrice || quote != null` here would let the card
+/// and the Confirm button disagree the next time either is touched.
+///
+/// A quote already on the state wins over [priceLoadFailed]. A reprice that
+/// fails over an existing quote (a promo re-check, a points toggle) leaves that
+/// quote in place, and it is still a real server figure for a real selection —
+/// the dead end being escaped here is having NO price at all, so that card
+/// stays and the failure is the snackbar's to report.
+PriceDisplay resolvePriceDisplay({
+  required BookingFlowConfig config,
+  required QuoteModel? quote,
+  required bool priceLoadFailed,
+}) {
+  if (isPriceLocked(config: config, quote: quote)) return PriceDisplay.ready;
+  return priceLoadFailed ? PriceDisplay.unavailable : PriceDisplay.pending;
+}
+
 /// The amount the customer will actually be charged, in major units (SAR).
 ///
 /// AQG-424 / AQG-425 — the booking summary used to read `Breakdown.gross`,

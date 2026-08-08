@@ -77,6 +77,28 @@ class BookingState extends Equatable {
   final bool packageServicesLoadFailed;
   /// True while the bundled-services resolve is in flight.
   final bool packageServicesLoading;
+  /// True when the call this flow prices from came back a FAILURE and left the
+  /// summary with no price at all.
+  ///
+  /// The distinction this carries is "no price is coming" vs "no price YET",
+  /// and `quote == null` alone cannot make it: both priced flows fire their
+  /// price call from a post-frame callback, so an unanswered request and a
+  /// failed one look identical on the state. Told apart they are two different
+  /// screens — a shimmer and an inline retry — and conflated they were one
+  /// endless shimmer with a dead Confirm button behind it, because nothing
+  /// re-fires the call (see `resolvePriceDisplay`,
+  /// booking_payable_total.dart).
+  ///
+  /// Set by BOTH price paths — `_priceAndPublish` / `_repriceAfter` for the
+  /// service flow's `/quote`, and `fetchWashChargePreview` for the package
+  /// flow's wash-charge preview — and cleared the moment either goes back out,
+  /// so a retry in flight shows the shimmer rather than the error it is busy
+  /// clearing.
+  ///
+  /// NOT the same fact as `status == BookingStatus.failure`, which every other
+  /// failing call on this cubit also raises (submit, payment-init). Only a
+  /// PRICE failure belongs here.
+  final bool priceLoadFailed;
   /// IDs of addons that are INCLUDED in the subscription but whose free
   /// quota has been exhausted — selecting them requires payment.
   final Set<String> includedAddonIds;
@@ -139,6 +161,7 @@ class BookingState extends Equatable {
     this.selectedPackageService,
     this.packageServicesLoadFailed = false,
     this.packageServicesLoading = false,
+    this.priceLoadFailed = false,
     this.includedAddonIds = const {},
     this.optionalAddonIds = const {},
     this.paymentPhase = PaymentPhase.none,
@@ -176,6 +199,7 @@ class BookingState extends Equatable {
     ServiceModel? selectedPackageService,
     bool? packageServicesLoadFailed,
     bool? packageServicesLoading,
+    bool? priceLoadFailed,
     Set<String>? includedAddonIds,
     Set<String>? optionalAddonIds,
     PaymentPhase? paymentPhase,
@@ -227,6 +251,7 @@ class BookingState extends Equatable {
           packageServicesLoadFailed ?? this.packageServicesLoadFailed,
       packageServicesLoading:
           packageServicesLoading ?? this.packageServicesLoading,
+      priceLoadFailed: priceLoadFailed ?? this.priceLoadFailed,
       includedAddonIds: includedAddonIds ?? this.includedAddonIds,
       optionalAddonIds: optionalAddonIds ?? this.optionalAddonIds,
       paymentPhase: paymentPhase ?? this.paymentPhase,
@@ -276,6 +301,7 @@ class BookingState extends Equatable {
     selectedPackageService,
     packageServicesLoadFailed,
     packageServicesLoading,
+    priceLoadFailed,
     includedAddonIds,
     optionalAddonIds,
     paymentPhase,

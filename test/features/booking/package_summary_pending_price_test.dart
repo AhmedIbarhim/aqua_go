@@ -4,6 +4,7 @@ import 'package:aqua_go/core/helpers/shimmer_helper.dart';
 import 'package:aqua_go/features/booking/domain/configs/booking_flow_config.dart';
 import 'package:aqua_go/features/booking/presentation/controllers/booking_state.dart';
 import 'package:aqua_go/features/booking/presentation/widgets/booking_summary_widgets/booking_payable_total.dart';
+import 'package:aqua_go/features/booking/presentation/widgets/booking_summary_widgets/price_unavailable_card.dart';
 import 'package:aqua_go/features/booking/presentation/widgets/payment_summary_card.dart';
 import 'package:dartz/dartz.dart' hide State;
 import 'package:easy_localization/easy_localization.dart';
@@ -107,10 +108,8 @@ void main() {
       final cubit = buildPackageCubit(_FailingPreviewBookingRepo());
       addTearDown(cubit.close);
 
-      // Pumped by hand rather than through `pumpSummary`: the placeholder is
-      // a shimmer, and a shimmer never settles. On every other path it is
-      // replaced the moment the price lands, which is why `pumpAndSettle`
-      // works there; here it is what the screen is left holding, so the frames
+      // Pumped by hand rather than through `pumpSummary`: the in-flight
+      // placeholder is a shimmer, and a shimmer never settles, so the frames
       // are advanced explicitly far enough for the failed round trip to land.
       await pumpSummaryPendingQuote(tester, cubit);
       for (var i = 0; i < 8; i++) {
@@ -122,15 +121,34 @@ void main() {
         findsNothing,
         reason: 'a preview that never arrived is not a price of zero',
       );
-      expect(find.byType(PaymentSummaryShimmer), findsOneWidget);
       expect(
         cubit.state.status,
         BookingStatus.failure,
-        reason: 'the screen now WAITS on this call, so a silent `initial` '
-            'would leave a placeholder and a dead Confirm button with nothing '
-            'saying why — the service flow reports the same failure',
+        reason: 'the screen WAITS on this call, so a silent `initial` would '
+            'leave a placeholder and a dead Confirm button with nothing saying '
+            'why — the service flow reports the same failure',
       );
       expect(cubit.state.errorMessage, isNotNull);
+
+      // The gate holding is only half of it. This assertion used to be
+      // `PaymentSummaryShimmer`, and that was the dead end: the preview is
+      // fired once from `initState`, so a failure left the shimmer running
+      // forever, promising a price that was never arriving, and the snackbar
+      // that explained it had already gone. A failed call is a different state
+      // from an outstanding one and now renders as one — see
+      // price_unavailable_retry_test.dart, which drives the Retry through both
+      // priced flows.
+      expect(
+        find.byType(PaymentSummaryShimmer),
+        findsNothing,
+        reason: 'nothing is in flight any more',
+      );
+      expect(
+        find.byType(PriceUnavailableCard),
+        findsOneWidget,
+        reason: 'the customer is told why, and given a way to re-fire the '
+            'preview without leaving the flow',
+      );
     });
   });
 

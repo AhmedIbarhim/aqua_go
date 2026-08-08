@@ -19,6 +19,7 @@ import '../widgets/promo_code_section.dart';
 import '../widgets/booking_summary_widgets/wallet_points_section.dart';
 import '../widgets/booking_summary_widgets/booking_summary_bottom_action_sheet.dart';
 import '../widgets/booking_summary_widgets/booking_payable_total.dart';
+import '../widgets/booking_summary_widgets/price_unavailable_card.dart';
 import '../controllers/booking_cubit.dart';
 import '../controllers/booking_state.dart';
 import 'package:aqua_go/core/route/routes.dart';
@@ -75,32 +76,57 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
       if (config.flowType == BookingFlowType.service) {
         _fetchLoyaltyBalance();
       }
-      if (config.requiresQuote) {
-        // An offer picked on the offers surface ("Use this code") is applied to
-        // the very first quote of this flow, then dropped so it cannot leak
-        // into a later booking — takeHandoff is single-shot by design. The
-        // OFFER id is what goes on the wire, never the code alongside it:
-        // the server resolves the offer's own code, refuses a request carrying
-        // both, and stamps the redemption with the offer that drove the sale.
-        // Only quote-bearing flows reach this branch, so no flow-type guard is
-        // needed.
-        final handoff = PendingPromoCode.instance.takeHandoff();
-        if (handoff != null) {
-          _applyOfferFromHandoff(handoff.offerId);
-        } else {
-          // Coming BACK to this screen (pop → forward) must re-price with the
-          // code that is already applied. Quoting bare here would drop the
-          // customer's discount without a word, and the applied chip would
-          // then be describing a quote that no longer carries it.
-          _reprice();
-        }
-      } else if (config.isPackage) {
-        // Subscription wash: fetch the read-only charge preview so the summary
-        // shows the real payable total (e.g. 8 SAR add-on) instead of 0.00 and
-        // the Confirm gate routes a paid wash through addon-payment-init.
-        context.read<BookingCubit>().fetchWashChargePreview();
-      }
+      _fetchPrice();
     });
+  }
+
+  /// Fires the call THIS flow prices from — and the ONLY place that decision is
+  /// made.
+  ///
+  /// Two priced flows, two different endpoints, and they are not
+  /// interchangeable: the service flow takes a `/quote`, the package flow has no
+  /// quote endpoint at all and prices from the read-only wash-charge preview.
+  /// Both land on `state.quote`, which is what makes them look like one thing
+  /// downstream and is exactly why the CALL must not be guessed downstream.
+  ///
+  /// Entry and Retry both come through here rather than each choosing for
+  /// themselves. A retry that hard-coded either call would be right for one flow
+  /// and would hit the wrong service for the other, and a second copy of this
+  /// routing would be free to drift from the one entry uses.
+  void _fetchPrice() {
+    final cubit = context.read<BookingCubit>();
+    final config = cubit.state.flowConfig;
+    if (config.requiresQuote) {
+      // An offer picked on the offers surface ("Use this code") is applied to
+      // the very first quote of this flow, then dropped so it cannot leak
+      // into a later booking — takeHandoff is single-shot by design. The
+      // OFFER id is what goes on the wire, never the code alongside it:
+      // the server resolves the offer's own code, refuses a request carrying
+      // both, and stamps the redemption with the offer that drove the sale.
+      // Only quote-bearing flows reach this branch, so no flow-type guard is
+      // needed.
+      //
+      // A RETRY re-reads the slot deliberately. It is normally empty by then
+      // (the read on entry drained it), but an offer whose apply went
+      // unanswered is put BACK — `_applyOfferFromHandoff` holds it when
+      // nothing was settled — and the retry is the customer's next attempt at
+      // the very deal they accepted. Re-taking it is how they get it.
+      final handoff = PendingPromoCode.instance.takeHandoff();
+      if (handoff != null) {
+        _applyOfferFromHandoff(handoff.offerId);
+      } else {
+        // Coming BACK to this screen (pop → forward) must re-price with the
+        // code that is already applied. Quoting bare here would drop the
+        // customer's discount without a word, and the applied chip would
+        // then be describing a quote that no longer carries it.
+        _reprice();
+      }
+    } else if (config.isPackage) {
+      // Subscription wash: fetch the read-only charge preview so the summary
+      // shows the real payable total (e.g. 8 SAR add-on) instead of 0.00 and
+      // the Confirm gate routes a paid wash through addon-payment-init.
+      cubit.fetchWashChargePreview();
+    }
   }
 
   @override
@@ -212,6 +238,18 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
     // `requiresQuote`: the package flow prices from the wash-charge preview
     // fetched in initState above, which lands on this same `state.quote`.
     final priceLocked = isPriceLocked(config: config, quote: bookingState.quote);
+
+    // The same wait, told apart into its THREE states for the section that
+    // renders it. `priceLocked` above is the gate — "may a figure be stated?" —
+    // and it stays the one answer the payment affordance and the Confirm button
+    // read. But "not yet" and "not coming" are different screens: the price call
+    // is fired ONCE from initState, so a failure left the shimmer below running
+    // forever. See `resolvePriceDisplay` (booking_payable_total.dart).
+    final priceDisplay = resolvePriceDisplay(
+      config: config,
+      quote: bookingState.quote,
+      priceLoadFailed: bookingState.priceLoadFailed,
+    );
 
     // Backend-rendered per-line breakdown (quote.lines) is the source of truth
     // for displayed amounts — no client-side VAT math. Each line's GROSS
@@ -458,10 +496,21 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
             // way to tell. The price-lock rule the block above states is
             // "never show a figure that did not come from the locked quote";
             // a placeholder honours it, a zero does not.
-            if (priceLocked)
-              PaymentSummaryCard(breakdown: summary)
-            else
-              ShimmerHelper.paymentSummary(),
+            //
+            // And a placeholder only honours it while a price is actually
+            // coming. When the call FAILED, the shimmer became a promise the
+            // screen could not keep — nothing re-fires it — so that case gets
+            // its own state: what happened, and a Retry that re-fires whichever
+            // call this flow prices from (`_fetchPrice`). Still no figure
+            // stated, and Confirm still disabled, exactly as while it is in
+            // flight.
+            switch (priceDisplay) {
+              PriceDisplay.ready => PaymentSummaryCard(breakdown: summary),
+              PriceDisplay.pending => ShimmerHelper.paymentSummary(),
+              PriceDisplay.unavailable => PriceUnavailableCard(
+                onRetry: _fetchPrice,
+              ),
+            },
           ],
           const SizedBox(height: 30),
         ],

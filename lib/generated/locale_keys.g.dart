@@ -147,6 +147,7 @@ abstract class  LocaleKeys {
   static const bookings_choose_car = 'bookings.choose_car';
   static const bookings_choose_service = 'bookings.choose_service';
   static const bookings_services_load_failed = 'bookings.services_load_failed';
+  static const bookings_price_unavailable = 'bookings.price_unavailable';
   static const bookings_service_selection_required = 'bookings.service_selection_required';
   static const bookings_additional_services = 'bookings.additional_services';
   static const bookings_total = 'bookings.total';
