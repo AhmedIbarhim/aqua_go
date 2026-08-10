@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../config/controllers/theme_controller/theme_cubit.dart';
 import '../../themes/app_colors.dart';
 
 extension AppThemeExtension on BuildContext {
@@ -8,6 +6,6 @@ extension AppThemeExtension on BuildContext {
 }
 
 extension ThemeExtentions on BuildContext {
-  bool get isDarkTheme => read<ThemeCubit>().state.themeMode == ThemeMode.dark;
+  bool get isDarkTheme => Theme.of(this).brightness == Brightness.dark;
   bool get isLightTheme => !isDarkTheme;
 }

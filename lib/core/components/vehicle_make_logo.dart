@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cached_network_svg_image/cached_network_svg_image.dart';
 import 'package:flutter/material.dart';
 import 'package:svg_flutter/svg.dart';
+import '../extentions/context_extentions.dart';
 import '../utils/app_assets.dart';
 
 class VehicleMakeLogo extends StatelessWidget {
@@ -44,27 +45,35 @@ class VehicleMakeLogo extends StatelessWidget {
       return image;
     }
 
-    return _applyGradientFilter(image);
+    return _applyGradientFilter(image, context);
   }
 
   Widget _fallback(BuildContext context) {
     return _applyGradientFilter(
       SvgPicture.asset(AppAssets.raceCar, width: size, height: size, fit: fit),
+      context,
     );
   }
 
-  Widget _applyGradientFilter(Widget child) {
+  Widget _applyGradientFilter(Widget child, BuildContext context) {
+    final isDark = context.isDarkTheme;
     return ShaderMask(
       shaderCallback: (bounds) => LinearGradient(
-        colors: [
-          Colors.grey.shade300,
-
-          Colors.grey.shade700,
-          Colors.grey.shade300,
-          Colors.grey.shade700,
-
-          Colors.grey.shade800,
-        ],
+        colors: isDark
+            ? [
+                Colors.grey.shade300,
+                Colors.grey.shade700,
+                Colors.grey.shade300,
+                Colors.grey.shade700,
+                Colors.grey.shade800,
+              ]
+            : [
+                Colors.grey.shade800,
+                Colors.grey.shade500,
+                Colors.grey.shade800,
+                Colors.grey.shade600,
+                Colors.grey.shade900,
+              ],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       ).createShader(bounds),

@@ -36,7 +36,7 @@ class MyCarCard extends StatelessWidget {
             height: height * 0.12,
             width: double.infinity,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
+              color: context.colors.themeOpositeColor.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Stack(
@@ -44,7 +44,20 @@ class MyCarCard extends StatelessWidget {
                 Positioned(
                   left: 0,
                   top: 0,
-                  child: Image.asset(AppAssets.shadows_1, width: width * 0.7),
+                  child: Image.asset(
+                    AppAssets.shadows_1,
+                    width: width * 0.7,
+                    color: context.colors.primary,
+                  ),
+                ),
+                Positioned(
+                  right: 0,
+                  bottom: 0,
+                  child: Image.asset(
+                    AppAssets.shadows_2,
+                    width: width * 0.3,
+                    color: context.colors.primary,
+                  ),
                 ),
                 // Car Image
                 Center(
@@ -86,10 +99,15 @@ class MyCarCard extends StatelessWidget {
                           GestureDetector(
                             onTap: () {
                               context.showWarningAlert(
-                                primaryButtonText: LocaleKeys.delete_confirm
-                                    .tr(context: context),
-                                title: LocaleKeys.delete_confirm.tr(context: context),
-                                message: LocaleKeys.my_cars_delete_message.tr(context: context),
+                                primaryButtonText: LocaleKeys.delete_confirm.tr(
+                                  context: context,
+                                ),
+                                title: LocaleKeys.delete_confirm.tr(
+                                  context: context,
+                                ),
+                                message: LocaleKeys.my_cars_delete_message.tr(
+                                  context: context,
+                                ),
                                 onPrimaryPressed: () {
                                   Navigator.pop(context);
                                   onDelete?.call();
