@@ -194,7 +194,7 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
       },
       builder: (context, bookingState) {
         return Scaffold(
-          backgroundColor: context.colors.background,
+          backgroundColor: context.colors.screenBG,
           appBar: GenericAppBar(
             title: LocaleKeys.bookings_booking_summary.tr(context: context),
             titleColor: context.colors.textPrimary,
@@ -237,7 +237,10 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
     // cannot each decide for themselves — and for why the answer is NOT
     // `requiresQuote`: the package flow prices from the wash-charge preview
     // fetched in initState above, which lands on this same `state.quote`.
-    final priceLocked = isPriceLocked(config: config, quote: bookingState.quote);
+    final priceLocked = isPriceLocked(
+      config: config,
+      quote: bookingState.quote,
+    );
 
     // The same wait, told apart into its THREE states for the section that
     // renders it. `priceLocked` above is the gate — "may a figure be stated?" —
@@ -339,7 +342,7 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
 
     return Container(
       padding: EdgeInsets.all(width * 0.06),
-      decoration: BoxDecoration(color: context.colors.themeColor),
+      decoration: BoxDecoration(color: context.colors.background),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

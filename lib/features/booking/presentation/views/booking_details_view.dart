@@ -98,7 +98,6 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
     await context.read<BookingCubit>().repriceForDisplayWithoutPromo();
   }
 
-
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
@@ -179,7 +178,7 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
 
     return Container(
       padding: EdgeInsets.all(width * 0.06),
-      decoration: BoxDecoration(color: context.colors.themeColor),
+      decoration: BoxDecoration(color: context.colors.background),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -220,7 +219,9 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
               bookingState.selectedService!.addons.isNotEmpty) ...[
             SizedBox(height: height * 0.03),
             BookingSectionTitle(
-              title: LocaleKeys.bookings_additional_services.tr(context: context),
+              title: LocaleKeys.bookings_additional_services.tr(
+                context: context,
+              ),
             ),
             SizedBox(height: height * 0.02),
             AddOnsGrid(
@@ -257,6 +258,4 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
       ),
     );
   }
-
 }
-

@@ -85,7 +85,7 @@ class GenericAppBar extends StatelessWidget implements PreferredSizeWidget {
               ? Text(
                   title!,
                   textAlign: TextAlign.center,
-                  style: AppTextStyles.regular22.copyWith(
+                  style: AppTextStyles.bold23.copyWith(
                     color: titleColor ?? context.colors.textPrimary,
                   ),
                 )
