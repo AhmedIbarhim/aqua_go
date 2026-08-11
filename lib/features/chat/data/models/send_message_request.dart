@@ -1,5 +1,3 @@
-/// Body for `POST /chat/threads/{id}/messages`. A message carries either text,
-/// an attachment (via a pre-uploaded object key), or both.
 class SendMessageRequest {
   final String body;
   final String? attachmentObjectKey;

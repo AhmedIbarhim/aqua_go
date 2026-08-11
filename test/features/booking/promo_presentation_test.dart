@@ -6,7 +6,7 @@ import 'package:aqua_go/features/booking/data/repos/booking_repository.dart';
 import 'package:aqua_go/features/booking/domain/promo_code_history.dart';
 import 'package:aqua_go/features/booking/domain/strategies/booking_submit_strategy.dart';
 import 'package:aqua_go/features/booking/presentation/controllers/booking_state.dart';
-import 'package:aqua_go/features/booking/presentation/widgets/payment_summary_card.dart';
+import 'package:aqua_go/features/booking/presentation/widgets/booking_summary_widgets/payment_summary_card.dart';
 import 'package:aqua_go/features/my_bookings/data/models/booking_response_model/booking_response_model.dart';
 import 'package:aqua_go/features/offers/domain/pending_promo_code.dart';
 import 'package:dartz/dartz.dart';
@@ -94,7 +94,8 @@ void main() {
       expect(
         find.text('12.39'),
         findsOneWidget,
-        reason: 'VAT is still the backend split of the DISCOUNTED total — the '
+        reason:
+            'VAT is still the backend split of the DISCOUNTED total — the '
             'discount is not subtracted a second time',
       );
     });
@@ -110,7 +111,10 @@ void main() {
       // The total, undiscounted — read off the TOTAL row. The SERVICE line
       // above it carries the same figure, which is exactly right for a
       // single-service order and exactly why the finder is scoped.
-      expect(summaryRowValue('bookings.total_amount', '115.00'), findsOneWidget);
+      expect(
+        summaryRowValue('bookings.total_amount', '115.00'),
+        findsOneWidget,
+      );
     });
   });
 
@@ -127,7 +131,8 @@ void main() {
       expect(
         find.textContaining('bookings.promo_saved'),
         findsOneWidget,
-        reason: 'a customer told only "code applied" cannot tell whether it '
+        reason:
+            'a customer told only "code applied" cannot tell whether it '
             'was worth 5 SAR or 50',
       );
       expect(find.textContaining('bookings.promo_code_applied'), findsNothing);
@@ -144,24 +149,34 @@ void main() {
       await openPromoDialog(tester);
 
       // Nothing typed yet is the starting state, not an error.
-      expect(find.textContaining('bookings.promo_code_malformed'), findsNothing);
+      expect(
+        find.textContaining('bookings.promo_code_malformed'),
+        findsNothing,
+      );
       expect(applyButtonEnabled(tester), isFalse);
 
       await tester.enterText(find.byType(TextField), 'AB-');
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('bookings.promo_code_malformed'), findsOneWidget);
+      expect(
+        find.textContaining('bookings.promo_code_malformed'),
+        findsOneWidget,
+      );
       expect(
         applyButtonEnabled(tester),
         isFalse,
-        reason: 'a malformed code must not cost a round trip that would come '
+        reason:
+            'a malformed code must not cost a round trip that would come '
             'back as the same generic "not recognised" an unknown code gets',
       );
 
       await tester.enterText(find.byType(TextField), 'ABCD');
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('bookings.promo_code_malformed'), findsNothing);
+      expect(
+        find.textContaining('bookings.promo_code_malformed'),
+        findsNothing,
+      );
       expect(applyButtonEnabled(tester), isTrue);
       expect(repo.quoteCalls, [null], reason: 'nothing was sent yet');
     });
@@ -178,13 +193,13 @@ void main() {
       await pumpSummary(tester, cubit);
       await openPromoDialog(tester);
 
-      expect(find.textContaining('bookings.promo_recent_codes'), findsOneWidget);
+      expect(
+        find.textContaining('bookings.promo_recent_codes'),
+        findsOneWidget,
+      );
       final chips = tester
           .widgetList<Text>(
-            find.descendant(
-              of: find.byType(Wrap),
-              matching: find.byType(Text),
-            ),
+            find.descendant(of: find.byType(Wrap), matching: find.byType(Text)),
           )
           .map((t) => t.data)
           .toList();
@@ -200,8 +215,10 @@ void main() {
       await tester.tap(find.text('OLDCODE1'));
       await tester.pumpAndSettle();
       expect(find.byType(TextField), findsOneWidget);
-      expect(tester.widget<TextField>(find.byType(TextField)).controller!.text,
-          'OLDCODE1');
+      expect(
+        tester.widget<TextField>(find.byType(TextField)).controller!.text,
+        'OLDCODE1',
+      );
     });
 
     testWidgets('a code that arrived through an OFFER is never remembered', (
@@ -272,112 +289,111 @@ void main() {
       expect(
         PromoCodeHistory.recent(),
         isEmpty,
-        reason: 'suggesting a code that has never worked would send the '
+        reason:
+            'suggesting a code that has never worked would send the '
             'customer back into the same rejection',
       );
     });
   });
 
   group('a charge with no booking behind it', () {
-    testWidgets(
-      'promises nothing about the money when the create is rejected',
-      (tester) async {
-        // The 422 the server raises when a promo cap was consumed between the
-        // quote and the charge. The card WAS charged. This rejection used to
-        // run a compensating refund and the copy said so — refunds were removed
-        // platform-wide on 2026-07-29, so it no longer does, and the client must
-        // not claim otherwise.
-        const serverDetail = 'This promo code is no longer valid.';
-        final cubit = buildCubit(
-          RecordingBookingRepo(),
-          submitStrategy: const _FailingSubmit(
-            serverDetail,
-            slug: 'promo-code-no-longer-valid',
-          ),
-        );
-        addTearDown(cubit.close);
+    testWidgets('promises nothing about the money when the create is rejected', (
+      tester,
+    ) async {
+      // The 422 the server raises when a promo cap was consumed between the
+      // quote and the charge. The card WAS charged. This rejection used to
+      // run a compensating refund and the copy said so — refunds were removed
+      // platform-wide on 2026-07-29, so it no longer does, and the client must
+      // not claim otherwise.
+      const serverDetail = 'This promo code is no longer valid.';
+      final cubit = buildCubit(
+        RecordingBookingRepo(),
+        submitStrategy: const _FailingSubmit(
+          serverDetail,
+          slug: 'promo-code-no-longer-valid',
+        ),
+      );
+      addTearDown(cubit.close);
 
-        await pumpSummary(tester, cubit);
-        await cubit.completeBookingAfterPayment('pay_1');
-        await settle(tester);
+      await pumpSummary(tester, cubit);
+      await cubit.completeBookingAfterPayment('pay_1');
+      await settle(tester);
 
-        expect(cubit.state.paymentPhase, PaymentPhase.createUnconfirmed);
-        expect(
-          find.textContaining(serverDetail),
-          findsOneWidget,
-          reason: 'the reason the booking failed is still stated',
-        );
-        expect(
-          find.textContaining('bookings.payment_unconfirmed_notice'),
-          findsOneWidget,
-          reason: 'money left the account and is not coming back on its own — '
-              'the customer is pointed at support, not promised a reversal',
-        );
-      },
-    );
+      expect(cubit.state.paymentPhase, PaymentPhase.createUnconfirmed);
+      expect(
+        find.textContaining(serverDetail),
+        findsOneWidget,
+        reason: 'the reason the booking failed is still stated',
+      );
+      expect(
+        find.textContaining('bookings.payment_unconfirmed_notice'),
+        findsOneWidget,
+        reason:
+            'money left the account and is not coming back on its own — '
+            'the customer is pointed at support, not promised a reversal',
+      );
+    });
 
-    testWidgets(
-      'promises nothing when the create never got an answer either',
-      (tester) async {
-        // The connection dropped after the card was charged. The server may
-        // have created the booking and may never have refunded anything — the
-        // client knows neither.
-        final cubit = buildCubit(
-          RecordingBookingRepo(),
-          submitStrategy: const _FailingSubmit(
-            'No internet connection',
-            type: FailureType.network,
-          ),
-        );
-        addTearDown(cubit.close);
+    testWidgets('promises nothing when the create never got an answer either', (
+      tester,
+    ) async {
+      // The connection dropped after the card was charged. The server may
+      // have created the booking and may never have refunded anything — the
+      // client knows neither.
+      final cubit = buildCubit(
+        RecordingBookingRepo(),
+        submitStrategy: const _FailingSubmit(
+          'No internet connection',
+          type: FailureType.network,
+        ),
+      );
+      addTearDown(cubit.close);
 
-        await pumpSummary(tester, cubit);
-        await cubit.completeBookingAfterPayment('pay_1');
-        await settle(tester);
+      await pumpSummary(tester, cubit);
+      await cubit.completeBookingAfterPayment('pay_1');
+      await settle(tester);
 
-        expect(cubit.state.paymentPhase, PaymentPhase.createUnconfirmed);
-        expect(
-          find.textContaining('bookings.payment_unconfirmed_title'),
-          findsOneWidget,
-          reason: 'the booking may in fact exist and nothing was returned — '
-              'the copy asserts neither',
-        );
-        expect(
-          find.textContaining('bookings.payment_unconfirmed_notice'),
-          findsOneWidget,
-          reason: 'the customer must be told not to pay again and where to '
-              'check whether the booking went through',
-        );
-      },
-    );
+      expect(cubit.state.paymentPhase, PaymentPhase.createUnconfirmed);
+      expect(
+        find.textContaining('bookings.payment_unconfirmed_title'),
+        findsOneWidget,
+        reason:
+            'the booking may in fact exist and nothing was returned — '
+            'the copy asserts neither',
+      );
+      expect(
+        find.textContaining('bookings.payment_unconfirmed_notice'),
+        findsOneWidget,
+        reason:
+            'the customer must be told not to pay again and where to '
+            'check whether the booking went through',
+      );
+    });
 
-    testWidgets(
-      'a 4xx after the charge is unconfirmed too',
-      (tester) async {
-        // A rejection thrown AFTER verify but on a path with no compensating
-        // refund (zone mismatch, saved address gone, schedule window). Same
-        // 422/409 shape as the refunding ones, so the status code cannot tell
-        // them apart — only the slug can, and this one is not in the set.
-        final cubit = buildCubit(
-          RecordingBookingRepo(),
-          submitStrategy: const _FailingSubmit(
-            'The address is no longer in this zone.',
-            slug: 'zone-mismatch',
-          ),
-        );
-        addTearDown(cubit.close);
+    testWidgets('a 4xx after the charge is unconfirmed too', (tester) async {
+      // A rejection thrown AFTER verify but on a path with no compensating
+      // refund (zone mismatch, saved address gone, schedule window). Same
+      // 422/409 shape as the refunding ones, so the status code cannot tell
+      // them apart — only the slug can, and this one is not in the set.
+      final cubit = buildCubit(
+        RecordingBookingRepo(),
+        submitStrategy: const _FailingSubmit(
+          'The address is no longer in this zone.',
+          slug: 'zone-mismatch',
+        ),
+      );
+      addTearDown(cubit.close);
 
-        await pumpSummary(tester, cubit);
-        await cubit.completeBookingAfterPayment('pay_1');
-        await settle(tester);
+      await pumpSummary(tester, cubit);
+      await cubit.completeBookingAfterPayment('pay_1');
+      await settle(tester);
 
-        expect(cubit.state.paymentPhase, PaymentPhase.createUnconfirmed);
-        expect(
-          find.textContaining('bookings.payment_unconfirmed_notice'),
-          findsOneWidget,
-        );
-      },
-    );
+      expect(cubit.state.paymentPhase, PaymentPhase.createUnconfirmed);
+      expect(
+        find.textContaining('bookings.payment_unconfirmed_notice'),
+        findsOneWidget,
+      );
+    });
 
     testWidgets('an ordinary failure stays a snackbar, not a refund notice', (
       tester,

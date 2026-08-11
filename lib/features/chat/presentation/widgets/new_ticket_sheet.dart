@@ -9,9 +9,6 @@ import '../../../../core/themes/app_text_styles.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../../data/enums/chat_category_enum.dart';
 
-/// Bottom sheet to open a new support ticket: pick a category + type a subject.
-/// Validates (category required, subject required, subject ≤ 200 chars) then
-/// invokes [onSubmit] and dismisses.
 class NewTicketSheet extends StatefulWidget {
   final void Function(ChatCategory category, String subject) onSubmit;
 

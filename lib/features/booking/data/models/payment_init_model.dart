@@ -1,9 +1,3 @@
-/// Response of `POST bookings/payment-init` (and the subscription mirror).
-///
-/// The server has re-validated the quote and soft-held the slot; it returns
-/// the authoritative amount + the deterministic Moyasar `given_id` + the
-/// metadata the SDK must stamp on the purchase so the create-time verify can
-/// correlate it back to the quote (spec §4.2 / §9.5).
 class PaymentInitModel {
   final int amountMinor;
   final String givenId;

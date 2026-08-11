@@ -14,34 +14,6 @@ import '../models/availability_response_model.dart';
 import '../models/promo_validate_response_model.dart';
 import '../data_sources/bookings_remote_data_source.dart';
 
-/// The deterministic `Idempotency-Key` for `POST /api/customer/bookings`.
-///
-/// Two shapes, one per lane:
-///
-///   * **Paid** — `booking-create:{moyasarPaymentId}`. Unchanged, and
-///     canonical: a retried create against the same verified Moyasar payment
-///     must replay the same booking (spec §9.5).
-///
-///   * **Card-less** (zero total, or fully points-covered) —
-///     `booking-create:quote:{quoteId}`. This USED to be the same expression
-///     as the paid lane, which interpolated a null payment id into the LITERAL
-///     string `booking-create:null` — one constant key shared by every free
-///     booking from every customer. `booking.idempotency_keys.key` is a bare
-///     PRIMARY KEY and the server's filter resolves it without consulting the
-///     principal, so within the 7-day retention window the second free booking
-///     on the platform either 422'd on a request-hash mismatch or replayed the
-///     first customer's cached 201.
-///
-/// The quote id is a real basis for the card-less lane, not a nonce: a quote
-/// belongs to exactly one customer (the server re-checks `quote.customerId` at
-/// create) and to exactly one intended booking, so the key is unique across
-/// customers AND stable across retries of the same create — which is the whole
-/// point of an idempotency key. A random nonce would satisfy uniqueness and
-/// destroy retry safety.
-///
-/// Throws [StateError] when neither basis is available, rather than emitting a
-/// key with no meaning. There is no legitimate create with neither a verified
-/// payment nor a quote.
 String bookingCreateIdempotencyKey(ServiceBookingRequestModel booking) {
   final paymentId = booking.moyasarPaymentId;
   if (paymentId != null && paymentId.isNotEmpty) {
@@ -61,8 +33,6 @@ class BookingRepository {
 
   BookingRepository({required this.bookingsRemoteDataSource});
 
-  /// [offerId] and [promoCode] are alternatives — see
-  /// [BookingsRemoteDataSource.getQuote].
   Future<Either<Failure, QuoteModel>> getQuote({
     required String packageId,
     required double lat,
@@ -180,15 +150,6 @@ class BookingRepository {
     }
   }
 
-  /// Pay-before-create step 2: re-validate the quote + soft-hold the slot.
-  /// Returns the amount + deterministic Moyasar `given_id` + metadata the SDK
-  /// needs to open the on-device purchase.
-  ///
-  /// [scheduledAt] — bare ISO-8601 Saudi time (no offset) from
-  ///   `toWireDateTime` (`core/utils/saudi_wire_format.dart`).
-  /// [vehicles] — 1-element list in the same shape as
-  ///   [ServiceBookingRequestModel.toJson] vehicles field (savedVehicleId XOR
-  ///   denormalised fields). Must be non-empty — backend @Size(min=1).
   Future<Either<Failure, PaymentInitModel>> bookingPaymentInit({
     required String quoteId,
     required String scheduledAt,
@@ -201,7 +162,8 @@ class BookingRepository {
         quoteId: quoteId,
         scheduledAt: scheduledAt,
         vehicles: vehicles,
-        idempotencyKey: 'booking-payment-init:$quoteId:${pointsToApply ?? 0}:$attemptNonce',
+        idempotencyKey:
+            'booking-payment-init:$quoteId:${pointsToApply ?? 0}:$attemptNonce',
         attemptNonce: attemptNonce,
         pointsToApply: pointsToApply,
       );
@@ -373,8 +335,6 @@ class BookingRepository {
     required PackageRescheduleRequestModel request,
   }) async {
     try {
-      // Serialise ONCE: the idempotency key is derived from the very body that
-      // is sent, so key and payload can never describe different slots.
       final rescheduleData = request.toJson();
       final newScheduledAtIso = rescheduleData['newScheduledAt'] as String;
       final idempotencyKey = 'customer-reschedule:$washId:$newScheduledAtIso';

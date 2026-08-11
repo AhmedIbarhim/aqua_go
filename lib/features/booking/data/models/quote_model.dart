@@ -8,14 +8,9 @@ class QuoteModel {
   final Breakdown? breakdown;
   final List<QuoteLine> lines;
 
-  /// Gross of the quote's ADD-ON rows only.
-  ///
-  /// A SERVICE offer prices the WASH alone, so a screen stating the offer's
-  /// price has to add back what the add-ons on that same screen cost — and the
-  /// quote's own add-on rows are the only server-blessed source for it. 0 when
-  /// nothing is selected, and 0 on a quote that carries no lines.
-  int get addOnsGrossMinor =>
-      lines.where((l) => l.isAddon).fold<int>(0, (sum, l) => sum + l.grossMinor);
+  int get addOnsGrossMinor => lines
+      .where((l) => l.isAddon)
+      .fold<int>(0, (sum, l) => sum + l.grossMinor);
   final QuoteSurgeModel? surge;
   final QuotePromoModel? promo;
   final QuoteLoyaltyModel? loyalty;

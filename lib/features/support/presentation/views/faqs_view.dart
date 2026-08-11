@@ -65,16 +65,6 @@ class _FaqsViewState extends State<FaqsView> {
                       return const SizedBox.shrink();
                     }
 
-                    // Grouped by the backend's category slug, and headed by the
-                    // backend's own localised categoryName. The category SET is
-                    // admin-managed, so a closed client enum could not represent
-                    // it: anything it did not know fell through to Service and
-                    // was silently misfiled, and a renamed category never
-                    // reached the app at all.
-                    //
-                    // LinkedHashMap keeps insertion order, so the sections
-                    // follow the order the API returned (displayOrder) instead
-                    // of a hardcoded list.
                     final Map<String, List<FaqModel>> groupedFaqs = {};
                     for (final faq in faqs) {
                       groupedFaqs.putIfAbsent(faq.category, () => []).add(faq);

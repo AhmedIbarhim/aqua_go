@@ -21,7 +21,10 @@ class GiftsRemoteDataSource {
     );
   }
 
-  Future<Either<Failure, dynamic>> getReceivedGifts({int limit = 20, String? cursor}) {
+  Future<Either<Failure, dynamic>> getReceivedGifts({
+    int limit = 20,
+    String? cursor,
+  }) {
     final Map<String, dynamic> queryParameters = {'limit': limit};
     if (cursor != null && cursor.isNotEmpty) {
       queryParameters['cursor'] = cursor;
@@ -48,9 +51,6 @@ class GiftsRemoteDataSource {
     );
   }
 
-  /// `gift-refund:` is the idempotency key the backend still expects here —
-  /// the name is historical. Cancelling a gift returns no money: refunds were
-  /// removed platform-wide on 2026-07-29.
   Future<Either<Failure, dynamic>> cancelGift({required String giftId}) {
     return _apiClient.post(
       Endpoints.cancelGift(giftId),

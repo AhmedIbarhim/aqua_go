@@ -10,10 +10,6 @@ import '../../../../generated/locale_keys.g.dart';
 import '../controllers/package_detail_controller/package_detail_cubit.dart';
 import '../widgets/package_card.dart';
 
-/// Single-package screen reached from a PACKAGE offer (home rail or the offer
-/// detail screen). [PackageCard] already owns the subscribe tap (guest prompt +
-/// subscription bottom sheet), so this screen only resolves the id and renders
-/// the card.
 class PackageDetailView extends StatelessWidget {
   const PackageDetailView({super.key, required this.packageId});
 
@@ -35,7 +31,8 @@ class PackageDetailView extends StatelessWidget {
         ),
         child: BlocBuilder<PackageDetailCubit, PackageDetailState>(
           builder: (context, state) {
-            if (state is PackageDetailInitial || state is PackageDetailLoading) {
+            if (state is PackageDetailInitial ||
+                state is PackageDetailLoading) {
               return ShimmerHelper.packagesList(itemCount: 1);
             }
 

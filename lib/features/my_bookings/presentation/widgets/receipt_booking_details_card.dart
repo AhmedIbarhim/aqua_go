@@ -47,8 +47,6 @@ class ReceiptBookingDetailsCard extends StatelessWidget {
     );
   }
 
-  /// The receipt shows time before date, which is why this does not reuse
-  /// `formatDateAndTime`; both halves still come from the shared formatter.
   String _getFormattedDateTime() {
     if (booking.scheduledAt == null) return '';
     try {

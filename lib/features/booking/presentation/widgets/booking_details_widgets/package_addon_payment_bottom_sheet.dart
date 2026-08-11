@@ -16,8 +16,6 @@ import '../booking_summary_widgets/payment_method_selection.dart';
 class PackageAddonPaymentBottomSheet extends StatelessWidget {
   const PackageAddonPaymentBottomSheet({super.key});
 
-  /// Opens a modal bottom sheet. Returns [true] if the user confirmed a
-  /// payment method, or [false]/null if they dismissed without confirming.
   static Future<bool> show(BuildContext context) async {
     final result = await showModalBottomSheet<bool>(
       context: context,
@@ -42,9 +40,6 @@ class PackageAddonPaymentBottomSheet extends StatelessWidget {
         final optionalIds = bookingState.optionalAddonIds;
         final includedIds = bookingState.includedAddonIds;
 
-        // Compute paid addons + package-covered (free) addons from selection.
-        // Covered rows are DISPLAY-ONLY at 0.00 (UC-C13 transparency) — they are
-        // never summed into [total].
         final List<({String name, double price})> paidAddons = [];
         final List<({String name})> coveredAddons = [];
         double total = 0;
@@ -75,11 +70,8 @@ class PackageAddonPaymentBottomSheet extends StatelessWidget {
           }
         }
 
-        // The subscription wash SERVICE itself is covered by the package.
-        // Show the CHOSEN included service (selectedPackageService); fall back to
-        // selectedService — which holds the PACKAGE name — only when the bundle
-        // has a single service (no picker, so package name is the wash name).
-        final coveredService = bookingState.selectedPackageService ??
+        final coveredService =
+            bookingState.selectedPackageService ??
             (bookingState.packageServices.length <= 1
                 ? bookingState.selectedService
                 : null);
@@ -137,18 +129,13 @@ class PackageAddonPaymentBottomSheet extends StatelessWidget {
                       ),
                       const SizedBox(height: 24),
 
-                      // Cost summary. The chosen wash service sits at the top
-                      // (covered by the package), followed by covered + paid
-                      // add-ons. No section header — the rows are self-describing.
                       if (hasAnyItem) ...[
-                        // Covered-by-package wash service (0.00, de-emphasized).
                         if (hasCoveredService)
                           _coveredRow(
                             context: context,
                             width: width,
                             name: serviceName,
                           ),
-                        // Covered-by-package add-ons (0.00, de-emphasized).
                         ...coveredAddons.map(
                           (item) => _coveredRow(
                             context: context,
@@ -192,40 +179,39 @@ class PackageAddonPaymentBottomSheet extends StatelessWidget {
                             ),
                           ),
                         ),
-                        // Total reflects only the PAID sum (covered items at
-                        // 0.00 are display-only). Shown only when paying.
+
                         if (paidAddons.isNotEmpty) ...[
-                        const Divider(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              LocaleKeys.bookings_total.tr(context: context),
-                              style: AppTextStyles.medium14.copyWith(
-                                color: context.colors.textPrimary,
+                          const Divider(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                LocaleKeys.bookings_total.tr(context: context),
+                                style: AppTextStyles.medium14.copyWith(
+                                  color: context.colors.textPrimary,
+                                ),
                               ),
-                            ),
-                            Row(
-                              children: [
-                                Text(
-                                  total.toStringAsFixed(2),
-                                  style: AppTextStyles.medium16.copyWith(
-                                    color: context.colors.primary,
+                              Row(
+                                children: [
+                                  Text(
+                                    total.toStringAsFixed(2),
+                                    style: AppTextStyles.medium16.copyWith(
+                                      color: context.colors.primary,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(width: 4),
-                                SvgPicture.asset(
-                                  AppAssets.currency,
-                                  width: width * 0.04,
-                                  colorFilter: ColorFilter.mode(
-                                    context.colors.primary,
-                                    BlendMode.srcIn,
+                                  const SizedBox(width: 4),
+                                  SvgPicture.asset(
+                                    AppAssets.currency,
+                                    width: width * 0.04,
+                                    colorFilter: ColorFilter.mode(
+                                      context.colors.primary,
+                                      BlendMode.srcIn,
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ],
                         const SizedBox(height: 24),
                       ],
@@ -250,8 +236,6 @@ class PackageAddonPaymentBottomSheet extends StatelessWidget {
     );
   }
 
-  /// A de-emphasized line for a package-covered item, shown at SAR 0.00 for
-  /// full breakdown transparency (UC-C13). Display-only — never summed.
   Widget _coveredRow({
     required BuildContext context,
     required double width,

@@ -3,19 +3,6 @@ import 'package:flutter_chat_core/flutter_chat_core.dart';
 import '../../data/enums/chat_sender_role_enum.dart';
 import '../../data/models/message_model.dart';
 
-/// Maps our wire [MessageModel] to the flutter_chat_ui [Message] union.
-///
-/// Why hand-mapping (not `Message.fromJson`): the freezed `Message` timestamps
-/// use `@EpochDateTimeConverter` (epoch millis), but our `createdAt`/`readAt`
-/// are ISO-8601 Instant STRINGS — so we `DateTime.parse` them ourselves.
-///
-/// Author IDs are role-derived (not the raw senderId) so bubble alignment and
-/// [resolveUser] labelling are deterministic regardless of whether the backend
-/// senderId equals the local user id:
-///   CUSTOMER      -> currentUserId (renders as "me", trailing side)
-///   SUPPORT_AGENT -> [supportAuthorId]
-///   WORKER        -> [workerAuthorId]
-///   SYSTEM        -> [systemAuthorId] (rendered as a centered system bubble)
 class MessageMapper {
   static const String supportAuthorId = 'aqua_support_agent';
   static const String workerAuthorId = 'aqua_worker';
@@ -49,7 +36,6 @@ class MessageMapper {
         ? MessageStatus.seen
         : MessageStatus.delivered;
 
-    // SYSTEM auto-replies render as a distinct centered system bubble.
     if (model.senderRole.isSystem) {
       return Message.system(
         id: model.id,

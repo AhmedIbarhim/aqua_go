@@ -22,24 +22,13 @@ class MapsCubit extends Cubit<MapsState> {
   Timer? _debounce;
   StreamSubscription<ServiceStatus>? _serviceStatusSubscription;
 
-  // PH1-005: one Google billing session groups the autocomplete calls of a
-  // single search until the user picks a result (or clears). Minted lazily on
-  // the first keystroke; reset once a place is selected or the search clears.
   static const _uuid = Uuid();
   String? _sessionToken;
 
   String _currentSessionToken() => _sessionToken ??= _uuid.v4();
 
-  /// True once [seedLocation] has run (edit path). Prevents the location-service
-  /// stream from recentering the camera onto current GPS and clobbering the
-  /// seeded saved location (AQG-243).
   bool _editSeeded = false;
 
-  /// Bounds the platform location fix in [determinePosition]. Without this,
-  /// a device that never gets a fix (indoors, GPS off, airplane mode, or the
-  /// iOS Simulator's "Location > None") leaves `getCurrentPosition` awaiting
-  /// forever, so `isLoading` never clears and the screen is stuck on a
-  /// spinner with no escape.
   static const Duration _positionTimeLimit = Duration(seconds: 15);
 
   void _monitorLocationService() {
@@ -48,8 +37,6 @@ class MapsCubit extends Cubit<MapsState> {
     ) {
       if (status == ServiceStatus.enabled) {
         emit(state.copyWith(isLocationServiceEnabled: true));
-        // In edit mode the camera is already seeded to the saved location —
-        // don't recenter to current GPS.
         if (!_editSeeded) {
           determinePosition();
         }
@@ -115,12 +102,6 @@ class MapsCubit extends Cubit<MapsState> {
 
       getAddressFromLatLng(latLng);
     } on TimeoutException {
-      // A cold GPS fix routinely takes longer than _positionTimeLimit, so a
-      // timeout is NOT the same as "we have no idea where you are" — the OS
-      // usually still holds a recent fix from another app. Fall back to it and
-      // carry on silently; only tell the customer we failed when there is
-      // genuinely nothing to show. Reporting an error while the map then
-      // centres on their actual location reads as a bug, because it is one.
       final lastKnown = await Geolocator.getLastKnownPosition();
       if (lastKnown != null) {
         final latLng = LatLng(lastKnown.latitude, lastKnown.longitude);
@@ -192,7 +173,6 @@ class MapsCubit extends Cubit<MapsState> {
   Future<void> getPlaceDetails(String placeId) async {
     final result = await mapsRepository.getPlaceDetails(placeId);
 
-    // The billing session ends once a suggestion is resolved to a place.
     _sessionToken = null;
 
     result.fold((failure) => debugPrint(failure.message), (address) {
@@ -209,8 +189,6 @@ class MapsCubit extends Cubit<MapsState> {
     });
   }
 
-  /// Seeds the initial selected point (edit path) and recenters the camera.
-  /// Reverse-geocodes once so Confirm is valid before any pan.
   void seedLocation(LatLng latLng) {
     _editSeeded = true;
     emit(
@@ -223,13 +201,10 @@ class MapsCubit extends Cubit<MapsState> {
     getAddressFromLatLng(latLng);
   }
 
-  /// Called continuously while the map pans — cheap, no geocode.
-  /// The camera target IS the geographic point under the screen-center pin.
   void onCameraMove(LatLng target) {
     emit(state.copyWith(selectedLatLng: target));
   }
 
-  /// Called once when the map stops moving — reverse-geocode the final point.
   void onCameraIdle() {
     final latLng = state.selectedLatLng;
     if (latLng != null) {

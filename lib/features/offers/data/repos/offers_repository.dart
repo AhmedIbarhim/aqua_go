@@ -13,10 +13,6 @@ class OffersRepository {
 
   OffersRepository(this._offersDataSource);
 
-  /// A payload this client could not read. `Failure.message` is customer-facing
-  /// text, so it carries the localized generic and nothing else — an exception
-  /// string is developer detail, in English, and belongs in the log
-  /// (`server_failure.dart` states the same rule for the 404 path).
   static ServerFailure _unreadable(Object error, StackTrace stackTrace) {
     developer.log(
       'Offers parsing exception: $error',
@@ -26,16 +22,16 @@ class OffersRepository {
     return ServerFailure(LocaleKeys.snackbar_default_error.tr());
   }
 
-  /// GET /api/public/offers — already ordered endsAt ASC by the backend, so the
-  /// wire order is preserved verbatim (no client-side re-sort here; the offers
-  /// screen re-sorts defensively for its own contract).
   Future<Either<Failure, List<CustomerOfferModel>>> fetchOffers() async {
     final result = await _offersDataSource.getOffers();
     return result.fold((failure) => Left(failure), (data) {
       try {
         final List<dynamic> list = data as List<dynamic>;
         final parsed = list
-            .map((json) => CustomerOfferModel.fromJson(json as Map<String, dynamic>))
+            .map(
+              (json) =>
+                  CustomerOfferModel.fromJson(json as Map<String, dynamic>),
+            )
             .toList();
         return Right(parsed);
       } catch (e, stackTrace) {
@@ -44,9 +40,6 @@ class OffersRepository {
     });
   }
 
-  /// GET /api/public/offers/{id} — the backend returns 404 for an INELIGIBLE
-  /// offer as well as an ABSENT one (deliberately indistinguishable, UCC23), so
-  /// the caller must render one neutral "offer unavailable" state for the Left.
   Future<Either<Failure, CustomerOfferModel>> fetchOffer(String offerId) async {
     final result = await _offersDataSource.getOffer(offerId);
     return result.fold((failure) => Left(failure), (data) {

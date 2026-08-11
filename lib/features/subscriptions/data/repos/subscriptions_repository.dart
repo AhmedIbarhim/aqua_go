@@ -65,9 +65,6 @@ class SubscriptionsRepository {
     });
   }
 
-  /// Pay-before-create step 1 for subscriptions (spec §4.3): re-validates the
-  /// package + customer and returns the SDK payload. No PSP call.
-  /// Idempotency key: `subscription-payment-init:{customerId}:{packageId}`.
   Future<Either<Failure, PaymentInitModel>> subscriptionPaymentInit({
     required String packageId,
     required String customerId,
@@ -84,20 +81,17 @@ class SubscriptionsRepository {
     return result.fold((failure) => Left(failure), (data) {
       if (data != null) {
         try {
-          return Right(
-            PaymentInitModel.fromJson(data as Map<String, dynamic>),
-          );
+          return Right(PaymentInitModel.fromJson(data as Map<String, dynamic>));
         } catch (e) {
           return Left(ServerFailure('Parsing error: $e'));
         }
       }
-      return const Left(ServerFailure('Failed to initialize subscription payment'));
+      return const Left(
+        ServerFailure('Failed to initialize subscription payment'),
+      );
     });
   }
 
-  /// Pay-before-confirm step 1 for wash add-ons (spec §4.4 / A2): computes the
-  /// payable add-on delta and returns the SDK payload. No PSP call.
-  /// Idempotency key: `wash-addon-payment-init:{washId}`.
   Future<Either<Failure, PaymentInitModel>> washAddonPaymentInit({
     required String subscriptionId,
     required String washId,
@@ -115,14 +109,14 @@ class SubscriptionsRepository {
     return result.fold((failure) => Left(failure), (data) {
       if (data != null) {
         try {
-          return Right(
-            PaymentInitModel.fromJson(data as Map<String, dynamic>),
-          );
+          return Right(PaymentInitModel.fromJson(data as Map<String, dynamic>));
         } catch (e) {
           return Left(ServerFailure('Parsing error: $e'));
         }
       }
-      return const Left(ServerFailure('Failed to initialize wash add-on payment'));
+      return const Left(
+        ServerFailure('Failed to initialize wash add-on payment'),
+      );
     });
   }
 
@@ -130,10 +124,7 @@ class SubscriptionsRepository {
     SubscriptionRequestModel subscriptionRequest,
   ) async {
     final body = subscriptionRequest.toJson();
-    // Deterministic pay-before-create key per CLAUDE.md §10:
-    // subscription-subscribe:{customerId}:{packageId}:{nonce}
-    // The nonce is generated client-side and stored on the request model so the
-    // same nonce is used across retries of the same subscription attempt.
+
     final customerId = FetchUserData.getUserId() ?? '';
     final nonce = subscriptionRequest.idempotencyNonce ?? '';
     final idempotencyKey =

@@ -71,8 +71,6 @@ class _SplashViewState extends State<SplashView>
     );
   }
 
-  /// Lands on the authenticated home shell, then consumes any cold-start
-  /// push-tap deep-link parked before the router/auth gate was ready.
   void _goToLayout() {
     context.pushReplacementNamed(Routes.layout);
     consumePendingDeepLink();
@@ -82,8 +80,6 @@ class _SplashViewState extends State<SplashView>
     await Future.delayed(const Duration(seconds: 3));
     if (!mounted) return;
 
-    // install-marker gate: SharedPrefs is wiped on reinstall but
-    // Keychain survives, so an absent marker means any stored token is stale.
     final installed = CacheClient.getBool(kSessionInstallMarker);
     if (!installed) {
       await locator<AuthRepository>().purgeLocalSession();
@@ -101,9 +97,6 @@ class _SplashViewState extends State<SplashView>
       return;
     }
 
-    // PH1-008/024: rehydrate the in-memory user cache from secure storage once
-    // at cold start (getUser() no longer reads disk). Token-gated inside
-    // restoreCachedUser, so a stale blob is never resurrected without a token.
     await locator<AuthRepository>().restoreCachedUser();
     if (!mounted) return;
 
@@ -112,18 +105,11 @@ class _SplashViewState extends State<SplashView>
 
     result.fold(
       (failure) async {
-        // Log out ONLY on a genuine 401 (refresh already exhausted by the
-        // RefreshTokenInterceptor before refreshProfile surfaces unauthorized).
-        // Everything else — 5XX (server), forbidden, notFound, unknown, network,
-        // timeout — is TRANSIENT: keep the session and apply offline grace so a
-        // backend hiccup on cold start never logs the user out.
         if (failure.type == FailureType.unauthorized) {
-          // Broken/expired session — log out fully and go to login.
           await locator<AuthRepository>().logout();
           if (!mounted) return;
           context.pushReplacementNamed(Routes.login);
         } else {
-          // Offline grace: trust cached identity if complete.
           final cached = locator<AuthRepository>().getUser();
           if (cached != null && _isProfileComplete(cached)) {
             _goToLayout();

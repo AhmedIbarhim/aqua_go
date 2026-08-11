@@ -39,11 +39,7 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
   @override
   void initState() {
     super.initState();
-    // Lock the price at booking INITIATION: as soon as the priced details
-    // screen mounts, capture a fresh server quote that freezes BOTH the service
-    // total and every selected add-on. The displayed total reads from this
-    // quote only — never from the (potentially stale) live catalog snapshot —
-    // so later admin price edits affect only NEW bookings.
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
       final cubit = context.read<BookingCubit>();
@@ -63,9 +59,6 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
     super.dispose();
   }
 
-  /// Re-locks the price after an add-on toggle. Debounced so rapid toggles
-  /// collapse into a single quote refresh. Service flow only — the package
-  /// flow uses the wash charge-preview path, not the service quote.
   void _scheduleQuoteRefresh(BookingState state) {
     if (!state.flowConfig.requiresQuote) return;
     _quoteDebounce?.cancel();
@@ -75,24 +68,6 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
     );
   }
 
-  /// Re-prices the current selection WITHOUT any promo or offer — the price
-  /// this screen shows is always the undiscounted one.
-  ///
-  /// The customer can reach this screen with a code already applied: they took
-  /// an offer, or typed a code on the summary, then came back to change an
-  /// add-on. This screen has no promo affordance of any kind, so pricing with
-  /// the code would show a total that nothing on screen explains. The owner's
-  /// ruling (plan §6.93) is that the discount appears only from the payment
-  /// page onward, where the summary's original → discount → total breakdown
-  /// says where it came from.
-  ///
-  /// Bare is a DISPLAY choice, not a removal: the applied code and offer id stay
-  /// on the cubit state, and the summary re-quotes with them on entry. Dropping
-  /// them here would silently un-take the offer the customer chose.
-  ///
-  /// A code that has gone dead therefore cannot be detected here — nothing is
-  /// sent to reject. That rejection surfaces on the summary, which is where the
-  /// code is actually applied and which already states the server's reason.
   void _repriceForDisplay() async {
     if (!mounted) return;
     await context.read<BookingCubit>().repriceForDisplayWithoutPromo();

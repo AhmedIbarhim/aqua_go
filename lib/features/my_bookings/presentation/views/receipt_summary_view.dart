@@ -107,23 +107,13 @@ class ReceiptSummaryView extends StatelessWidget {
   }
 }
 
-/// Fetches the receipt PDF through the app's authenticated Dio client,
-/// writes an app-private copy, best-effort-reveals a second copy in the
-/// platform's Downloads / Files surface, then opens the private copy in the
-/// native viewer.
-///
-/// This used to be `launchUrl(Endpoints.baseUrl + ...)` handed to the system
-/// browser — that request carried no `Authorization` header against an
-/// endpoint that is JWT-authenticated AND ownership-gated, so it could only
-/// ever 401. See git history on this file for the prior implementation.
 class _DownloadReceiptButton extends StatefulWidget {
   const _DownloadReceiptButton({required this.booking});
 
   final BookingResponseModel booking;
 
   @override
-  State<_DownloadReceiptButton> createState() =>
-      _DownloadReceiptButtonState();
+  State<_DownloadReceiptButton> createState() => _DownloadReceiptButtonState();
 }
 
 class _DownloadReceiptButtonState extends State<_DownloadReceiptButton> {
@@ -148,7 +138,11 @@ class _DownloadReceiptButtonState extends State<_DownloadReceiptButton> {
               shape: BoxShape.circle,
               border: Border.all(color: Colors.black, width: 1.5),
             ),
-            child: Icon(Icons.arrow_downward, size: sw(14), color: Colors.black),
+            child: Icon(
+              Icons.arrow_downward,
+              size: sw(14),
+              color: Colors.black,
+            ),
           );
 
     return BottomActionSheetContainer(
@@ -168,8 +162,9 @@ class _DownloadReceiptButtonState extends State<_DownloadReceiptButton> {
 
     setState(() => _downloading = true);
     try {
-      final result =
-          await locator<MyBookingsRepository>().downloadReceiptPdf(bookingId);
+      final result = await locator<MyBookingsRepository>().downloadReceiptPdf(
+        bookingId,
+      );
       if (!mounted) return;
 
       final bytes = result.fold<Uint8List?>((failure) {
@@ -181,13 +176,6 @@ class _DownloadReceiptButtonState extends State<_DownloadReceiptButton> {
       final referenceNumber = widget.booking.referenceNumber ?? bookingId;
       final filename = 'AquaGo-$referenceNumber.pdf';
 
-      // The app-private copy is what actually gets opened below — it is
-      // written the same way on both platforms via path_provider, so
-      // opening it never depends on a native round trip succeeding. On
-      // Android this lands under internal per-app storage (covered by the
-      // FileProvider open_file_android's own manifest already declares); on
-      // iOS it lands in ~/Documents, the same directory the native "reveal"
-      // step below writes into.
       final docsDir = await getApplicationDocumentsDirectory();
       final privateFile = File('${docsDir.path}/$filename');
       await privateFile.writeAsBytes(bytes, flush: true);
@@ -203,14 +191,10 @@ class _DownloadReceiptButtonState extends State<_DownloadReceiptButton> {
           LocaleKeys.receipt_storage_permission_denied.tr(context: context),
         );
       }
-      // ReceiptRevealFailed is swallowed on purpose: the private copy above
-      // still exists and stays openable even when the best-effort visible
-      // copy could not be written.
 
-      // iOS goes through our own channel (QuickLook presented from the root view
-      // controller); it returns false on Android, which falls through to
-      // open_file's ACTION_VIEW intent.
-      final openedNatively = await ReceiptFilesChannel.openFile(privateFile.path);
+      final openedNatively = await ReceiptFilesChannel.openFile(
+        privateFile.path,
+      );
       if (!mounted) return;
       if (openedNatively) return;
 

@@ -4,9 +4,6 @@ import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/themes/app_colors.dart';
 import '../../../../generated/locale_keys.g.dart';
 
-/// Support-ticket lifecycle status. RESOLVED / CLOSED threads are treated as
-/// "send-to-reopen": the composer stays enabled and the backend auto-reopens a
-/// CUSTOMER_SUPPORT thread when the customer sends a new message.
 enum ChatThreadStatus {
   open,
   assigned,
@@ -40,7 +37,6 @@ enum ChatThreadStatus {
     }
   }
 
-  /// A resolved/closed thread reopens on the next customer message.
   bool get isReopenable =>
       this == ChatThreadStatus.resolved || this == ChatThreadStatus.closed;
 

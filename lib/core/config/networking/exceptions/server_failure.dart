@@ -7,17 +7,6 @@ import 'failure.dart';
 class ServerFailure extends Failure {
   static String get _defaultMessage => LocaleKeys.snackbar_default_error.tr();
 
-  /// The last segment of the RFC 9457 `type` URI the server answered with —
-  /// e.g. `slot-no-longer-available` for
-  /// `https://api.aquago.sa/errors/slot-no-longer-available`. Null when the
-  /// body carried no `type` (a transport failure, a non-ProblemDetail body, a
-  /// gateway 5xx).
-  ///
-  /// This is the ONLY machine-readable statement of WHICH rejection fired.
-  /// `message` is localized prose for the customer and `type` is a coarse
-  /// transport class; neither can distinguish two rejections that share a
-  /// status code, and some of those differ in whether money moved. Logic that
-  /// turns on a specific server rejection reads this, never the message.
   final String? slug;
 
   const ServerFailure(
@@ -119,16 +108,11 @@ class ServerFailure extends Failure {
         return ServerFailure(message, type: FailureType.forbidden, slug: slug);
 
       case StatusCodes.notFound:
-        // Surface the localized server `detail`/`title` when the body carries a
-        // ProblemDetail; otherwise `_extractErrorMessage` already returns the
-        // localized generic (`snackbar_default_error`) — no English literal.
         return ServerFailure(message, type: FailureType.notFound, slug: slug);
 
       case StatusCodes.internalServerError:
       case StatusCodes.badGateway:
       case StatusCodes.serviceUnavailable:
-        // 5xx bodies are usually non-localized; keep the generic maintenance
-        // message. Only prefer the server `detail` if one is actually present.
         return ServerFailure(
           _hasProblemDetail(response)
               ? message
@@ -142,10 +126,6 @@ class ServerFailure extends Failure {
     }
   }
 
-  /// Reads the last path segment of the RFC 9457 `type` URI, host-agnostically
-  /// so a change of API host cannot silently stop a rejection being recognised.
-  /// Returns null for the RFC's `about:blank` default and for any body that
-  /// carries no usable `type`.
   static String? _extractSlug(dynamic response) {
     if (response is! Map) return null;
     final raw = response['type']?.toString();
@@ -154,10 +134,6 @@ class ServerFailure extends Failure {
     return segment.isEmpty ? null : segment;
   }
 
-  /// Joins the server-localized `message` strings from an RFC 9457
-  /// `violations[]` array. `field`/`code` are reserved for LOGIC only and are
-  /// never surfaced as display text. Returns null when no displayable message
-  /// is present.
   static String? _extractViolations(dynamic response) {
     if (response is! Map) return null;
     final violations = response['violations'];
@@ -172,9 +148,6 @@ class ServerFailure extends Failure {
     return messages.join('\n');
   }
 
-  /// True when the response body carries a localized RFC 9457 ProblemDetail
-  /// string (`detail` or `title`), meaning `_extractErrorMessage` will return
-  /// server-localized text rather than the generic fallback.
   static bool _hasProblemDetail(dynamic response) {
     if (response is! Map) return false;
     final detail = response['detail']?.toString();
@@ -189,12 +162,10 @@ class ServerFailure extends Failure {
         return _defaultMessage;
       }
 
-      /// detail (RFC 9457 — canonical localized server string; wins)
       if (response['detail'] != null) {
         return response['detail'].toString();
       }
 
-      /// violations[] (joined server `message` strings; logic uses code/field)
       final violations = _extractViolations(response);
       if (violations != null) {
         return violations;

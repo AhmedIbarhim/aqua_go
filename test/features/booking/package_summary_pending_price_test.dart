@@ -5,7 +5,7 @@ import 'package:aqua_go/features/booking/domain/configs/booking_flow_config.dart
 import 'package:aqua_go/features/booking/presentation/controllers/booking_state.dart';
 import 'package:aqua_go/features/booking/presentation/widgets/booking_summary_widgets/booking_payable_total.dart';
 import 'package:aqua_go/features/booking/presentation/widgets/booking_summary_widgets/price_unavailable_card.dart';
-import 'package:aqua_go/features/booking/presentation/widgets/payment_summary_card.dart';
+import 'package:aqua_go/features/booking/presentation/widgets/booking_summary_widgets/payment_summary_card.dart';
 import 'package:dartz/dartz.dart' hide State;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -60,19 +60,22 @@ void main() {
       expect(
         cubit.state.quote,
         isNull,
-        reason: 'the wash-charge preview must still be in flight for this to '
+        reason:
+            'the wash-charge preview must still be in flight for this to '
             'test anything',
       );
       expect(
         find.byType(PaymentSummaryCard),
         findsNothing,
-        reason: 'with no preview every figure on the card is `?? 0`, so it '
+        reason:
+            'with no preview every figure on the card is `?? 0`, so it '
             'prices a payable wash at nothing',
       );
       expect(
         find.byType(PaymentSummaryShimmer),
         findsOneWidget,
-        reason: 'the section keeps its place with a placeholder — the absence '
+        reason:
+            'the section keeps its place with a placeholder — the absence '
             'of a price, not a price of nothing',
       );
 
@@ -124,7 +127,8 @@ void main() {
       expect(
         cubit.state.status,
         BookingStatus.failure,
-        reason: 'the screen WAITS on this call, so a silent `initial` would '
+        reason:
+            'the screen WAITS on this call, so a silent `initial` would '
             'leave a placeholder and a dead Confirm button with nothing saying '
             'why — the service flow reports the same failure',
       );
@@ -146,7 +150,8 @@ void main() {
       expect(
         find.byType(PriceUnavailableCard),
         findsOneWidget,
-        reason: 'the customer is told why, and given a way to re-fire the '
+        reason:
+            'the customer is told why, and given a way to re-fire the '
             'preview without leaving the flow',
       );
     });
@@ -223,7 +228,8 @@ class _PreviewBookingRepo extends RecordingBookingRepo {
   int previewCalls = 0;
 
   @override
-  Future<Either<Failure, Map<String, dynamic>>> previewScheduleSubscriptionWash({
+  Future<Either<Failure, Map<String, dynamic>>>
+  previewScheduleSubscriptionWash({
     required String subscriptionId,
     required String washId,
     required Map<String, dynamic> scheduleData,
@@ -250,7 +256,8 @@ class _PreviewBookingRepo extends RecordingBookingRepo {
 /// costs whatever it costs; this client simply does not know it.
 class _FailingPreviewBookingRepo extends RecordingBookingRepo {
   @override
-  Future<Either<Failure, Map<String, dynamic>>> previewScheduleSubscriptionWash({
+  Future<Either<Failure, Map<String, dynamic>>>
+  previewScheduleSubscriptionWash({
     required String subscriptionId,
     required String washId,
     required Map<String, dynamic> scheduleData,

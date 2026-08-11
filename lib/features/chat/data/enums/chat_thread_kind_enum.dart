@@ -1,7 +1,3 @@
-/// Thread kind — a customer support ticket or a customer↔worker thread.
-///
-/// The customer support inbox surfaces CUSTOMER_SUPPORT threads; CUSTOMER_WORKER
-/// is modelled for completeness (worker-linked threads share the same shape).
 enum ChatThreadKind {
   customerSupport,
   customerWorker;

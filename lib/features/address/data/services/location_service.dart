@@ -6,10 +6,6 @@ import '../../../../core/config/local_storage/shared_prefs.dart';
 import '../../../../core/config/networking/endpoints.dart';
 import '../../../../core/constants.dart';
 
-/// PH1-005: address lookups go through the backend `geo/places` proxy — the
-/// Google Maps key lives on the server (R-19 adapter), never in the shipped app.
-/// The shared [APIClient] attaches the customer JWT for these relative-path
-/// calls. Responses are tech-neutral DTOs (NOT raw Google JSON).
 class LocationService {
   final APIClient apiClient;
 
@@ -18,8 +14,8 @@ class LocationService {
   /// Backend language code derived from the persisted UI language.
   String get _lang =>
       CacheClient.getString(kLanguage, defaultValue: kArabicLang) == kArabicLang
-          ? 'ar'
-          : 'en';
+      ? 'ar'
+      : 'en';
 
   /// [sessionToken] groups the autocomplete calls of one search session for
   /// Google billing — mint one UUID per session, reuse until a result is picked.

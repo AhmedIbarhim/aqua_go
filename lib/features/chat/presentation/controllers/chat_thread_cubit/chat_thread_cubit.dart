@@ -17,16 +17,8 @@ import '../../mappers/message_mapper.dart';
 
 part 'chat_thread_state.dart';
 
-/// Semantic outcome of a one-shot action; the view maps it to localised text.
-enum ChatNoticeCode {
-  sendFailed,
-  uploadFailed,
-  reportSucceeded,
-  reportFailed,
-}
+enum ChatNoticeCode { sendFailed, uploadFailed, reportSucceeded, reportFailed }
 
-/// A retained outgoing send: the request body + the idempotency key minted for
-/// its first attempt. Reused verbatim on retry so the backend dedups.
 class _PendingSend {
   final SendMessageRequest request;
   final String idempotencyKey;
@@ -34,14 +26,6 @@ class _PendingSend {
   const _PendingSend({required this.request, required this.idempotencyKey});
 }
 
-/// Drives a single open thread: loads the message history into an
-/// [InMemoryChatController], marks the thread read, polls for new replies every
-/// ~5s, sends messages optimistically (insert → reconcile), loads older pages,
-/// reports messages, and handles the attachment (presign → PUT → send) flow.
-///
-/// The Chat widget listens to [chatController] directly, so message-list changes
-/// do not flow through cubit state — cubit state only carries thread meta +
-/// transient flags (sending / uploading / loading-older) and one-shot notices.
 class ChatThreadCubit extends Cubit<ChatThreadState> {
   final ChatRepository _repository;
   final String threadId;
@@ -51,10 +35,8 @@ class ChatThreadCubit extends Cubit<ChatThreadState> {
 
   ThreadModel? _thread;
 
-  /// Server message ids currently in the controller (excludes optimistic temps).
   final Set<String> _knownIds = {};
 
-  /// Cursor to the NEXT OLDER page (from the newest-first messages endpoint).
   String? _olderCursor;
   bool _hasMoreOlder = false;
   bool _isLoadingOlder = false;
@@ -65,9 +47,6 @@ class ChatThreadCubit extends Cubit<ChatThreadState> {
   int _noticeTick = 0;
   int _tempCounter = 0;
 
-  /// Retained outgoing sends keyed by their optimistic temp id, so a failed send
-  /// can be retried with the SAME idempotency key (backend dedups → a resend
-  /// never duplicates the row). Entries are dropped once the server confirms.
   final Map<String, _PendingSend> _pendingSends = {};
 
   static const int _pageSize = 20;
@@ -92,14 +71,9 @@ class ChatThreadCubit extends Cubit<ChatThreadState> {
         category: ChatCategory.general,
       );
 
-  // ---------------------------------------------------------------------------
-  // Load + polling
-  // ---------------------------------------------------------------------------
-
   Future<void> open() async {
     emit(ChatThreadLoading());
 
-    // Resolve thread meta (status/subject) when deep-linked without it.
     if (_thread == null) {
       await _resolveThreadMeta();
     }
@@ -111,29 +85,29 @@ class ChatThreadCubit extends Cubit<ChatThreadState> {
 
     if (_disposed) return;
 
-    await result.fold((failure) async {
-      emit(ChatThreadError(failure.message));
-    }, (page) async {
-      // API is newest-first; the controller wants oldest-first (index 0 = oldest).
-      final chronological = page.items.reversed.toList();
-      final mapped = chronological
-          .map((m) => MessageMapper.toChatMessage(m, _currentUserId))
-          .toList();
-      _knownIds
-        ..clear()
-        ..addAll(chronological.map((m) => m.id));
-      await chatController.setMessages(mapped);
-      _olderCursor = page.nextCursor;
-      _hasMoreOlder = page.hasMore;
+    await result.fold(
+      (failure) async {
+        emit(ChatThreadError(failure.message));
+      },
+      (page) async {
+        final chronological = page.items.reversed.toList();
+        final mapped = chronological
+            .map((m) => MessageMapper.toChatMessage(m, _currentUserId))
+            .toList();
+        _knownIds
+          ..clear()
+          ..addAll(chronological.map((m) => m.id));
+        await chatController.setMessages(mapped);
+        _olderCursor = page.nextCursor;
+        _hasMoreOlder = page.hasMore;
 
-      _markReadSilently();
-      _emitLoaded();
-      _startPolling();
-    });
+        _markReadSilently();
+        _emitLoaded();
+        _startPolling();
+      },
+    );
   }
 
-  /// Best-effort thread-meta resolution for a deep-linked thread: scans the
-  /// first page of the inbox for the id. Falls back to an OPEN placeholder.
   Future<void> _resolveThreadMeta() async {
     final result = await _repository.getThreads(limit: _pageSize);
     result.fold((_) {}, (page) {
@@ -163,23 +137,8 @@ class ChatThreadCubit extends Cubit<ChatThreadState> {
     result.fold((_) {}, (page) => _reconcile(page.items));
   }
 
-  /// Manual refresh: re-poll newest immediately. No caller today — the app-bar
-  /// action was removed once the background poll made it redundant — kept as
-  /// the entry point for a pull-to-refresh gesture, the only place a manual
-  /// refresh still makes sense on this screen.
   Future<void> refresh() => _poll();
 
-  /// True when [existing] and [mapped] are the same message differing ONLY by
-  /// the attachment's presigned URL.
-  ///
-  /// Garage links are signed with a 1-hour expiry and the server mints a FRESH
-  /// signature every time it reads the message, so an unchanged attachment comes
-  /// back with a different `source` on EVERY poll. Treated as a real change,
-  /// that re-issued a `updateMessage` each tick; the bubble rebuilt with a new
-  /// URL, cached_network_image saw an unfamiliar key, and the download restarted
-  /// from zero — a large photo could never finish before the next tick killed
-  /// it, so it spun forever. The bytes behind the URL are immutable (a message's
-  /// attachment is written once), so a signature-only difference is not a change.
   static bool _differsOnlyBySignedUrl(Message existing, Message mapped) {
     if (existing is ImageMessage && mapped is ImageMessage) {
       return mapped.copyWith(source: existing.source) == existing;
@@ -190,9 +149,6 @@ class ChatThreadCubit extends Cubit<ChatThreadState> {
     return false;
   }
 
-  /// Merges a freshly fetched newest-first page into the controller: appends
-  /// unseen messages in chronological order and updates changed ones (e.g. a
-  /// sent message becoming "seen").
   Future<void> _reconcile(List<MessageModel> newestFirst) async {
     final chronological = newestFirst.reversed.toList();
     bool inboundArrived = false;
@@ -267,8 +223,6 @@ class ChatThreadCubit extends Cubit<ChatThreadState> {
       index: tempId,
     );
 
-    // Retain the request + idempotency key so a failed send can be retried with
-    // the SAME key (see [resendMessage] / [_dispatchSend]).
     _pendingSends[tempId] = _PendingSend(
       request: SendMessageRequest(body: body),
       idempotencyKey: idempotencyKey,
@@ -286,12 +240,6 @@ class ChatThreadCubit extends Cubit<ChatThreadState> {
     await _dispatchSend(tempId);
   }
 
-  /// Re-sends a message that previously failed (tap-to-resend on a failed
-  /// bubble). Flips the failed bubble back to "sending" IN PLACE (keeps its list
-  /// position) and re-runs the exact same send with the ORIGINAL idempotency
-  /// key, so the backend dedups and no duplicate row is created. No-op for
-  /// anything that is not a retryable failed text message (attachment sends have
-  /// no optimistic bubble, so nothing to retry there).
   Future<void> resendMessage(Message failedMessage) async {
     final tempId = failedMessage.id;
     if (!_pendingSends.containsKey(tempId)) return;
@@ -308,10 +256,6 @@ class ChatThreadCubit extends Cubit<ChatThreadState> {
     await _dispatchSend(tempId);
   }
 
-  /// Shared POST path for the initial send and every retry. Reuses the request +
-  /// idempotency key retained under [tempId]: on success reconciles the
-  /// optimistic bubble to the server message; on failure flips it back to
-  /// failed and surfaces a notice.
   Future<void> _dispatchSend(String tempId) async {
     final pending = _pendingSends[tempId];
     if (pending == null) return;
@@ -324,22 +268,21 @@ class ChatThreadCubit extends Cubit<ChatThreadState> {
     );
     if (_disposed) return;
 
-    await result.fold((failure) async {
-      await _markOptimisticFailed(tempId);
-      _emitLoaded(isSending: false);
-      _emitNotice(ChatNoticeCode.sendFailed, detail: failure.message);
-    }, (serverMessage) async {
-      _pendingSends.remove(tempId);
-      await _settleOptimistic(tempId, serverMessage);
-      _reopenIfNeeded();
-      _emitLoaded(isSending: false);
-    });
+    await result.fold(
+      (failure) async {
+        await _markOptimisticFailed(tempId);
+        _emitLoaded(isSending: false);
+        _emitNotice(ChatNoticeCode.sendFailed, detail: failure.message);
+      },
+      (serverMessage) async {
+        _pendingSends.remove(tempId);
+        await _settleOptimistic(tempId, serverMessage);
+        _reopenIfNeeded();
+        _emitLoaded(isSending: false);
+      },
+    );
   }
 
-  /// Attachment flow: presign + PUT (via repo), then send-message referencing
-  /// the object key. No optimistic bubble — an [isUploading] flag drives the UI
-  /// and the server-returned message (with its download URL) is inserted on
-  /// success.
   Future<void> sendAttachment(File file) async {
     _emitLoaded(isUploading: true);
 
@@ -349,42 +292,48 @@ class ChatThreadCubit extends Cubit<ChatThreadState> {
     );
     if (_disposed) return;
 
-    await uploadResult.fold((failure) async {
-      _emitLoaded(isUploading: false);
-      _emitNotice(ChatNoticeCode.uploadFailed, detail: failure.message);
-    }, (upload) async {
-      final tempId = _nextTempId();
-      final idempotencyKey = IdempotencyKeyHelper.generate(
-        prefix: 'chat-message-send',
-        userId: _currentUserId,
-        requestId: threadId,
-        index: tempId,
-      );
-      final result = await _repository.sendMessage(
-        threadId: threadId,
-        request: SendMessageRequest(
-          body: '',
-          attachmentObjectKey: upload.objectKey,
-          attachmentSizeBytes: upload.sizeBytes,
-          attachmentMimeType: upload.mimeType,
-        ),
-        idempotencyKey: idempotencyKey,
-      );
-      if (_disposed) return;
-      await result.fold((failure) async {
+    await uploadResult.fold(
+      (failure) async {
         _emitLoaded(isUploading: false);
         _emitNotice(ChatNoticeCode.uploadFailed, detail: failure.message);
-      }, (serverMessage) async {
-        if (!_knownIds.contains(serverMessage.id)) {
-          await chatController.insertMessage(
-            MessageMapper.toChatMessage(serverMessage, _currentUserId),
-          );
-          _knownIds.add(serverMessage.id);
-        }
-        _reopenIfNeeded();
-        _emitLoaded(isUploading: false);
-      });
-    });
+      },
+      (upload) async {
+        final tempId = _nextTempId();
+        final idempotencyKey = IdempotencyKeyHelper.generate(
+          prefix: 'chat-message-send',
+          userId: _currentUserId,
+          requestId: threadId,
+          index: tempId,
+        );
+        final result = await _repository.sendMessage(
+          threadId: threadId,
+          request: SendMessageRequest(
+            body: '',
+            attachmentObjectKey: upload.objectKey,
+            attachmentSizeBytes: upload.sizeBytes,
+            attachmentMimeType: upload.mimeType,
+          ),
+          idempotencyKey: idempotencyKey,
+        );
+        if (_disposed) return;
+        await result.fold(
+          (failure) async {
+            _emitLoaded(isUploading: false);
+            _emitNotice(ChatNoticeCode.uploadFailed, detail: failure.message);
+          },
+          (serverMessage) async {
+            if (!_knownIds.contains(serverMessage.id)) {
+              await chatController.insertMessage(
+                MessageMapper.toChatMessage(serverMessage, _currentUserId),
+              );
+              _knownIds.add(serverMessage.id);
+            }
+            _reopenIfNeeded();
+            _emitLoaded(isUploading: false);
+          },
+        );
+      },
+    );
   }
 
   Future<void> reportMessage(String messageId) async {
@@ -401,11 +350,13 @@ class ChatThreadCubit extends Cubit<ChatThreadState> {
   // Helpers
   // ---------------------------------------------------------------------------
 
-  String _nextTempId() => 'temp_${DateTime.now().microsecondsSinceEpoch}_${_tempCounter++}';
+  String _nextTempId() =>
+      'temp_${DateTime.now().microsecondsSinceEpoch}_${_tempCounter++}';
 
-  /// Resolves an optimistic message once the server confirms it. Guards the poll
-  /// race: if a poll already inserted the real id, just drop the temp bubble.
-  Future<void> _settleOptimistic(String tempId, MessageModel serverMessage) async {
+  Future<void> _settleOptimistic(
+    String tempId,
+    MessageModel serverMessage,
+  ) async {
     final temp = _findById(tempId);
     if (temp == null) {
       _knownIds.add(serverMessage.id);

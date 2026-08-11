@@ -1,11 +1,5 @@
 import '../enums/chat_sender_role_enum.dart';
 
-/// A single chat message. Mirrors the backend `MessageView`.
-///
-/// Note: `createdAt` / `readAt` are ISO-8601 Instant STRINGS on the wire — they
-/// are parsed to [DateTime] only when mapping to the flutter_chat_ui `Message`
-/// (see [MessageMapper]); never round-trip this through `Message.fromJson`
-/// (that expects epoch-millis via @EpochDateTimeConverter).
 class MessageModel {
   final String id;
   final String threadId;

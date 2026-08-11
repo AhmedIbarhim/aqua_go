@@ -1,5 +1,3 @@
-/// PH1-005: mirrors the backend `PlaceAutocompleteResponse.Suggestion` DTO
-/// ({placeId, mainText, secondaryText}) — no longer raw Google predictions.
 class PlacePredictionModel {
   final String placeId;
   final String mainText;
@@ -19,7 +17,6 @@ class PlacePredictionModel {
     );
   }
 
-  /// Single-line label for the search-result row (main + secondary parts).
   String get description =>
       secondaryText.isEmpty ? mainText : '$mainText, $secondaryText';
 }

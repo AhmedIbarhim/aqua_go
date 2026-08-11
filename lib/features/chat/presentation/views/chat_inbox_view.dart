@@ -18,8 +18,6 @@ import '../controllers/chat_threads_cubit/chat_threads_cubit.dart';
 import '../widgets/chat_thread_card.dart';
 import '../widgets/new_ticket_sheet.dart';
 
-/// Support inbox — a list of the customer's ticket/support threads with
-/// pull-to-refresh, cursor pagination, an empty state and a "new ticket" action.
 class ChatInboxView extends StatefulWidget {
   const ChatInboxView({super.key});
 

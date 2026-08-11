@@ -1,8 +1,6 @@
 import '../enums/chat_category_enum.dart';
 import '../enums/chat_thread_kind_enum.dart';
 
-/// Body for `POST /chat/threads`. For a customer support ticket send
-/// kind=CUSTOMER_SUPPORT + category + the customer's free-text subject.
 class CreateThreadRequest {
   final ChatThreadKind kind;
   final ChatCategory category;

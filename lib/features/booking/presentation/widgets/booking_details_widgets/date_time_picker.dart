@@ -12,11 +12,9 @@ import '../../../data/models/availability_response_model.dart';
 class BookingDateTimePicker extends StatefulWidget {
   final DateTime? initialDate;
 
-  /// The already-selected slot, carried as the slot's own `start` instant.
   final DateTime? initialSlotStart;
   final Function(DateTime) onDateChanged;
 
-  /// Emits the picked slot's `start` instant — never a display label.
   final Function(DateTime) onSlotSelected;
   final List<AvailabilitySlot> availabilitySlots;
   final bool isLoading;
@@ -40,18 +38,9 @@ class _BookingDateTimePickerState extends State<BookingDateTimePicker> {
   DateTime? selectedSlotStart;
   late List<DateTime> dates;
 
-  /// Backend caps bookings to a rolling 7-day window
-  /// (MAX_BOOKING_HORIZON = Duration.ofDays(7) in BookingServiceImpl,
-  /// enforced by validateScheduleWindow for BOTH create and reschedule) —
-  /// the last bookable calendar day is today + 6. Offer EXACTLY that range so
-  /// no server-rejected day is ever selectable. Matches the worker app's
-  /// kUpcomingDayStripLength (worker-mobile reservations_screen.dart).
-  static const int _bookableDayCount = 7; // today .. today + 6
+  static const int _bookableDayCount = 7;
 
   List<DateTime> _generateDates(DateTime? initialDate) {
-    // A reschedule's initialDate is bound by the SAME backend window, so it can
-    // never validly exceed today + 6 — it is always inside this fixed strip.
-    // initialDate is intentionally ignored; the window is fixed, never extended.
     final today = DateUtils.dateOnly(DateTime.now());
     return List.generate(
       _bookableDayCount,

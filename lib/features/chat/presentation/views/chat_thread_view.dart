@@ -21,9 +21,6 @@ import '../controllers/chat_thread_cubit/chat_thread_cubit.dart';
 import '../mappers/message_mapper.dart';
 import '../widgets/chat_theme_builder.dart';
 
-/// A single support thread rendered with flutter_chat_ui. Wires the composer,
-/// attachment picker, long-press report, older-message pagination and the
-/// "resolved — send to reopen" banner to [ChatThreadCubit].
 class ChatThreadView extends StatelessWidget {
   const ChatThreadView({super.key});
 
@@ -31,8 +28,6 @@ class ChatThreadView extends StatelessWidget {
   Widget build(BuildContext context) {
     final currentUserId = FetchUserData.getUserId() ?? '';
 
-    // Pre-resolve the role labels here (with context) so resolveUser — a bare
-    // callback — can hand back localised display names.
     final meLabel = LocaleKeys.chat_role_you.tr(context: context);
     final supportLabel = LocaleKeys.chat_role_support_agent.tr(
       context: context,
@@ -75,9 +70,6 @@ class ChatThreadView extends StatelessWidget {
 
         return Scaffold(
           backgroundColor: context.colors.background,
-          // No manual refresh action: the thread already refreshes itself (the
-          // poll while the screen is open, plus the optimistic append on send),
-          // so the button only ever repeated work the screen does on its own.
           appBar: GenericAppBar(title: title, centerTitle: false),
           body: _buildBody(context, state, cubit, currentUserId, resolveUser),
         );
@@ -117,18 +109,9 @@ class ChatThreadView extends StatelessWidget {
                   _confirmReport(context, cubit, message, currentUserId);
                 },
             builders: Builders(
-              // flutter_chat_ui ships its OWN English defaults for the composer
-              // hint and the empty state ('Type a message' / 'No messages yet'),
-              // which easy_localization never sees — that is why this screen read
-              // as untranslated while the rest of the feature was fine. Both are
-              // overridden here; the package exposes no l10n hook, only builders.
               composerBuilder: (context) => Composer(
                 hintText: LocaleKeys.chat_type_a_message.tr(),
-                // The send glyph is directional — it points the way the message
-                // travels, i.e. along the reading direction. The asset points
-                // RIGHT, which is correct in LTR and backwards in Arabic, so it
-                // is mirrored for RTL. Only the ARROW flips; the composer's own
-                // layout is handled by Directionality and must not be touched.
+
                 sendIcon: Transform(
                   alignment: Alignment.center,
                   transform: Matrix4.diagonal3Values(
@@ -158,22 +141,13 @@ class ChatThreadView extends StatelessWidget {
               ),
               emptyChatListBuilder: (context) =>
                   EmptyChatList(text: LocaleKeys.chat_no_messages_yet.tr()),
-              // Anchor the list to the bottom (like every other messaging app):
-              // ChatAnimatedListReversed lays the CustomScrollView out with
-              // `reverse: true`, so a short thread sits at the bottom of the
-              // viewport instead of the top, and the view opens already
-              // scrolled to the newest message with no extra scroll call
-              // needed. `onEndReached` semantics are unchanged by `reversed`
-              // — it still fires on reaching the TOP (oldest), so pagination
-              // keeps loading older pages exactly as before.
+
               chatAnimatedListBuilder: (context, itemBuilder) =>
                   ChatAnimatedListReversed(
                     itemBuilder: itemBuilder,
                     onEndReached: () => cubit.loadOlder(),
                   ),
-              // Default text bubble, plus an obvious "tap to resend" affordance
-              // under any message that failed to send. RTL is automatic (the
-              // affordance aligns to the trailing/sender side).
+
               textMessageBuilder:
                   (
                     context,
@@ -200,12 +174,7 @@ class ChatThreadView extends StatelessWidget {
                       ],
                     );
                   },
-              // REQUIRED, not optional polish. flutter_chat_ui has no default
-              // widget for image or file messages — `_buildMessage` asserts on
-              // the zero-size SizedBox it falls back to, so a single attachment
-              // in the thread throws on every frame and the list never renders.
-              // MessageMapper emits Message.image / Message.file whenever the
-              // wire carries an attachmentDownloadUrl, so both must be provided.
+
               imageMessageBuilder:
                   (
                     context,
@@ -369,8 +338,6 @@ class _UploadingBar extends StatelessWidget {
   }
 }
 
-/// "Tap to resend" affordance shown under a message that failed to send.
-/// Tapping re-runs the send with the original idempotency key (no duplicate).
 class _ResendAffordance extends StatelessWidget {
   final VoidCallback onTap;
   const _ResendAffordance({required this.onTap});
@@ -400,10 +367,6 @@ class _ResendAffordance extends StatelessWidget {
   }
 }
 
-/// Shared shell for an attachment message — the sender-side alignment, the
-/// bubble tint, the rounded clip and the optional caption/resend row. Keeps the
-/// image and file bubbles from drifting apart, and keeps both aligned with the
-/// text bubble the package draws for us.
 class _AttachmentBubble extends StatelessWidget {
   final bool isSentByMe;
   final Widget child;
@@ -422,7 +385,6 @@ class _AttachmentBubble extends StatelessWidget {
     final hasCaption = caption != null && caption!.trim().isNotEmpty;
     return Column(
       mainAxisSize: MainAxisSize.min,
-      // Start/end, never left/right — the sender side flips with the locale.
       crossAxisAlignment: isSentByMe
           ? CrossAxisAlignment.end
           : CrossAxisAlignment.start,
@@ -463,17 +425,6 @@ class _AttachmentBubble extends StatelessWidget {
   }
 }
 
-/// A chat image, cached by MESSAGE ID rather than by URL.
-///
-/// The URL is a Garage presigned link: the signature rotates on every read, so
-/// the default cache key (the URL itself) would miss on every poll and re-download
-/// the whole photo. [cacheKey] pins the entry to the thing that is actually
-/// stable — the message id — because a message's attachment bytes are written
-/// once and never change. First view downloads; every view after that, in this
-/// session or a later one, is served from disk regardless of how many times the
-/// signature has been reissued.
-///
-/// Tapping opens the full-size viewer, which reuses the same cache entry.
 class _RemoteImage extends StatelessWidget {
   final String url;
   final String cacheKey;
@@ -515,8 +466,6 @@ class _RemoteImage extends StatelessWidget {
   }
 }
 
-/// Full-screen attachment viewer: pinch/pan over the SAME cached entry the
-/// bubble used, so opening it costs no second download.
 class _ImageViewer extends StatelessWidget {
   final String url;
   final String cacheKey;

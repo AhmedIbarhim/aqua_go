@@ -17,12 +17,6 @@ part 'language_state.dart';
 class LanguageCubit extends Cubit<LanguageState> {
   LanguageCubit() : super(LanguageInitial(initialLocale));
 
-  /// The app's start locale, read from the persisted language preference.
-  ///
-  /// THE single source: `launch_app` derives both easy_localization's
-  /// `startLocale` and the boot-time [Intl.defaultLocale] pin from this getter,
-  /// so no second, independently-maintained copy can drift out of sync with the
-  /// locale `context.isAr` reports.
   static Locale get initialLocale {
     final isArabic =
         CacheClient.getString(kLanguage, defaultValue: kArabicLang) ==
@@ -30,12 +24,6 @@ class LanguageCubit extends Cubit<LanguageState> {
     return isArabic ? const Locale('ar') : const Locale('en');
   }
 
-  /// Persists [newLocale], applies it to easy_localization, and re-pins
-  /// [Intl.defaultLocale] so every `DateFormat` built without an explicit
-  /// locale follows the language the customer picked in-app rather than the
-  /// phone's OS locale. Also re-registers the device token so the backend
-  /// renders future notifications in the new locale (no-op when not logged in /
-  /// no token yet — `syncDeviceToken` guards on `getIsLoggedIn()`).
   Future<void> _applyLocale(BuildContext context, Locale newLocale) async {
     await CacheClient.setString(kLanguage, newLocale.languageCode);
     await context.setLocale(newLocale);
@@ -55,7 +43,7 @@ class LanguageCubit extends Cubit<LanguageState> {
       final localeStr = newLocale.languageCode == 'ar' ? 'ar' : 'en';
       final updatedUser = user.copyWith(locale: localeStr);
       final result = await authRepo.updateProfile(updatedUser);
-      
+
       await result.fold(
         (failure) async {
           emit(LanguageError(state.locale, failure.message));

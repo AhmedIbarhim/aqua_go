@@ -9,8 +9,6 @@ import '../../../data/repos/chat_repository.dart';
 
 part 'chat_threads_state.dart';
 
-/// Drives the support inbox: cursor-paginated thread list, pull-to-refresh, and
-/// new-ticket creation.
 class ChatThreadsCubit extends Cubit<ChatThreadsState> {
   final ChatRepository _repository;
 
@@ -39,35 +37,40 @@ class ChatThreadsCubit extends Cubit<ChatThreadsState> {
     });
   }
 
-  /// Pull-to-refresh — reloads the first page without flashing the full-screen
-  /// loader (the RefreshIndicator shows its own spinner).
   Future<void> refresh() async {
     if (_isFetching) return;
     _isFetching = true;
     final result = await _repository.getThreads(limit: _pageSize);
     _isFetching = false;
-    result.fold((failure) {
-      // Keep the current list on a refresh failure; only surface an error
-      // screen when we have nothing to show.
-      if (_threads.isEmpty) {
-        emit(ChatThreadsError(failure.message));
-      } else {
+    result.fold(
+      (failure) {
+        if (_threads.isEmpty) {
+          emit(ChatThreadsError(failure.message));
+        } else {
+          _emitLoaded();
+        }
+      },
+      (page) {
+        _threads
+          ..clear()
+          ..addAll(page.items);
+        _nextCursor = page.nextCursor;
+        _hasMore = page.hasMore;
         _emitLoaded();
-      }
-    }, (page) {
-      _threads
-        ..clear()
-        ..addAll(page.items);
-      _nextCursor = page.nextCursor;
-      _hasMore = page.hasMore;
-      _emitLoaded();
-    });
+      },
+    );
   }
 
   Future<void> loadMore() async {
     if (_isFetching || !_hasMore) return;
     _isFetching = true;
-    emit(ChatThreadsLoaded(threads: List.of(_threads), hasMore: _hasMore, isLoadingMore: true));
+    emit(
+      ChatThreadsLoaded(
+        threads: List.of(_threads),
+        hasMore: _hasMore,
+        isLoadingMore: true,
+      ),
+    );
     final result = await _repository.getThreads(
       cursor: _nextCursor,
       limit: _pageSize,
@@ -93,15 +96,17 @@ class ChatThreadsCubit extends Cubit<ChatThreadsState> {
         subject: subject.trim(),
       ),
     );
-    result.fold((failure) {
-      emit(ChatThreadCreateError(failure.message));
-      _emitLoaded();
-    }, (thread) {
-      // Surface the new thread at the top of the local list optimistically.
-      _threads.insert(0, thread);
-      emit(ChatThreadCreated(thread));
-      _emitLoaded();
-    });
+    result.fold(
+      (failure) {
+        emit(ChatThreadCreateError(failure.message));
+        _emitLoaded();
+      },
+      (thread) {
+        _threads.insert(0, thread);
+        emit(ChatThreadCreated(thread));
+        _emitLoaded();
+      },
+    );
   }
 
   void _emitLoaded() {

@@ -6,7 +6,7 @@ import 'package:aqua_go/features/booking/data/models/quote_model.dart';
 import 'package:aqua_go/features/booking/domain/configs/booking_flow_config.dart';
 import 'package:aqua_go/features/booking/presentation/widgets/booking_summary_widgets/booking_payable_total.dart';
 import 'package:aqua_go/features/booking/presentation/widgets/booking_summary_widgets/payment_method_selection.dart';
-import 'package:aqua_go/features/booking/presentation/widgets/payment_summary_card.dart';
+import 'package:aqua_go/features/booking/presentation/widgets/booking_summary_widgets/payment_summary_card.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:dartz/dartz.dart' hide State;
 import 'package:easy_localization/easy_localization.dart';
@@ -58,13 +58,15 @@ void main() {
         expect(
           cubit.state.quote,
           isNull,
-          reason: 'the initial quote must still be in flight for this to test '
+          reason:
+              'the initial quote must still be in flight for this to test '
               'anything',
         );
         expect(
           find.text(noPaymentCopy),
           findsNothing,
-          reason: 'an unresolved quote is not a free booking — this copy is a '
+          reason:
+              'an unresolved quote is not a free booking — this copy is a '
               'claim the screen cannot make yet',
         );
 
@@ -102,7 +104,8 @@ void main() {
       expect(
         find.byType(PaymentMethodSelection),
         findsOneWidget,
-        reason: 'the picker must still render for every booking that has '
+        reason:
+            'the picker must still render for every booking that has '
             'something to pay',
       );
       expect(find.text(noPaymentCopy), findsNothing);
@@ -139,19 +142,22 @@ void main() {
       expect(
         cubit.state.quote,
         isNull,
-        reason: 'the initial quote must still be in flight for this to test '
+        reason:
+            'the initial quote must still be in flight for this to test '
             'anything',
       );
       expect(
         find.byType(PaymentSummaryCard),
         findsNothing,
-        reason: 'every figure on the card is `quote?.<field> ?? 0`, so with no '
+        reason:
+            'every figure on the card is `quote?.<field> ?? 0`, so with no '
             'quote it prices a payable order at zero',
       );
       expect(
         find.byType(PaymentSummaryShimmer),
         findsOneWidget,
-        reason: 'the section keeps its place with a placeholder — the absence '
+        reason:
+            'the section keeps its place with a placeholder — the absence '
             'of a price, not a price of nothing',
       );
 
@@ -183,7 +189,8 @@ void main() {
       expect(
         find.byType(PaymentSummaryCard),
         findsOneWidget,
-        reason: 'a resolved free order HAS a price — zero — and is entitled to '
+        reason:
+            'a resolved free order HAS a price — zero — and is entitled to '
             'see it stated; only the unresolved case is withheld',
       );
       expect(find.byType(PaymentSummaryShimmer), findsNothing);

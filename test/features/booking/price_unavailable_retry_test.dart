@@ -6,7 +6,7 @@ import 'package:aqua_go/features/booking/domain/configs/booking_flow_config.dart
 import 'package:aqua_go/features/offers/domain/pending_promo_code.dart';
 import 'package:aqua_go/features/booking/presentation/widgets/booking_summary_widgets/booking_payable_total.dart';
 import 'package:aqua_go/features/booking/presentation/widgets/booking_summary_widgets/price_unavailable_card.dart';
-import 'package:aqua_go/features/booking/presentation/widgets/payment_summary_card.dart';
+import 'package:aqua_go/features/booking/presentation/widgets/booking_summary_widgets/payment_summary_card.dart';
 import 'package:dartz/dartz.dart' hide State;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -89,7 +89,8 @@ void main() {
       expect(
         find.byType(PaymentSummaryShimmer),
         findsNothing,
-        reason: 'nothing is loading — the shimmer promises a price that is not '
+        reason:
+            'nothing is loading — the shimmer promises a price that is not '
             'coming, and it is the only thing on screen once the snackbar goes',
       );
       expect(
@@ -125,7 +126,8 @@ void main() {
       expect(
         repo.previewCalls,
         0,
-        reason: 'the service flow has no wash-charge preview to fetch — a '
+        reason:
+            'the service flow has no wash-charge preview to fetch — a '
             'hard-coded retry would call the other flow\'s endpoint',
       );
       expect(cubit.state.quote, isNotNull);
@@ -161,7 +163,8 @@ void main() {
       expect(
         repo.quoteCalls.length,
         3,
-        reason: 'entry is applyOffer (retried once, because an unanswered '
+        reason:
+            'entry is applyOffer (retried once, because an unanswered '
             'request is no verdict on the offer) plus the bare reprice that '
             'follows it',
       );
@@ -183,7 +186,8 @@ void main() {
       expect(
         repo.quoteCalls.length,
         4,
-        reason: 'the retry re-attempts the offer the customer accepted, not a '
+        reason:
+            'the retry re-attempts the offer the customer accepted, not a '
             'bare quote that would silently drop their deal',
       );
       expect(
@@ -194,7 +198,8 @@ void main() {
       expect(
         cubit.state.priceLoadFailed,
         isFalse,
-        reason: 'a call is in flight — the screen must not still be offering a '
+        reason:
+            'a call is in flight — the screen must not still be offering a '
             'Retry for it',
       );
       expect(find.byType(PriceUnavailableCard), findsNothing);
@@ -234,7 +239,8 @@ void main() {
       expect(
         find.byType(PaymentSummaryShimmer),
         findsNothing,
-        reason: 'the package flow reaches the same dead end down its own road, '
+        reason:
+            'the package flow reaches the same dead end down its own road, '
             'and the narrowing that stopped it submitting a fabricated SAR '
             '0.00 is what made an exit from it necessary',
       );
@@ -258,13 +264,15 @@ void main() {
       expect(
         repo.previewCalls,
         2,
-        reason: 'the package flow prices from the preview, so that is what '
+        reason:
+            'the package flow prices from the preview, so that is what '
             'retry must ask for again',
       );
       expect(
         repo.quoteCalls,
         isEmpty,
-        reason: 'the package flow has no quote endpoint at all — calling it '
+        reason:
+            'the package flow has no quote endpoint at all — calling it '
             'here is the drift this asserts against',
       );
       expect(cubit.state.quote, isNotNull);
@@ -298,7 +306,8 @@ void main() {
             priceLoadFailed: true,
           ),
           PriceDisplay.unavailable,
-          reason: '${config.flowType}: no price, and none is coming — the '
+          reason:
+              '${config.flowType}: no price, and none is coming — the '
               'state that used to render as an endless shimmer',
         );
       }
@@ -419,7 +428,8 @@ class _FlakyQuoteRepo extends RecordingBookingRepo {
   }
 
   @override
-  Future<Either<Failure, Map<String, dynamic>>> previewScheduleSubscriptionWash({
+  Future<Either<Failure, Map<String, dynamic>>>
+  previewScheduleSubscriptionWash({
     required String subscriptionId,
     required String washId,
     required Map<String, dynamic> scheduleData,
@@ -441,7 +451,8 @@ class _FlakyPreviewRepo extends RecordingBookingRepo {
   int previewCalls = 0;
 
   @override
-  Future<Either<Failure, Map<String, dynamic>>> previewScheduleSubscriptionWash({
+  Future<Either<Failure, Map<String, dynamic>>>
+  previewScheduleSubscriptionWash({
     required String subscriptionId,
     required String washId,
     required Map<String, dynamic> scheduleData,

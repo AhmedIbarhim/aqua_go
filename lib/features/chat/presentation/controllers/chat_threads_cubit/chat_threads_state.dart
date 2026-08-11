@@ -34,8 +34,6 @@ final class ChatThreadsError extends ChatThreadsState {
   List<Object?> get props => [message];
 }
 
-/// Transient states for the "new ticket" flow. Handled by a BlocListener; the
-/// list BlocBuilder ignores them (buildWhen) so the inbox stays rendered.
 final class ChatThreadCreating extends ChatThreadsState {}
 
 final class ChatThreadCreated extends ChatThreadsState {

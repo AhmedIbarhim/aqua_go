@@ -60,10 +60,6 @@ final class ChatThreadError extends ChatThreadState {
   List<Object?> get props => [message];
 }
 
-/// One-shot notice (send/upload/report outcome). Handled by a BlocListener; the
-/// Chat BlocBuilder ignores it via buildWhen so the message list is untouched.
-/// User-facing text lives in the view (mapped from [code]); [detail] carries an
-/// already-localised backend failure message when present.
 final class ChatThreadActionNotice extends ChatThreadState {
   final ChatNoticeCode code;
   final String? detail;

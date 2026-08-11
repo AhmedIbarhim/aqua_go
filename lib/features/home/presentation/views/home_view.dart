@@ -47,8 +47,6 @@ class _HomeViewState extends State<HomeView> {
   final PendingRatingsCubit _pendingRatingsCubit =
       locator<PendingRatingsCubit>();
 
-  // AQG-160: prompt the home rating popup at most once per HomeView lifecycle,
-  // so widget rebuilds / re-emits never re-open an already-handled sheet.
   bool _ratingPromptShown = false;
 
   @override
@@ -60,10 +58,8 @@ class _HomeViewState extends State<HomeView> {
     _offersCubit.getOffers();
     if (currentUser.value != null) {
       _subscriptionsCubit.getActiveSubscriptions();
-      // Fire-and-forget: never block home rendering on the rating nudge.
       _pendingRatingsCubit.fetchPendingRatings();
     }
-    // Load subscriptions reactively when user transitions from guest to logged-in.
     currentUser.addListener(_onAuthChanged);
   }
 
@@ -81,11 +77,6 @@ class _HomeViewState extends State<HomeView> {
 
     await RatingBottomSheet.show(context, booking, navigateOnSuccess: false);
 
-    // The sheet is now closed — whether the user rated or dismissed. Remember
-    // this booking id locally so it is never re-prompted on a later home load.
-    // (Rated bookings also drop off the endpoint naturally, so this is a safe
-    // no-cost record on the rate path and the deliberate user decision on the
-    // dismiss path.)
     await DismissedRatingsStore.dismiss(bookingId);
   }
 
@@ -97,9 +88,7 @@ class _HomeViewState extends State<HomeView> {
     _packagesCubit.close();
     _offersCubit.close();
     _pendingRatingsCubit.close();
-    // _subscriptionsCubit is a shared lazy singleton (see service_locator):
-    // do NOT close it here, otherwise other surfaces lose their data source
-    // and a post-subscribe refetch can't propagate.
+
     super.dispose();
   }
 
@@ -121,7 +110,6 @@ class _HomeViewState extends State<HomeView> {
               !_ratingPromptShown &&
               currentUser.value != null &&
               mounted) {
-            // Prompt with the most-recently-completed unrated booking.
             _showRatingPopup(state.bookings.first);
           }
         },

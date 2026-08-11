@@ -3,7 +3,6 @@ import '../../../../core/utils/saudi_wire_format.dart';
 
 class ServiceRescheduleRequestModel {
   final String bookingId;
-  /// The picked availability slot's own `start` instant.
   final DateTime slotStart;
   final AddressModel? address;
   final List<String> vehicleIds;

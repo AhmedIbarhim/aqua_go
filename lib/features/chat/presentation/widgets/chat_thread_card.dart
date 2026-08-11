@@ -5,8 +5,6 @@ import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/themes/app_text_styles.dart';
 import '../../data/models/thread_model.dart';
 
-/// Inbox row for a single support thread: subject, category chip, status chip,
-/// last-message preview, last-activity time and an unread-count badge.
 class ChatThreadCard extends StatelessWidget {
   final ThreadModel thread;
   final VoidCallback onTap;

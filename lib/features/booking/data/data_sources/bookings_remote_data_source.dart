@@ -9,11 +9,6 @@ class BookingsRemoteDataSource {
 
   BookingsRemoteDataSource(this._apiClient);
 
-  /// [offerId] and [promoCode] are ALTERNATIVES, never companions: the server
-  /// resolves an offer's linked promo code itself, and a body carrying both is
-  /// a 400 (`promo-and-offer-mutually-exclusive`). The offer wins when both are
-  /// somehow supplied — it is the richer binding, carrying the attribution the
-  /// bare code cannot.
   Future<Either<Failure, dynamic>> getQuote({
     required String packageId,
     required double lat,
@@ -32,9 +27,6 @@ class BookingsRemoteDataSource {
         'packageId': packageId,
         'lat': lat,
         'lng': lng,
-        // offerId and promoCode are alternatives — sending both is a 400
-        // (promo-and-offer-mutually-exclusive), so the offer wins when present and
-        // the server resolves its linked code.
         if (hasOffer) 'offerId': offerId,
         if (!hasOffer && promoCode != null && promoCode.isNotEmpty)
           'promoCode': promoCode,
@@ -77,14 +69,6 @@ class BookingsRemoteDataSource {
     );
   }
 
-  /// Pay-before-create step 2: re-validates the quote, soft-holds the slot,
-  /// and returns {amountMinor, givenId, metadata} for the Moyasar SDK.
-  ///
-  /// `scheduledAt` is the bare ISO-8601 Saudi time string (no offset) matching
-  /// the format produced by `toWireDateTime`
-  /// (`core/utils/saudi_wire_format.dart`).
-  /// `vehicles` is the 1-element list matching the shape in
-  /// [ServiceBookingRequestModel.toJson] (savedVehicleId XOR denormalised fields).
   Future<Either<Failure, dynamic>> bookingPaymentInit({
     required String quoteId,
     required String scheduledAt,

@@ -10,27 +10,17 @@ class ServiceBookingRequestModel {
   final ServiceModel? service;
   final MyCarModel? car;
   final AddressModel? address;
-  /// The picked availability slot's own `start` instant. Serialised verbatim
-  /// as the bare Asia/Riyadh `scheduledAt` — no display string in between.
+
   final DateTime? slotStart;
   final List<AddOnModel> serviceAddOns;
   final List<String> workerNotes;
   final PaymentMethod? paymentMethod;
   final QuoteModel? quote;
 
-  /// The Moyasar payment id returned by the on-device SDK purchase. The
-  /// backend verifies this `paid` payment, then creates the booking
-  /// (pay-before-create). Required on the create call.
   final String? moyasarPaymentId;
 
-  /// Soft slot-hold token returned by POST /api/customer/bookings/payment-init.
   final String? holdToken;
 
-  /// The merchandising offer this booking came through — the SAME offerId the
-  /// quote was priced with. Null for a manually typed code. Carried purely for
-  /// redemption attribution (`promo.promo_redemptions.offer_id`): the discount
-  /// itself is already frozen in the quote, and the server rejects a create
-  /// whose offer resolves to a different code than the quote was priced with.
   final String? offerId;
 
   ServiceBookingRequestModel({

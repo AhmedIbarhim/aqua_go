@@ -6,7 +6,6 @@ import '../enums/chat_category_enum.dart';
 import '../enums/chat_thread_kind_enum.dart';
 import '../enums/chat_thread_status_enum.dart';
 
-/// A support (or worker) conversation thread. Mirrors the backend `ThreadView`.
 class ThreadModel {
   final String id;
   final ChatThreadKind kind;
@@ -18,8 +17,6 @@ class ThreadModel {
   final String? subjectEn;
   final ChatCategory category;
 
-  /// Free-text subject typed by the customer at ticket creation (nullable — the
-  /// backend also localises to subjectAr/subjectEn for system-created threads).
   final String? subject;
   final String? createdAt;
   final String? updatedAt;
@@ -91,8 +88,6 @@ class ThreadModel {
     );
   }
 
-  /// The customer-facing subject: the free-text subject when present, otherwise
-  /// the localised system subject for the active locale.
   String displaySubject(BuildContext context) {
     if (subject != null && subject!.trim().isNotEmpty) return subject!.trim();
     final localized = context.isAr ? subjectAr : subjectEn;
@@ -100,7 +95,6 @@ class ThreadModel {
     return subjectEn ?? subjectAr ?? '';
   }
 
-  /// Timestamp shown on the inbox card (last activity), formatted for locale.
   String lastActivityLabel(BuildContext context) {
     final raw = lastMessageAt ?? updatedAt ?? createdAt;
     if (raw == null) return '';

@@ -15,8 +15,6 @@ import '../models/presigned_url.dart';
 import '../models/send_message_request.dart';
 import '../models/thread_model.dart';
 
-/// Result of a successful attachment upload — the object key the send-message
-/// call references, plus the metadata the server needs to persist it.
 class AttachmentUploadResult {
   final String objectKey;
   final int sizeBytes;
@@ -103,9 +101,6 @@ class ChatRepository {
     });
   }
 
-  /// Sends a message. The [idempotencyKey] is generated once by the caller (tied
-  /// to the optimistic message) and reused across retries so a resend never
-  /// duplicates the row.
   Future<Either<Failure, MessageModel>> sendMessage({
     required String threadId,
     required SendMessageRequest request,
@@ -147,9 +142,6 @@ class ChatRepository {
     return result.fold((failure) => Left(failure), (_) => const Right(unit));
   }
 
-  /// Presigns + PUTs [file] to object storage, returning the object key +
-  /// metadata for the follow-up send-message call. Mirrors the COMPLAINT
-  /// presign pattern (presign → direct PUT with a fresh Dio → return key).
   Future<Either<Failure, AttachmentUploadResult>> uploadAttachment({
     required String threadId,
     required File file,

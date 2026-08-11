@@ -1,8 +1,5 @@
 import '../../../../generated/locale_keys.g.dart';
 
-/// Support-ticket category. WORKER is really for the separate CUSTOMER_WORKER
-/// thread kind, so it is omitted from the customer support picker
-/// ([pickerCategories]). GENERAL is the default.
 enum ChatCategory {
   bookingIssue,
   payment,
@@ -56,7 +53,6 @@ enum ChatCategory {
     }
   }
 
-  /// Categories surfaced in the customer "new ticket" picker (WORKER excluded).
   static const List<ChatCategory> pickerCategories = [
     ChatCategory.bookingIssue,
     ChatCategory.payment,

@@ -137,7 +137,10 @@ bool routeForNotificationFields(String? targetType, String? targetId) {
 ///   [pendingDeepLink]; it is consumed after the splash/auth gate.
 ///
 /// R-15: never log [data] contents.
-void handleNotificationTap(Map<String, dynamic> data, {required bool appReady}) {
+void handleNotificationTap(
+  Map<String, dynamic> data, {
+  required bool appReady,
+}) {
   final target = NotificationTarget.fromData(data);
   if (target == null) return; // no routing pair (e.g. SYSTEM push) — no-op.
 

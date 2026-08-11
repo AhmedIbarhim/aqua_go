@@ -44,13 +44,7 @@ class MyBookingProceduresBottomSheet extends StatelessWidget {
         _buildActionItem(
           context,
           title: LocaleKeys.bookings_pay_tip_for_biker.tr(context: context),
-          // UC-C19 — `canTip` is the server's decision (COMPLETED, not already
-          // tipped, and still inside the admin-configurable tip window measured
-          // from completedAt). Gating on tipPaid alone kept offering the row on
-          // long-finished bookings the tip endpoint rejects. Kept VISIBLE but
-          // disabled, like the rate/complaint rows above and below it — this menu
-          // lists what the booking supports, so a row vanishing would read as a
-          // missing feature rather than an expired one.
+
           onTap: booking.canTip
               ? () {
                   Navigator.pop(context);

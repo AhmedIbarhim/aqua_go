@@ -15,8 +15,6 @@ class PackageSubscribtionPaymentContent extends StatefulWidget {
   final bool isLoading;
   final void Function(BuildContext context) onConfirm;
 
-  /// Optional callback invoked when the user selects a payment method. Used
-  /// by the parent sheet to track the selection for the async payment flow.
   final void Function(PaymentMethod method)? onPaymentMethodChanged;
 
   const PackageSubscribtionPaymentContent({
@@ -65,11 +63,7 @@ class _PackageSubscribtionPaymentContentState
           isTextValue: true,
         ),
         const Divider(height: 24),
-        // Exactly ONE total, VAT-INCLUSIVE, emphasised — the same shape the
-        // booking review screen and the booking detail render. There is
-        // deliberately no VAT-exclusive "before tax" subtotal: showing a net
-        // figure the customer never pays, above a gross one they do, is the
-        // two-competing-bases defect this replaces.
+
         _buildSummaryRow(
           context,
           label: LocaleKeys.bookings_total_amount.tr(context: context),
@@ -77,9 +71,6 @@ class _PackageSubscribtionPaymentContentState
           isTotal: true,
         ),
         const SizedBox(height: 8),
-        // VAT is a DISCLOSURE, not a step in the sum: it is already inside the
-        // total above. Smaller and muted, under the total, so it cannot be read
-        // as an addend. Backend-sourced; never recomputed here.
         _buildVatFootnote(context),
         const SizedBox(height: 32),
         CustomButton(
@@ -106,8 +97,6 @@ class _PackageSubscribtionPaymentContentState
     );
   }
 
-  /// The inclusive-VAT disclosure under the total: smaller and muted, so it
-  /// cannot be read as an addend.
   Widget _buildVatFootnote(BuildContext context) {
     final style = AppTextStyles.regular12.copyWith(
       color: context.colors.contentDisabled,

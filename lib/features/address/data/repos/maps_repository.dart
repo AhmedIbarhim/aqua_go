@@ -4,10 +4,6 @@ import 'package:aqua_go/features/address/data/models/place_prediction_model.dart
 import 'package:dartz/dartz.dart';
 import '../services/location_service.dart';
 
-/// PH1-005: parses the backend `geo/places` proxy DTOs. The proxy already maps
-/// Google errors onto the standard problem+json contract, so non-200 responses
-/// (incl. 404 no-result on reverse-geocode) arrive here as a [Failure] from the
-/// shared APIClient — no `status`/`error_message` field to inspect.
 class MapsRepository {
   final LocationService locationService;
 

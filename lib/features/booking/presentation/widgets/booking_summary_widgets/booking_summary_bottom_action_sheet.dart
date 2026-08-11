@@ -83,27 +83,7 @@ class BookingSummaryBottomActionSheet extends StatelessWidget {
             );
             return;
           }
-          // A free SERVICE booking still reserves its slot. `submitBooking()`
-          // alone would send a create with a null holdToken (the strategy
-          // reads `state.paymentInit?.holdToken`, and only `initiatePayment`
-          // populates it), and the server's consumeHold returns true for a
-          // null token — the booking would be made and the slot never
-          // consumed. So the card-less SERVICE lane goes through payment-init
-          // exactly like the paid one; only the SDK step is skipped, and only
-          // because the SERVER said the amount is zero.
-          //
-          // SPEC CORRECTION (2026-08-05): the plan said to delete this branch
-          // outright. That would regress every OTHER flow. Before this task,
-          // `needsPayment` folded in `config.requiresPaymentMethod`, which is
-          // true only for the service flow — so the service flow never reached
-          // this branch, and reschedule / gift-redeem / package-with-nothing-
-          // payable ALWAYS did. Those three take no slot hold (`holdToken` is
-          // read only by `ServiceBookingSubmit`) and have no quote to init
-          // against: `initiatePayment` would fail on the missing quote and
-          // `initiateWashAddonPayment` on a package with no paid add-on is a
-          // round-trip that can only fail the submit. The branch therefore
-          // stays, narrowed to "not the service flow" — which is byte-for-byte
-          // the set that used to reach it.
+
           if (!needsPayment && !config.isNormal) {
             await cubit.submitBooking();
             return;
@@ -137,10 +117,6 @@ class BookingSummaryBottomActionSheet extends StatelessWidget {
           }
           if (init == null || !context.mounted) return;
           if (!shouldOpenPaymentSdk(init)) {
-            // Server says SAR 0.00 — nothing to charge. Submit straight
-            // through with no moyasarPaymentId; the hold token is already in
-            // state from initiatePayment, and the server stamps the row
-            // NOT_REQUIRED / payment_method='PROMO'.
             await cubit.submitBooking();
             return;
           }

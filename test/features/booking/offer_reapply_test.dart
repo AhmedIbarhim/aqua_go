@@ -1,6 +1,6 @@
 import 'package:aqua_go/core/config/local_storage/shared_prefs.dart';
 import 'package:aqua_go/core/config/networking/exceptions/failure.dart';
-import 'package:aqua_go/features/booking/presentation/widgets/promo_code_section.dart';
+import 'package:aqua_go/features/booking/presentation/widgets/booking_summary_widgets/promo_code_section.dart';
 import 'package:aqua_go/features/offers/domain/pending_promo_code.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -142,30 +142,34 @@ void main() {
       expect(
         reapplyCard,
         findsOneWidget,
-        reason: 'the whole point — the offer the typed code displaced is back '
+        reason:
+            'the whole point — the offer the typed code displaced is back '
             'within reach instead of destroyed for the session',
       );
     });
   });
 
   group('on the cubit', () {
-    test('a typed code applied straight over a live offer remembers it', () async {
-      // The literal defect: `clearOfferId: offerId == null` in `_emitQuote`
-      // dropped the ONLY record that an offer had been in play, so the offer
-      // could never come back for the rest of the session. Attribution still
-      // goes — this sale did not come through the offer — but the offer itself
-      // is remembered.
-      final repo = RecordingBookingRepo();
-      final cubit = buildCubit(repo);
-      addTearDown(cubit.close);
+    test(
+      'a typed code applied straight over a live offer remembers it',
+      () async {
+        // The literal defect: `clearOfferId: offerId == null` in `_emitQuote`
+        // dropped the ONLY record that an offer had been in play, so the offer
+        // could never come back for the rest of the session. Attribution still
+        // goes — this sale did not come through the offer — but the offer itself
+        // is remembered.
+        final repo = RecordingBookingRepo();
+        final cubit = buildCubit(repo);
+        addTearDown(cubit.close);
 
-      await cubit.applyOffer('offer-1');
-      await cubit.applyPromoCode('OTHERCODE');
+        await cubit.applyOffer('offer-1');
+        await cubit.applyPromoCode('OTHERCODE');
 
-      expect(cubit.state.appliedPromoCode, 'OTHERCODE');
-      expect(cubit.state.appliedOfferId, isNull);
-      expect(cubit.state.rememberedOfferId, 'offer-1');
-    });
+        expect(cubit.state.appliedPromoCode, 'OTHERCODE');
+        expect(cubit.state.appliedOfferId, isNull);
+        expect(cubit.state.rememberedOfferId, 'offer-1');
+      },
+    );
 
     test('a bare display re-quote decides nothing about the offer', () async {
       // `repriceForDisplayWithoutPromo` is the details screen's bare quote. It
@@ -232,7 +236,8 @@ void main() {
       expect(
         cubit.state.rememberedOfferId,
         'offer-1',
-        reason: 'a timeout is not a verdict — the same discipline that guards '
+        reason:
+            'a timeout is not a verdict — the same discipline that guards '
             'the two display figures',
       );
     });
@@ -282,7 +287,8 @@ void main() {
       expect(
         repo.quoteCalls.length,
         beforeRemoval + 1,
-        reason: 'exactly the bare re-quote the removal asked for — a silent '
+        reason:
+            'exactly the bare re-quote the removal asked for — a silent '
             're-price the customer did not ask for is worse than an offer to '
             'restore one',
       );
@@ -324,7 +330,8 @@ void main() {
       expect(
         reapplyCard,
         findsNothing,
-        reason: 'a settled refusal ends the offer — a card that re-runs the '
+        reason:
+            'a settled refusal ends the offer — a card that re-runs the '
             'same rejection forever is a dead button',
       );
     });
@@ -360,7 +367,8 @@ void main() {
       expect(
         cubit.state.rememberedOfferId,
         'offer-1',
-        reason: 'the server never answered, so the offer is still the '
+        reason:
+            'the server never answered, so the offer is still the '
             "customer's to take",
       );
       expect(reapplyCard, findsOneWidget);

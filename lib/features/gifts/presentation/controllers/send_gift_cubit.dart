@@ -199,10 +199,12 @@ class SendGiftCubit extends Cubit<SendGiftState> {
     if (state.selectedService == null) return null;
 
     final attemptNonce = const Uuid().v4();
-    emit(state.copyWith(
-      status: SendGiftStatus.loading,
-      attemptNonce: attemptNonce,
-    ));
+    emit(
+      state.copyWith(
+        status: SendGiftStatus.loading,
+        attemptNonce: attemptNonce,
+      ),
+    );
 
     final result = await _giftsRepository.giftPaymentInit(
       request: GiftPaymentInitRequestModel(
@@ -249,10 +251,6 @@ class SendGiftCubit extends Cubit<SendGiftState> {
 
     final giftId = const Uuid().v4();
 
-    // The picked wall clock reaches the wire verbatim, in the backend's bare
-    // Asia/Riyadh shape. Nothing here reads a formatted string: the delivery
-    // time used to be recovered by parsing the picker's LABEL, which booked
-    // every Arabic PM delivery 12 hours early.
     final delivery = state.deliveryType == 'SCHEDULED'
         ? state.scheduledDeliveryAt
         : null;

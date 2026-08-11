@@ -40,9 +40,7 @@ class MyBookingsCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 16),
-              // Show the actual per-status badge (localized + colour-coded) so a
-              // refresh visibly reflects every state change — not just the
-              // terminal ones that move the booking between tabs.
+
               if (booking.status != null)
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -120,10 +118,6 @@ class MyBookingsCard extends StatelessWidget {
           // Actions
           GestureDetector(
             onTap: () async {
-              // Re-fetch the list when returning from the detail so any status
-              // change made there (pull-to-refresh, cancel, reschedule, rate) is
-              // reflected — the detail has its own cubit; the list cache is
-              // otherwise never told. isRefresh keeps the list visible (no spinner).
               await context.pushNamed(
                 Routes.myBookingDetails,
                 arguments: MyBookingDetailsArgs(booking: booking),

@@ -33,12 +33,6 @@ class SendGiftState extends Equatable {
   final String deliveryType; // 'IMMEDIATE' or 'SCHEDULED'
   final DateTime? scheduledDate;
 
-  /// The picked delivery time, carried structurally from `showTimePicker`.
-  ///
-  /// This was a display label (`"09:00 PM"`) that the purchase path split on a
-  /// space and matched against `'PM'`. In Arabic the picker emits `م`, so the
-  /// match failed and every PM delivery was sent 12 hours early; a locale with
-  /// its own digits made the hour parse throw outright.
   final TimeOfDay? scheduledTime;
   final GiftThemeModel? selectedTheme;
   final PaymentMethod? paymentMethod;
@@ -133,10 +127,6 @@ class SendGiftState extends Equatable {
     );
   }
 
-  /// The scheduled delivery as a single wall clock, or null until BOTH pickers
-  /// have been used. Feeds `scheduledDeliveryAt`; the picked fields are carried
-  /// through verbatim, so nothing between the picker and the wire re-reads a
-  /// formatted string.
   DateTime? get scheduledDeliveryAt {
     final date = scheduledDate;
     final time = scheduledTime;

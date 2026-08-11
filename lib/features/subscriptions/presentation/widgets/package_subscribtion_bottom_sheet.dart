@@ -104,27 +104,18 @@ class _PackageSubscribtionBottomSheetState
     );
   }
 
-  /// Pay-before-create: payment-init → Moyasar SDK → create subscription.
-  ///
-  /// The nonce is generated once here and reused across retries: it rides
-  /// the idempotency key `subscription-subscribe:{customerId}:{packageId}:{nonce}`
-  /// and the `idempotencyNonce` body field (B2/B3 fix).
   Future<void> _handleConfirm(BuildContext sheetContext) async {
-    // Generate a stable nonce for this subscription attempt. A UUID v4 keeps
-    // the nonce unique per attempt and within the backend's 100-char limit.
     final nonce = const Uuid().v4();
 
     final cubit = sheetContext.read<SubscriptionsCubit>();
-    final PaymentInitModel? init =
-        await cubit.initiateSubscriptionPayment(
-          packageId: widget.packageModel.id,
-        );
+    final PaymentInitModel? init = await cubit.initiateSubscriptionPayment(
+      packageId: widget.packageModel.id,
+    );
     if (init == null || !sheetContext.mounted) return;
     await PaymentSdkConfigService.instance.ensureLoaded();
     if (!sheetContext.mounted) return;
 
-    final paymentMethod =
-        _selectedPaymentMethod ?? PaymentMethod.creditCard;
+    final paymentMethod = _selectedPaymentMethod ?? PaymentMethod.creditCard;
 
     final result = await Navigator.of(sheetContext).push<MoyasarPaymentResult>(
       MaterialPageRoute(
@@ -156,9 +147,11 @@ class _PackageSubscribtionBottomSheetState
       case MoyasarPaymentStatus.failed:
         cubit.onSubscriptionPaymentCancelled();
         if (sheetContext.mounted) {
-          sheetContext.showErrorSnackBar(sheetContext.isAr
-              ? 'فشلت عملية الدفع. يرجى المحاولة مرة أخرى.'
-              : 'Payment failed. Please try again.');
+          sheetContext.showErrorSnackBar(
+            sheetContext.isAr
+                ? 'فشلت عملية الدفع. يرجى المحاولة مرة أخرى.'
+                : 'Payment failed. Please try again.',
+          );
         }
         break;
       case MoyasarPaymentStatus.cancelled:

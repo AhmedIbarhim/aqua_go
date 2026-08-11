@@ -1,7 +1,3 @@
-/// Generic cursor-paginated envelope returned by the chat list endpoints:
-/// `{ items, nextCursor, totalMatching }`. [nextCursor] is an opaque string —
-/// pass it straight back as the `cursor` query param to fetch the next page;
-/// a null/empty cursor means there are no more pages.
 class PageResponse<T> {
   final List<T> items;
   final String? nextCursor;

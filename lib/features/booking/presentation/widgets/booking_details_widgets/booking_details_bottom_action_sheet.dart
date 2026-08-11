@@ -70,19 +70,10 @@ class BookingDetailsBottomActionSheet extends StatelessWidget {
       );
     }
 
-    // For service/package flow: show pricing and navigate to summary.
-    //
-    // PRICE LOCK: the displayed total comes ONLY from the server quote captured
-    // at booking initiation (quote.breakdown.gross) — it freezes both the
-    // service price and every selected add-on. We do NOT fall back to the live
-    // catalog (selectedService.priceDouble + live add-on prices), so admin price
-    // edits made mid-session never change this booking's total. No client-side
-    // VAT/price math: the amount is the backend-rendered gross.
     final double? lockedTotal = config.showPricingInDetails
         ? bookingState.quote?.breakdown?.gross
         : null;
-    // Block "Book now" on the service flow until the price is locked, so we can
-    // never navigate to summary on a live (unlocked) amount.
+
     final bool priceLocked =
         !config.showPricingInDetails || lockedTotal != null;
     final bool canProceed = isComplete && priceLocked;
@@ -130,13 +121,10 @@ class BookingDetailsBottomActionSheet extends StatelessWidget {
             enabled: canProceed,
             onPressed: canProceed
                 ? () async {
-                    // For package flow with payable addons, collect payment
-                    // method before proceeding to the summary screen.
                     if (_requiresPayment(bookingState)) {
                       final confirmed =
                           await PackageAddonPaymentBottomSheet.show(context);
                       if (!context.mounted) return;
-                      // User tapped outside or dragged down — abort navigation.
                       if (!confirmed) return;
                     }
                     if (!context.mounted) return;

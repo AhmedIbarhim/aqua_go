@@ -1,5 +1,3 @@
-/// Author role of a chat message. SYSTEM is an automated reply and is rendered
-/// distinctly (centered system bubble) rather than as a party bubble.
 enum ChatSenderRole {
   customer,
   worker,
