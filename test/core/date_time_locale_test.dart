@@ -86,7 +86,7 @@ void main() {
       expect(time, startsWith('11:00'));
       expect(time, contains('PM'));
       expect(time, isNot(contains('م')));
-      expect(formatShortDate(slot), '7/23/2026');
+      expect(formatShortDate(slot), '23/7/2026');
     });
 
     testWidgets('the mirror case: English handset, app in Arabic', (
@@ -221,7 +221,7 @@ void main() {
       // (U+202F), which is invisible in a failure diff — normalise it away.
       expect(
         renderedDateTime(tester).replaceAll('\u202f', ' '),
-        '11:00 PM . 7/23/2026',
+        '11:00 PM . 23/7/2026',
       );
 
       Intl.systemLocale = 'en_US';

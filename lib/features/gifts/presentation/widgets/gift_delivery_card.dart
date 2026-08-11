@@ -3,11 +3,10 @@ import 'package:svg_flutter/svg.dart';
 import '../../../../core/components/custom_radio_widget.dart';
 import '../../../../core/extentions/context_extentions.dart';
 import '../../../../core/themes/app_text_styles.dart';
-import '../../../../core/utils/app_assets.dart';
 
 class GiftDeliveryCard extends StatelessWidget {
   final String title;
-  final IconData icon;
+  final String icon;
   final bool isSelected;
   final VoidCallback onTap;
 
@@ -51,9 +50,7 @@ class GiftDeliveryCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(context.sw(8)),
               ),
               child: SvgPicture.asset(
-                icon == Icons.calendar_today_outlined
-                    ? AppAssets.giftSendNow
-                    : AppAssets.giftSendLater,
+                icon,
                 colorFilter: ColorFilter.mode(
                   isSelected
                       ? context.colors.primary

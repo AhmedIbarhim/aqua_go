@@ -175,7 +175,7 @@ class _CustomizeStepState extends State<CustomizeStep> {
               title: context.isAr
                   ? "ارسال الهدية فوراً"
                   : "Send Gift Immediately",
-              icon: Icons.send_rounded,
+              icon: AppAssets.giftSendNow,
               isSelected: state.deliveryType == 'IMMEDIATE',
               onTap: () {
                 context.read<SendGiftCubit>().updateCustomization(
@@ -190,7 +190,7 @@ class _CustomizeStepState extends State<CustomizeStep> {
             SizedBox(height: context.sh(12)),
             GiftDeliveryCard(
               title: context.isAr ? "جدولة لاحقاً" : "Schedule Later",
-              icon: Icons.calendar_today_outlined,
+              icon: AppAssets.giftSendLater,
               isSelected: state.deliveryType == 'SCHEDULED',
               onTap: () {
                 context.read<SendGiftCubit>().updateCustomization(

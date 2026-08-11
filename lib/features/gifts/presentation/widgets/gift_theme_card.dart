@@ -33,7 +33,6 @@ class GiftThemeCard extends StatelessWidget {
   }
 
   Color _getThemeBg(String name, bool isSelected, BuildContext context) {
-    if (!isSelected) return context.colors.cardBackGround;
     final themeColor = _parseColor(theme.color);
 
     return themeColor!.withValues(alpha: isSelected ? 0.3 : 0.2);

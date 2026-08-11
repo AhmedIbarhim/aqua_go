@@ -33,8 +33,9 @@ String formatClockTime(DateTime time) => DateFormat.jm(_locale).format(time);
 String formatPickedTime(TimeOfDay time) =>
     formatClockTime(DateTime(2000, 1, 1, time.hour, time.minute));
 
-/// Numeric date in the locale's own field order, e.g. `7/23/2026` / `٢٣‏/٧‏/٢٠٢٦`.
-String formatShortDate(DateTime date) => DateFormat.yMd(_locale).format(date);
+/// Numeric date in day-first order, e.g. `23/7/2026` / `٢٣‏/٧‏/٢٠٢٦`.
+String formatShortDate(DateTime date) =>
+    DateFormat('d/M/y', _locale).format(date);
 
 /// Date and time together, e.g. `7/23/2026 - 2:00 PM`.
 String formatDateAndTime(DateTime dateTime) =>

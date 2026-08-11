@@ -26,17 +26,22 @@ class _HomeBannersCarosalState extends State<HomeBannersCarosal> {
 
   @override
   Widget build(BuildContext context) {
+    final bannersList = context.isAr
+        ? widget.banners
+              .where((b) => b.imageUrl.isNotEmpty && b.locale == 'ar')
+              .toList()
+        : widget.banners
+              .where((b) => b.imageUrl.isNotEmpty && b.locale == 'en')
+              .toList();
+
     return Column(
       children: [
         CarouselSlider.builder(
           carouselController: widget.carouselController,
-          itemCount: widget.banners.length,
+          itemCount: bannersList.length,
           itemBuilder: (context, index, realIndex) {
-            final banner = widget.banners[index];
+            final banner = bannersList[index];
             final bannerImage = banner.imageUrl;
-            final isNetworkImage =
-                bannerImage.startsWith('http') ||
-                bannerImage.startsWith('https');
 
             return GestureDetector(
               onTap: () => _handleBannerTap(context, banner),
@@ -46,25 +51,25 @@ class _HomeBannersCarosalState extends State<HomeBannersCarosal> {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: isNetworkImage
-                      ? CachedNetworkImage(
-                          imageUrl: bannerImage,
-                          fit: BoxFit.fill,
-                          width: double.infinity,
-                          height: double.infinity,
-                          placeholder: (context, url) =>
-                              Container(color: context.colors.defaultSubtle),
-                          errorWidget: (context, url, error) => Image.asset(
-                            AppAssets.demoBanner,
-                            fit: BoxFit.fill,
-                          ),
-                        )
-                      : Image.asset(
-                          bannerImage,
-                          fit: BoxFit.fill,
-                          width: double.infinity,
-                          height: double.infinity,
-                        ),
+                  child:
+                      //  isNetworkImage
+                      // ?
+                      CachedNetworkImage(
+                        imageUrl: bannerImage,
+                        fit: BoxFit.fill,
+                        width: double.infinity,
+                        height: double.infinity,
+                        placeholder: (context, url) =>
+                            Container(color: context.colors.defaultSubtle),
+                        errorWidget: (context, url, error) =>
+                            Image.asset(AppAssets.demoBanner, fit: BoxFit.fill),
+                      ),
+                  // : Image.asset(
+                  //     bannerImage,
+                  //     fit: BoxFit.fill,
+                  //     width: double.infinity,
+                  //     height: double.infinity,
+                  //   ),
                 ),
               ),
             );
@@ -91,10 +96,10 @@ class _HomeBannersCarosalState extends State<HomeBannersCarosal> {
             enlargeStrategy: CenterPageEnlargeStrategy.scale,
           ),
         ),
-        if (widget.banners.isNotEmpty) ...[
+        if (bannersList.isNotEmpty) ...[
           SizedBox(height: context.screenHeight * 0.012),
           CustomDotsIndicator(
-            count: widget.banners.length,
+            count: bannersList.length,
             currentIndex: _currentIndex,
           ),
         ],
