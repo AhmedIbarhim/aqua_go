@@ -329,8 +329,6 @@ class BookingDetailsSummaryCard extends StatelessWidget {
                 width: 24,
                 height: 24,
                 colorFilter: ColorFilter.mode(
-                  // Same reasoning as the label below — the icon shares the
-                  // label's weight, so it shares its colour.
                   context.colors.textSecondary,
                   BlendMode.srcIn,
                 ),
