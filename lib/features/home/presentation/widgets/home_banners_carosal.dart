@@ -26,21 +26,13 @@ class _HomeBannersCarosalState extends State<HomeBannersCarosal> {
 
   @override
   Widget build(BuildContext context) {
-    final bannersList = context.isAr
-        ? widget.banners
-              .where((b) => b.imageUrl.isNotEmpty && b.locale == 'ar')
-              .toList()
-        : widget.banners
-              .where((b) => b.imageUrl.isNotEmpty && b.locale == 'en')
-              .toList();
-
     return Column(
       children: [
         CarouselSlider.builder(
           carouselController: widget.carouselController,
-          itemCount: bannersList.length,
+          itemCount: widget.banners.length,
           itemBuilder: (context, index, realIndex) {
-            final banner = bannersList[index];
+            final banner = widget.banners[index];
             final bannerImage = banner.imageUrl;
 
             return GestureDetector(
@@ -96,10 +88,10 @@ class _HomeBannersCarosalState extends State<HomeBannersCarosal> {
             enlargeStrategy: CenterPageEnlargeStrategy.scale,
           ),
         ),
-        if (bannersList.isNotEmpty) ...[
+        if (widget.banners.isNotEmpty) ...[
           SizedBox(height: context.screenHeight * 0.012),
           CustomDotsIndicator(
-            count: bannersList.length,
+            count: widget.banners.length,
             currentIndex: _currentIndex,
           ),
         ],
