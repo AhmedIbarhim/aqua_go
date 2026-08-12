@@ -60,9 +60,9 @@ class OnboardingPageView extends StatelessWidget {
   }
 
   List<String> get backgroundImages => [
-    AppAssets.onboarding1,
-    AppAssets.onboarding2,
-    AppAssets.onboarding3,
+    AppAssets.onboard_1,
+    AppAssets.onboard_2,
+    AppAssets.onboard_3,
   ];
 
   @override
@@ -71,7 +71,7 @@ class OnboardingPageView extends StatelessWidget {
       controller: pageController,
       itemCount: backgroundImages.length,
       itemBuilder: (context, index) =>
-          Image.asset(backgroundImages[index], fit: BoxFit.contain),
+          Image.asset(backgroundImages[index], fit: BoxFit.fill),
     );
   }
 }

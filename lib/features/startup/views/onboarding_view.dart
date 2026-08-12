@@ -1,13 +1,11 @@
 import 'package:aqua_go/core/components/custom_button.dart';
 import 'package:aqua_go/core/route/routes.dart';
 import 'package:aqua_go/core/themes/app_colors.dart';
-import 'package:aqua_go/core/utils/app_assets.dart';
 import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../../../core/config/local_storage/shared_prefs.dart';
 import '../../../core/constants.dart';
 import '../../../core/config/controllers/language_controller/language_cubit.dart';
@@ -64,24 +62,31 @@ class _OnboardingViewState extends State<OnboardingView> {
           //   height: size.height * 0.7,
           //   child: Image.asset(AppAssets.onboardingMainBg, fit: BoxFit.cover),
           // ),
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: SizedBox(
-              width: double.infinity,
-              child: Image.asset(
-                AppAssets.onboardingShadowTop,
-                fit: BoxFit.fill,
-              ),
-            ),
+          // Positioned(
+          //   top: 0,
+          //   left: 0,
+          //   right: 0,
+          //   child: SizedBox(
+          //     width: double.infinity,
+          //     child: Image.asset(
+          //       AppAssets.onboardingShadowTop,
+          //       fit: BoxFit.fill,
+          //     ),
+          //   ),
+          // ),
+          SizedBox(
+            width: double.infinity,
+            height: size.height * 0.7,
+            child: OnboardingPageView(pageController: _pageController),
           ),
+
           Column(
             children: [
-              SizedBox(height: MediaQuery.sizeOf(context).height * 0.2),
-              Expanded(
-                child: OnboardingPageView(pageController: _pageController),
-              ),
+              // SizedBox(height: MediaQuery.sizeOf(context).height * 0.2),
+              // Expanded(
+              //   child: OnboardingPageView(pageController: _pageController),
+              // ),
+              const Spacer(),
               _buildBottomContainer(context, isSmallScreen),
             ],
           ),
@@ -100,7 +105,6 @@ class _OnboardingViewState extends State<OnboardingView> {
               arImages: OnboardingPageView.getArStepImagesForPage(currentPage),
             ),
           ),
-
           Positioned(top: 48, left: 24, child: LanguageWidget()),
         ],
       ),

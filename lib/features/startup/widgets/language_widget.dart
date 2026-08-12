@@ -53,8 +53,8 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                 'English',
                 style: AppTextStyles.regular14.copyWith(
                   color: currentLocale.languageCode == 'en'
-                      ? darkAppColors.primary
-                      : darkAppColors.textSecondary,
+                      ? lightAppColors.primary
+                      : lightAppColors.textSecondary,
                 ),
               ),
             ),
@@ -67,8 +67,8 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                 'العربية',
                 style: AppTextStyles.regular14.copyWith(
                   color: currentLocale.languageCode == 'ar'
-                      ? darkAppColors.primary
-                      : darkAppColors.textSecondary,
+                      ? lightAppColors.primary
+                      : lightAppColors.textSecondary,
                 ),
               ),
             ),
@@ -80,7 +80,7 @@ class _LanguageWidgetState extends State<LanguageWidget> {
         width: 18,
         height: 18,
         colorFilter: ColorFilter.mode(
-          _isOpened ? darkAppColors.primary : darkAppColors.contentDisabled,
+          _isOpened ? lightAppColors.primary : darkAppColors.contentDisabled,
           BlendMode.srcIn,
         ),
       ),
