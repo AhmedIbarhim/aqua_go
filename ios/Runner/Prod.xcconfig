@@ -1,4 +1,6 @@
-#include "Generated.xcconfig"
+#include? "Flutter/Generated.xcconfig"
+#include? "../Flutter/Generated.xcconfig"
+#include? "Generated.xcconfig"
 
 APP_DISPLAY_NAME=Aqua Go
 FLAVOR=prod
