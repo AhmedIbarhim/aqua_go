@@ -18,6 +18,11 @@ import '../widgets/booking_location_widgets/saved_locations_list.dart';
 import '../../../address/data/models/address_model.dart';
 import '../controllers/booking_cubit.dart';
 import '../controllers/booking_state.dart';
+import '../controllers/booking_payment_cubit.dart';
+import '../controllers/booking_payment_state.dart';
+import '../controllers/booking_pricing_cubit.dart';
+import '../controllers/booking_pricing_state.dart';
+import '../widgets/booking_loading_overlay_listener.dart';
 import '../widgets/booking_location_widgets/booking_location_bottom_action_sheet.dart';
 
 class BookingLocationView extends StatefulWidget {
@@ -181,14 +186,23 @@ class _BookingLocationViewState extends State<BookingLocationView> {
                 }
               },
             ),
+            // This screen stays mounted under the rest of the flow and shares
+            // the cubits' lifetime, so it owns the overlay: a later screen that
+            // is popped mid-request cannot strand it.
+            bookingLoadingOverlayListener<BookingCubit, BookingState>(
+              (state) => state.status,
+            ),
+            bookingLoadingOverlayListener<
+              BookingPricingCubit,
+              BookingPricingState
+            >((state) => state.status),
+            bookingLoadingOverlayListener<
+              BookingPaymentCubit,
+              BookingPaymentState
+            >((state) => state.status),
             BlocListener<BookingCubit, BookingState>(
               listenWhen: (prev, curr) => prev.status != curr.status,
               listener: (context, state) {
-                if (state.status == BookingStatus.loading) {
-                  context.showLoadingOverlay();
-                } else {
-                  context.hideLoadingOverlay();
-                }
                 if (state.status == BookingStatus.failure &&
                     state.errorMessage != null) {
                   context.showErrorSnackBar(state.errorMessage!);

@@ -12,9 +12,11 @@ import 'package:aqua_go/features/booking/data/models/payment_init_model.dart';
 import 'package:aqua_go/features/booking/data/models/quote_model.dart';
 import 'package:aqua_go/features/booking/data/repos/booking_repository.dart';
 import 'package:aqua_go/features/booking/domain/configs/booking_flow_config.dart';
+import 'package:aqua_go/features/booking/domain/booking_submission.dart';
 import 'package:aqua_go/features/booking/domain/strategies/booking_submit_strategy.dart';
 import 'package:aqua_go/features/booking/presentation/controllers/booking_cubit.dart';
-import 'package:aqua_go/features/booking/presentation/controllers/booking_state.dart';
+import 'package:aqua_go/features/booking/presentation/controllers/booking_payment_cubit.dart';
+import 'package:aqua_go/features/booking/presentation/controllers/booking_pricing_cubit.dart';
 import 'package:aqua_go/features/booking/presentation/views/booking_summary_view.dart';
 import 'package:aqua_go/core/config/di/service_locator.dart';
 import 'package:aqua_go/features/booking/presentation/views/booking_details_view.dart';
@@ -93,7 +95,7 @@ class _InMemoryTranslations extends AssetLoader {
 
 /// Pumps [BookingSummaryView] with the localization + theme + cubit scaffolding
 /// the real app provides, and lets the post-frame initial quote settle.
-Future<void> pumpSummary(WidgetTester tester, BookingCubit cubit) async {
+Future<void> pumpSummary(WidgetTester tester, BookingFlowCubits cubit) async {
   // Generous surface: widget tests render with the fixed-width test font, which
   // is far wider than the shipped one, so a phone-sized canvas overflows rows
   // that are fine on a device. These tests assert behaviour, not layout.
@@ -116,7 +118,7 @@ Future<void> pumpSummary(WidgetTester tester, BookingCubit cubit) async {
 /// otherwise the in-flight timer outlives the test.
 Future<void> pumpSummaryPendingQuote(
   WidgetTester tester,
-  BookingCubit cubit,
+  BookingFlowCubits cubit,
 ) async {
   tester.view.physicalSize = const Size(1400, 3000);
   tester.view.devicePixelRatio = 1.0;
@@ -130,7 +132,10 @@ Future<void> pumpSummaryPendingQuote(
 
 /// Tears the summary out of the tree, destroying its [State] exactly as popping
 /// the route does, then mounts it again on the SAME cubit.
-Future<void> remountSummary(WidgetTester tester, BookingCubit cubit) async {
+Future<void> remountSummary(
+  WidgetTester tester,
+  BookingFlowCubits cubit,
+) async {
   _ensureWalletRepositoryRegistered();
   await tester.pumpWidget(const MaterialApp(home: SizedBox.shrink()));
   await tester.pump();
@@ -160,7 +165,7 @@ void _ensureWalletRepositoryRegistered() {
 /// summary — with the same scaffolding. Its `MyCarsCubit` comes from the
 /// service locator, so a fake is registered here rather than reaching the
 /// network.
-Future<void> pumpDetails(WidgetTester tester, BookingCubit cubit) async {
+Future<void> pumpDetails(WidgetTester tester, BookingFlowCubits cubit) async {
   tester.view.physicalSize = const Size(1400, 3000);
   tester.view.devicePixelRatio = 1.0;
   addTearDown(tester.view.reset);
@@ -194,7 +199,8 @@ class _NoCarsRepository extends CarsRepository {
   _NoCarsRepository() : super(CarsRemoteDataSource(APIClient(Dio())));
 
   @override
-  Future<Either<Failure, List<MyCarModel>>> fetchCars() async => right(const []);
+  Future<Either<Failure, List<MyCarModel>>> fetchCars() async =>
+      right(const []);
 }
 
 /// Answers the loyalty balance with a zeroed-out fake, so the summary screen's
@@ -216,10 +222,10 @@ class _NoWalletRepository extends WalletRepository {
       );
 }
 
-Widget _summaryApp(BookingCubit cubit) =>
+Widget _summaryApp(BookingFlowCubits cubit) =>
     _localizedApp(cubit, const BookingSummaryView());
 
-Widget _localizedApp(BookingCubit cubit, Widget home) {
+Widget _localizedApp(BookingFlowCubits cubit, Widget home) {
   return EasyLocalization(
     supportedLocales: const [Locale('en'), Locale('ar')],
     path: 'assets/translations',
@@ -238,7 +244,9 @@ Widget _localizedApp(BookingCubit cubit, Widget home) {
             BlocProvider<LanguageCubit>(create: (_) => LanguageCubit()),
             // The details screen's shimmer placeholders read the theme cubit.
             BlocProvider<ThemeCubit>(create: (_) => ThemeCubit()),
-            BlocProvider<BookingCubit>.value(value: cubit),
+            BlocProvider<BookingCubit>.value(value: cubit.booking),
+            BlocProvider<BookingPricingCubit>.value(value: cubit.pricing),
+            BlocProvider<BookingPaymentCubit>.value(value: cubit.payment),
           ],
           child: home,
         ),
@@ -295,44 +303,92 @@ Future<void> tapConfirm(WidgetTester tester) async {
   await settle(tester);
 }
 
-BookingCubit buildCubit(
+/// The three cubits of one booking flow, wired as the router wires them.
+class BookingFlowCubits {
+  BookingFlowCubits({
+    required BookingRepository repo,
+    required SubscriptionsRepository subscriptionsRepo,
+    required ServicesRepository servicesRepo,
+    required BookingSubmitStrategy submitStrategy,
+    BookingFlowConfig flowConfig = BookingFlowConfig.normal,
+    String? offerTitleAr,
+    String? offerTitleEn,
+    int? offerListPriceMinor,
+    int? offerTargetPriceMinor,
+  }) : booking = BookingCubit(
+         bookingRepo: repo,
+         subscriptionsRepo: subscriptionsRepo,
+         servicesRepo: servicesRepo,
+         flowConfig: flowConfig,
+       ) {
+    pricing = BookingPricingCubit(
+      bookingRepo: repo,
+      booking: booking,
+      offerTitleAr: offerTitleAr,
+      offerTitleEn: offerTitleEn,
+      offerListPriceMinor: offerListPriceMinor,
+      offerTargetPriceMinor: offerTargetPriceMinor,
+    );
+    payment = BookingPaymentCubit(
+      bookingRepo: repo,
+      subscriptionsRepo: subscriptionsRepo,
+      submitStrategy: submitStrategy,
+      booking: booking,
+      pricing: pricing,
+    );
+  }
+
+  final BookingCubit booking;
+  late final BookingPricingCubit pricing;
+  late final BookingPaymentCubit payment;
+
+  Future<void> close() async {
+    await payment.close();
+    await pricing.close();
+    await booking.close();
+  }
+}
+
+BookingFlowCubits buildCubit(
   BookingRepository repo, {
   BookingSubmitStrategy? submitStrategy,
   ServiceModel? withService,
+
   /// The two display figures a SERVICE offer card hands into the flow. Left
   /// null, the cubit is an ordinary booking that never came through an offer —
   /// which is what every pre-existing caller of this helper is.
   int? offerListPriceMinor,
   int? offerTargetPriceMinor,
+
   /// The offer's own name, as the offer detail screen hands it in. Left null,
   /// the re-apply card falls back to its generic copy.
   String? offerTitleAr,
   String? offerTitleEn,
 }) {
   final apiClient = APIClient(Dio());
-  final cubit = BookingCubit(
-    bookingRepo: repo,
+  final cubit = BookingFlowCubits(
+    repo: repo,
     subscriptionsRepo: SubscriptionsRepository(
       SubscriptionsRemoteDataSource(apiClient),
     ),
     servicesRepo: ServicesRepository(ServicesRemoteDataSource(apiClient)),
     submitStrategy: submitStrategy ?? UnusedSubmitStrategy(),
-  );
-
-  cubit.initBooking(
-    withService ?? service,
-    existingCar: car,
-    existingAddress: address,
     offerListPriceMinor: offerListPriceMinor,
     offerTargetPriceMinor: offerTargetPriceMinor,
     offerTitleAr: offerTitleAr,
     offerTitleEn: offerTitleEn,
   );
+
+  cubit.booking.initBooking(
+    withService ?? service,
+    existingCar: car,
+    existingAddress: address,
+  );
   final date = DateTime.now().add(const Duration(days: 2));
   final slotStart = DateTime(date.year, date.month, date.day, 10, 0);
-  cubit.updateDateTime(date, null);
-  cubit.updateDateTime(date, slotStart);
-  cubit.updatePaymentMethod(PaymentMethod.creditCard);
+  cubit.booking.updateDateTime(date, null);
+  cubit.booking.updateDateTime(date, slotStart);
+  cubit.booking.updatePaymentMethod(PaymentMethod.creditCard);
   return cubit;
 }
 
@@ -350,17 +406,17 @@ BookingCubit buildCubit(
 /// populate (the package pseudo-service, the add-on classification, the
 /// bundled-service picker) is beside the point here, and [service] is already
 /// on the state from `initBooking` itself.
-BookingCubit buildPackageCubit(BookingRepository repo) {
+BookingFlowCubits buildPackageCubit(BookingRepository repo) {
   final apiClient = APIClient(Dio());
-  final cubit = BookingCubit(
-    bookingRepo: repo,
+  final cubit = BookingFlowCubits(
+    repo: repo,
     subscriptionsRepo: _NoSubscriptionsRepository(),
     servicesRepo: ServicesRepository(ServicesRemoteDataSource(apiClient)),
     submitStrategy: UnusedSubmitStrategy(),
     flowConfig: const BookingFlowConfig(flowType: BookingFlowType.package),
   );
 
-  cubit.initBooking(
+  cubit.booking.initBooking(
     service,
     existingCar: car,
     existingAddress: address,
@@ -369,8 +425,8 @@ BookingCubit buildPackageCubit(BookingRepository repo) {
   );
   final date = DateTime.now().add(const Duration(days: 2));
   final slotStart = DateTime(date.year, date.month, date.day, 10, 0);
-  cubit.updateDateTime(date, null);
-  cubit.updateDateTime(date, slotStart);
+  cubit.booking.updateDateTime(date, null);
+  cubit.booking.updateDateTime(date, slotStart);
   return cubit;
 }
 
@@ -453,7 +509,7 @@ QuoteModel quotePayload({
 }) {
   final grossMinor =
       (promoCode == null ? grossWithoutPromoMinor : grossWithPromoMinor) +
-          addOnGrossMinor;
+      addOnGrossMinor;
   final vatMinor = (grossMinor * 15 / 115).round();
   // VAT contained within the add-on's own gross, exactly as the server states
   // it on the ADDON row. The DISCOUNT row's VAT stays the residual below.
@@ -519,7 +575,8 @@ QuoteModel quotePayload({
           'kind': 'DISCOUNT',
           'refId': null,
           'grossMinor': -promoDiscountMinor,
-          'netMinor': -promoDiscountMinor -
+          'netMinor':
+              -promoDiscountMinor -
               (vatMinor - serviceVatMinor - addOnVatMinor),
           'vatMinor': vatMinor - serviceVatMinor - addOnVatMinor,
         },
@@ -542,8 +599,8 @@ class RecordingBookingRepo extends BookingRepository {
     this.quoteFailure,
     this.addOnGrossMinor = 0,
   }) : super(
-        bookingsRemoteDataSource: BookingsRemoteDataSource(APIClient(Dio())),
-      );
+         bookingsRemoteDataSource: BookingsRemoteDataSource(APIClient(Dio())),
+       );
 
   /// What ONE selected add-on adds to the quoted gross, as an ADDON row.
   ///
@@ -591,8 +648,8 @@ class RecordingBookingRepo extends BookingRepository {
         // offer-driven quote never carries the code on the request, so a fake
         // that echoed only what it was given would report every offer quote as
         // carrying no promo at all.
-        promoCode: promoCode ??
-            (offerId == null ? null : offerResolvedPromoCode),
+        promoCode:
+            promoCode ?? (offerId == null ? null : offerResolvedPromoCode),
         quoteId: 'quote-${quoteCalls.length}',
         expired: expiredQuotes,
         addOnGrossMinor: addOnIds.isEmpty ? 0 : addOnGrossMinor,
@@ -635,7 +692,6 @@ class UnusedSubmitStrategy implements BookingSubmitStrategy {
   @override
   Future<Either<Failure, BookingResponseModel>> submit({
     required BookingRepository repo,
-    required BookingState state,
-    String? moyasarPaymentId,
+    required BookingSubmission submission,
   }) async => left(ServerFailure('submit not exercised in this test'));
 }

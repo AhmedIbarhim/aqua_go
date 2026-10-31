@@ -5,7 +5,8 @@ import 'package:aqua_go/features/auth/data/models/user_model.dart';
 import 'package:aqua_go/features/booking/data/repos/booking_repository.dart';
 import 'package:aqua_go/features/booking/domain/promo_code_history.dart';
 import 'package:aqua_go/features/booking/domain/strategies/booking_submit_strategy.dart';
-import 'package:aqua_go/features/booking/presentation/controllers/booking_state.dart';
+import 'package:aqua_go/features/booking/domain/booking_submission.dart';
+import 'package:aqua_go/features/booking/presentation/controllers/booking_payment_state.dart';
 import 'package:aqua_go/features/booking/presentation/widgets/booking_summary_widgets/payment_summary_card.dart';
 import 'package:aqua_go/features/my_bookings/data/models/booking_response_model/booking_response_model.dart';
 import 'package:aqua_go/features/offers/domain/pending_promo_code.dart';
@@ -242,7 +243,7 @@ void main() {
 
       // The offer WAS applied — the code the SERVER resolved it to is on the
       // quote, so this is not a vacuous pass.
-      expect(cubit.state.appliedPromoCode, offerResolvedPromoCode);
+      expect(cubit.pricing.state.appliedPromoCode, offerResolvedPromoCode);
       expect(PromoCodeHistory.recent(), isEmpty);
     });
 
@@ -266,7 +267,7 @@ void main() {
 
       await pumpSummary(tester, cubit);
 
-      expect(cubit.state.appliedPromoCode, isNull);
+      expect(cubit.pricing.state.appliedPromoCode, isNull);
       expect(PromoCodeHistory.recent(), isEmpty);
     });
 
@@ -285,7 +286,7 @@ void main() {
       await pumpSummary(tester, cubit);
       await applyPromo(tester, 'NOSUCHCODE');
 
-      expect(cubit.state.appliedPromoCode, isNull);
+      expect(cubit.pricing.state.appliedPromoCode, isNull);
       expect(
         PromoCodeHistory.recent(),
         isEmpty,
@@ -316,10 +317,10 @@ void main() {
       addTearDown(cubit.close);
 
       await pumpSummary(tester, cubit);
-      await cubit.completeBookingAfterPayment('pay_1');
+      await cubit.payment.completeBookingAfterPayment('pay_1');
       await settle(tester);
 
-      expect(cubit.state.paymentPhase, PaymentPhase.createUnconfirmed);
+      expect(cubit.payment.state.paymentPhase, PaymentPhase.createUnconfirmed);
       expect(
         find.textContaining(serverDetail),
         findsOneWidget,
@@ -350,10 +351,10 @@ void main() {
       addTearDown(cubit.close);
 
       await pumpSummary(tester, cubit);
-      await cubit.completeBookingAfterPayment('pay_1');
+      await cubit.payment.completeBookingAfterPayment('pay_1');
       await settle(tester);
 
-      expect(cubit.state.paymentPhase, PaymentPhase.createUnconfirmed);
+      expect(cubit.payment.state.paymentPhase, PaymentPhase.createUnconfirmed);
       expect(
         find.textContaining('bookings.payment_unconfirmed_title'),
         findsOneWidget,
@@ -385,10 +386,10 @@ void main() {
       addTearDown(cubit.close);
 
       await pumpSummary(tester, cubit);
-      await cubit.completeBookingAfterPayment('pay_1');
+      await cubit.payment.completeBookingAfterPayment('pay_1');
       await settle(tester);
 
-      expect(cubit.state.paymentPhase, PaymentPhase.createUnconfirmed);
+      expect(cubit.payment.state.paymentPhase, PaymentPhase.createUnconfirmed);
       expect(
         find.textContaining('bookings.payment_unconfirmed_notice'),
         findsOneWidget,
@@ -412,7 +413,7 @@ void main() {
       await pumpSummary(tester, cubit);
       await applyPromo(tester, 'NOSUCHCODE');
 
-      expect(cubit.state.paymentPhase, PaymentPhase.none);
+      expect(cubit.payment.state.paymentPhase, PaymentPhase.none);
       expect(
         find.textContaining('bookings.payment_unconfirmed_notice'),
         findsNothing,
@@ -426,7 +427,7 @@ void main() {
 /// Fails booking-create the way the server does after the card is charged.
 /// [slug] is the RFC 9457 error slug the rejection carried — the only thing
 /// that says whether the compensating refund ran.
-class _FailingSubmit implements BookingSubmitStrategy {
+class _FailingSubmit implements PaidBookingSubmitStrategy {
   const _FailingSubmit(
     this.detail, {
     this.type = FailureType.validation,
@@ -440,7 +441,13 @@ class _FailingSubmit implements BookingSubmitStrategy {
   @override
   Future<Either<Failure, BookingResponseModel>> submit({
     required BookingRepository repo,
-    required BookingState state,
-    String? moyasarPaymentId,
+    required BookingSubmission submission,
+  }) async => left(ServerFailure(detail, type: type, slug: slug));
+
+  @override
+  Future<Either<Failure, BookingResponseModel>> submitPaid({
+    required BookingRepository repo,
+    required BookingSubmission submission,
+    required String moyasarPaymentId,
   }) async => left(ServerFailure(detail, type: type, slug: slug));
 }

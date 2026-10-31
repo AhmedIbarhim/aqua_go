@@ -78,21 +78,24 @@ void main() {
 
     /// Account DELETION erases it — a PDPL obligation, not a nicety: the
     /// account is gone server-side, so nothing of it may sit on the handset.
-    test('forget erases this customer, and the pre-scoping store too', () async {
-      await CacheClient.setStringList(
-        PromoCodeHistory.legacyStorageKey,
-        const ['LEGACY1'],
-      );
-      await PromoCodeHistory.remember('ACODE1');
+    test(
+      'forget erases this customer, and the pre-scoping store too',
+      () async {
+        await CacheClient.setStringList(
+          PromoCodeHistory.legacyStorageKey,
+          const ['LEGACY1'],
+        );
+        await PromoCodeHistory.remember('ACODE1');
 
-      await PromoCodeHistory.forget();
+        await PromoCodeHistory.forget();
 
-      expect(PromoCodeHistory.recent(), isEmpty);
-      expect(
-        CacheClient.getStringList(PromoCodeHistory.legacyStorageKey),
-        isEmpty,
-      );
-    });
+        expect(PromoCodeHistory.recent(), isEmpty);
+        expect(
+          CacheClient.getStringList(PromoCodeHistory.legacyStorageKey),
+          isEmpty,
+        );
+      },
+    );
 
     /// An ordinary sign-out is NOT an erasure. UCC16 asks for "autocomplete of
     /// previously used codes"; wiping the store whenever the session ends would
@@ -100,22 +103,24 @@ void main() {
     /// per-customer key is what makes keeping it safe — the test above proves
     /// nobody else can read it. What DOES go is the pre-scoping shared store an
     /// older build could have left behind.
-    test('the ordinary teardown keeps the customer\'s codes and drops the legacy store',
-        () async {
-      await CacheClient.setStringList(
-        PromoCodeHistory.legacyStorageKey,
-        const ['LEGACY1'],
-      );
-      await PromoCodeHistory.remember('ACODE1');
+    test(
+      'the ordinary teardown keeps the customer\'s codes and drops the legacy store',
+      () async {
+        await CacheClient.setStringList(
+          PromoCodeHistory.legacyStorageKey,
+          const ['LEGACY1'],
+        );
+        await PromoCodeHistory.remember('ACODE1');
 
-      await PromoCodeHistory.forgetLegacyDeviceStore();
+        await PromoCodeHistory.forgetLegacyDeviceStore();
 
-      expect(PromoCodeHistory.recent(), ['ACODE1']);
-      expect(
-        CacheClient.getStringList(PromoCodeHistory.legacyStorageKey),
-        isEmpty,
-      );
-    });
+        expect(PromoCodeHistory.recent(), ['ACODE1']);
+        expect(
+          CacheClient.getStringList(PromoCodeHistory.legacyStorageKey),
+          isEmpty,
+        );
+      },
+    );
 
     test('most recent first', () async {
       await PromoCodeHistory.remember('FIRST1');
@@ -124,13 +129,16 @@ void main() {
       expect(PromoCodeHistory.recent(), ['SECOND2', 'FIRST1']);
     });
 
-    test('re-using a code moves it to the front instead of repeating it', () async {
-      await PromoCodeHistory.remember('FIRST1');
-      await PromoCodeHistory.remember('SECOND2');
-      await PromoCodeHistory.remember('first1');
+    test(
+      're-using a code moves it to the front instead of repeating it',
+      () async {
+        await PromoCodeHistory.remember('FIRST1');
+        await PromoCodeHistory.remember('SECOND2');
+        await PromoCodeHistory.remember('first1');
 
-      expect(PromoCodeHistory.recent(), ['FIRST1', 'SECOND2']);
-    });
+        expect(PromoCodeHistory.recent(), ['FIRST1', 'SECOND2']);
+      },
+    );
 
     test('normalises to upper case, the way the server stores it', () async {
       await PromoCodeHistory.remember(' welcome20 ');

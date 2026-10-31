@@ -56,7 +56,7 @@ void main() {
         await pumpSummaryPendingQuote(tester, cubit);
 
         expect(
-          cubit.state.quote,
+          cubit.pricing.state.quote,
           isNull,
           reason:
               'the initial quote must still be in flight for this to test '
@@ -100,7 +100,7 @@ void main() {
 
       await pumpSummary(tester, cubit);
 
-      expect(cubit.state.quote, isNotNull);
+      expect(cubit.pricing.state.quote, isNotNull);
       expect(
         find.byType(PaymentMethodSelection),
         findsOneWidget,
@@ -119,7 +119,7 @@ void main() {
 
       await pumpSummary(tester, cubit);
 
-      expect(cubit.state.quote, isNotNull);
+      expect(cubit.pricing.state.quote, isNotNull);
       expect(
         find.text(noPaymentCopy),
         findsOneWidget,
@@ -140,7 +140,7 @@ void main() {
       await pumpSummaryPendingQuote(tester, cubit);
 
       expect(
-        cubit.state.quote,
+        cubit.pricing.state.quote,
         isNull,
         reason:
             'the initial quote must still be in flight for this to test '
@@ -173,7 +173,7 @@ void main() {
 
       await pumpSummary(tester, cubit);
 
-      expect(cubit.state.quote, isNotNull);
+      expect(cubit.pricing.state.quote, isNotNull);
       expect(find.byType(PaymentSummaryCard), findsOneWidget);
       expect(find.byType(PaymentSummaryShimmer), findsNothing);
     });

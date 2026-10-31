@@ -4,17 +4,17 @@ import '../../../../../core/themes/app_text_styles.dart';
 import '../../../../../core/extentions/context_extentions.dart';
 import '../../../../../generated/locale_keys.g.dart';
 import '../../../../wallet/data/models/loyalty_balance_model.dart';
-import '../../controllers/booking_state.dart';
+import '../../../data/models/quote_model.dart';
 
 class WalletPointsSection extends StatelessWidget {
-  final BookingState bookingState;
+  final QuoteModel? quote;
   final LoyaltyBalanceModel? loyaltyBalance;
   final bool isPointsToggled;
   final Function(bool) onPointsToggled;
 
   const WalletPointsSection({
     super.key,
-    required this.bookingState,
+    required this.quote,
     required this.loyaltyBalance,
     required this.isPointsToggled,
     required this.onPointsToggled,
@@ -22,7 +22,6 @@ class WalletPointsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final quote = bookingState.quote;
     final int balanceValueMinor =
         quote?.currentBalanceValueMinor ??
         loyaltyBalance?.estimatedValueMinor ??

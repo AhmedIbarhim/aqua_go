@@ -9,7 +9,7 @@ import 'package:aqua_go/core/utils/saudi_wire_format.dart';
 import 'package:aqua_go/features/booking/data/models/service_booking_request_model.dart';
 import 'package:aqua_go/features/booking/data/repos/booking_repository.dart';
 import 'package:aqua_go/features/booking/domain/strategies/service_booking_submit.dart';
-import 'package:aqua_go/features/booking/presentation/controllers/booking_state.dart';
+import 'package:aqua_go/features/booking/domain/booking_submission.dart';
 import 'package:aqua_go/features/home/data/models/service_model.dart';
 import 'package:aqua_go/features/my_bookings/data/models/booking_response_model/booking_response_model.dart';
 import 'package:aqua_go/features/my_cars/data/models/my_car_model.dart';
@@ -122,9 +122,9 @@ void main() {
 
     test('forwards the applied offer id from the booking state', () async {
       final repo = _CapturingRepo();
-      await ServiceBookingSubmit().submit(
+      await ServiceBookingSubmit().submitPaid(
         repo: repo,
-        state: BookingState(
+        submission: BookingSubmission(
           selectedService: ServiceModel(id: 'pkg-1'),
           selectedCar: MyCarModel(id: 'car-1', color: '0xFF000000'),
           selectedAddress: AddressModel(
@@ -135,7 +135,6 @@ void main() {
             lng: 39.1925,
           ),
           quote: _quote,
-          appliedPromoCode: 'WELCOME20',
           appliedOfferId: 'offer-1',
         ),
         moyasarPaymentId: 'pay_1',
@@ -158,18 +157,18 @@ void main() {
         final cubit = buildCubit(RecordingBookingRepo());
         addTearDown(cubit.close);
 
-        await cubit.applyOffer('offer-1');
-        expect(cubit.state.appliedOfferId, 'offer-1');
+        await cubit.pricing.applyOffer('offer-1');
+        expect(cubit.pricing.state.appliedOfferId, 'offer-1');
 
         // The customer types a different code over the offer. The quote that
         // comes back was priced with NO offer, so the booking must not be
         // stamped with one — `promo_redemptions.offer_id` is the whole of the
         // sale attribution, and this sale did not come through that offer.
-        await cubit.applyPromoCode('OTHERCODE');
+        await cubit.pricing.applyPromoCode('OTHERCODE');
 
-        expect(cubit.state.appliedPromoCode, 'OTHERCODE');
+        expect(cubit.pricing.state.appliedPromoCode, 'OTHERCODE');
         expect(
-          cubit.state.appliedOfferId,
+          cubit.pricing.state.appliedOfferId,
           isNull,
           reason:
               'the offer the customer did not come through must not be '
@@ -182,10 +181,10 @@ void main() {
       final cubit = buildCubit(RecordingBookingRepo());
       addTearDown(cubit.close);
 
-      await cubit.applyOffer('offer-1');
-      await cubit.reprice();
+      await cubit.pricing.applyOffer('offer-1');
+      await cubit.pricing.reprice();
 
-      expect(cubit.state.appliedOfferId, 'offer-1');
+      expect(cubit.pricing.state.appliedOfferId, 'offer-1');
     });
   });
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../features/booking/presentation/controllers/booking_cubit.dart';
+import '../../features/booking/presentation/controllers/booking_payment_cubit.dart';
+import '../../features/booking/presentation/controllers/booking_pricing_cubit.dart';
 import '../../features/booking/domain/configs/booking_flow_config.dart';
 import '../../features/booking/domain/strategies/booking_submit_strategy.dart';
 import '../../features/booking/domain/strategies/service_booking_submit.dart';
@@ -194,8 +196,8 @@ abstract class AppRouter {
       case Routes.bookingDetails:
         final args = settings.arguments as BookingFlowArgs;
         return MaterialPageRoute(
-          builder: (_) => BlocProvider.value(
-            value: args.bookingCubit,
+          builder: (_) => MultiBlocProvider(
+            providers: args.providers,
             child: const BookingDetailsView(),
           ),
         );
@@ -203,30 +205,49 @@ abstract class AppRouter {
       case Routes.bookingLocation:
         final args = settings.arguments as BookingFlowStartArgs;
         return MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (_) =>
-                BookingCubit(
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (_) =>
+                    BookingCubit(
+                      bookingRepo: locator<BookingRepository>(),
+                      subscriptionsRepo: locator<SubscriptionsRepository>(),
+                      servicesRepo: locator<ServicesRepository>(),
+                      flowConfig: args.flowConfig,
+                    )..initBooking(
+                      args.service,
+                      existingCar: args.existingCar,
+                      existingAddress: args.existingAddress,
+                      existingDate: args.existingDate,
+                      existingSlotStart: args.existingSlotStart,
+                      subscriptionId: args.subscriptionId,
+                      washId: args.washId,
+                      // Without this the gift-redeem flow POSTs giftCode:"" and
+                      // the server 400s on a required field the customer never
+                      // sees.
+                      giftCode: args.giftCode,
+                    ),
+              ),
+              BlocProvider(
+                create: (context) => BookingPricingCubit(
                   bookingRepo: locator<BookingRepository>(),
-                  subscriptionsRepo: locator<SubscriptionsRepository>(),
-                  servicesRepo: locator<ServicesRepository>(),
-                  flowConfig: args.flowConfig,
-                  submitStrategy: args.submitStrategy,
-                )..initBooking(
-                  args.service,
-                  existingCar: args.existingCar,
-                  existingAddress: args.existingAddress,
-                  existingDate: args.existingDate,
-                  existingSlotStart: args.existingSlotStart,
-                  subscriptionId: args.subscriptionId,
-                  washId: args.washId,
-                  // Without this the gift-redeem flow POSTs giftCode:"" and the
-                  // server 400s on a required field the customer never sees.
-                  giftCode: args.giftCode,
+                  booking: context.read<BookingCubit>(),
                   offerTitleAr: args.offerTitleAr,
                   offerTitleEn: args.offerTitleEn,
                   offerListPriceMinor: args.offerListPriceMinor,
                   offerTargetPriceMinor: args.offerTargetPriceMinor,
                 ),
+              ),
+              BlocProvider(
+                create: (context) => BookingPaymentCubit(
+                  bookingRepo: locator<BookingRepository>(),
+                  subscriptionsRepo: locator<SubscriptionsRepository>(),
+                  submitStrategy: args.submitStrategy,
+                  booking: context.read<BookingCubit>(),
+                  pricing: context.read<BookingPricingCubit>(),
+                ),
+              ),
+            ],
             child: const BookingLocationView(),
           ),
         );
@@ -234,8 +255,8 @@ abstract class AppRouter {
       case Routes.bookingSummary:
         final args = settings.arguments as BookingFlowArgs;
         return MaterialPageRoute(
-          builder: (_) => BlocProvider.value(
-            value: args.bookingCubit,
+          builder: (_) => MultiBlocProvider(
+            providers: args.providers,
             child: const BookingSummaryView(),
           ),
         );
@@ -382,13 +403,12 @@ abstract class AppRouter {
             : null;
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
-            create: (_) =>
-                ChatThreadCubit(
-                  repository: locator<ChatRepository>(),
-                  threadId: threadId,
-                  currentUserId: FetchUserData.getUserId() ?? '',
-                  initialThread: initialThread,
-                )..open(),
+            create: (_) => ChatThreadCubit(
+              repository: locator<ChatRepository>(),
+              threadId: threadId,
+              currentUserId: FetchUserData.getUserId() ?? '',
+              initialThread: initialThread,
+            )..open(),
             child: const ChatThreadView(),
           ),
         );
@@ -409,13 +429,26 @@ class ChatThreadArgs {
   const ChatThreadArgs({required this.threadId, this.initialThread});
 }
 
-/// Args for passing an already-created BookingCubit between views in the flow.
+/// Args for passing the already-created booking cubits between views in the
+/// flow.
 class BookingFlowArgs {
   final BookingCubit bookingCubit;
-  BookingFlowArgs({required this.bookingCubit});
+  final BookingPricingCubit pricingCubit;
+  final BookingPaymentCubit paymentCubit;
+
+  BookingFlowArgs.of(BuildContext context)
+    : bookingCubit = context.read<BookingCubit>(),
+      pricingCubit = context.read<BookingPricingCubit>(),
+      paymentCubit = context.read<BookingPaymentCubit>();
+
+  List<BlocProvider> get providers => [
+    BlocProvider<BookingCubit>.value(value: bookingCubit),
+    BlocProvider<BookingPricingCubit>.value(value: pricingCubit),
+    BlocProvider<BookingPaymentCubit>.value(value: paymentCubit),
+  ];
 }
 
-/// Args for starting a new booking flow (creates the cubit in the router).
+/// Args for starting a new booking flow (creates the cubits in the router).
 class BookingFlowStartArgs {
   final ServiceModel? service;
   final MyCarModel? existingCar;

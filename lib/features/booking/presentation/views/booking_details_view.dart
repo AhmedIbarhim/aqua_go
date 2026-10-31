@@ -16,6 +16,10 @@ import '../widgets/booking_details_widgets/package_service_selection_list.dart';
 import '../widgets/booking_details_widgets/add_ons_grid.dart';
 import '../widgets/booking_details_widgets/date_time_picker.dart';
 import '../controllers/booking_cubit.dart';
+import '../controllers/booking_payment_cubit.dart';
+import '../controllers/booking_payment_state.dart';
+import '../controllers/booking_pricing_cubit.dart';
+import '../controllers/booking_pricing_state.dart';
 import '../controllers/booking_state.dart';
 import '../widgets/booking_details_widgets/booking_section_title.dart';
 import '../widgets/booking_details_widgets/car_selection_section.dart';
@@ -70,7 +74,7 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
 
   void _repriceForDisplay() async {
     if (!mounted) return;
-    await context.read<BookingCubit>().repriceForDisplayWithoutPromo();
+    await context.read<BookingPricingCubit>().repriceForDisplayWithoutPromo();
   }
 
   @override
@@ -81,66 +85,86 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
       providers: [
         BlocProvider(create: (context) => locator<MyCarsCubit>()..getCars()),
       ],
-      child: BlocConsumer<BookingCubit, BookingState>(
-        listener: (context, state) {
+      child: MultiBlocListener(
+        listeners: [
           // Only handle submit states for reschedule flow (submits from this view)
-          if (!state.flowConfig.showSummaryStep) {
-            if (state.status == BookingStatus.loading) {
-              context.showLoadingOverlay();
-            } else {
-              context.hideLoadingOverlay();
-            }
-
-            if (state.status == BookingStatus.success) {
-              context.showSuccessSnackBar(
-                LocaleKeys.bookings_reschedule_success.tr(context: context),
-              );
-              Navigator.popUntil(context, (route) => route.isFirst);
-              if (state.createdBooking != null) {
-                Navigator.pushNamed(
-                  context,
-                  Routes.myBookingDetails,
-                  arguments: MyBookingDetailsArgs(
-                    booking: BookingSummaryModel.fromDetails(
-                      state.createdBooking!,
-                    ),
-                    isFromBookingFlow: true,
-                  ),
-                );
-              }
-            } else if (state.status == BookingStatus.failure) {
+          BlocListener<BookingPaymentCubit, BookingPaymentState>(
+            listenWhen: (previous, current) =>
+                previous.status != current.status,
+            listener: _onSubmitStatusChanged,
+          ),
+          // While this screen is on top, the price it shows is its own to report.
+          BlocListener<BookingPricingCubit, BookingPricingState>(
+            listenWhen: (previous, current) =>
+                previous.status != current.status &&
+                current.status == BookingStatus.failure &&
+                (ModalRoute.of(context)?.isCurrent ?? true),
+            listener: (context, state) {
               context.showErrorSnackBar(state.errorMessage ?? '');
-            }
-          }
-        },
-        builder: (context, bookingState) {
-          return Scaffold(
-            backgroundColor: context.colors.background,
-            appBar: GenericAppBar(
-              title: bookingState.flowConfig.isReschedule
-                  ? LocaleKeys.bookings_reschedule_booking.tr(context: context)
-                  : LocaleKeys.bookings_booking_details.tr(context: context),
-              titleColor: context.colors.textPrimary,
-              hasBackground: true,
-              backgroundImage: context.isDarkTheme
-                  ? AppAssets.bookingHeaderImageDark
-                  : AppAssets.bookingHeaderImageLight,
-              centerTitle: true,
-            ),
-            body: Column(
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: _buildContent(context, bookingState, width, height),
+            },
+          ),
+        ],
+        child: BlocBuilder<BookingCubit, BookingState>(
+          builder: (context, bookingState) {
+            return Scaffold(
+              backgroundColor: context.colors.background,
+              appBar: GenericAppBar(
+                title: bookingState.flowConfig.isReschedule
+                    ? LocaleKeys.bookings_reschedule_booking.tr(
+                        context: context,
+                      )
+                    : LocaleKeys.bookings_booking_details.tr(context: context),
+                titleColor: context.colors.textPrimary,
+                hasBackground: true,
+                backgroundImage: context.isDarkTheme
+                    ? AppAssets.bookingHeaderImageDark
+                    : AppAssets.bookingHeaderImageLight,
+                centerTitle: true,
+              ),
+              body: Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: _buildContent(
+                        context,
+                        bookingState,
+                        width,
+                        height,
+                      ),
+                    ),
                   ),
-                ),
-                BookingDetailsBottomActionSheet(bookingState: bookingState),
-              ],
-            ),
-          );
-        },
+                  BookingDetailsBottomActionSheet(bookingState: bookingState),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
+  }
+
+  void _onSubmitStatusChanged(BuildContext context, BookingPaymentState state) {
+    final flowConfig = context.read<BookingCubit>().state.flowConfig;
+    if (flowConfig.showSummaryStep) return;
+
+    if (state.status == BookingStatus.success) {
+      context.showSuccessSnackBar(
+        LocaleKeys.bookings_reschedule_success.tr(context: context),
+      );
+      Navigator.popUntil(context, (route) => route.isFirst);
+      if (state.createdBooking != null) {
+        Navigator.pushNamed(
+          context,
+          Routes.myBookingDetails,
+          arguments: MyBookingDetailsArgs(
+            booking: BookingSummaryModel.fromDetails(state.createdBooking!),
+            isFromBookingFlow: true,
+          ),
+        );
+      }
+    } else if (state.status == BookingStatus.failure) {
+      context.showErrorSnackBar(state.errorMessage ?? '');
+    }
   }
 
   Widget _buildContent(
@@ -165,7 +189,6 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
           CarSelectionSection(bookingState: bookingState),
           if (config.isPackage &&
               (bookingState.packageServices.length > 1 ||
-                  bookingState.packageServicesLoading ||
                   bookingState.packageServicesLoadFailed)) ...[
             SizedBox(height: height * 0.03),
             BookingSectionTitle(
@@ -173,12 +196,7 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
               isRequired: true,
             ),
             SizedBox(height: height * 0.02),
-            if (bookingState.packageServicesLoading)
-              SizedBox(
-                height: height * 0.14,
-                child: const Center(child: CircularProgressIndicator()),
-              )
-            else if (bookingState.packageServicesLoadFailed)
+            if (bookingState.packageServicesLoadFailed)
               ServicesLoadErrorWidget(width: width)
             else
               PackageServiceSelectionList(

@@ -42,7 +42,10 @@ void main() {
 
     // The applied quote is the discounted one and it is already expired.
     expect(repo.quoteCalls, [null, promoCode]);
-    expect(cubit.state.quote!.breakdown!.grossMinor, grossWithPromoMinor);
+    expect(
+      cubit.pricing.state.quote!.breakdown!.grossMinor,
+      grossWithPromoMinor,
+    );
 
     await tapConfirm(tester);
 
@@ -71,7 +74,10 @@ void main() {
 
     await pumpSummary(tester, cubit);
     expect(repo.quoteCalls, [null]);
-    expect(cubit.state.quote!.breakdown!.grossMinor, grossWithoutPromoMinor);
+    expect(
+      cubit.pricing.state.quote!.breakdown!.grossMinor,
+      grossWithoutPromoMinor,
+    );
 
     await tapConfirm(tester);
 

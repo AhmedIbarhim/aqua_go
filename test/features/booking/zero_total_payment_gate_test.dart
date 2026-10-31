@@ -63,14 +63,17 @@ void main() {
       );
     });
 
-    test('a partially discounted quote is payable at the discounted figure', () {
-      expect(
-        payableTotalMajor(
-          Breakdown(grossMinor: 6000, totalMinor: 4500, currency: 'SAR'),
-        ),
-        45.0,
-      );
-    });
+    test(
+      'a partially discounted quote is payable at the discounted figure',
+      () {
+        expect(
+          payableTotalMajor(
+            Breakdown(grossMinor: 6000, totalMinor: 4500, currency: 'SAR'),
+          ),
+          45.0,
+        );
+      },
+    );
 
     test('points reduce the payable figure below the total', () {
       // amountDueMinor is the post-points figure the server computes.
@@ -91,7 +94,10 @@ void main() {
     test('a legacy quote with only grossMinor is payable at the gross', () {
       // The same never-read-zero fallback `Breakdown.total` carries: an older
       // payload must not silently become a free booking.
-      expect(payableTotalMajor(Breakdown(grossMinor: 6000, currency: 'SAR')), 60.0);
+      expect(
+        payableTotalMajor(Breakdown(grossMinor: 6000, currency: 'SAR')),
+        60.0,
+      );
     });
 
     test('a null breakdown is payable-zero', () {

@@ -3,7 +3,7 @@ import '../../../../core/config/networking/exceptions/failure.dart';
 import '../../../my_bookings/data/models/booking_response_model/booking_response_model.dart';
 import '../../../../core/utils/saudi_wire_format.dart';
 import '../../data/repos/booking_repository.dart';
-import '../../presentation/controllers/booking_state.dart';
+import '../booking_submission.dart';
 import 'booking_submit_strategy.dart';
 
 class RedeemGiftBookingSubmit implements BookingSubmitStrategy {
@@ -12,24 +12,23 @@ class RedeemGiftBookingSubmit implements BookingSubmitStrategy {
   @override
   Future<Either<Failure, BookingResponseModel>> submit({
     required BookingRepository repo,
-    required BookingState state,
-    String? moyasarPaymentId,
+    required BookingSubmission submission,
   }) async {
-    final addr = state.selectedAddress;
-    final car = state.selectedCar;
+    final addr = submission.selectedAddress;
+    final car = submission.selectedCar;
 
     final isSavedAddress =
         addr?.id != null &&
         addr?.id != 'current_gps' &&
         addr?.id != 'custom_map';
 
-    final slotStart = state.selectedSlotStart;
+    final slotStart = submission.selectedSlotStart;
     final String scheduledAt = slotStart != null
         ? toWireDateTime(slotStart)
         : '';
 
     final data = {
-      'giftCode': state.giftCode ?? '',
+      'giftCode': submission.giftCode ?? '',
       'addressLabel': addr?.label ?? '',
       'lat': addr?.lat ?? 0.0,
       'lng': addr?.lng ?? 0.0,

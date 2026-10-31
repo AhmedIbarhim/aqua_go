@@ -35,7 +35,7 @@ void main() {
     await pumpSummary(tester, cubit);
     await applyPromo(tester, promoCode);
     expect(repo.quoteCalls, [null, promoCode]);
-    expect(cubit.state.appliedPromoCode, promoCode);
+    expect(cubit.pricing.state.appliedPromoCode, promoCode);
 
     // Pop back to the details screen and come forward again: the route's State
     // is destroyed, the cubit is not.
@@ -48,8 +48,11 @@ void main() {
           're-entering the summary must re-quote WITH the code the customer '
           'already applied, not silently at the undiscounted price',
     );
-    expect(cubit.state.appliedPromoCode, promoCode);
-    expect(cubit.state.quote!.breakdown!.grossMinor, grossWithPromoMinor);
+    expect(cubit.pricing.state.appliedPromoCode, promoCode);
+    expect(
+      cubit.pricing.state.quote!.breakdown!.grossMinor,
+      grossWithPromoMinor,
+    );
     // The applied chip is on screen, not the "add a code" prompt.
     expect(find.byIcon(Icons.discount_outlined), findsNothing);
     expect(find.textContaining(promoCode), findsOneWidget);
@@ -75,7 +78,7 @@ void main() {
 
       await pumpSummary(tester, cubit);
       await applyPromo(tester, promoCode);
-      expect(cubit.state.appliedPromoCode, promoCode);
+      expect(cubit.pricing.state.appliedPromoCode, promoCode);
 
       // Confirm: the quote has expired, so the screen re-quotes first — and the
       // code is refused this time.
@@ -89,12 +92,12 @@ void main() {
             'it, so the customer has a total they can actually pay',
       );
       expect(
-        cubit.state.appliedPromoCode,
+        cubit.pricing.state.appliedPromoCode,
         isNull,
         reason: 'a code the backend refused must not stay applied',
       );
       expect(
-        cubit.state.quote!.breakdown!.grossMinor,
+        cubit.pricing.state.quote!.breakdown!.grossMinor,
         grossWithoutPromoMinor,
         reason: 'the displayed total must be the one without the discount',
       );
@@ -122,54 +125,51 @@ void main() {
     },
   );
 
-  testWidgets(
-    'a re-quote the server never answered keeps the code — a dropped '
-    'connection is not a rejection',
-    (tester) async {
-      // The code is fine; the network is not. Dropping it here would remove the
-      // customer's own discount over a blip and re-price them at full price the
-      // moment the connection came back, on the one screen that exists to show
-      // the discount. The offers surface makes the same distinction
-      // (`OfferUncheckable`) for the same reason.
-      late final RecordingBookingRepo repo;
-      repo = RecordingBookingRepo(
-        quoteFailure: (code, _) => repo.quoteCalls.length >= 3
-            ? const ServerFailure(
-                'No internet connection',
-                type: FailureType.network,
-              )
-            : null,
-      );
-      final cubit = buildCubit(repo);
-      addTearDown(cubit.close);
+  testWidgets('a re-quote the server never answered keeps the code — a dropped '
+      'connection is not a rejection', (tester) async {
+    // The code is fine; the network is not. Dropping it here would remove the
+    // customer's own discount over a blip and re-price them at full price the
+    // moment the connection came back, on the one screen that exists to show
+    // the discount. The offers surface makes the same distinction
+    // (`OfferUncheckable`) for the same reason.
+    late final RecordingBookingRepo repo;
+    repo = RecordingBookingRepo(
+      quoteFailure: (code, _) => repo.quoteCalls.length >= 3
+          ? const ServerFailure(
+              'No internet connection',
+              type: FailureType.network,
+            )
+          : null,
+    );
+    final cubit = buildCubit(repo);
+    addTearDown(cubit.close);
 
-      await pumpSummary(tester, cubit);
-      await applyPromo(tester, promoCode);
-      expect(cubit.state.appliedPromoCode, promoCode);
+    await pumpSummary(tester, cubit);
+    await applyPromo(tester, promoCode);
+    expect(cubit.pricing.state.appliedPromoCode, promoCode);
 
-      // Coming back to the summary re-quotes with the applied code — and the
-      // request never reaches the server.
-      await remountSummary(tester, cubit);
+    // Coming back to the summary re-quotes with the applied code — and the
+    // request never reaches the server.
+    await remountSummary(tester, cubit);
 
-      expect(
-        repo.quoteCalls,
-        [null, promoCode, promoCode],
-        reason:
-            'a transport failure says nothing about the code, so there is no '
-            'second, bare attempt to fall through to',
-      );
-      expect(
-        cubit.state.appliedPromoCode,
-        promoCode,
-        reason: 'the code the server never judged stays applied',
-      );
-      expect(
-        find.textContaining('bookings.promo_code_removed'),
-        findsNothing,
-        reason: 'nothing was removed, so nothing may say it was',
-      );
-    },
-  );
+    expect(
+      repo.quoteCalls,
+      [null, promoCode, promoCode],
+      reason:
+          'a transport failure says nothing about the code, so there is no '
+          'second, bare attempt to fall through to',
+    );
+    expect(
+      cubit.pricing.state.appliedPromoCode,
+      promoCode,
+      reason: 'the code the server never judged stays applied',
+    );
+    expect(
+      find.textContaining('bookings.promo_code_removed'),
+      findsNothing,
+      reason: 'nothing was removed, so nothing may say it was',
+    );
+  });
 
   testWidgets(
     'an offer whose quote never reached the server is held for the next '
@@ -249,15 +249,14 @@ void main() {
       addTearDown(cubit.close);
       await pumpSummary(tester, cubit);
 
+      expect(repo.offerCalls, [
+        'offer-1',
+        'offer-1',
+      ], reason: 'tried, retried, and no bare re-price because it applied');
+      expect(cubit.pricing.state.appliedOfferId, 'offer-1');
+      expect(cubit.pricing.state.appliedPromoCode, offerResolvedPromoCode);
       expect(
-        repo.offerCalls,
-        ['offer-1', 'offer-1'],
-        reason: 'tried, retried, and no bare re-price because it applied',
-      );
-      expect(cubit.state.appliedOfferId, 'offer-1');
-      expect(cubit.state.appliedPromoCode, offerResolvedPromoCode);
-      expect(
-        cubit.state.quote!.breakdown!.grossMinor,
+        cubit.pricing.state.quote!.breakdown!.grossMinor,
         grossWithPromoMinor,
         reason: 'the customer gets the discount they accepted',
       );
@@ -282,7 +281,7 @@ void main() {
 
       await pumpSummary(tester, cubit);
       await applyPromo(tester, promoCode);
-      expect(cubit.state.appliedPromoCode, promoCode);
+      expect(cubit.pricing.state.appliedPromoCode, promoCode);
 
       // Back to the details screen, where the customer adds an add-on. That
       // re-prices the order — BARE, per the owner's ruling (plan §6.93): no
@@ -300,11 +299,14 @@ void main() {
         reason: 'the add-on re-quote on details must carry no promo code',
       );
       expect(
-        cubit.state.appliedPromoCode,
+        cubit.pricing.state.appliedPromoCode,
         promoCode,
         reason: 'the code is out of the quote, not out of the order',
       );
-      expect(cubit.state.quote!.breakdown!.grossMinor, grossWithoutPromoMinor);
+      expect(
+        cubit.pricing.state.quote!.breakdown!.grossMinor,
+        grossWithoutPromoMinor,
+      );
     },
   );
 
@@ -338,11 +340,12 @@ void main() {
             'the offer is tried first, then the order is re-priced WITHOUT it '
             'so the customer has a total they can actually pay',
       );
-      expect(cubit.state.appliedPromoCode, isNull);
+      expect(cubit.pricing.state.appliedPromoCode, isNull);
       expect(
-        cubit.state.quote!.breakdown!.grossMinor,
+        cubit.pricing.state.quote!.breakdown!.grossMinor,
         grossWithoutPromoMinor,
-        reason: 'UCC23 A3 — the discount is not granted, the total is unchanged',
+        reason:
+            'UCC23 A3 — the discount is not granted, the total is unchanged',
       );
       // The rejection is raised once, by the cubit's failure state. Nothing
       // adds a second message on top of it.

@@ -98,9 +98,7 @@ class BookingLocationBottomActionSheet extends StatelessWidget {
                   if (!context.mounted) return;
                   context.pushNamed(
                     Routes.bookingDetails,
-                    arguments: BookingFlowArgs(
-                      bookingCubit: context.read<BookingCubit>(),
-                    ),
+                    arguments: BookingFlowArgs.of(context),
                   );
                 },
               ),

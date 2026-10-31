@@ -18,9 +18,12 @@ class MoyasarPaymentResult {
   final MoyasarPaymentStatus status;
   final String? paymentId; // non-null only when status == paid
   const MoyasarPaymentResult._(this.status, this.paymentId);
-  const MoyasarPaymentResult.paid(String id) : this._(MoyasarPaymentStatus.paid, id);
-  const MoyasarPaymentResult.failed() : this._(MoyasarPaymentStatus.failed, null);
-  const MoyasarPaymentResult.cancelled() : this._(MoyasarPaymentStatus.cancelled, null);
+  const MoyasarPaymentResult.paid(String id)
+    : this._(MoyasarPaymentStatus.paid, id);
+  const MoyasarPaymentResult.failed()
+    : this._(MoyasarPaymentStatus.failed, null);
+  const MoyasarPaymentResult.cancelled()
+    : this._(MoyasarPaymentStatus.cancelled, null);
 }
 
 /// Arguments for the on-device Moyasar purchase step (pay-before-create).
@@ -219,9 +222,7 @@ class _MoyasarPaymentViewState extends State<MoyasarPaymentView>
           child: Padding(
             padding: const EdgeInsets.all(24),
             child: Text(
-              isAr
-                  ? 'إعدادات الدفع غير مكتملة.'
-                  : 'Payment is not configured.',
+              isAr ? 'إعدادات الدفع غير مكتملة.' : 'Payment is not configured.',
               textAlign: TextAlign.center,
               style: const TextStyle(color: _ink),
             ),
@@ -231,7 +232,8 @@ class _MoyasarPaymentViewState extends State<MoyasarPaymentView>
     }
 
     final config = _buildConfig();
-    final bool showApplePay = widget.args.paymentMethod == PaymentMethod.applePay &&
+    final bool showApplePay =
+        widget.args.paymentMethod == PaymentMethod.applePay &&
         !kIsWeb &&
         Platform.isIOS;
     final formatted = (widget.args.init.amountMinor / 100).toStringAsFixed(2);
@@ -285,7 +287,12 @@ class _MoyasarPaymentViewState extends State<MoyasarPaymentView>
           SafeArea(
             top: false,
             child: SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(0, topInset + kToolbarHeight + 12, 0, 28),
+              padding: EdgeInsets.fromLTRB(
+                0,
+                topInset + kToolbarHeight + 12,
+                0,
+                28,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -322,7 +329,10 @@ class _MoyasarPaymentViewState extends State<MoyasarPaymentView>
                             const SizedBox(height: 10),
                             Text(
                               desc,
-                              style: const TextStyle(color: _slate, fontSize: 14),
+                              style: const TextStyle(
+                                color: _slate,
+                                fontSize: 14,
+                              ),
                             ),
                           ],
                         ],
@@ -388,7 +398,9 @@ class _MoyasarPaymentViewState extends State<MoyasarPaymentView>
                         const Icon(Icons.lock_outline, size: 14, color: _teal),
                         const SizedBox(width: 6),
                         Text(
-                          isAr ? 'مدفوعات آمنة ومشفّرة' : 'Secure, encrypted payment',
+                          isAr
+                              ? 'مدفوعات آمنة ومشفّرة'
+                              : 'Secure, encrypted payment',
                           style: const TextStyle(
                             color: _slate,
                             fontSize: 12,

@@ -66,15 +66,18 @@ void main() {
       // reach this case.
       final cubit = buildCubit(repo);
       addTearDown(cubit.close);
-      expect(cubit.state.offerTargetPriceMinor, isNull);
+      expect(cubit.pricing.state.offerTargetPriceMinor, isNull);
 
       takeOffer();
       await pumpSummary(tester, cubit);
 
       // The offer is applied and the summary is showing the discounted total.
       expect(repo.offerCalls, [offerId]);
-      expect(cubit.state.appliedPromoCode, offerResolvedPromoCode);
-      expect(cubit.state.quote!.breakdown!.grossMinor, grossWithPromoMinor);
+      expect(cubit.pricing.state.appliedPromoCode, offerResolvedPromoCode);
+      expect(
+        cubit.pricing.state.quote!.breakdown!.grossMinor,
+        grossWithPromoMinor,
+      );
 
       // Close the payment page: back to booking details.
       await pumpDetails(tester, cubit);
@@ -90,7 +93,7 @@ void main() {
         reason: 'and no offer id — the discount does not apply before payment',
       );
       expect(
-        cubit.state.quote!.breakdown!.grossMinor,
+        cubit.pricing.state.quote!.breakdown!.grossMinor,
         grossWithoutPromoMinor,
         reason: 'details prices the selection as if no offer had been taken',
       );
@@ -123,12 +126,12 @@ void main() {
       // clear both halves here, leaving the summary nothing to re-apply and the
       // customer paying full price for an offer they took.
       expect(
-        cubit.state.appliedPromoCode,
+        cubit.pricing.state.appliedPromoCode,
         offerResolvedPromoCode,
         reason: 'quoting bare is a display choice, not a removal',
       );
       expect(
-        cubit.state.appliedOfferId,
+        cubit.pricing.state.appliedOfferId,
         offerId,
         reason: 'the offer attribution must reach the redemption row',
       );
@@ -163,7 +166,10 @@ void main() {
         offerId,
         reason: 'and with the offer that produced it, for attribution',
       );
-      expect(cubit.state.quote!.breakdown!.grossMinor, grossWithPromoMinor);
+      expect(
+        cubit.pricing.state.quote!.breakdown!.grossMinor,
+        grossWithPromoMinor,
+      );
 
       // The subtotal → discount → total breakdown is what explains the step
       // down — nothing else is added to soften it. This basket is a single
@@ -186,22 +192,26 @@ void main() {
       await pumpSummary(tester, cubit);
       await pumpDetails(tester, cubit);
       await remountSummary(tester, cubit);
-      expect(cubit.state.quote!.breakdown!.grossMinor, grossWithPromoMinor);
+      expect(
+        cubit.pricing.state.quote!.breakdown!.grossMinor,
+        grossWithPromoMinor,
+      );
 
       await pumpDetails(tester, cubit);
 
       expect(repo.quoteCalls.last, isNull);
       expect(repo.offerCalls.last, isNull);
       expect(
-        cubit.state.quote!.breakdown!.grossMinor,
+        cubit.pricing.state.quote!.breakdown!.grossMinor,
         grossWithoutPromoMinor,
-        reason: 'the total steps back up — the accepted consequence, pinned '
+        reason:
+            'the total steps back up — the accepted consequence, pinned '
             'so it cannot be "fixed" into leaking the discount backward',
       );
       expect(find.text('115.00'), findsOneWidget);
       expect(find.text('95.00'), findsNothing);
-      expect(cubit.state.appliedPromoCode, offerResolvedPromoCode);
-      expect(cubit.state.appliedOfferId, offerId);
+      expect(cubit.pricing.state.appliedPromoCode, offerResolvedPromoCode);
+      expect(cubit.pricing.state.appliedOfferId, offerId);
     },
   );
 }

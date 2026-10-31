@@ -10,7 +10,8 @@ import '../../../../../core/components/custom_button.dart';
 import '../../../../../core/components/bottom_action_sheet_container.dart';
 import '../../../../../generated/locale_keys.g.dart';
 import '../../../../../core/route/app_router.dart';
-import '../../controllers/booking_cubit.dart';
+import '../../controllers/booking_payment_cubit.dart';
+import '../../controllers/booking_pricing_cubit.dart';
 import '../../controllers/booking_state.dart';
 import 'package:aqua_go/features/booking/presentation/widgets/booking_details_widgets/package_addon_payment_bottom_sheet.dart';
 
@@ -63,15 +64,18 @@ class BookingDetailsBottomActionSheet extends StatelessWidget {
           enabled: isComplete,
           onPressed: isComplete
               ? () {
-                  context.read<BookingCubit>().submitBooking();
+                  context.read<BookingPaymentCubit>().submitBooking();
                 }
               : null,
         ),
       );
     }
 
+    final quote = context.select(
+      (BookingPricingCubit cubit) => cubit.state.quote,
+    );
     final double? lockedTotal = config.showPricingInDetails
-        ? bookingState.quote?.breakdown?.gross
+        ? quote?.breakdown?.gross
         : null;
 
     final bool priceLocked =
@@ -130,9 +134,7 @@ class BookingDetailsBottomActionSheet extends StatelessWidget {
                     if (!context.mounted) return;
                     context.pushNamed(
                       Routes.bookingSummary,
-                      arguments: BookingFlowArgs(
-                        bookingCubit: context.read<BookingCubit>(),
-                      ),
+                      arguments: BookingFlowArgs.of(context),
                     );
                   }
                 : null,

@@ -20,11 +20,11 @@ class PromoValidateResponseModel {
       );
 
   Map<String, dynamic> toJson() => {
-        'valid': valid,
-        'code': code,
-        'discountMinor': discountMinor,
-        if (rejectionReason != null) 'rejectionReason': rejectionReason,
-      };
+    'valid': valid,
+    'code': code,
+    'discountMinor': discountMinor,
+    if (rejectionReason != null) 'rejectionReason': rejectionReason,
+  };
 
   double get discount => discountMinor / 100.0;
 }

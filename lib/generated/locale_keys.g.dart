@@ -154,6 +154,11 @@ abstract class  LocaleKeys {
   static const bookings_book_now = 'bookings.book_now';
   static const bookings_calculating_price = 'bookings.calculating_price';
   static const bookings_price_updated = 'bookings.price_updated';
+  static const bookings_no_washes_available = 'bookings.no_washes_available';
+  static const bookings_missing_quote = 'bookings.missing_quote';
+  static const bookings_missing_slot = 'bookings.missing_slot';
+  static const bookings_missing_vehicle = 'bookings.missing_vehicle';
+  static const bookings_missing_wash_context = 'bookings.missing_wash_context';
   static const bookings_choose_car_location = 'bookings.choose_car_location';
   static const bookings_save_car_location = 'bookings.save_car_location';
   static const bookings_booking_summary = 'bookings.booking_summary';

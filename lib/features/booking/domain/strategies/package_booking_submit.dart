@@ -4,41 +4,43 @@ import 'package:aqua_go/generated/locale_keys.g.dart';
 import 'package:dartz/dartz.dart';
 import '../../../../core/config/networking/exceptions/failure.dart';
 import '../../../my_bookings/data/models/booking_response_model/booking_response_model.dart';
-import '../../../home/data/models/add_on_model.dart';
 import '../../data/models/biker_note.dart';
 import '../../data/models/package_booking_request_model.dart';
 import '../../data/repos/booking_repository.dart';
-import '../../presentation/controllers/booking_state.dart';
+import '../booking_submission.dart';
 import 'booking_submit_strategy.dart';
 
-class PackageBookingSubmit implements BookingSubmitStrategy {
+class PackageBookingSubmit implements PaidBookingSubmitStrategy {
   const PackageBookingSubmit();
 
   @override
   Future<Either<Failure, BookingResponseModel>> submit({
     required BookingRepository repo,
-    required BookingState state,
+    required BookingSubmission submission,
+  }) => _create(repo, submission);
+
+  @override
+  Future<Either<Failure, BookingResponseModel>> submitPaid({
+    required BookingRepository repo,
+    required BookingSubmission submission,
+    required String moyasarPaymentId,
+  }) => _create(repo, submission, moyasarPaymentId: moyasarPaymentId);
+
+  Future<Either<Failure, BookingResponseModel>> _create(
+    BookingRepository repo,
+    BookingSubmission submission, {
     String? moyasarPaymentId,
   }) async {
-    // Build add-ons list
-    final List<AddOnModel> addonsList = [];
-    final availableAddons = state.selectedService?.addons ?? [];
-    for (final idx in state.selectedServiceIndices) {
-      if (idx < availableAddons.length) {
-        addonsList.add(availableAddons[idx]);
-      }
-    }
-
     // Build biker notes list
     final List<String> notesList = [];
     final isArabic =
         CacheClient.getString(kLanguage, defaultValue: kArabicLang) ==
         kArabicLang;
 
-    for (final noteKey in state.bikerNotes) {
+    for (final noteKey in submission.bikerNotes) {
       if (noteKey == LocaleKeys.bookings_special_note) {
-        if (state.specialNoteText.trim().isNotEmpty) {
-          notesList.add(state.specialNoteText.trim());
+        if (submission.specialNoteText.trim().isNotEmpty) {
+          notesList.add(submission.specialNoteText.trim());
         }
       } else {
         final enumVal = BikerNote.fromKey(noteKey);
@@ -49,23 +51,23 @@ class PackageBookingSubmit implements BookingSubmitStrategy {
     }
 
     final List<String> vehicleIds = [];
-    if (state.selectedCar != null) {
-      vehicleIds.add(state.selectedCar!.id);
+    if (submission.selectedCar != null) {
+      vehicleIds.add(submission.selectedCar!.id);
     }
 
     final packageBooking = PackageBookingRequestModel(
-      address: state.selectedAddress,
-      slotStart: state.selectedSlotStart,
+      address: submission.selectedAddress,
+      slotStart: submission.selectedSlotStart,
       vehicleIds: vehicleIds,
-      serviceAddOns: addonsList,
+      serviceAddOns: submission.selectedAddons,
       workerNotes: notesList,
       moyasarPaymentId: moyasarPaymentId,
-      serviceId: state.selectedPackageService?.id,
+      serviceId: submission.selectedPackageService?.id,
     );
 
     return repo.scheduleSubscriptionWash(
-      subscriptionId: state.subscriptionId!,
-      washId: state.washId!,
+      subscriptionId: submission.subscriptionId!,
+      washId: submission.washId!,
       request: packageBooking,
     );
   }

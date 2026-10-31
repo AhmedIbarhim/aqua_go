@@ -21,6 +21,10 @@ import '../widgets/booking_summary_widgets/booking_summary_bottom_action_sheet.d
 import '../widgets/booking_summary_widgets/booking_payable_total.dart';
 import '../widgets/booking_summary_widgets/price_unavailable_card.dart';
 import '../controllers/booking_cubit.dart';
+import '../controllers/booking_payment_cubit.dart';
+import '../controllers/booking_payment_state.dart';
+import '../controllers/booking_pricing_cubit.dart';
+import '../controllers/booking_pricing_state.dart';
 import '../controllers/booking_state.dart';
 import 'package:aqua_go/core/route/routes.dart';
 import 'package:aqua_go/features/my_bookings/presentation/views/my_booking_details_view.dart';
@@ -81,8 +85,7 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
   }
 
   void _fetchPrice() {
-    final cubit = context.read<BookingCubit>();
-    final config = cubit.state.flowConfig;
+    final config = context.read<BookingCubit>().state.flowConfig;
     if (config.requiresQuote) {
       final handoff = PendingPromoCode.instance.takeHandoff();
       if (handoff != null) {
@@ -91,117 +94,143 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
         _reprice();
       }
     } else if (config.isPackage) {
-      cubit.fetchWashChargePreview();
+      context.read<BookingPricingCubit>().fetchWashChargePreview();
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    return BlocConsumer<BookingCubit, BookingState>(
-      listener: (context, state) {
-        if (state.status == BookingStatus.loading) {
-          context.showLoadingOverlay();
-        } else {
-          context.hideLoadingOverlay();
-        }
-
-        if (state.status == BookingStatus.success) {
-          context.showSuccessSnackBar(
-            LocaleKeys.snackbar_booking_created.tr(context: context),
-          );
-          context
-              .showSuccessAlert(
-                title: LocaleKeys.bookings_booking_success_message.tr(
-                  context: context,
-                ),
-              )
-              .then((_) {
-                if (!context.mounted) return;
-                Navigator.popUntil(context, (route) => route.isFirst);
-                if (state.createdBooking != null) {
-                  Navigator.pushNamed(
-                    context,
-                    Routes.myBookingDetails,
-                    arguments: MyBookingDetailsArgs(
-                      booking: BookingSummaryModel.fromDetails(
-                        state.createdBooking!,
-                      ),
-                      isFromBookingFlow: true,
-                    ),
-                  );
-                }
-              });
-        } else if (state.status == BookingStatus.failure) {
-          switch (state.paymentPhase) {
-            case PaymentPhase.createUnconfirmed:
-              context.showWarningAlert(
-                title: LocaleKeys.bookings_payment_unconfirmed_title.tr(
-                  context: context,
-                ),
-                message:
-                    '${state.errorMessage ?? ''}\n\n'
-                    '${LocaleKeys.bookings_payment_unconfirmed_notice.tr(context: context)}',
-                primaryButtonText: LocaleKeys.ok.tr(context: context),
-              );
-            default:
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<BookingPricingCubit, BookingPricingState>(
+          listenWhen: (previous, current) => previous.status != current.status,
+          listener: (context, state) {
+            if (state.status == BookingStatus.failure) {
               context.showErrorSnackBar(state.errorMessage ?? '');
-          }
-        }
-      },
-      builder: (context, bookingState) {
-        return Scaffold(
-          backgroundColor: context.colors.screenBG,
-          appBar: GenericAppBar(
-            title: LocaleKeys.bookings_booking_summary.tr(context: context),
-            titleColor: context.colors.textPrimary,
-            hasBackground: true,
-            backgroundImage: context.isDarkTheme
-                ? AppAssets.bookingHeaderImageDark
-                : AppAssets.bookingHeaderImageLight,
-            centerTitle: true,
-          ),
-          body: Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  child: _buildContent(context, bookingState, width),
+            }
+          },
+        ),
+        BlocListener<BookingPaymentCubit, BookingPaymentState>(
+          listenWhen: (previous, current) => previous.status != current.status,
+          listener: _onPaymentStatusChanged,
+        ),
+      ],
+      child: BlocBuilder<BookingCubit, BookingState>(
+        builder: (context, bookingState) {
+          return BlocBuilder<BookingPricingCubit, BookingPricingState>(
+            builder: (context, pricingState) {
+              return Scaffold(
+                backgroundColor: context.colors.screenBG,
+                appBar: GenericAppBar(
+                  title: LocaleKeys.bookings_booking_summary.tr(
+                    context: context,
+                  ),
+                  titleColor: context.colors.textPrimary,
+                  hasBackground: true,
+                  backgroundImage: context.isDarkTheme
+                      ? AppAssets.bookingHeaderImageDark
+                      : AppAssets.bookingHeaderImageLight,
+                  centerTitle: true,
                 ),
-              ),
-              BookingSummaryBottomActionSheet(
-                bookingState: bookingState,
-                appliedPromoCode: _appliedPromoCode,
-                getPointsToApply: () => _getPointsToApply(bookingState.quote),
-              ),
-            ],
-          ),
-        );
-      },
+                body: Column(
+                  children: [
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: _buildContent(
+                          context,
+                          bookingState,
+                          pricingState,
+                          width,
+                        ),
+                      ),
+                    ),
+                    BookingSummaryBottomActionSheet(
+                      bookingState: bookingState,
+                      pricingState: pricingState,
+                      appliedPromoCode: _appliedPromoCode,
+                      getPointsToApply: () =>
+                          _getPointsToApply(pricingState.quote),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        },
+      ),
     );
+  }
+
+  void _onPaymentStatusChanged(
+    BuildContext context,
+    BookingPaymentState state,
+  ) {
+    if (state.status == BookingStatus.success) {
+      context.showSuccessSnackBar(
+        LocaleKeys.snackbar_booking_created.tr(context: context),
+      );
+      context
+          .showSuccessAlert(
+            title: LocaleKeys.bookings_booking_success_message.tr(
+              context: context,
+            ),
+          )
+          .then((_) {
+            if (!context.mounted) return;
+            Navigator.popUntil(context, (route) => route.isFirst);
+            if (state.createdBooking != null) {
+              Navigator.pushNamed(
+                context,
+                Routes.myBookingDetails,
+                arguments: MyBookingDetailsArgs(
+                  booking: BookingSummaryModel.fromDetails(
+                    state.createdBooking!,
+                  ),
+                  isFromBookingFlow: true,
+                ),
+              );
+            }
+          });
+    } else if (state.status == BookingStatus.failure) {
+      switch (state.paymentPhase) {
+        case PaymentPhase.createUnconfirmed:
+          context.showWarningAlert(
+            title: LocaleKeys.bookings_payment_unconfirmed_title.tr(
+              context: context,
+            ),
+            message:
+                '${state.errorMessage ?? ''}\n\n'
+                '${LocaleKeys.bookings_payment_unconfirmed_notice.tr(context: context)}',
+            primaryButtonText: LocaleKeys.ok.tr(context: context),
+          );
+        default:
+          context.showErrorSnackBar(state.errorMessage ?? '');
+      }
+    }
   }
 
   Widget _buildContent(
     BuildContext context,
     BookingState bookingState,
+    BookingPricingState pricingState,
     double width,
   ) {
     final config = bookingState.flowConfig;
+    final quote = pricingState.quote;
 
-    final priceLocked = isPriceLocked(
-      config: config,
-      quote: bookingState.quote,
-    );
+    final priceLocked = isPriceLocked(config: config, quote: quote);
 
     final priceDisplay = resolvePriceDisplay(
       config: config,
-      quote: bookingState.quote,
-      priceLoadFailed: bookingState.priceLoadFailed,
+      quote: quote,
+      priceLoadFailed: pricingState.priceLoadFailed,
     );
 
     final serviceName = _resolveServiceName(context, bookingState);
     final availableAddons = bookingState.selectedService?.addons ?? [];
 
-    final lines = bookingState.quote?.lines ?? const [];
+    final lines = quote?.lines ?? const [];
 
     final List<GrossLine> itemLines = [];
 
@@ -225,16 +254,16 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
       }
     }
 
-    final int promoDiscountMinor = bookingState.quote?.promoDiscountMinor ?? 0;
+    final int promoDiscountMinor = quote?.promoDiscountMinor ?? 0;
 
-    final quoteTotalMinor = bookingState.quote?.totalMinor ?? 0;
+    final quoteTotalMinor = quote?.totalMinor ?? 0;
     final summary = GrossPriceBreakdown.fromBookingLines(
       itemLines: itemLines,
       discountMinor: promoDiscountMinor,
-      promoCode: bookingState.quote?.promoCode,
+      promoCode: quote?.promoCode,
       totalMinor: quoteTotalMinor,
-      vatMinor: bookingState.quote?.vatMinor ?? 0,
-      pointsDiscountMinor: bookingState.quote?.pointsDiscountMinor ?? 0,
+      vatMinor: quote?.vatMinor ?? 0,
+      pointsDiscountMinor: quote?.pointsDiscountMinor ?? 0,
     );
 
     return Container(
@@ -282,7 +311,7 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
 
           if (config.showPaymentMethod && priceLocked) ...[
             if (needsPaymentMethod(
-              payableTotal: payableTotalMajor(bookingState.quote?.breakdown),
+              payableTotal: payableTotalMajor(quote?.breakdown),
               hasPayableAddon: false,
             ))
               PaymentMethodSelection(
@@ -304,29 +333,30 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
           ],
           if (config.flowType == BookingFlowType.service) ...[
             PromoCodeSection(
-              appliedPromoCode: bookingState.appliedPromoCode,
+              appliedPromoCode: pricingState.appliedPromoCode,
               promoDiscountMinor: promoDiscountMinor,
               onApplyPromoCode: _applyPromoCode,
               onRemovePromoCode: _removePromoCode,
               canReapplyOffer:
-                  bookingState.rememberedOfferId != null &&
-                  bookingState.appliedOfferId == null &&
-                  bookingState.appliedPromoCode == null,
+                  pricingState.rememberedOfferId != null &&
+                  pricingState.appliedOfferId == null &&
+                  pricingState.appliedPromoCode == null,
               reapplyOfferTitle: context.isAr
-                  ? bookingState.offerTitleAr
-                  : bookingState.offerTitleEn,
+                  ? pricingState.offerTitleAr
+                  : pricingState.offerTitleEn,
               onReapplyOffer: _reapplyOffer,
             ),
             const SizedBox(height: 24),
             WalletPointsSection(
-              bookingState: bookingState,
+              quote: quote,
               loyaltyBalance: _loyaltyBalance,
               isPointsToggled: _isPointsToggled,
               onPointsToggled: (val) async {
                 setState(() {
                   _isPointsToggled = val;
                 });
-                final currentQuote = context.read<BookingCubit>().state.quote;
+                final pricing = context.read<BookingPricingCubit>();
+                final currentQuote = pricing.state.quote;
                 final balValMinor =
                     currentQuote?.currentBalanceValueMinor ??
                     _loyaltyBalance?.estimatedValueMinor ??
@@ -340,12 +370,12 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
                   final pointsToApply = balance < maxPoints
                       ? balance
                       : maxPoints;
-                  await context.read<BookingCubit>().fetchQuote(
+                  await pricing.fetchQuote(
                     promoCode: _appliedPromoCode,
                     pointsToApply: pointsToApply,
                   );
                 } else if (!val) {
-                  await context.read<BookingCubit>().fetchQuote(
+                  await pricing.fetchQuote(
                     promoCode: _appliedPromoCode,
                     pointsToApply: 0,
                   );
@@ -411,28 +441,30 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
     setState(() {
       _isPointsToggled = false;
     });
-    final quote = await context.read<BookingCubit>().applyPromoCode(code);
+    final quote = await context.read<BookingPricingCubit>().applyPromoCode(
+      code,
+    );
     if (quote?.promoCode != null) {
       await PromoCodeHistory.remember(quote!.promoCode!);
     }
   }
 
   void _removePromoCode() {
-    context.read<BookingCubit>().removePromoCode();
+    context.read<BookingPricingCubit>().removePromoCode();
   }
 
   void _reapplyOffer() {
     setState(() {
       _isPointsToggled = false;
     });
-    final cubit = context.read<BookingCubit>();
+    final cubit = context.read<BookingPricingCubit>();
     final offerId = cubit.state.rememberedOfferId;
     if (offerId == null) return;
     cubit.applyOffer(offerId);
   }
 
   void _applyOfferFromHandoff(String offerId) async {
-    final cubit = context.read<BookingCubit>();
+    final cubit = context.read<BookingPricingCubit>();
     final application = await cubit.applyOffer(offerId);
     if (application.applied) return;
     if (!application.settled) {
@@ -444,7 +476,7 @@ class _BookingSummaryViewState extends State<BookingSummaryView> {
   }
 
   void _reprice() async {
-    final refresh = await context.read<BookingCubit>().reprice();
+    final refresh = await context.read<BookingPricingCubit>().reprice();
     if (!mounted) return;
     final reason = refresh.droppedPromoReason;
     if (reason != null) _sayPromoWasDropped(reason);

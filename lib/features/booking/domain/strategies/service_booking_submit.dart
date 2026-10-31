@@ -5,39 +5,41 @@ import 'package:dartz/dartz.dart';
 
 import '../../../../core/config/networking/exceptions/failure.dart';
 import '../../../my_bookings/data/models/booking_response_model/booking_response_model.dart';
-import '../../../home/data/models/add_on_model.dart';
 import '../../data/models/biker_note.dart';
 import '../../data/models/service_booking_request_model.dart';
 import '../../data/repos/booking_repository.dart';
-import '../../presentation/controllers/booking_state.dart';
+import '../booking_submission.dart';
 import 'booking_submit_strategy.dart';
 
-class ServiceBookingSubmit implements BookingSubmitStrategy {
+class ServiceBookingSubmit implements PaidBookingSubmitStrategy {
   @override
   Future<Either<Failure, BookingResponseModel>> submit({
     required BookingRepository repo,
-    required BookingState state,
+    required BookingSubmission submission,
+  }) => _create(repo, submission);
+
+  @override
+  Future<Either<Failure, BookingResponseModel>> submitPaid({
+    required BookingRepository repo,
+    required BookingSubmission submission,
+    required String moyasarPaymentId,
+  }) => _create(repo, submission, moyasarPaymentId: moyasarPaymentId);
+
+  Future<Either<Failure, BookingResponseModel>> _create(
+    BookingRepository repo,
+    BookingSubmission submission, {
     String? moyasarPaymentId,
   }) async {
-    // Build add-ons list
-    final List<AddOnModel> addonsList = [];
-    final availableAddons = state.selectedService?.addons ?? [];
-    for (final idx in state.selectedServiceIndices) {
-      if (idx < availableAddons.length) {
-        addonsList.add(availableAddons[idx]);
-      }
-    }
-
     // Build biker notes list
     final List<String> notesList = [];
     final isArabic =
         CacheClient.getString(kLanguage, defaultValue: kArabicLang) ==
         kArabicLang;
 
-    for (final noteKey in state.bikerNotes) {
+    for (final noteKey in submission.bikerNotes) {
       if (noteKey == LocaleKeys.bookings_special_note) {
-        if (state.specialNoteText.trim().isNotEmpty) {
-          notesList.add(state.specialNoteText.trim());
+        if (submission.specialNoteText.trim().isNotEmpty) {
+          notesList.add(submission.specialNoteText.trim());
         }
       } else {
         final enumVal = BikerNote.fromKey(noteKey);
@@ -48,19 +50,19 @@ class ServiceBookingSubmit implements BookingSubmitStrategy {
     }
 
     final booking = ServiceBookingRequestModel(
-      service: state.selectedService,
-      car: state.selectedCar,
-      address: state.selectedAddress,
-      slotStart: state.selectedSlotStart,
-      serviceAddOns: addonsList,
+      service: submission.selectedService,
+      car: submission.selectedCar,
+      address: submission.selectedAddress,
+      slotStart: submission.selectedSlotStart,
+      serviceAddOns: submission.selectedAddons,
       workerNotes: notesList,
-      paymentMethod: state.paymentMethod,
-      quote: state.quote,
+      paymentMethod: submission.paymentMethod,
+      quote: submission.quote,
       moyasarPaymentId: moyasarPaymentId,
-      holdToken: state.paymentInit?.holdToken,
+      holdToken: submission.holdToken,
       // Redemption attribution (UCA22 A6): the offer the applied code came
       // through, so the sale is credited to the offer that drove it.
-      offerId: state.appliedOfferId,
+      offerId: submission.appliedOfferId,
     );
 
     return repo.createBooking(booking);

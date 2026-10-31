@@ -121,7 +121,8 @@ void main() {
       expect(
         find.text('230.00'),
         findsOneWidget,
-        reason: 'the struck figure is what the same basket costs without the '
+        reason:
+            'the struck figure is what the same basket costs without the '
             'offer, so the gap between the two stays the offer own saving',
       );
       expect(find.text('175.00'), findsNothing);
@@ -161,7 +162,8 @@ void main() {
       expect(
         find.text('99.00'),
         findsNothing,
-        reason: 'the stale target is above what the summary charges — showing '
+        reason:
+            'the stale target is above what the summary charges — showing '
             'it as the Total quotes a price the customer never pays',
       );
       expect(
@@ -172,82 +174,82 @@ void main() {
     },
   );
 
-  testWidgets(
-    'the offer price survives a return from the payment page',
-    (tester) async {
-      // It is state, not a one-shot handoff: walking forward to the summary
-      // and back must not drop the figure the card promised.
-      final repo = RecordingBookingRepo();
-      final cubit = buildCubit(
-        repo,
-        offerListPriceMinor: 17500,
-        offerTargetPriceMinor: 3500,
-      );
-      addTearDown(cubit.close);
+  testWidgets('the offer price survives a return from the payment page', (
+    tester,
+  ) async {
+    // It is state, not a one-shot handoff: walking forward to the summary
+    // and back must not drop the figure the card promised.
+    final repo = RecordingBookingRepo();
+    final cubit = buildCubit(
+      repo,
+      offerListPriceMinor: 17500,
+      offerTargetPriceMinor: 3500,
+    );
+    addTearDown(cubit.close);
 
-      await pumpDetails(tester, cubit);
-      await pumpSummary(tester, cubit);
-      await pumpDetails(tester, cubit);
+    await pumpDetails(tester, cubit);
+    await pumpSummary(tester, cubit);
+    await pumpDetails(tester, cubit);
 
-      expect(find.text('35.00'), findsOneWidget);
-      expect(find.text('175.00'), findsOneWidget);
-    },
-  );
+    expect(find.text('35.00'), findsOneWidget);
+    expect(find.text('175.00'), findsOneWidget);
+  });
 
-  testWidgets(
-    'an offer the server REFUSED stops pricing this screen',
-    (tester) async {
-      // The figures survive navigation ON PURPOSE (the test above), because
-      // the details re-quote is deliberately bare and clearing them alongside
-      // the applied code would blank the very numbers D-4 keeps on screen.
-      //
-      // A REFUSAL is the other thing entirely. The summary asked for the offer
-      // and the server said no — cap consumed, campaign over, the customer
-      // ineligible (UCC23 A3) — so the order is priced without it and 115.00 is
-      // charged. Keeping the pair here left the customer bounced back to
-      // "175.00 struck through, then 35.00", tapping Book now, and landing on
-      // 115.00: the exact step-change the whole override exists to remove,
-      // pointing the wrong way.
-      final repo = RecordingBookingRepo(
-        quoteFailure: (_, offerId) => offerId == null
-            ? null
-            : const ServerFailure(
-                'This code is no longer valid',
-                type: FailureType.validation,
-              ),
-      );
-      PendingPromoCode.instance.hold(offerId: 'offer-1');
-      addTearDown(PendingPromoCode.instance.takeHandoff);
+  testWidgets('an offer the server REFUSED stops pricing this screen', (
+    tester,
+  ) async {
+    // The figures survive navigation ON PURPOSE (the test above), because
+    // the details re-quote is deliberately bare and clearing them alongside
+    // the applied code would blank the very numbers D-4 keeps on screen.
+    //
+    // A REFUSAL is the other thing entirely. The summary asked for the offer
+    // and the server said no — cap consumed, campaign over, the customer
+    // ineligible (UCC23 A3) — so the order is priced without it and 115.00 is
+    // charged. Keeping the pair here left the customer bounced back to
+    // "175.00 struck through, then 35.00", tapping Book now, and landing on
+    // 115.00: the exact step-change the whole override exists to remove,
+    // pointing the wrong way.
+    final repo = RecordingBookingRepo(
+      quoteFailure: (_, offerId) => offerId == null
+          ? null
+          : const ServerFailure(
+              'This code is no longer valid',
+              type: FailureType.validation,
+            ),
+    );
+    PendingPromoCode.instance.hold(offerId: 'offer-1');
+    addTearDown(PendingPromoCode.instance.takeHandoff);
 
-      final cubit = buildCubit(
-        repo,
-        offerListPriceMinor: 17500,
-        offerTargetPriceMinor: 3500,
-      );
-      addTearDown(cubit.close);
+    final cubit = buildCubit(
+      repo,
+      offerListPriceMinor: 17500,
+      offerTargetPriceMinor: 3500,
+    );
+    addTearDown(cubit.close);
 
-      // The summary is where the offer is asked for, and refused.
-      await pumpSummary(tester, cubit);
-      expect(cubit.state.appliedOfferId, isNull);
-      expect(cubit.state.appliedPromoCode, isNull);
+    // The summary is where the offer is asked for, and refused.
+    await pumpSummary(tester, cubit);
+    expect(cubit.pricing.state.appliedOfferId, isNull);
+    expect(cubit.pricing.state.appliedPromoCode, isNull);
 
-      await pumpDetails(tester, cubit);
+    await pumpDetails(tester, cubit);
 
-      expect(
-        find.text('35.00'),
-        findsNothing,
-        reason: 'a refused offer prices nothing — the card promised a deal the '
-            'server has since taken away',
-      );
-      expect(find.text('175.00'), findsNothing);
-      expect(
-        find.text('115.00'),
-        findsOneWidget,
-        reason: 'the same figure the summary charges, so Book now no longer '
-            'walks into a higher number',
-      );
-    },
-  );
+    expect(
+      find.text('35.00'),
+      findsNothing,
+      reason:
+          'a refused offer prices nothing — the card promised a deal the '
+          'server has since taken away',
+    );
+    expect(find.text('175.00'), findsNothing);
+    expect(
+      find.text('115.00'),
+      findsOneWidget,
+      reason:
+          'the same figure the summary charges, so Book now no longer '
+          'walks into a higher number',
+    );
+  });
 
   testWidgets(
     'an offer the summary RE-QUOTE refused stops pricing this screen',
@@ -291,15 +293,15 @@ void main() {
 
       // First entry: the handoff applies the offer and the server grants it.
       await pumpSummary(tester, cubit);
-      expect(cubit.state.appliedOfferId, 'offer-1');
-      expect(cubit.state.appliedPromoCode, offerResolvedPromoCode);
+      expect(cubit.pricing.state.appliedOfferId, 'offer-1');
+      expect(cubit.pricing.state.appliedPromoCode, offerResolvedPromoCode);
 
       // Back to details, then forward again — the handoff is drained, so the
       // summary re-quotes with the applied code instead of applying an offer.
       await pumpDetails(tester, cubit);
       await pumpSummary(tester, cubit);
       expect(
-        cubit.state.appliedPromoCode,
+        cubit.pricing.state.appliedPromoCode,
         isNull,
         reason: 'the re-quote dropped the dead code and priced bare',
       );
@@ -320,103 +322,99 @@ void main() {
     },
   );
 
-  testWidgets(
-    'a typed code applied over the offer stops pricing this screen',
-    (tester) async {
-      // The offer is not gone — it is REMEMBERED and the summary offers it
-      // back — but it is not what prices the order any more, and the two
-      // figures state a price the customer will not be charged. Details goes
-      // back to §6.93's bare quote for as long as the typed code stands.
-      final repo = RecordingBookingRepo();
-      PendingPromoCode.instance.hold(offerId: 'offer-1');
-      addTearDown(PendingPromoCode.instance.takeHandoff);
+  testWidgets('a typed code applied over the offer stops pricing this screen', (
+    tester,
+  ) async {
+    // The offer is not gone — it is REMEMBERED and the summary offers it
+    // back — but it is not what prices the order any more, and the two
+    // figures state a price the customer will not be charged. Details goes
+    // back to §6.93's bare quote for as long as the typed code stands.
+    final repo = RecordingBookingRepo();
+    PendingPromoCode.instance.hold(offerId: 'offer-1');
+    addTearDown(PendingPromoCode.instance.takeHandoff);
 
-      final cubit = buildCubit(
-        repo,
-        offerListPriceMinor: 17500,
-        offerTargetPriceMinor: 3500,
-      );
-      addTearDown(cubit.close);
+    final cubit = buildCubit(
+      repo,
+      offerListPriceMinor: 17500,
+      offerTargetPriceMinor: 3500,
+    );
+    addTearDown(cubit.close);
 
-      await pumpSummary(tester, cubit);
-      // The promo box carries the applied chip while the offer stands, so a
-      // typed code is reached through the remove action — the route that used
-      // to destroy the offer outright.
-      await tester.tap(find.text('bookings.delete_promo_code'));
-      await settle(tester);
-      await applyPromo(tester, 'OTHERCODE');
-      expect(cubit.state.appliedOfferId, isNull);
-      expect(cubit.state.rememberedOfferId, 'offer-1');
+    await pumpSummary(tester, cubit);
+    // The promo box carries the applied chip while the offer stands, so a
+    // typed code is reached through the remove action — the route that used
+    // to destroy the offer outright.
+    await tester.tap(find.text('bookings.delete_promo_code'));
+    await settle(tester);
+    await applyPromo(tester, 'OTHERCODE');
+    expect(cubit.pricing.state.appliedOfferId, isNull);
+    expect(cubit.pricing.state.rememberedOfferId, 'offer-1');
 
-      await pumpDetails(tester, cubit);
+    await pumpDetails(tester, cubit);
 
-      expect(find.text('35.00'), findsNothing);
-      expect(find.text('175.00'), findsNothing);
-      expect(
-        find.text('115.00'),
-        findsOneWidget,
-        reason: 'the bare quote §6.93 asks for — the discount the typed code '
-            'earns is stated on the payment page, not here',
-      );
-    },
-  );
+    expect(find.text('35.00'), findsNothing);
+    expect(find.text('175.00'), findsNothing);
+    expect(
+      find.text('115.00'),
+      findsOneWidget,
+      reason:
+          'the bare quote §6.93 asks for — the discount the typed code '
+          'earns is stated on the payment page, not here',
+    );
+  });
 
-  testWidgets(
-    'an offer the customer took off stops pricing this screen',
-    (tester) async {
-      // Same shape as the typed-code case: the offer survives on the state so
-      // it can be restored, but nothing is priced with it, so nothing here may
-      // quote it.
-      final repo = RecordingBookingRepo();
-      PendingPromoCode.instance.hold(offerId: 'offer-1');
-      addTearDown(PendingPromoCode.instance.takeHandoff);
+  testWidgets('an offer the customer took off stops pricing this screen', (
+    tester,
+  ) async {
+    // Same shape as the typed-code case: the offer survives on the state so
+    // it can be restored, but nothing is priced with it, so nothing here may
+    // quote it.
+    final repo = RecordingBookingRepo();
+    PendingPromoCode.instance.hold(offerId: 'offer-1');
+    addTearDown(PendingPromoCode.instance.takeHandoff);
 
-      final cubit = buildCubit(
-        repo,
-        offerListPriceMinor: 17500,
-        offerTargetPriceMinor: 3500,
-      );
-      addTearDown(cubit.close);
+    final cubit = buildCubit(
+      repo,
+      offerListPriceMinor: 17500,
+      offerTargetPriceMinor: 3500,
+    );
+    addTearDown(cubit.close);
 
-      await pumpSummary(tester, cubit);
-      await tester.tap(find.text('bookings.delete_promo_code'));
-      await settle(tester);
+    await pumpSummary(tester, cubit);
+    await tester.tap(find.text('bookings.delete_promo_code'));
+    await settle(tester);
 
-      await pumpDetails(tester, cubit);
+    await pumpDetails(tester, cubit);
 
-      expect(find.text('35.00'), findsNothing);
-      expect(find.text('175.00'), findsNothing);
-      expect(find.text('115.00'), findsOneWidget);
-    },
-  );
+    expect(find.text('35.00'), findsNothing);
+    expect(find.text('175.00'), findsNothing);
+    expect(find.text('115.00'), findsOneWidget);
+  });
 
-  testWidgets(
-    'restoring the offer prices this screen again',
-    (tester) async {
-      // The pair is suspended, not destroyed. Re-applying the offer at the
-      // summary brings the D-4 figures straight back — no second trip through
-      // the offers surface, and no re-entry of the flow.
-      final repo = RecordingBookingRepo();
-      PendingPromoCode.instance.hold(offerId: 'offer-1');
-      addTearDown(PendingPromoCode.instance.takeHandoff);
+  testWidgets('restoring the offer prices this screen again', (tester) async {
+    // The pair is suspended, not destroyed. Re-applying the offer at the
+    // summary brings the D-4 figures straight back — no second trip through
+    // the offers surface, and no re-entry of the flow.
+    final repo = RecordingBookingRepo();
+    PendingPromoCode.instance.hold(offerId: 'offer-1');
+    addTearDown(PendingPromoCode.instance.takeHandoff);
 
-      final cubit = buildCubit(
-        repo,
-        offerListPriceMinor: 17500,
-        offerTargetPriceMinor: 3500,
-      );
-      addTearDown(cubit.close);
+    final cubit = buildCubit(
+      repo,
+      offerListPriceMinor: 17500,
+      offerTargetPriceMinor: 3500,
+    );
+    addTearDown(cubit.close);
 
-      await pumpSummary(tester, cubit);
-      await tester.tap(find.text('bookings.delete_promo_code'));
-      await settle(tester);
-      await tester.tap(find.byKey(const ValueKey('offer-reapply')));
-      await settle(tester);
+    await pumpSummary(tester, cubit);
+    await tester.tap(find.text('bookings.delete_promo_code'));
+    await settle(tester);
+    await tester.tap(find.byKey(const ValueKey('offer-reapply')));
+    await settle(tester);
 
-      await pumpDetails(tester, cubit);
+    await pumpDetails(tester, cubit);
 
-      expect(find.text('35.00'), findsOneWidget);
-      expect(find.text('175.00'), findsOneWidget);
-    },
-  );
+    expect(find.text('35.00'), findsOneWidget);
+    expect(find.text('175.00'), findsOneWidget);
+  });
 }

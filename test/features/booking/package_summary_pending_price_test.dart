@@ -53,12 +53,12 @@ void main() {
       await pumpSummaryPendingQuote(tester, cubit);
 
       expect(
-        cubit.state.flowConfig.isPackage,
+        cubit.booking.state.flowConfig.isPackage,
         isTrue,
         reason: 'this test is about the package flow specifically',
       );
       expect(
-        cubit.state.quote,
+        cubit.pricing.state.quote,
         isNull,
         reason:
             'the wash-charge preview must still be in flight for this to '
@@ -98,7 +98,7 @@ void main() {
         1,
         reason: 'the summary asks for the preview exactly once on entry',
       );
-      expect(cubit.state.quote, isNotNull);
+      expect(cubit.pricing.state.quote, isNotNull);
       expect(find.byType(PaymentSummaryCard), findsOneWidget);
       expect(find.byType(PaymentSummaryShimmer), findsNothing);
     });
@@ -125,14 +125,14 @@ void main() {
         reason: 'a preview that never arrived is not a price of zero',
       );
       expect(
-        cubit.state.status,
+        cubit.pricing.state.status,
         BookingStatus.failure,
         reason:
             'the screen WAITS on this call, so a silent `initial` would '
             'leave a placeholder and a dead Confirm button with nothing saying '
             'why — the service flow reports the same failure',
       );
-      expect(cubit.state.errorMessage, isNotNull);
+      expect(cubit.pricing.state.errorMessage, isNotNull);
 
       // The gate holding is only half of it. This assertion used to be
       // `PaymentSummaryShimmer`, and that was the dead end: the preview is

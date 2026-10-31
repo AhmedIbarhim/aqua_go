@@ -9,10 +9,7 @@ import '../../controllers/booking_cubit.dart';
 class ServicesLoadErrorWidget extends StatelessWidget {
   final double width;
 
-  const ServicesLoadErrorWidget({
-    super.key,
-    required this.width,
-  });
+  const ServicesLoadErrorWidget({super.key, required this.width});
 
   @override
   Widget build(BuildContext context) {

@@ -60,7 +60,7 @@ void main() {
       await pumpSummaryPendingQuote(tester, cubit);
 
       expect(
-        cubit.state.quote,
+        cubit.pricing.state.quote,
         isNull,
         reason: 'the quote must still be outstanding for this to test anything',
       );
@@ -85,7 +85,7 @@ void main() {
       await pumpSummaryPendingQuote(tester, cubit);
       await settleFailure(tester);
 
-      expect(cubit.state.quote, isNull);
+      expect(cubit.pricing.state.quote, isNull);
       expect(
         find.byType(PaymentSummaryShimmer),
         findsNothing,
@@ -130,7 +130,7 @@ void main() {
             'the service flow has no wash-charge preview to fetch — a '
             'hard-coded retry would call the other flow\'s endpoint',
       );
-      expect(cubit.state.quote, isNotNull);
+      expect(cubit.pricing.state.quote, isNotNull);
       expect(
         find.byType(PaymentSummaryCard),
         findsOneWidget,
@@ -196,7 +196,7 @@ void main() {
         reason: 'the held offer goes back on the wire',
       );
       expect(
-        cubit.state.priceLoadFailed,
+        cubit.pricing.state.priceLoadFailed,
         isFalse,
         reason:
             'a call is in flight — the screen must not still be offering a '
@@ -217,8 +217,8 @@ void main() {
 
       await pumpSummaryPendingQuote(tester, cubit);
 
-      expect(cubit.state.flowConfig.isPackage, isTrue);
-      expect(cubit.state.quote, isNull);
+      expect(cubit.booking.state.flowConfig.isPackage, isTrue);
+      expect(cubit.pricing.state.quote, isNull);
       expect(find.byType(PaymentSummaryShimmer), findsOneWidget);
       expect(find.byType(PriceUnavailableCard), findsNothing);
 
@@ -235,7 +235,7 @@ void main() {
       await pumpSummaryPendingQuote(tester, cubit);
       await settleFailure(tester);
 
-      expect(cubit.state.quote, isNull);
+      expect(cubit.pricing.state.quote, isNull);
       expect(
         find.byType(PaymentSummaryShimmer),
         findsNothing,
@@ -275,7 +275,7 @@ void main() {
             'the package flow has no quote endpoint at all — calling it '
             'here is the drift this asserts against',
       );
-      expect(cubit.state.quote, isNotNull);
+      expect(cubit.pricing.state.quote, isNotNull);
       expect(find.byType(PaymentSummaryCard), findsOneWidget);
       expect(find.byType(PriceUnavailableCard), findsNothing);
       expect(find.byType(PaymentSummaryShimmer), findsNothing);

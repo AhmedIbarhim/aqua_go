@@ -35,7 +35,10 @@ void main() {
 
     test('a card-less booking never contains the literal "null"', () {
       final k = bookingCreateIdempotencyKey(
-        ServiceBookingRequestModel(quote: _quote('q-1'), moyasarPaymentId: null),
+        ServiceBookingRequestModel(
+          quote: _quote('q-1'),
+          moyasarPaymentId: null,
+        ),
       );
 
       expect(k, isNot(contains('null')));
@@ -85,13 +88,19 @@ void main() {
       );
     });
 
-    test('an empty payment id falls through to the quote rather than keying on ""', () {
-      final k = bookingCreateIdempotencyKey(
-        ServiceBookingRequestModel(quote: _quote('q-aaa'), moyasarPaymentId: ''),
-      );
+    test(
+      'an empty payment id falls through to the quote rather than keying on ""',
+      () {
+        final k = bookingCreateIdempotencyKey(
+          ServiceBookingRequestModel(
+            quote: _quote('q-aaa'),
+            moyasarPaymentId: '',
+          ),
+        );
 
-      expect(k, 'booking-create:quote:q-aaa');
-    });
+        expect(k, 'booking-create:quote:q-aaa');
+      },
+    );
 
     test('a booking with neither a payment nor a quote is rejected loudly', () {
       expect(

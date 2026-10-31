@@ -12,10 +12,7 @@ import 'car_selection_list.dart';
 class CarSelectionSection extends StatefulWidget {
   final BookingState bookingState;
 
-  const CarSelectionSection({
-    super.key,
-    required this.bookingState,
-  });
+  const CarSelectionSection({super.key, required this.bookingState});
 
   @override
   State<CarSelectionSection> createState() => _CarSelectionSectionState();
@@ -43,17 +40,14 @@ class _CarSelectionSectionState extends State<CarSelectionSection> {
             if (newCar != null) {
               context.read<BookingCubit>().selectCar(newCar);
             } else if (myCarsState.cars.isNotEmpty) {
-              context.read<BookingCubit>().selectCar(
-                myCarsState.cars.last,
-              );
+              context.read<BookingCubit>().selectCar(myCarsState.cars.last);
             }
           }
           _previousCars = myCarsState.cars;
         }
       },
       builder: (context, myCarsState) {
-        if (myCarsState is MyCarsLoading ||
-            myCarsState is MyCarsInitial) {
+        if (myCarsState is MyCarsLoading || myCarsState is MyCarsInitial) {
           return ShimmerHelper.bookingCars(
             onAddCar: () {
               context.pushNamed(Routes.addVehicle).then((val) {

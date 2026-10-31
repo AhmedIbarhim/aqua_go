@@ -59,7 +59,7 @@ void main() {
 
       await pumpSummary(tester, cubit);
 
-      expect(cubit.state.appliedOfferId, 'offer-1');
+      expect(cubit.pricing.state.appliedOfferId, 'offer-1');
       expect(
         reapplyCard,
         findsNothing,
@@ -77,10 +77,10 @@ void main() {
       await tester.tap(removeCode);
       await settle(tester);
 
-      expect(cubit.state.appliedOfferId, isNull);
-      expect(cubit.state.appliedPromoCode, isNull);
+      expect(cubit.pricing.state.appliedOfferId, isNull);
+      expect(cubit.pricing.state.appliedPromoCode, isNull);
       expect(
-        cubit.state.rememberedOfferId,
+        cubit.pricing.state.rememberedOfferId,
         'offer-1',
         reason: 'removing the code says nothing about the offer being over',
       );
@@ -103,14 +103,14 @@ void main() {
       await settle(tester);
       await applyPromo(tester, 'OTHERCODE');
 
-      expect(cubit.state.appliedPromoCode, 'OTHERCODE');
+      expect(cubit.pricing.state.appliedPromoCode, 'OTHERCODE');
       expect(
-        cubit.state.appliedOfferId,
+        cubit.pricing.state.appliedOfferId,
         isNull,
         reason: 'this sale did not come through the offer — attribution is off',
       );
       expect(
-        cubit.state.rememberedOfferId,
+        cubit.pricing.state.rememberedOfferId,
         'offer-1',
         reason: 'attribution being off is not the offer being gone',
       );
@@ -138,7 +138,7 @@ void main() {
       await tester.tap(removeCode);
       await settle(tester);
 
-      expect(cubit.state.appliedPromoCode, isNull);
+      expect(cubit.pricing.state.appliedPromoCode, isNull);
       expect(
         reapplyCard,
         findsOneWidget,
@@ -162,12 +162,12 @@ void main() {
         final cubit = buildCubit(repo);
         addTearDown(cubit.close);
 
-        await cubit.applyOffer('offer-1');
-        await cubit.applyPromoCode('OTHERCODE');
+        await cubit.pricing.applyOffer('offer-1');
+        await cubit.pricing.applyPromoCode('OTHERCODE');
 
-        expect(cubit.state.appliedPromoCode, 'OTHERCODE');
-        expect(cubit.state.appliedOfferId, isNull);
-        expect(cubit.state.rememberedOfferId, 'offer-1');
+        expect(cubit.pricing.state.appliedPromoCode, 'OTHERCODE');
+        expect(cubit.pricing.state.appliedOfferId, isNull);
+        expect(cubit.pricing.state.rememberedOfferId, 'offer-1');
       },
     );
 
@@ -178,11 +178,11 @@ void main() {
       final cubit = buildCubit(repo);
       addTearDown(cubit.close);
 
-      await cubit.applyOffer('offer-1');
-      await cubit.repriceForDisplayWithoutPromo();
+      await cubit.pricing.applyOffer('offer-1');
+      await cubit.pricing.repriceForDisplayWithoutPromo();
 
-      expect(cubit.state.rememberedOfferId, 'offer-1');
-      expect(cubit.state.appliedOfferId, 'offer-1');
+      expect(cubit.pricing.state.rememberedOfferId, 'offer-1');
+      expect(cubit.pricing.state.appliedOfferId, 'offer-1');
     });
 
     test('an offer the summary RE-QUOTE refuses is forgotten', () async {
@@ -207,12 +207,12 @@ void main() {
       final cubit = buildCubit(repo);
       addTearDown(cubit.close);
 
-      await cubit.applyOffer('offer-1');
-      expect(cubit.state.rememberedOfferId, 'offer-1');
+      await cubit.pricing.applyOffer('offer-1');
+      expect(cubit.pricing.state.rememberedOfferId, 'offer-1');
 
-      await cubit.reprice();
+      await cubit.pricing.reprice();
 
-      expect(cubit.state.rememberedOfferId, isNull);
+      expect(cubit.pricing.state.rememberedOfferId, isNull);
     });
 
     test('an unanswered summary re-quote forgets nothing', () async {
@@ -230,11 +230,11 @@ void main() {
       final cubit = buildCubit(repo);
       addTearDown(cubit.close);
 
-      await cubit.applyOffer('offer-1');
-      await cubit.reprice();
+      await cubit.pricing.applyOffer('offer-1');
+      await cubit.pricing.reprice();
 
       expect(
-        cubit.state.rememberedOfferId,
+        cubit.pricing.state.rememberedOfferId,
         'offer-1',
         reason:
             'a timeout is not a verdict — the same discipline that guards '
@@ -259,8 +259,8 @@ void main() {
       await tester.tap(reapplyCard);
       await settle(tester);
 
-      expect(cubit.state.appliedOfferId, 'offer-1');
-      expect(cubit.state.appliedPromoCode, offerResolvedPromoCode);
+      expect(cubit.pricing.state.appliedOfferId, 'offer-1');
+      expect(cubit.pricing.state.appliedPromoCode, offerResolvedPromoCode);
       expect(reapplyCard, findsNothing);
 
       // The wire rule: an offer travels as an id, never alongside a code —
@@ -292,7 +292,7 @@ void main() {
             're-price the customer did not ask for is worse than an offer to '
             'restore one',
       );
-      expect(cubit.state.appliedOfferId, isNull);
+      expect(cubit.pricing.state.appliedOfferId, isNull);
     });
 
     testWidgets('an offer the server REFUSES on re-apply is forgotten', (
@@ -326,7 +326,7 @@ void main() {
       await tester.tap(reapplyCard);
       await settle(tester);
 
-      expect(cubit.state.rememberedOfferId, isNull);
+      expect(cubit.pricing.state.rememberedOfferId, isNull);
       expect(
         reapplyCard,
         findsNothing,
@@ -363,9 +363,9 @@ void main() {
       await tester.tap(reapplyCard);
       await settle(tester);
 
-      expect(cubit.state.appliedOfferId, isNull);
+      expect(cubit.pricing.state.appliedOfferId, isNull);
       expect(
-        cubit.state.rememberedOfferId,
+        cubit.pricing.state.rememberedOfferId,
         'offer-1',
         reason:
             'the server never answered, so the offer is still the '
@@ -431,12 +431,13 @@ void main() {
       addTearDown(cubit.close);
 
       await pumpSummary(tester, cubit);
-      expect(cubit.state.rememberedOfferId, 'offer-1');
+      expect(cubit.pricing.state.rememberedOfferId, 'offer-1');
 
-      // initBooking is the flow restart — a brand new state, so nothing of the
-      // previous booking's offer can leak into this one.
-      cubit.initBooking(service, existingCar: car, existingAddress: address);
-      expect(cubit.state.rememberedOfferId, isNull);
+      // The router builds new cubits for every flow — a brand new state, so
+      // nothing of the previous booking's offer can leak into this one.
+      final fresh = buildCubit(repo);
+      addTearDown(fresh.close);
+      expect(fresh.pricing.state.rememberedOfferId, isNull);
     });
   });
 }

@@ -8,19 +8,23 @@ import '../../../../../core/components/custom_button.dart';
 import '../../../../../core/components/bottom_action_sheet_container.dart';
 import '../../../../../generated/locale_keys.g.dart';
 import '../../../data/models/payment_init_model.dart';
-import '../../controllers/booking_cubit.dart';
+import '../../controllers/booking_payment_cubit.dart';
+import '../../controllers/booking_pricing_cubit.dart';
+import '../../controllers/booking_pricing_state.dart';
 import '../../controllers/booking_state.dart';
 import '../../views/moyasar_payment_view.dart';
 import 'booking_payable_total.dart';
 
 class BookingSummaryBottomActionSheet extends StatelessWidget {
   final BookingState bookingState;
+  final BookingPricingState pricingState;
   final String? appliedPromoCode;
   final int? Function() getPointsToApply;
 
   const BookingSummaryBottomActionSheet({
     super.key,
     required this.bookingState,
+    required this.pricingState,
     required this.appliedPromoCode,
     required this.getPointsToApply,
   });
@@ -47,13 +51,10 @@ class BookingSummaryBottomActionSheet extends StatelessWidget {
     return false;
   }
 
-  double _calculateTotal(BookingState state) =>
-      payableTotalMajor(state.quote?.breakdown);
-
   @override
   Widget build(BuildContext context) {
     final config = bookingState.flowConfig;
-    final total = _calculateTotal(bookingState);
+    final total = payableTotalMajor(pricingState.quote?.breakdown);
     final hasPayableAddon = _hasPayableAddon(bookingState);
     final needsPayment = needsPaymentMethod(
       payableTotal: total,
@@ -61,7 +62,7 @@ class BookingSummaryBottomActionSheet extends StatelessWidget {
     );
     final priceLocked = isPriceLocked(
       config: config,
-      quote: bookingState.quote,
+      quote: pricingState.quote,
     );
     final servicePicked = _servicePicked(bookingState);
     final isEnabled =
@@ -74,7 +75,8 @@ class BookingSummaryBottomActionSheet extends StatelessWidget {
         text: LocaleKeys.bookings_confirm_booking.tr(context: context),
         enabled: isEnabled,
         onPressed: () async {
-          final cubit = context.read<BookingCubit>();
+          final pricing = context.read<BookingPricingCubit>();
+          final payment = context.read<BookingPaymentCubit>();
           if (!_servicePicked(bookingState)) {
             context.showErrorSnackBar(
               LocaleKeys.bookings_service_selection_required.tr(
@@ -85,20 +87,20 @@ class BookingSummaryBottomActionSheet extends StatelessWidget {
           }
 
           if (!needsPayment && !config.isNormal) {
-            await cubit.submitBooking();
+            await payment.submitBooking();
             return;
           }
 
           final PaymentInitModel? init;
           if (config.isPackage) {
-            init = await cubit.initiateWashAddonPayment();
+            init = await payment.initiateWashAddonPayment();
           } else {
-            final existing = cubit.state.quote;
+            final existing = pricing.state.quote;
             if (existing != null &&
                 DateTime.now().isAfter(existing.expiresAt)) {
               final previousGross = existing.breakdown?.gross;
               final pts = getPointsToApply();
-              final refreshed = await cubit.fetchQuote(
+              final refreshed = await pricing.fetchQuote(
                 promoCode: appliedPromoCode,
                 pointsToApply: pts,
               );
@@ -113,11 +115,11 @@ class BookingSummaryBottomActionSheet extends StatelessWidget {
               }
             }
             final pts = getPointsToApply();
-            init = await cubit.initiatePayment(pointsToApply: pts);
+            init = await payment.initiatePayment(pointsToApply: pts);
           }
           if (init == null || !context.mounted) return;
           if (!shouldOpenPaymentSdk(init)) {
-            await cubit.submitBooking();
+            await payment.submitBooking();
             return;
           }
           await PaymentSdkConfigService.instance.ensureLoaded();
@@ -138,10 +140,10 @@ class BookingSummaryBottomActionSheet extends StatelessWidget {
           if (!context.mounted) return;
           switch (result?.status) {
             case MoyasarPaymentStatus.paid:
-              await cubit.completeBookingAfterPayment(result!.paymentId!);
+              await payment.completeBookingAfterPayment(result!.paymentId!);
               break;
             case MoyasarPaymentStatus.failed:
-              cubit.onPaymentCancelled();
+              payment.onPaymentCancelled();
               if (context.mounted) {
                 context.showErrorSnackBar(
                   context.isAr
@@ -152,7 +154,7 @@ class BookingSummaryBottomActionSheet extends StatelessWidget {
               break;
             case MoyasarPaymentStatus.cancelled:
             case null:
-              cubit.onPaymentCancelled();
+              payment.onPaymentCancelled();
               break;
           }
         },

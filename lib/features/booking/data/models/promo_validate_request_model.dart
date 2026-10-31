@@ -12,9 +12,9 @@ class PromoValidateRequestModel {
   });
 
   Map<String, dynamic> toJson() => {
-        'code': code,
-        'packageId': packageId,
-        'lat': lat,
-        'lng': lng,
-      };
+    'code': code,
+    'packageId': packageId,
+    'lat': lat,
+    'lng': lng,
+  };
 }
