@@ -93,12 +93,13 @@ class _BookingDetailsViewState extends State<BookingDetailsView> {
                 previous.status != current.status,
             listener: _onSubmitStatusChanged,
           ),
-          // While this screen is on top, the price it shows is its own to report.
+          // Reported whatever is on top of this screen: a re-price can land after
+          // the customer has moved on. The summary reports it too, and a
+          // snackbar replaces the one before it, so they still see one message.
           BlocListener<BookingPricingCubit, BookingPricingState>(
             listenWhen: (previous, current) =>
                 previous.status != current.status &&
-                current.status == BookingStatus.failure &&
-                (ModalRoute.of(context)?.isCurrent ?? true),
+                current.status == BookingStatus.failure,
             listener: (context, state) {
               context.showErrorSnackBar(state.errorMessage ?? '');
             },

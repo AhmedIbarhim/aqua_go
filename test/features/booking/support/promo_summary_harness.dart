@@ -19,6 +19,7 @@ import 'package:aqua_go/features/booking/presentation/controllers/booking_paymen
 import 'package:aqua_go/features/booking/presentation/controllers/booking_pricing_cubit.dart';
 import 'package:aqua_go/features/booking/presentation/views/booking_summary_view.dart';
 import 'package:aqua_go/core/config/di/service_locator.dart';
+import 'package:aqua_go/core/route/app_router.dart';
 import 'package:aqua_go/features/booking/presentation/views/booking_details_view.dart';
 import 'package:aqua_go/features/home/data/models/add_on_model.dart';
 import 'package:aqua_go/features/my_cars/data/data_sources/cars_remote_data_source.dart';
@@ -252,6 +253,45 @@ Widget _localizedApp(BookingFlowCubits cubit, Widget home) {
         ),
       ),
     ),
+  );
+}
+
+/// The app as it really runs the booking flow: the real [AppRouter] behind a
+/// real navigator, so routes create the cubits themselves.
+Widget routedApp(GlobalKey<NavigatorState> navigatorKey) {
+  return EasyLocalization(
+    supportedLocales: const [Locale('en'), Locale('ar')],
+    path: 'assets/translations',
+    fallbackLocale: const Locale('en'),
+    startLocale: const Locale('en'),
+    saveLocale: false,
+    assetLoader: _InMemoryTranslations(_enTranslations!),
+    child: Builder(
+      builder: (context) => MultiBlocProvider(
+        providers: [
+          BlocProvider<LanguageCubit>(create: (_) => LanguageCubit()),
+          BlocProvider<ThemeCubit>(create: (_) => ThemeCubit()),
+        ],
+        child: MaterialApp(
+          navigatorKey: navigatorKey,
+          locale: context.locale,
+          supportedLocales: context.supportedLocales,
+          localizationsDelegates: context.localizationDelegates,
+          theme: ThemeData(extensions: const [darkAppColors]),
+          onGenerateRoute: AppRouter.generateRoute,
+          home: const SizedBox.shrink(),
+        ),
+      ),
+    ),
+  );
+}
+
+/// What the details and summary screens pull from the service locator.
+void registerFlowScreenFakes() {
+  _ensureWalletRepositoryRegistered();
+  if (locator.isRegistered<MyCarsCubit>()) locator.unregister<MyCarsCubit>();
+  locator.registerFactory<MyCarsCubit>(
+    () => MyCarsCubit(carsRepository: _NoCarsRepository()),
   );
 }
 
